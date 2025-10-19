@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preguntas Frecuentes - FutureLabs</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/notifications.css">
+    <link rel="stylesheet" href="css/informational-pages.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/typography.css">
+    <style>
+        .faq-page {
+            min-height: 100vh;
+            padding-top: 100px;
+            padding-bottom: 60px;
+        }
+        
+        .faq-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 0;
+            margin-bottom: 40px;
+        }
+        
+        .faq-header h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        
+        .faq-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .faq-category {
+            margin-bottom: 50px;
+        }
+        
+        .faq-category h2 {
+            font-size: 28px;
+            margin-bottom: 25px;
+            color: #333;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .faq-item {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .faq-question {
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .faq-question:hover {
+            background: #f8f9fa;
+        }
+        
+        .faq-question h3 {
+            font-size: 18px;
+            margin: 0;
+            color: #333;
+            flex: 1;
+        }
+        
+        .faq-question i {
+            color: #667eea;
+            transition: transform 0.3s ease;
+        }
+        
+        .faq-item.active .faq-question i {
+            transform: rotate(180deg);
+        }
+        
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+        }
+        
+        .faq-answer-content {
+            padding: 0 20px 20px 20px;
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .search-box {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Dinámico -->
+    <header id="mainHeader"></header>
+
+    <!-- FAQ Page -->
+    <div class="faq-page">
+        <div class="faq-header">
+            <div class="container">
+                <h1>Preguntas Frecuentes</h1>
+                <p>Encuentra respuestas a tus dudas</p>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="faq-container">
+                <!-- Search Box -->
+                <div class="search-box">
+                    <input type="text" placeholder="Buscar en preguntas frecuentes..." id="faqSearch">
+                </div>
+
+                <!-- Compras -->
+                <div class="faq-category" data-category="compras">
+                    <h2><i class="fas fa-shopping-cart"></i> Compras</h2>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>¿Cómo puedo realizar una compra?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Es muy sencillo. Solo necesitas:</p>
+                                <ol>
+                                    <li>Buscar el producto que deseas</li>
+                                    <li>Agregarlo a tu carrito</li>
+                                    <li>Ir al checkout y completar tus datos</li>
+                                    <li>Seleccionar tu método de pago</li>
+                                    <li>Confirmar tu pedido</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>¿Qué métodos de pago aceptan?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Aceptamos múltiples métodos de pago:</p>
+                                <ul>
+                                    <li>Tarjetas de crédito/débito (Visa, MasterCard, Amex)</li>
+                                    <li>PayPal</li>
+                                    <li>Yape</li>
+                                    <li>Plin</li>
+                                    <li>PagoEfectivo</li>
+                                    <li>Efectivo contra entrega</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>¿Cuánto tiempo tarda el envío?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>El tiempo de envío depende de tu ubicación:</p>
+                                <ul>
+                                    <li><strong>Lima Metropolitana:</strong> 1-2 días hábiles</li>
+                                    <li><strong>Provincias:</strong> 3-5 días hábiles</li>
+                                    <li><strong>Regiones:</strong> 5-7 días hábiles</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>¿Ofrecen envío gratis?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Sí, ofrecemos envío gratis en compras mayores a S/ 200 en Lima Metropolitana.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Devoluciones -->
+                <div class="faq-category" data-category="devoluciones">
+                    <h2><i class="fas fa-undo"></i> Devoluciones y Garantías</h2>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>¿Puedo devolver un producto?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Sí, puedes devolver productos en un plazo de 15 días desde la compra, siempre que:</p>
+                                <ul>
+                                    <li>El producto esté en su empaque original</li>
+                                    <li>No haya sido usado</li>
+                                    <li>Incluya todos los accesorios</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>¿Qué garantía tienen los productos?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Todos nuestros productos tienen garantía de fábrica. Además, ofrecemos garantía extendida en productos seleccionados.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cuenta -->
+                <div class="faq-category" data-category="cuenta">
+                    <h2><i class="fas fa-user"></i> Mi Cuenta</h2>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>¿Cómo creo una cuenta?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Puedes crear una cuenta haciendo clic en "Cuenta" en el header y luego en "Regístrate". Solo necesitas tu email y contraseña.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>¿Cómo recupero mi contraseña?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>En la página de login, haz clic en "¿Olvidaste tu contraseña?" y sigue las instrucciones que te enviaremos por email.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Productos -->
+                <div class="faq-category" data-category="productos">
+                    <h2><i class="fas fa-box"></i> Productos</h2>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>¿Son productos originales?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Sí, todos nuestros productos son 100% originales y cuentan con garantía de fábrica.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>¿Puedo ver el producto antes de comprarlo?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Puedes visitar nuestras tiendas físicas para ver los productos. También ofrecemos fotos de alta calidad y videos en cada producto.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer id="mainFooter"></footer>
+
+    <!-- Modals -->
+    <div id="loginModal" class="modal-overlay"></div>
+    <div id="registerModal" class="modal-overlay"></div>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/modals.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/components.js"></script>
+
+    
+    <script>
+        // Inicializar componentes
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar header dinámico (sin barra de búsqueda)
+            const headerContainer = document.getElementById('mainHeader');
+            if (headerContainer && window.Components) {
+                headerContainer.innerHTML = window.Components.getHeader(false, false);
+                window.Components.initHeader();
+            }
+
+            // Renderizar header y footer
+            }
+
+            if (footerContainer && window.Components) {
+                footerContainer.innerHTML = window.Components.getFooter();
+            }
+
+            // Inicializar contador de carrito
+            if (window.Components) {
+                window.Components.initCartCounter();
+            }
+
+            // Toggle FAQ items
+            document.querySelectorAll('.faq-question').forEach(question => {
+                question.addEventListener('click', function() {
+                    const item = this.parentElement;
+                    const isActive = item.classList.contains('active');
+                    
+                    // Cerrar todos los items
+                    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+                    
+                    // Abrir el item clickeado si no estaba activo
+                    if (!isActive) {
+                        item.classList.add('active');
+                    }
+                });
+            });
+
+            // Búsqueda en FAQ
+            const faqSearch = document.getElementById('faqSearch');
+            if (faqSearch) {
+                faqSearch.addEventListener('input', function(e) {
+                    const searchTerm = e.target.value.toLowerCase();
+                    
+                    document.querySelectorAll('.faq-item').forEach(item => {
+                        const question = item.querySelector('.faq-question h3').textContent.toLowerCase();
+                        const answer = item.querySelector('.faq-answer-content').textContent.toLowerCase();
+                        
+                        if (question.includes(searchTerm) || answer.includes(searchTerm)) {
+                            item.style.display = 'block';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+

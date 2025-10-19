@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FutureLabs - Tu portal al futuro | Tecnología y Electrónica</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="FutureLabs - Tu tienda online de tecnología. Encuentra los mejores smartphones, laptops, tablets, smart home y más. Envío gratis y garantía oficial.">
+    <meta name="keywords" content="tecnología, smartphones, laptops, tablets, smart home, gaming, electrónica, FutureLabs, comprar tecnología">
+    <meta name="author" content="FutureLabs">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="Spanish">
+    <meta name="revisit-after" content="7 days">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="FutureLabs - Tu portal al futuro">
+    <meta property="og:description" content="Tu tienda online de tecnología. Encuentra los mejores smartphones, laptops, tablets y más.">
+    <meta property="og:image" content="http://localhost:8080/assets/images/banners/hero-banner.jpg">
+    <meta property="og:url" content="http://localhost:8080/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="FutureLabs">
+    <meta property="og:locale" content="es_PE">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="FutureLabs - Tu portal al futuro">
+    <meta name="twitter:description" content="Tu tienda online de tecnología. Encuentra los mejores smartphones, laptops, tablets y más.">
+    <meta name="twitter:image" content="http://localhost:8080/assets/images/banners/hero-banner.jpg">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="FutureLabs">
+    <link rel="apple-touch-icon" href="/icons/icon-192.svg">
+    <link rel="manifest" href="/manifest.webmanifest">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="http://localhost:8080/">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS Base - Sistema de Diseño y Estilos Fundamentales -->
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/typography.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    
+    <!-- CSS de Componentes - Componentes Específicos -->
+    <link rel="stylesheet" href="css/notifications.css">
+    <link rel="stylesheet" href="css/autocomplete.css">
+    <link rel="stylesheet" href="css/related-products.css">
+    <link rel="stylesheet" href="css/comparator.css">
+    <link rel="stylesheet" href="css/product-cards.css">
+    
+    <!-- CSS Premium - Efectos y Animaciones Avanzadas -->
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/premium-effects.css">
+    <link rel="stylesheet" href="css/skeleton.css">
+</head>
+<body>
+    <!-- Header -->
+    <header id="mainHeader"></header>
+
+    <!-- Megamenú -->
+<div class="mega-menu-overlay" id="megaMenuOverlay"></div>
+<div class="mega-menu" id="megaMenu">
+    <div class="mega-menu-container">
+        <!-- Encabezado -->
+        <div class="mega-menu-header">
+            <div class="welcome-text">
+                <i class="fas fa-rocket"></i>
+                ¡Hola, explorador del futuro!
+            </div>
+            <button class="close-menu" id="closeMenu">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="mega-menu-content">
+            <!-- Columna Izquierda - Categorías Principales -->
+            <div class="categories-column">
+                <div class="category-item active" data-category="laptops">
+                    <span class="category-text">Laptops & Cómputo</span>
+                    <i class="fas fa-chevron-right"></i>
+                    <div class="active-indicator"></div>
+                </div>
+                <div class="category-item" data-category="celulares">
+                    <span class="category-text">Celulares & Wearables</span>
+                    <i class="fas fa-chevron-right"></i>
+                    <div class="active-indicator"></div>
+                </div>
+                <div class="category-item" data-category="gaming">
+                    <span class="category-text">Gaming</span>
+                    <i class="fas fa-chevron-right"></i>
+                    <div class="active-indicator"></div>
+                </div>
+                <div class="category-item" data-category="smart-home">
+                    <span class="category-text">Smart Home</span>
+                    <i class="fas fa-chevron-right"></i>
+                    <div class="active-indicator"></div>
+                </div>
+                <div class="category-item" data-category="audio-video">
+                    <span class="category-text">Audio & Video</span>
+                    <i class="fas fa-chevron-right"></i>
+                    <div class="active-indicator"></div>
+                </div>
+                <div class="category-item" data-category="drones">
+                    <span class="category-text">Drones & Cámaras</span>
+                    <i class="fas fa-chevron-right"></i>
+                    <div class="active-indicator"></div>
+                </div>
+                <div class="category-item" data-category="movilidad">
+                    <span class="category-text">Movilidad Eléctrica</span>
+                    <i class="fas fa-chevron-right"></i>
+                    <div class="active-indicator"></div>
+                </div>
+                <div class="category-item" data-category="accesorios">
+                    <span class="category-text">Accesorios Tech</span>
+                    <i class="fas fa-chevron-right"></i>
+                    <div class="active-indicator"></div>
+                </div>
+            </div>
+
+            <!-- Columna Derecha - Contenido de Categoría -->
+            <div class="content-column">
+                <!-- Laptops & Cómputo -->
+                <div class="category-content active" data-category="laptops">
+                    <div class="content-header">
+                        <h2>Laptops & Cómputo</h2>
+                        <a href="#" class="view-all">Ver todo <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="subcategories-grid">
+                        <div class="subcategory-column">
+                            <h3>Componentes</h3>
+                            <ul>
+                                <li><a href="#">Procesadores (CPU)</a></li>
+                                <li><a href="#">Tarjetas de Video (GPU)</a></li>
+                                <li><a href="#">Placas Madre</a></li>
+                                <li><a href="#">Memoria RAM</a></li>
+                                <li><a href="#">Almacenamiento SSD/HDD</a></li>
+                            </ul>
+                        </div>
+                        <div class="subcategory-column">
+                            <h3>Periféricos</h3>
+                            <ul>
+                                <li><a href="#">Teclados</a></li>
+                                <li><a href="#">Mouses</a></li>
+                                <li><a href="#">Monitores</a></li>
+                                <li><a href="#">Webcams y Micrófonos</a></li>
+                                <li><a href="#">Audífonos</a></li>
+                            </ul>
+                        </div>
+                        <div class="subcategory-column">
+                            <h3>Laptops por Tipo</h3>
+                            <ul>
+                                <li><a href="#">Laptops para Gaming</a></li>
+                                <li><a href="#">Laptops Ultraligeras</a></li>
+                                <li><a href="#">Laptops para Trabajo</a></li>
+                                <li><a href="#">Laptops Convertibles 2-en-1</a></li>
+                            </ul>
+                        </div>
+                        <div class="subcategory-column">
+                            <h3>Marcas Destacadas</h3>
+                            <ul>
+                                <li><a href="#">Apple</a></li>
+                                <li><a href="#">Dell (Alienware)</a></li>
+                                <li><a href="#">HP (Omen)</a></li>
+                                <li><a href="#">Asus (ROG)</a></li>
+                                <li><a href="#">Lenovo (Legion)</a></li>
+                                <li><a href="#">Razer</a></li>
+                                <li><a href="#">Logitech</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Celulares & Wearables -->
+                <div class="category-content" data-category="celulares">
+                    <div class="content-header">
+                        <h2>Celulares & Wearables</h2>
+                        <a href="#" class="view-all">Ver todo <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="subcategories-grid">
+                        <div class="subcategory-column">
+                            <h3>Smartphones</h3>
+                            <ul>
+                                <li><a href="#">Android</a></li>
+                                <li><a href="#">iPhone</a></li>
+                                <li><a href="#">Gaming Phones</a></li>
+                                <li><a href="#">Smartphones Plegables</a></li>
+                            </ul>
+                        </div>
+                        <div class="subcategory-column">
+                            <h3>Wearables</h3>
+                            <ul>
+                                <li><a href="#">Smartwatches</a></li>
+                                <li><a href="#">Fitness Trackers</a></li>
+                                <li><a href="#">Audífonos Inalámbricos</a></li>
+                                <li><a href="#">Gafas Inteligentes</a></li>
+                            </ul>
+                        </div>
+                        <div class="subcategory-column">
+                            <h3>Accesorios</h3>
+                            <ul>
+                                <li><a href="#">Fundas y Cases</a></li>
+                                <li><a href="#">Cargadores</a></li>
+                                <li><a href="#">Power Banks</a></li>
+                                <li><a href="#">Soportes y Docks</a></li>
+                            </ul>
+                        </div>
+                        <div class="subcategory-column">
+                            <h3>Marcas</h3>
+                            <ul>
+                                <li><a href="#">Apple</a></li>
+                                <li><a href="#">Samsung</a></li>
+                                <li><a href="#">Xiaomi</a></li>
+                                <li><a href="#">Huawei</a></li>
+                                <li><a href="#">OnePlus</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gaming -->
+                <div class="category-content" data-category="gaming">
+                    <div class="content-header">
+                        <h2>Gaming</h2>
+                        <a href="#" class="view-all">Ver todo <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="subcategories-grid">
+                        <div class="subcategory-column">
+                            <h3>Consolas</h3>
+                            <ul>
+                                <li><a href="#">PlayStation</a></li>
+                                <li><a href="#">Xbox</a></li>
+                                <li><a href="#">Nintendo Switch</a></li>
+                                <li><a href="#">PC Gaming</a></li>
+                            </ul>
+                        </div>
+                        <div class="subcategory-column">
+                            <h3>Periféricos Gaming</h3>
+                            <ul>
+                                <li><a href="#">Teclados Mecánicos</a></li>
+                                <li><a href="#">Mouses Gaming</a></li>
+                                <li><a href="#">Headsets</a></li>
+                                <li><a href="#">Mousepads</a></li>
+                            </ul>
+                        </div>
+                        <div class="subcategory-column">
+                            <h3>Componentes</h3>
+                            <ul>
+                                <li><a href="#">Tarjetas Gráficas</a></li>
+                                <li><a href="#">Procesadores Gaming</a></li>
+                                <li><a href="#">Refrigeración Líquida</a></li>
+                                <li><a href="#">Gabinetes Gaming</a></li>
+                            </ul>
+                        </div>
+                        <div class="subcategory-column">
+                            <h3>Streaming</h3>
+                            <ul>
+                                <li><a href="#">Cámaras Web 4K</a></li>
+                                <li><a href="#">Micrófonos</a></li>
+                                <li><a href="#">Luces y Fondos</a></li>
+                                <li><a href="#">Capturadoras</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Los demás contenidos de categorías seguirían el mismo patrón -->
+                <!-- Por brevedad, solo muestro las primeras 3 categorías completas -->
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-slider">
+            <div class="slide active">
+                <div class="slide-content">
+                    <h1>INNOVATION DAYS</h1>
+                    <p>Descubre las mejores ofertas en tecnología de vanguardia</p>
+                    <button class="btn btn-primary btn-lg">Ver promociones</button>
+                </div>
+            </div>
+            <div class="slide">
+                <div class="slide-content">
+                    <h1>TECNOLOGÍA DEL FUTURO</h1>
+                    <p>Los dispositivos más innovadores al mejor precio</p>
+                    <button class="btn btn-primary btn-lg">Explorar productos</button>
+                </div>
+            </div>
+            <div class="slide">
+                <div class="slide-content">
+                    <h1>SMART HOME</h1>
+                    <p>Transforma tu hogar con la última tecnología</p>
+                    <button class="btn btn-primary btn-lg">Descubrir</button>
+                </div>
+            </div>
+            
+            <div class="slider-arrow prev"><i class="fas fa-chevron-left"></i></div>
+            <div class="slider-arrow next"><i class="fas fa-chevron-right"></i></div>
+            
+            <div class="slider-controls">
+                <div class="slider-dot active"></div>
+                <div class="slider-dot"></div>
+                <div class="slider-dot"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">¡Aprovecha nuestros beneficios exclusivos!</h2>
+            <div class="benefits-slider">
+                <div class="benefit-card">
+                    <div class="benefit-image">
+                        <h3>Descuentos Especiales</h3>
+                    </div>
+                    <div class="benefit-content">
+                        <p>Hasta 40% de descuento en productos seleccionados</p>
+                    </div>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-image">
+                        <h3>Envío Gratis</h3>
+                    </div>
+                    <div class="benefit-content">
+                        <p>En compras mayores a S/ 200 en todo Lima</p>
+                    </div>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-image">
+                        <h3>Meses Sin Intereses</h3>
+                    </div>
+                    <div class="benefit-content">
+                        <p>Hasta 18 meses sin intereses con tarjetas participantes</p>
+                    </div>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-image">
+                        <h3>Garantía Extendida</h3>
+                    </div>
+                    <div class="benefit-content">
+                        <p>+1 año de garantía en productos seleccionados</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Affiliate Banner -->
+    <section class="section">
+        <div class="container">
+            <div class="affiliate-banner">
+                <h2>Comienza a ganar dinero con FutureLabs Affiliates</h2>
+                <p>Únete a nuestro programa de afiliados y gana comisiones por cada venta</p>
+                <button class="cta-button">Más información</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Flash Offers -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Ofertas Flash por tiempo limitado <i class="fas fa-fire"></i></h2>
+            <div class="flash-offers-message">
+                <p>Próximamente encontrarás aquí nuestras mejores ofertas. ¡Mantente atento!</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Banner Grid -->
+    <section class="section">
+        <div class="container">
+            <div class="banner-grid">
+                <div class="banner">
+                    <h3>Gaming Zone</h3>
+                    <p>Los mejores equipos para gamers</p>
+                </div>
+                <div class="banner">
+                    <h3>Smart Home</h3>
+                    <p>Automatiza tu hogar</p>
+                </div>
+                <div class="banner">
+                    <h3>Audio Pro</h3>
+                    <p>Experiencia sonora superior</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Product Carousels by Category -->
+    <section class="section">
+        <div class="container">
+            <h3 class="section-title">Novedades en Smart Home</h3>
+            <div class="category-carousel">
+                <div class="carousel-message">
+                    <p>Nuestros productos de Smart Home estarán aquí pronto.</p>
+                </div>
+                <div class="carousel-arrow prev"><i class="fas fa-chevron-left"></i></div>
+                <div class="carousel-arrow next"><i class="fas fa-chevron-right"></i></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Descubre nuestros mundos</h2>
+            <div class="categories-carousel">
+                <div class="category-card">
+                    <div class="category-icon"><i class="fas fa-gamepad"></i></div>
+                    <h3>Mundo Gamer</h3>
+                    <p>Equipos y accesorios gaming</p>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon"><i class="fas fa-laptop"></i></div>
+                    <h3>Mundo Productividad</h3>
+                    <p>Herramientas para trabajar</p>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon"><i class="fas fa-home"></i></div>
+                    <h3>Mundo Hogar Inteligente</h3>
+                    <p>Automatización y control</p>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon"><i class="fas fa-heartbeat"></i></div>
+                    <h3>Mundo Bienestar Tech</h3>
+                    <p>Tecnología para tu salud</p>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon"><i class="fas fa-headphones"></i></div>
+                    <h3>Mundo Audio</h3>
+                    <p>Sonido de alta calidad</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEO Content -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Conoce más sobre FutureLabs</h2>
+            <p class="seo-description">FutureLabs es tu portal al futuro, una plataforma online enfocada en reunir la tecnología más innovadora en un solo lugar. Desde dispositivos inteligentes para el hogar hasta equipos de última generación para gaming y productividad, ofrecemos productos cuidadosamente seleccionados que combinan calidad, innovación y las mejores condiciones de compra.</p>
+            <div class="tag-cloud">
+                <span class="tag">laptops</span>
+                <span class="tag">celulares</span>
+                <span class="tag">drones</span>
+                <span class="tag">smartwatches</span>
+                <span class="tag">gaming</span>
+                <span class="tag">smart home</span>
+                <span class="tag">tablets</span>
+                <span class="tag">audio</span>
+                <span class="tag">wearables</span>
+                <span class="tag">accesorios</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="mainFooter"></footer>
+
+    <!-- Floating Components -->
+    <div class="sticky-footer">
+        <div class="container">
+            <p>¡Suscríbete y obtén 10% de descuento en tu primera compra!</p>
+            <button class="cta-button">Suscribirme</button>
+        </div>
+    </div>
+
+    <div class="chat-button">
+        <i class="fas fa-comments"></i>
+    </div>
+
+    <!-- Scripts del Sistema Integrado -->
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/skeleton.js"></script>
+    <script src="js/modals.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/home.js"></script>
+    <script src="js/comparator.js"></script>
+    <script src="js/autocomplete.js"></script>
+    <script src="js/carousel.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/pwa.js"></script>
+    
+    <script>
+        // Inicializar componentes cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Inicializando FutureLabs...');
+            
+            // Renderizar header y footer
+            const headerContainer = document.getElementById('mainHeader');
+            const footerContainer = document.getElementById('mainFooter');
+            
+            if (headerContainer && window.Components) {
+                headerContainer.innerHTML = window.Components.getHeader(true, true); // true = con barra de búsqueda, true = con navegación
+                window.Components.initHeader();
+                console.log('✅ Header renderizado');
+            }
+            
+            if (footerContainer && window.Components) {
+                footerContainer.innerHTML = window.Components.getFooter();
+                console.log('✅ Footer renderizado');
+            }
+            
+            // Inicializar contador de carrito
+            if (window.Components) {
+                window.Components.initCartCounter();
+                console.log('✅ Contador de carrito inicializado');
+            }
+            
+            // Inicializar modales
+            if (window.modalManager) {
+                console.log('✅ Modal manager inicializado');
+            }
+            
+            // Inicializar autenticación
+            if (window.authManager) {
+                console.log('✅ Auth manager inicializado');
+            }
+            
+            // Inicializar API
+            if (window.api) {
+                console.log('✅ API client inicializado');
+            }
+            
+            console.log('🎉 FutureLabs está listo!');
+        });
+    </script>
+</body>
+</html>

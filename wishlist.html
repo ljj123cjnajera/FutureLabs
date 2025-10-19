@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Wishlist - FutureLabs</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/notifications.css">
+    <style>
+        .wishlist-page {
+            min-height: 100vh;
+            padding-top: 100px;
+            padding-bottom: 60px;
+        }
+        
+        .wishlist-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 0;
+            margin-bottom: 40px;
+        }
+        
+        .wishlist-header h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        
+        .wishlist-stats {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .wishlist-stat {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .wishlist-stat i {
+            font-size: 32px;
+            color: #667eea;
+        }
+        
+        .wishlist-stat-content h3 {
+            font-size: 28px;
+            margin: 0;
+            color: #333;
+        }
+        
+        .wishlist-stat-content p {
+            color: #999;
+            margin: 0;
+        }
+        
+        .wishlist-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .wishlist-filters {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .filter-btn {
+            padding: 10px 20px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .wishlist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+        }
+        
+        .wishlist-item {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .wishlist-item:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+        
+        .wishlist-item-header {
+            position: relative;
+            height: 250px;
+            overflow: hidden;
+        }
+        
+        .wishlist-item-header img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .wishlist-item-remove {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .wishlist-item-remove:hover {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .wishlist-item-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: #e74c3c;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .wishlist-item-content {
+            padding: 20px;
+        }
+        
+        .wishlist-item-brand {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        
+        .wishlist-item-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        
+        .wishlist-item-name:hover {
+            color: #667eea;
+        }
+        
+        .wishlist-item-rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .wishlist-item-price {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .wishlist-item-price-old {
+            color: #999;
+            text-decoration: line-through;
+        }
+        
+        .wishlist-item-price-new {
+            font-size: 24px;
+            font-weight: 700;
+            color: #e74c3c;
+        }
+        
+        .wishlist-item-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+        
+        .wishlist-item-actions .btn {
+            flex: 1;
+        }
+        
+        .empty-wishlist {
+            text-align: center;
+            padding: 100px;
+            background: white;
+            border-radius: 12px;
+        }
+        
+        .empty-wishlist i {
+            font-size: 80px;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .empty-wishlist h2 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .empty-wishlist p {
+            color: #999;
+            margin-bottom: 30px;
+        }
+        
+        /* Los botones ahora usan las clases del sistema de diseño */
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <!-- Header Dinámico -->
+    <header id="mainHeader"></header>
+
+    <!-- Wishlist Page -->
+    <div class="wishlist-page">
+        <div class="wishlist-header">
+            <div class="container">
+                <h1>Mi Wishlist</h1>
+                <p>Productos que te gustan</p>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="wishlist-stats">
+                <div class="wishlist-stat">
+                    <i class="fas fa-heart"></i>
+                    <div class="wishlist-stat-content">
+                        <h3 id="wishlistCount">0</h3>
+                        <p>Productos guardados</p>
+                    </div>
+                </div>
+                <div class="wishlist-stat">
+                    <i class="fas fa-percent"></i>
+                    <div class="wishlist-stat-content">
+                        <h3 id="onSaleCount">0</h3>
+                        <p>En oferta</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="wishlist-actions">
+                <div class="wishlist-filters">
+                    <button class="filter-btn active" data-filter="all">Todos</button>
+                    <button class="filter-btn" data-filter="on-sale">En Oferta</button>
+                    <button class="filter-btn" data-filter="available">Disponibles</button>
+                </div>
+            </div>
+
+            <div id="wishlistContainer">
+                <div style="text-align: center; padding: 100px;">
+                    <i class="fas fa-spinner fa-spin fa-3x"></i>
+                    <p>Cargando wishlist...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <!-- Scripts del Sistema Integrado -->
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/skeleton.js"></script>
+    <script src="js/modals.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/wishlist.js"></script>
+    <script src="js/components.js"></script>
+    
+    <script>
+        // Inicializar header dinámico (sin barra de búsqueda)
+        document.addEventListener('DOMContentLoaded', function() {
+            const headerContainer = document.getElementById('mainHeader');
+            if (headerContainer && window.Components) {
+                headerContainer.innerHTML = window.Components.getHeader(false, false); // false = sin barra de búsqueda, false = sin navegación
+                window.Components.initHeader();
+            }
+        let wishlistItems = [];
+        let currentFilter = 'all';
+        
+        // Usar wishlistManager global
+        const wishlistManager = window.wishlistManager;
+
+        // Cargar wishlist
+        async function loadWishlist() {
+            const container = document.getElementById('wishlistContainer');
+            
+            try {
+                // Verificar autenticación
+                if (!window.authManager || !window.authManager.isAuthenticated()) {
+                    container.innerHTML = `
+                        <div class="empty-wishlist">
+                            <i class="fas fa-lock"></i>
+                            <h2>Inicia sesión para ver tu wishlist</h2>
+                            <p>Necesitas estar autenticado para ver tus productos favoritos</p>
+                            <button onclick="window.location.href='index.html'" class="btn btn-primary">Ir a Inicio</button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const response = await window.api.getWishlist();
+                
+                if (response.success) {
+                    wishlistItems = response.data.items;
+                    renderWishlist();
+                } else {
+                    container.innerHTML = `
+                        <div class="empty-wishlist">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <h2>Error al cargar wishlist</h2>
+                            <p>${response.message}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="empty-wishlist">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h2>Error al cargar wishlist</h2>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Renderizar wishlist
+        function renderWishlist() {
+            const container = document.getElementById('wishlistContainer');
+            
+            // Filtrar items
+            let filteredItems = wishlistItems;
+            if (currentFilter === 'on-sale') {
+                filteredItems = wishlistItems.filter(item => item.discount_price);
+            } else if (currentFilter === 'available') {
+                filteredItems = wishlistItems.filter(item => item.stock_quantity > 0);
+            }
+
+            // Actualizar estadísticas
+            document.getElementById('wishlistCount').textContent = wishlistItems.length;
+            document.getElementById('onSaleCount').textContent = 
+                wishlistItems.filter(item => item.discount_price).length;
+
+            if (filteredItems.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-wishlist">
+                        <i class="far fa-heart"></i>
+                        <h2>Tu wishlist está vacía</h2>
+                        <p>Agrega productos a tu wishlist para verlos aquí</p>
+                        <button class="btn btn-primary" onclick="window.location.href='products.html'">
+                            <i class="fas fa-shopping-bag"></i> Explorar Productos
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="wishlist-grid">
+                    ${filteredItems.map(item => `
+                        <div class="wishlist-item">
+                            <div class="wishlist-item-header">
+                                <img src="${item.image_url}" alt="${item.name}">
+                                <button class="wishlist-item-remove" onclick="removeFromWishlist('${item.id}')">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                                ${item.discount_price ? '<div class="wishlist-item-badge">Oferta</div>' : ''}
+                            </div>
+                            <div class="wishlist-item-content">
+                                <div class="wishlist-item-brand">${item.brand}</div>
+                                <div class="wishlist-item-name" onclick="window.location.href='product-detail.html?id=${item.id}'">
+                                    ${item.name}
+                                </div>
+                                <div class="wishlist-item-rating">
+                                    ${generateStars(item.rating)}
+                                    <span style="color: #999; font-size: 14px;">(${item.review_count})</span>
+                                </div>
+                                <div class="wishlist-item-price">
+                                    ${item.discount_price ? `
+                                        <span class="wishlist-item-price-old">S/ ${parseFloat(item.price).toFixed(2)}</span>
+                                        <span class="wishlist-item-price-new">S/ ${parseFloat(item.discount_price).toFixed(2)}</span>
+                                    ` : `
+                                        <span class="wishlist-item-price-new">S/ ${parseFloat(item.price).toFixed(2)}</span>
+                                    `}
+                                </div>
+                                <div class="wishlist-item-actions">
+                                    <button class="btn btn-primary" onclick="addToCart('${item.id}')">
+                                        <i class="fas fa-shopping-cart"></i> Agregar
+                                    </button>
+                                    <button class="btn btn-secondary" onclick="buyNow('${item.id}')">
+                                        Comprar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Generar estrellas
+        function generateStars(rating) {
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating % 1 >= 0.5;
+            const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+            
+            return `
+                ${'<i class="fas fa-star" style="color: #ffc107;"></i>'.repeat(fullStars)}
+                ${hasHalfStar ? '<i class="fas fa-star-half-alt" style="color: #ffc107;"></i>' : ''}
+                ${'<i class="far fa-star" style="color: #ddd;"></i>'.repeat(emptyStars)}
+            `;
+        }
+
+        // Eliminar de wishlist
+        async function removeFromWishlist(productId) {
+            try {
+                const response = await window.api.removeFromWishlist(productId);
+                
+                if (response.success) {
+                    wishlistItems = wishlistItems.filter(item => item.product_id !== productId);
+                    renderWishlist();
+                    window.notifications.success('Producto eliminado de tu wishlist');
+                } else {
+                    window.notifications.error('Error al eliminar de wishlist');
+                }
+            } catch (error) {
+                window.notifications.error('Error al eliminar de wishlist');
+            }
+        }
+
+        // Agregar al carrito
+        async function addToCart(productId) {
+            try {
+                await window.cartManager.add(productId, 1);
+                window.notifications.success('Producto agregado al carrito');
+            } catch (error) {
+                window.notifications.error('Error al agregar producto');
+            }
+        }
+
+        // Comprar ahora
+        async function buyNow(productId) {
+            try {
+                await window.cartManager.add(productId, 1);
+                window.location.href = 'checkout.html';
+            } catch (error) {
+                window.notifications.error('Error al procesar compra');
+            }
+        }
+
+        // Filtros
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.dataset.filter;
+                renderWishlist();
+            });
+        });
+
+        // Actualizar contador de carrito
+        document.addEventListener('cartUpdated', (e) => {
+            const cartCount = document.querySelector('.cart-count');
+            if (cartCount) {
+                cartCount.textContent = e.detail.count;
+            }
+        });
+
+        // Inicializar header dinámico (sin barra de búsqueda)
+        document.addEventListener('DOMContentLoaded', function() {
+            const headerContainer = document.getElementById('mainHeader');
+            if (headerContainer && window.Components) {
+                headerContainer.innerHTML = window.Components.getHeader(false, false); // false = sin barra de búsqueda, false = sin navegación
+                window.Components.initHeader();
+            }
+        });
+
+        // Cargar wishlist al iniciar
+        loadWishlist();
+    </script>
+</body>
+</html>
+

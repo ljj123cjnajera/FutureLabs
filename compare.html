@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparar Productos - FutureLabs</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/notifications.css">
+    <link rel="stylesheet" href="css/blog-compare.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/typography.css">
+    <link rel="stylesheet" href="css/product-cards.css">
+    <style>
+        .compare-page {
+            min-height: 100vh;
+            background: #f5f7fa;
+            padding: 40px 20px;
+        }
+        
+        .compare-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .compare-header {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .compare-header h1 {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .compare-header p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .compare-table {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .compare-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .compare-table th {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .compare-table td {
+            padding: 20px;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: top;
+        }
+        
+        .compare-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .product-column {
+            width: 250px;
+            background: #f8f9fa;
+        }
+        
+        .product-card {
+            text-align: center;
+        }
+        
+        .product-image {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .product-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        
+        .product-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .product-price-old {
+            font-size: 18px;
+            color: #999;
+            text-decoration: line-through;
+            margin-right: 10px;
+        }
+        
+        .product-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .btn-add-cart {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-add-cart:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-add-wishlist {
+            padding: 12px 20px;
+            background: #f8f9fa;
+            color: #666;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-add-wishlist:hover {
+            background: #e9ecef;
+        }
+        
+        .btn-remove {
+            padding: 12px 20px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-remove:hover {
+            background: #c0392b;
+        }
+        
+        .spec-label {
+            font-weight: 600;
+            color: #666;
+        }
+        
+        .spec-value {
+            color: #333;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+        
+        .empty-state i {
+            font-size: 80px;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .empty-state h3 {
+            font-size: 24px;
+            color: #999;
+            margin-bottom: 10px;
+        }
+        
+        .empty-state p {
+            color: #999;
+            margin-bottom: 30px;
+        }
+        
+        .btn-browse {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-browse:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .comparison-row {
+            display: flex;
+        }
+        
+        .comparison-cell {
+            flex: 1;
+            padding: 20px;
+            border-right: 1px solid #f0f0f0;
+        }
+        
+        .comparison-cell:last-child {
+            border-right: none;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .compare-table {
+                overflow-x: auto;
+            }
+            
+            .product-column {
+                width: 200px;
+            }
+            
+            .product-image {
+                width: 150px;
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Dinámico -->
+    <header id="mainHeader"></header>
+
+    <!-- Compare Page -->
+    <section class="compare-page">
+        <div class="compare-container">
+            <div class="compare-header">
+                <h1><i class="fas fa-balance-scale"></i> Comparar Productos</h1>
+                <p>Compara hasta 3 productos lado a lado</p>
+            </div>
+
+            <div id="compareContent">
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin fa-3x"></i>
+                    <p>Cargando comparación...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="mainFooter"></footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/comparator.js"></script>
+    
+    <script>
+        async function loadComparison() {
+            const products = window.productComparator.getProducts();
+            const container = document.getElementById('compareContent');
+            
+            if (products.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-balance-scale"></i>
+                        <h3>No hay productos para comparar</h3>
+                        <p>Agrega productos desde la página de productos para compararlos</p>
+                        <a href="products.html" class="btn-browse">
+                            <i class="fas fa-shopping-bag"></i> Ver Productos
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Obtener detalles completos de los productos
+            const detailedProducts = await Promise.all(
+                products.map(async (product) => {
+                    try {
+                        const response = await window.api.getProductById(product.id);
+                        return response.success ? response.data.product : null;
+                    } catch (error) {
+                        return null;
+                    }
+                })
+            );
+            
+            // Filtrar productos nulos
+            const validProducts = detailedProducts.filter(p => p !== null);
+            
+            if (validProducts.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>Error al cargar productos</h3>
+                        <p>No se pudieron cargar los productos para comparar</p>
+                        <a href="products.html" class="btn-browse">
+                            <i class="fas fa-shopping-bag"></i> Ver Productos
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Renderizar tabla de comparación
+            renderComparisonTable(validProducts);
+        }
+        
+        function renderComparisonTable(products) {
+            const container = document.getElementById('compareContent');
+            
+            container.innerHTML = `
+                <div class="compare-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="product-column">Producto</th>
+                                ${products.map(product => `
+                                    <th>
+                                        <div class="product-card">
+                                            <img src="${product.image_url || 'https://via.placeholder.com/200'}" 
+                                                 alt="${product.name}" 
+                                                 class="product-image">
+                                            <div class="product-name">${product.name}</div>
+                                            <div class="product-price">
+                                                ${product.discount_price ? `
+                                                    <span class="product-price-old">S/ ${parseFloat(product.price).toFixed(2)}</span>
+                                                    S/ ${parseFloat(product.discount_price).toFixed(2)}
+                                                ` : `
+                                                    S/ ${parseFloat(product.price).toFixed(2)}
+                                                `}
+                                            </div>
+                                            <div class="product-actions d-flex flex-col gap-sm">
+                                                <button class="btn btn-primary btn-sm" onclick="addToCart('${product.id}')">
+                                                    <i class="fas fa-shopping-cart"></i> Agregar al Carrito
+                                                </button>
+                                                <button class="btn btn-outline btn-sm" onclick="addToWishlist('${product.id}')">
+                                                    <i class="fas fa-heart"></i> Agregar a Wishlist
+                                                </button>
+                                                <button class="btn btn-error btn-sm" onclick="removeFromComparison('${product.id}')">
+                                                    <i class="fas fa-times"></i> Eliminar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </th>
+                                `).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="spec-label">Categoría</td>
+                                ${products.map(product => `
+                                    <td class="spec-value">${product.category_name || 'N/A'}</td>
+                                `).join('')}
+                            </tr>
+                            <tr>
+                                <td class="spec-label">Marca</td>
+                                ${products.map(product => `
+                                    <td class="spec-value">${product.brand || 'N/A'}</td>
+                                `).join('')}
+                            </tr>
+                            <tr>
+                                <td class="spec-label">SKU</td>
+                                ${products.map(product => `
+                                    <td class="spec-value">${product.sku || 'N/A'}</td>
+                                `).join('')}
+                            </tr>
+                            <tr>
+                                <td class="spec-label">Stock</td>
+                                ${products.map(product => `
+                                    <td class="spec-value ${product.stock_quantity > 0 ? 'highlight' : ''}">
+                                        ${product.stock_quantity > 0 ? `${product.stock_quantity} disponibles` : 'Agotado'}
+                                    </td>
+                                `).join('')}
+                            </tr>
+                            <tr>
+                                <td class="spec-label">Peso</td>
+                                ${products.map(product => `
+                                    <td class="spec-value">${product.weight || 'N/A'}</td>
+                                `).join('')}
+                            </tr>
+                            <tr>
+                                <td class="spec-label">Dimensiones</td>
+                                ${products.map(product => `
+                                    <td class="spec-value">${product.dimensions || 'N/A'}</td>
+                                `).join('')}
+                            </tr>
+                            <tr>
+                                <td class="spec-label">Descripción</td>
+                                ${products.map(product => `
+                                    <td class="spec-value">${product.description ? product.description.substring(0, 100) + '...' : 'N/A'}</td>
+                                `).join('')}
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+        
+        async function addToCart(productId) {
+            try {
+                await window.cartManager.add(productId, 1);
+                window.notifications.show('Producto agregado al carrito', 'success');
+            } catch (error) {
+                window.notifications.show('Error al agregar al carrito', 'error');
+            }
+        }
+        
+        async function addToWishlist(productId) {
+            try {
+                await window.api.addToWishlist(productId);
+                window.notifications.success('Producto agregado a wishlist');
+            } catch (error) {
+                window.notifications.error('Error al agregar a wishlist');
+            }
+        }
+        
+        function removeFromComparison(productId) {
+            window.productComparator.removeProduct(productId);
+            loadComparison();
+        }
+        
+        // Cargar comparación al iniciar
+        loadComparison();
+    </script>
+</body>
+</html>
+
+

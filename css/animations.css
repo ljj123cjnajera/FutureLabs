@@ -1,0 +1,1548 @@
+/* ✨ Animaciones y Transiciones - FutureLabs */
+
+/* Animaciones de entrada */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeInRight {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInDown {
+    from {
+        transform: translateY(-100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+/* Animaciones de salida */
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes fadeOutDown {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+}
+
+@keyframes scaleOut {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+}
+
+/* Animaciones de hover */
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-10px);
+    }
+    75% {
+        transform: translateX(10px);
+    }
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Animaciones de gradiente */
+@keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Animaciones de brillo */
+@keyframes shine {
+    0% {
+        background-position: -100% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* Animaciones de onda */
+@keyframes wave {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Clases de animación */
+.animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.animate-fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.animate-fade-in-down {
+    animation: fadeInDown 0.6s ease-out;
+}
+
+.animate-fade-in-left {
+    animation: fadeInLeft 0.6s ease-out;
+}
+
+.animate-fade-in-right {
+    animation: fadeInRight 0.6s ease-out;
+}
+
+.animate-scale-in {
+    animation: scaleIn 0.4s ease-out;
+}
+
+.animate-slide-in-up {
+    animation: slideInUp 0.5s ease-out;
+}
+
+.animate-slide-in-down {
+    animation: slideInDown 0.5s ease-out;
+}
+
+.animate-slide-in-left {
+    animation: slideInLeft 0.5s ease-out;
+}
+
+.animate-slide-in-right {
+    animation: slideInRight 0.5s ease-out;
+}
+
+/* Clases de hover */
+.hover-bounce:hover {
+    animation: bounce 0.6s ease-in-out;
+}
+
+.hover-pulse:hover {
+    animation: pulse 1s ease-in-out infinite;
+}
+
+.hover-shake:hover {
+    animation: shake 0.5s ease-in-out;
+}
+
+.hover-rotate:hover {
+    animation: rotate 0.5s ease-in-out;
+}
+
+.hover-scale:hover {
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-5px);
+    transition: transform 0.3s ease;
+}
+
+.hover-glow:hover {
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+    transition: box-shadow 0.3s ease;
+}
+
+/* Clases de transición */
+.transition-all {
+    transition: all 0.3s ease;
+}
+
+.transition-fast {
+    transition: all 0.15s ease;
+}
+
+.transition-slow {
+    transition: all 0.5s ease;
+}
+
+/* Efectos de hover para tarjetas */
+.card-hover-effect {
+    transition: all 0.3s ease;
+}
+
+.card-hover-effect:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Efectos de hover para botones */
+.btn-hover-effect {
+    transition: all 0.3s ease;
+}
+
+.btn-hover-effect:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-hover-effect:active {
+    transform: translateY(0);
+}
+
+/* Efectos de hover para imágenes */
+.img-hover-effect {
+    transition: transform 0.3s ease;
+}
+
+.img-hover-effect:hover {
+    transform: scale(1.05);
+}
+
+/* Efectos de hover para iconos */
+.icon-hover-effect {
+    transition: all 0.3s ease;
+}
+
+.icon-hover-effect:hover {
+    transform: scale(1.2);
+    color: var(--primary);
+}
+
+/* Efectos de hover para enlaces */
+.link-hover-effect {
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.link-hover-effect::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--primary);
+    transition: width 0.3s ease;
+}
+
+.link-hover-effect:hover::after {
+    width: 100%;
+}
+
+/* Efectos de hover para badges */
+.badge-hover-effect {
+    transition: all 0.3s ease;
+}
+
+.badge-hover-effect:hover {
+    transform: scale(1.1);
+}
+
+/* Efectos de hover para inputs */
+.input-hover-effect {
+    transition: all 0.3s ease;
+}
+
+.input-hover-effect:hover {
+    border-color: var(--primary);
+}
+
+.input-hover-effect:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Efectos de hover para dropdowns */
+.dropdown-hover-effect {
+    transition: all 0.3s ease;
+}
+
+.dropdown-hover-effect:hover {
+    background: var(--gray-50);
+}
+
+/* Efectos de hover para modales */
+.modal-hover-effect {
+    transition: all 0.3s ease;
+}
+
+.modal-hover-effect:hover {
+    transform: scale(1.02);
+}
+
+/* Efectos de hover para tooltips */
+.tooltip-hover-effect {
+    transition: all 0.3s ease;
+}
+
+.tooltip-hover-effect:hover {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Efectos de hover para tabs */
+.tab-hover-effect {
+    transition: all 0.3s ease;
+}
+
+.tab-hover-effect:hover {
+    background: var(--gray-50);
+}
+
+.tab-hover-effect.active {
+    background: var(--primary);
+    color: var(--white);
+}
+
+/* Efectos de hover para accordions */
+.accordion-hover-effect {
+    transition: all 0.3s ease;
+}
+
+.accordion-hover-effect:hover {
+    background: var(--gray-50);
+}
+
+/* Efectos de hover para carousels */
+.carousel-hover-effect {
+    transition: all 0.3s ease;
+}
+
+.carousel-hover-effect:hover {
+    transform: scale(1.05);
+}
+
+/* Efectos de hover para sliders */
+.slider-hover-effect {
+    transition: all 0.3s ease;
+}
+
+.slider-hover-effect:hover {
+    transform: scale(1.1);
+}
+
+/* Efectos de hover para progress bars */
+.progress-hover-effect {
+    transition: all 0.3s ease;
+}
+
+.progress-hover-effect:hover {
+    transform: scaleY(1.2);
+}
+
+/* Efectos de hover para ratings */
+.rating-hover-effect {
+    transition: all 0.3s ease;
+}
+
+.rating-hover-effect:hover {
+    transform: scale(1.2);
+    color: var(--warning);
+}
+
+/* Efectos de hover para avatares */
+.avatar-hover-effect {
+    transition: all 0.3s ease;
+}
+
+.avatar-hover-effect:hover {
+    transform: scale(1.1);
+}
+
+/* Efectos de hover para notificaciones */
+.notification-hover-effect {
+    transition: all 0.3s ease;
+}
+
+.notification-hover-effect:hover {
+    transform: translateX(5px);
+}
+
+/* Efectos de hover para breadcrumbs */
+.breadcrumb-hover-effect {
+    transition: all 0.3s ease;
+}
+
+.breadcrumb-hover-effect:hover {
+    color: var(--primary);
+}
+
+/* Efectos de hover para paginación */
+.pagination-hover-effect {
+    transition: all 0.3s ease;
+}
+
+.pagination-hover-effect:hover {
+    background: var(--primary);
+    color: var(--white);
+    transform: scale(1.1);
+}
+
+/* Efectos de hover para filtros */
+.filter-hover-effect {
+    transition: all 0.3s ease;
+}
+
+.filter-hover-effect:hover {
+    background: var(--primary);
+    color: var(--white);
+    transform: translateY(-2px);
+}
+
+/* Efectos de hover para búsqueda */
+.search-hover-effect {
+    transition: all 0.3s ease;
+}
+
+.search-hover-effect:hover {
+    transform: scale(1.05);
+}
+
+/* Efectos de hover para categorías */
+.category-hover-effect {
+    transition: all 0.3s ease;
+}
+
+.category-hover-effect:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Efectos de hover para productos */
+.product-hover-effect {
+    transition: all 0.3s ease;
+}
+
+.product-hover-effect:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.product-hover-effect:hover .product-image {
+    transform: scale(1.05);
+}
+
+.product-hover-effect:hover .product-overlay {
+    opacity: 1;
+}
+
+/* Efectos de hover para wishlist */
+.wishlist-hover-effect {
+    transition: all 0.3s ease;
+}
+
+.wishlist-hover-effect:hover {
+    transform: scale(1.2);
+    color: var(--error);
+}
+
+/* Efectos de hover para carrito */
+.cart-hover-effect {
+    transition: all 0.3s ease;
+}
+
+.cart-hover-effect:hover {
+    transform: scale(1.1);
+    color: var(--primary);
+}
+
+/* Efectos de hover para checkout */
+.checkout-hover-effect {
+    transition: all 0.3s ease;
+}
+
+.checkout-hover-effect:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Efectos de hover para reviews */
+.review-hover-effect {
+    transition: all 0.3s ease;
+}
+
+.review-hover-effect:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Efectos de hover para cupones */
+.coupon-hover-effect {
+    transition: all 0.3s ease;
+}
+
+.coupon-hover-effect:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Efectos de hover para comparador */
+.comparator-hover-effect {
+    transition: all 0.3s ease;
+}
+
+.comparator-hover-effect:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Efectos de hover para ordenes */
+.order-hover-effect {
+    transition: all 0.3s ease;
+}
+
+.order-hover-effect:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Efectos de hover para perfil */
+.profile-hover-effect {
+    transition: all 0.3s ease;
+}
+
+.profile-hover-effect:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Efectos de hover para admin */
+.admin-hover-effect {
+    transition: all 0.3s ease;
+}
+
+.admin-hover-effect:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Efectos de loading */
+.loading-spinner {
+    animation: spin 1s linear infinite;
+}
+
+.loading-pulse {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+.loading-bounce {
+    animation: bounce 1s ease-in-out infinite;
+}
+
+/* Efectos de gradiente animado */
+.gradient-animated {
+    background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #4facfe);
+    background-size: 400% 400%;
+    animation: gradient 15s ease infinite;
+}
+
+/* Efectos de brillo */
+.shine-effect {
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.3) 50%,
+        transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shine 2s infinite;
+}
+
+/* Efectos de onda */
+.wave-effect {
+    animation: wave 2s ease-in-out infinite;
+}
+
+/* Efectos de entrada escalonada */
+.stagger-animation {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.stagger-animation:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.stagger-animation:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.stagger-animation:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.stagger-animation:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+.stagger-animation:nth-child(5) {
+    animation-delay: 0.5s;
+}
+
+.stagger-animation:nth-child(6) {
+    animation-delay: 0.6s;
+}
+
+/* Efectos de entrada con delay */
+.delay-100 {
+    animation-delay: 0.1s;
+}
+
+.delay-200 {
+    animation-delay: 0.2s;
+}
+
+.delay-300 {
+    animation-delay: 0.3s;
+}
+
+.delay-400 {
+    animation-delay: 0.4s;
+}
+
+.delay-500 {
+    animation-delay: 0.5s;
+}
+
+.delay-600 {
+    animation-delay: 0.6s;
+}
+
+.delay-700 {
+    animation-delay: 0.7s;
+}
+
+.delay-800 {
+    animation-delay: 0.8s;
+}
+
+.delay-900 {
+    animation-delay: 0.9s;
+}
+
+.delay-1000 {
+    animation-delay: 1s;
+}
+
+/* Efectos de duración */
+.duration-100 {
+    animation-duration: 0.1s;
+}
+
+.duration-200 {
+    animation-duration: 0.2s;
+}
+
+.duration-300 {
+    animation-duration: 0.3s;
+}
+
+.duration-500 {
+    animation-duration: 0.5s;
+}
+
+.duration-700 {
+    animation-duration: 0.7s;
+}
+
+.duration-1000 {
+    animation-duration: 1s;
+}
+
+/* Efectos de timing */
+.ease-in {
+    animation-timing-function: ease-in;
+}
+
+.ease-out {
+    animation-timing-function: ease-out;
+}
+
+.ease-in-out {
+    animation-timing-function: ease-in-out;
+}
+
+.linear {
+    animation-timing-function: linear;
+}
+
+/* Efectos de dirección */
+.reverse {
+    animation-direction: reverse;
+}
+
+.alternate {
+    animation-direction: alternate;
+}
+
+.alternate-reverse {
+    animation-direction: alternate-reverse;
+}
+
+/* Efectos de iteración */
+.infinite {
+    animation-iteration-count: infinite;
+}
+
+/* Efectos de estado */
+.paused {
+    animation-play-state: paused;
+}
+
+.running {
+    animation-play-state: running;
+}
+
+/* Efectos de relleno */
+.fill-mode-forwards {
+    animation-fill-mode: forwards;
+}
+
+.fill-mode-backwards {
+    animation-fill-mode: backwards;
+}
+
+.fill-mode-both {
+    animation-fill-mode: both;
+}
+
+/* Efectos de transform */
+.transform-origin-center {
+    transform-origin: center;
+}
+
+.transform-origin-top {
+    transform-origin: top;
+}
+
+.transform-origin-bottom {
+    transform-origin: bottom;
+}
+
+.transform-origin-left {
+    transform-origin: left;
+}
+
+.transform-origin-right {
+    transform-origin: right;
+}
+
+/* Efectos de perspectiva */
+.perspective {
+    perspective: 1000px;
+}
+
+.preserve-3d {
+    transform-style: preserve-3d;
+}
+
+/* Efectos de parallax */
+.parallax {
+    transform: translateZ(0);
+    will-change: transform;
+}
+
+/* Efectos de hardware acceleration */
+.gpu-accelerated {
+    transform: translateZ(0);
+    will-change: transform;
+}
+
+/* Efectos de blur */
+.blur-effect {
+    filter: blur(5px);
+    transition: filter 0.3s ease;
+}
+
+.blur-effect:hover {
+    filter: blur(0);
+}
+
+/* Efectos de brightness */
+.brightness-effect {
+    filter: brightness(1);
+    transition: filter 0.3s ease;
+}
+
+.brightness-effect:hover {
+    filter: brightness(1.2);
+}
+
+/* Efectos de contrast */
+.contrast-effect {
+    filter: contrast(1);
+    transition: filter 0.3s ease;
+}
+
+.contrast-effect:hover {
+    filter: contrast(1.2);
+}
+
+/* Efectos de saturate */
+.saturate-effect {
+    filter: saturate(1);
+    transition: filter 0.3s ease;
+}
+
+.saturate-effect:hover {
+    filter: saturate(1.5);
+}
+
+/* Efectos de hue-rotate */
+.hue-rotate-effect {
+    filter: hue-rotate(0deg);
+    transition: filter 0.3s ease;
+}
+
+.hue-rotate-effect:hover {
+    filter: hue-rotate(180deg);
+}
+
+/* Efectos de invert */
+.invert-effect {
+    filter: invert(0);
+    transition: filter 0.3s ease;
+}
+
+.invert-effect:hover {
+    filter: invert(1);
+}
+
+/* Efectos de sepia */
+.sepia-effect {
+    filter: sepia(0);
+    transition: filter 0.3s ease;
+}
+
+.sepia-effect:hover {
+    filter: sepia(1);
+}
+
+/* Efectos de grayscale */
+.grayscale-effect {
+    filter: grayscale(0);
+    transition: filter 0.3s ease;
+}
+
+.grayscale-effect:hover {
+    filter: grayscale(1);
+}
+
+/* Efectos de opacity */
+.opacity-effect {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.opacity-effect:hover {
+    opacity: 0.8;
+}
+
+/* Efectos de visibility */
+.visibility-effect {
+    visibility: visible;
+    opacity: 1;
+    transition: all 0.3s ease;
+}
+
+.visibility-effect:hover {
+    visibility: hidden;
+    opacity: 0;
+}
+
+/* Efectos de cursor */
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.cursor-not-allowed {
+    cursor: not-allowed;
+}
+
+.cursor-wait {
+    cursor: wait;
+}
+
+.cursor-grab {
+    cursor: grab;
+}
+
+.cursor-grabbing {
+    cursor: grabbing;
+}
+
+/* Efectos de pointer events */
+.pointer-events-none {
+    pointer-events: none;
+}
+
+.pointer-events-auto {
+    pointer-events: auto;
+}
+
+/* Efectos de user select */
+.user-select-none {
+    user-select: none;
+}
+
+.user-select-all {
+    user-select: all;
+}
+
+.user-select-auto {
+    user-select: auto;
+}
+
+/* Efectos de resize */
+.resize-none {
+    resize: none;
+}
+
+.resize-both {
+    resize: both;
+}
+
+.resize-horizontal {
+    resize: horizontal;
+}
+
+.resize-vertical {
+    resize: vertical;
+}
+
+/* Efectos de overflow */
+.overflow-hidden {
+    overflow: hidden;
+}
+
+.overflow-auto {
+    overflow: auto;
+}
+
+.overflow-scroll {
+    overflow: scroll;
+}
+
+.overflow-visible {
+    overflow: visible;
+}
+
+/* Efectos de text overflow */
+.text-overflow-ellipsis {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.text-overflow-clip {
+    text-overflow: clip;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+/* Efectos de word wrap */
+.word-wrap-break-word {
+    word-wrap: break-word;
+}
+
+.word-wrap-normal {
+    word-wrap: normal;
+}
+
+/* Efectos de word break */
+.word-break-break-all {
+    word-break: break-all;
+}
+
+.word-break-break-word {
+    word-break: break-word;
+}
+
+.word-break-normal {
+    word-break: normal;
+}
+
+/* Efectos de white space */
+.white-space-normal {
+    white-space: normal;
+}
+
+.white-space-nowrap {
+    white-space: nowrap;
+}
+
+.white-space-pre {
+    white-space: pre;
+}
+
+.white-space-pre-wrap {
+    white-space: pre-wrap;
+}
+
+.white-space-pre-line {
+    white-space: pre-line;
+}
+
+/* Efectos de text transform */
+.text-transform-uppercase {
+    text-transform: uppercase;
+}
+
+.text-transform-lowercase {
+    text-transform: lowercase;
+}
+
+.text-transform-capitalize {
+    text-transform: capitalize;
+}
+
+.text-transform-none {
+    text-transform: none;
+}
+
+/* Efectos de text decoration */
+.text-decoration-none {
+    text-decoration: none;
+}
+
+.text-decoration-underline {
+    text-decoration: underline;
+}
+
+.text-decoration-overline {
+    text-decoration: overline;
+}
+
+.text-decoration-line-through {
+    text-decoration: line-through;
+}
+
+/* Efectos de text shadow */
+.text-shadow-sm {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.text-shadow-md {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.text-shadow-lg {
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.text-shadow-xl {
+    text-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Efectos de box shadow */
+.box-shadow-sm {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.box-shadow-md {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.box-shadow-lg {
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+.box-shadow-xl {
+    box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+}
+
+.box-shadow-2xl {
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+}
+
+.box-shadow-inner {
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.box-shadow-none {
+    box-shadow: none;
+}
+
+/* Efectos de border radius */
+.rounded-sm {
+    border-radius: 0.125rem;
+}
+
+.rounded-md {
+    border-radius: 0.375rem;
+}
+
+.rounded-lg {
+    border-radius: 0.5rem;
+}
+
+.rounded-xl {
+    border-radius: 0.75rem;
+}
+
+.rounded-2xl {
+    border-radius: 1rem;
+}
+
+.rounded-full {
+    border-radius: 9999px;
+}
+
+.rounded-none {
+    border-radius: 0;
+}
+
+/* Efectos de border */
+.border-solid {
+    border-style: solid;
+}
+
+.border-dashed {
+    border-style: dashed;
+}
+
+.border-dotted {
+    border-style: dotted;
+}
+
+.border-double {
+    border-style: double;
+}
+
+.border-none {
+    border-style: none;
+}
+
+/* Efectos de outline */
+.outline-none {
+    outline: none;
+}
+
+.outline-2 {
+    outline: 2px solid var(--primary);
+}
+
+.outline-offset-2 {
+    outline-offset: 2px;
+}
+
+/* Efectos de z-index */
+.z-0 {
+    z-index: 0;
+}
+
+.z-10 {
+    z-index: 10;
+}
+
+.z-20 {
+    z-index: 20;
+}
+
+.z-30 {
+    z-index: 30;
+}
+
+.z-40 {
+    z-index: 40;
+}
+
+.z-50 {
+    z-index: 50;
+}
+
+.z-auto {
+    z-index: auto;
+}
+
+/* Efectos de position */
+.position-static {
+    position: static;
+}
+
+.position-relative {
+    position: relative;
+}
+
+.position-absolute {
+    position: absolute;
+}
+
+.position-fixed {
+    position: fixed;
+}
+
+.position-sticky {
+    position: sticky;
+}
+
+/* Efectos de top, right, bottom, left */
+.top-0 {
+    top: 0;
+}
+
+.right-0 {
+    right: 0;
+}
+
+.bottom-0 {
+    bottom: 0;
+}
+
+.left-0 {
+    left: 0;
+}
+
+/* Efectos de width y height */
+.w-full {
+    width: 100%;
+}
+
+.h-full {
+    height: 100%;
+}
+
+.w-screen {
+    width: 100vw;
+}
+
+.h-screen {
+    height: 100vh;
+}
+
+.w-auto {
+    width: auto;
+}
+
+.h-auto {
+    height: auto;
+}
+
+/* Efectos de min/max width y height */
+.min-w-0 {
+    min-width: 0;
+}
+
+.min-h-0 {
+    min-height: 0;
+}
+
+.max-w-full {
+    max-width: 100%;
+}
+
+.max-h-full {
+    max-height: 100%;
+}
+
+/* Efectos de object fit */
+.object-contain {
+    object-fit: contain;
+}
+
+.object-cover {
+    object-fit: cover;
+}
+
+.object-fill {
+    object-fit: fill;
+}
+
+.object-none {
+    object-fit: none;
+}
+
+.object-scale-down {
+    object-fit: scale-down;
+}
+
+/* Efectos de object position */
+.object-center {
+    object-position: center;
+}
+
+.object-top {
+    object-position: top;
+}
+
+.object-bottom {
+    object-position: bottom;
+}
+
+.object-left {
+    object-position: left;
+}
+
+.object-right {
+    object-position: right;
+}
+
+/* Efectos de aspect ratio */
+.aspect-square {
+    aspect-ratio: 1 / 1;
+}
+
+.aspect-video {
+    aspect-ratio: 16 / 9;
+}
+
+/* Efectos de backdrop */
+.backdrop-blur-sm {
+    backdrop-filter: blur(4px);
+}
+
+.backdrop-blur-md {
+    backdrop-filter: blur(8px);
+}
+
+.backdrop-blur-lg {
+    backdrop-filter: blur(12px);
+}
+
+.backdrop-blur-xl {
+    backdrop-filter: blur(16px);
+}
+
+.backdrop-blur-2xl {
+    backdrop-filter: blur(24px);
+}
+
+.backdrop-blur-none {
+    backdrop-filter: blur(0);
+}
+
+/* Efectos de backdrop brightness */
+.backdrop-brightness-50 {
+    backdrop-filter: brightness(0.5);
+}
+
+.backdrop-brightness-75 {
+    backdrop-filter: brightness(0.75);
+}
+
+.backdrop-brightness-100 {
+    backdrop-filter: brightness(1);
+}
+
+.backdrop-brightness-125 {
+    backdrop-filter: brightness(1.25);
+}
+
+.backdrop-brightness-150 {
+    backdrop-filter: brightness(1.5);
+}
+
+/* Efectos de backdrop contrast */
+.backdrop-contrast-50 {
+    backdrop-filter: contrast(0.5);
+}
+
+.backdrop-contrast-75 {
+    backdrop-filter: contrast(0.75);
+}
+
+.backdrop-contrast-100 {
+    backdrop-filter: contrast(1);
+}
+
+.backdrop-contrast-125 {
+    backdrop-filter: contrast(1.25);
+}
+
+.backdrop-contrast-150 {
+    backdrop-filter: contrast(1.5);
+}
+
+/* Efectos de backdrop saturate */
+.backdrop-saturate-50 {
+    backdrop-filter: saturate(0.5);
+}
+
+.backdrop-saturate-100 {
+    backdrop-filter: saturate(1);
+}
+
+.backdrop-saturate-150 {
+    backdrop-filter: saturate(1.5);
+}
+
+.backdrop-saturate-200 {
+    backdrop-filter: saturate(2);
+}
+
+/* Efectos de backdrop opacity */
+.backdrop-opacity-0 {
+    backdrop-filter: opacity(0);
+}
+
+.backdrop-opacity-25 {
+    backdrop-filter: opacity(0.25);
+}
+
+.backdrop-opacity-50 {
+    backdrop-filter: opacity(0.5);
+}
+
+.backdrop-opacity-75 {
+    backdrop-filter: opacity(0.75);
+}
+
+.backdrop-opacity-100 {
+    backdrop-filter: opacity(1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hover-scale:hover {
+        transform: scale(1.02);
+    }
+    
+    .hover-lift:hover {
+        transform: translateY(-2px);
+    }
+    
+    .card-hover-effect:hover {
+        transform: translateY(-4px);
+    }
+    
+    .product-hover-effect:hover {
+        transform: translateY(-4px);
+    }
+}
+
+

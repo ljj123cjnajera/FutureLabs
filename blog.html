@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - FutureLabs</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/notifications.css">
+    <link rel="stylesheet" href="css/informational-pages.css">
+    <link rel="stylesheet" href="css/blog-compare.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/typography.css">
+    <style>
+        .blog-hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+        }
+        
+        .blog-hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        
+        .blog-hero p {
+            font-size: 20px;
+            opacity: 0.9;
+        }
+        
+        .blog-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+        
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .blog-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .blog-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+        
+        .blog-card-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+        
+        .blog-card-content {
+            padding: 25px;
+        }
+        
+        .blog-card-meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #999;
+        }
+        
+        .blog-card-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+        
+        .blog-card-excerpt {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .blog-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        .blog-card-views {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #999;
+            font-size: 14px;
+        }
+        
+        .btn-read-more {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-read-more:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 40px;
+        }
+        
+        .pagination button {
+            padding: 12px 20px;
+            border: 2px solid #eee;
+            background: white;
+            color: #666;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .pagination button:hover:not(:disabled) {
+            border-color: #667eea;
+            color: #667eea;
+        }
+        
+        .pagination button.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+        
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+        
+        .empty-state i {
+            font-size: 80px;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .empty-state h3 {
+            font-size: 24px;
+            color: #999;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Blog Hero -->
+    <section class="blog-hero">
+        <div class="container">
+            <h1><i class="fas fa-blog"></i> Blog de Tecnología</h1>
+            <p>Descubre las últimas tendencias, noticias y guías sobre tecnología</p>
+        </div>
+    </section>
+
+    <!-- Blog Container -->
+    <div class="blog-container">
+        <div id="blogContent">
+            <div class="loading">
+                <i class="fas fa-spinner fa-spin fa-3x"></i>
+                <p>Cargando artículos...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer id="mainFooter"></footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/notifications.js"></script>
+    
+    <script>
+        let currentPage = 1;
+        let totalPages = 1;
+
+        async function loadBlogPosts(page = 1) {
+            try {
+                const response = await window.api.getBlogPosts(page, 12);
+                
+                if (response.success) {
+                    const { posts, pagination } = response.data;
+                    currentPage = pagination.page;
+                    totalPages = pagination.pages;
+                    
+                    renderBlogPosts(posts);
+                    renderPagination();
+                } else {
+                    showEmptyState();
+                }
+            } catch (error) {
+                console.error('Error loading blog posts:', error);
+                showEmptyState();
+            }
+        }
+
+        function renderBlogPosts(posts) {
+            const container = document.getElementById('blogContent');
+            
+            if (posts.length === 0) {
+                showEmptyState();
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="blog-grid">
+                    ${posts.map(post => `
+                        <div class="blog-card" onclick="viewPost('${post.slug}')">
+                            <img src="${post.featured_image || 'https://via.placeholder.com/800x400'}" 
+                                 alt="${post.title}" 
+                                 class="blog-card-image">
+                            <div class="blog-card-content">
+                                <div class="blog-card-meta">
+                                    <span><i class="far fa-user"></i> ${post.first_name} ${post.last_name}</span>
+                                    <span><i class="far fa-calendar"></i> ${formatDate(post.published_at)}</span>
+                                </div>
+                                <h2 class="blog-card-title">${post.title}</h2>
+                                <p class="blog-card-excerpt">${post.excerpt || ''}</p>
+                                <div class="blog-card-footer">
+                                    <span class="blog-card-views">
+                                        <i class="far fa-eye"></i> ${post.views} vistas
+                                    </span>
+                                    <a href="blog-post.html?slug=${post.slug}" class="btn-read-more">
+                                        Leer más <i class="fas fa-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function renderPagination() {
+            const container = document.getElementById('blogContent');
+            
+            if (totalPages <= 1) return;
+            
+            let paginationHTML = '<div class="pagination">';
+            
+            // Botón anterior
+            paginationHTML += `
+                <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+                    <i class="fas fa-chevron-left"></i> Anterior
+                </button>
+            `;
+            
+            // Páginas
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                    paginationHTML += `
+                        <button onclick="changePage(${i})" class="${i === currentPage ? 'active' : ''}">
+                            ${i}
+                        </button>
+                    `;
+                } else if (i === currentPage - 2 || i === currentPage + 2) {
+                    paginationHTML += '<span>...</span>';
+                }
+            }
+            
+            // Botón siguiente
+            paginationHTML += `
+                <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+                    Siguiente <i class="fas fa-chevron-right"></i>
+                </button>
+            `;
+            
+            paginationHTML += '</div>';
+            
+            container.insertAdjacentHTML('beforeend', paginationHTML);
+        }
+
+        function changePage(page) {
+            if (page < 1 || page > totalPages) return;
+            loadBlogPosts(page);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showEmptyState() {
+            const container = document.getElementById('blogContent');
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-newspaper"></i>
+                    <h3>No hay artículos disponibles</h3>
+                    <p>Vuelve pronto para ver nuevos contenidos</p>
+                </div>
+            `;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-PE', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        }
+
+        // Cargar posts al iniciar
+        loadBlogPosts();
+    </script>
+</body>
+</html>
+
+
+
+

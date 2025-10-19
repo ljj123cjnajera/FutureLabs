@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Carrito - FutureLabs</title>
+</head>
+<body>
+    <h1>Test de Carrito</h1>
+    <button onclick="testCarrito()">Probar Agregar al Carrito</button>
+    
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/home.js"></script>
+    
+    <script>
+        async function testCarrito() {
+            console.log('🧪 Iniciando test de carrito...');
+            
+            // Verificar que todo exista
+            console.log('🔍 authManager:', typeof window.authManager);
+            console.log('🔍 cartManager:', typeof window.cartManager);
+            console.log('🔍 notifications:', typeof window.notifications);
+            console.log('🔍 homeManager:', typeof window.homeManager);
+            
+            // Verificar autenticación
+            console.log('🔍 isAuthenticated:', window.authManager.isAuthenticated());
+            console.log('🔍 currentUser:', window.authManager.currentUser);
+            
+            // Intentar agregar producto
+            try {
+                console.log('🛒 Intentando agregar producto...');
+                await window.homeManager.addToCart('660e8400-e29b-41d4-a716-446655440001');
+                console.log('✅ Producto agregado exitosamente');
+            } catch (error) {
+                console.error('❌ Error:', error);
+            }
+        }
+        
+        // Ejecutar automáticamente
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                console.log('🚀 Ejecutando test automático...');
+                testCarrito();
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
+
+
+
+

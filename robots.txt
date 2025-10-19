@@ -1,0 +1,37 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: http://localhost:8080/sitemap.xml
+
+# Disallow admin pages
+Disallow: /admin.html
+Disallow: /admin-login.html
+
+# Disallow user pages
+Disallow: /profile.html
+Disallow: /orders.html
+Disallow: /wishlist.html
+Disallow: /cart.html
+Disallow: /checkout.html
+
+# Allow product pages
+Allow: /products.html
+Allow: /product-detail.html
+
+# Allow blog
+Allow: /blog.html
+
+# Allow static assets
+Allow: /css/
+Allow: /js/
+Allow: /images/
+Allow: /assets/
+
+# Crawl-delay
+Crawl-delay: 1
+
+
+
+
+

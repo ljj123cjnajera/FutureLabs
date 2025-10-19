@@ -1,0 +1,166 @@
+/* Tablets */
+@media (max-width: 1024px) {
+    .hero-slider {
+        height: 400px;
+    }
+    
+    .slide h1 {
+        font-size: 36px;
+    }
+    
+    .slide p {
+        font-size: 18px;
+    }
+    
+    .footer-content {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+    }
+    
+    .banner-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .top-bar {
+        flex-direction: column;
+        gap: 15px;
+        padding: 15px 0;
+    }
+    
+    .search-bar {
+        max-width: 100%;
+        margin: 10px 0;
+        order: 3;
+        width: 100%;
+    }
+    
+    .user-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .nav-bar {
+        padding: 8px 0;
+        font-size: 14px;
+    }
+    
+    .hero-slider {
+        height: 300px;
+    }
+    
+    .slide h1 {
+        font-size: 28px;
+    }
+    
+    .slide p {
+        font-size: 16px;
+    }
+    
+    .slider-arrow {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+    
+    .slider-arrow.prev {
+        left: 15px;
+    }
+    
+    .slider-arrow.next {
+        right: 15px;
+    }
+    
+    .section {
+        margin: 40px 0;
+    }
+    
+    .section-title {
+        font-size: 24px;
+    }
+    
+    .affiliate-banner {
+        padding: 30px 20px;
+    }
+    
+    .affiliate-banner h2 {
+        font-size: 24px;
+    }
+    
+    .banner-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+    
+    .footer-bottom {
+        flex-direction: column;
+        gap: 25px;
+        text-align: center;
+    }
+    
+    .sticky-footer .container {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    .chat-button {
+        bottom: 70px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+    
+    .carousel-arrow {
+        width: 35px;
+        height: 35px;
+        font-size: 14px;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+    .hero-slider {
+        height: 250px;
+    }
+    
+    .slide h1 {
+        font-size: 24px;
+    }
+    
+    .slide p {
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+    
+    .cta-button {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+    
+    .benefit-card {
+        min-width: 250px;
+    }
+    
+    .category-card {
+        min-width: 160px;
+        padding: 20px 15px;
+    }
+    
+    .category-icon {
+        font-size: 30px;
+    }
+    
+    .payment-methods {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
