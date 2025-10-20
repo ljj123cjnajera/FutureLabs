@@ -17,9 +17,25 @@ app.use(helmet({
   contentSecurityPolicy: false
 }));
 
-// CORS
+// CORS - Permite múltiples orígenes
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'https://ljj123cjnajera.github.io',
+  'https://ljj123cjnajera.github.io/FutureLabs/',
+  'http://localhost:8080'
+].filter(Boolean); // Elimina valores undefined/null
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:8080',
+  origin: function (origin, callback) {
+    // Permite requests sin origen (como mobile apps o curl)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 
