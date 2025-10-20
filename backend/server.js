@@ -9,6 +9,9 @@ const slowDown = require('express-slow-down');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Agrega esta línea para el proxy:
+app.set('trust proxy', 1);
+
 // Middleware de seguridad
 app.use(helmet({
   contentSecurityPolicy: false
