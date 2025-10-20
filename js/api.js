@@ -1,7 +1,7 @@
 // 🚀 FutureLabs API Client
 class FutureLabsAPI {
   constructor() {
-    this.baseURL = 'http://futurelabs-production.up.railway.app/api';
+    this.baseURL = 'https://futurelabs-production.up.railway.app/api';
     this.token = localStorage.getItem('auth_token');
   }
 
