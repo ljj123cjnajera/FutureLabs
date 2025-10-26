@@ -11,11 +11,17 @@ console.log('DATABASE_URL present =', !!process.env.DATABASE_URL);
 // Build effective knex config
 let knexConfig;
 
-// If a DATABASE_URL is present, prefer it and add SSL options for providers like Railway
-if (process.env.DATABASE_URL) {
-  // Parse DATABASE_URL using Node.js URL module for robust parsing
-  const dbUrl = process.env.DATABASE_URL;
-  
+// Check if DATABASE_URL is a placeholder (Railway sometimes shows placeholders)
+const dbUrl = process.env.DATABASE_URL;
+const isPlaceholder = dbUrl && (
+  dbUrl.includes('<USER>') || 
+  dbUrl.includes('<PASSWORD>') || 
+  dbUrl.includes('<HOST>') || 
+  dbUrl.includes('<DBNAME>')
+);
+
+// If DATABASE_URL is present and not a placeholder, prefer it
+if (dbUrl && !isPlaceholder) {
   try {
     // Use URL module to parse the connection string
     const url = new URL(dbUrl);
@@ -54,22 +60,41 @@ if (process.env.DATABASE_URL) {
     console.log('DB Connection: postgres://' + user + '@' + host + ':' + port + '/' + database);
     console.log('✅ Using DATABASE_URL for connection (parsed as object)');
   } catch (error) {
-    // Fallback: use URL string if parsing fails
+    // If URL parsing fails, fall through to individual variables
     console.log('⚠️  Could not parse DATABASE_URL:', error.message);
-    console.log('Falling back to URL string format');
-    const baseEnvConfig = baseConfig[environment] || {};
-    knexConfig = {
-      client: 'postgresql',
-      connection: dbUrl,
-      migrations: baseEnvConfig.migrations || {},
-      seeds: baseEnvConfig.seeds || {},
-      pool: baseEnvConfig.pool || { min: 2, max: 10 }
-    };
+    console.log('Falling back to individual DB variables');
   }
-} else {
-  // No DATABASE_URL — use the knexfile config as-is (fallback to DB_HOST/DB_* vars)
+}
+
+// Use individual DB variables if DATABASE_URL is not available or is a placeholder
+if (!knexConfig && (process.env.DB_HOST || isPlaceholder)) {
+  const baseEnvConfig = baseConfig[environment] || {};
+  
+  knexConfig = {
+    client: 'postgresql',
+    connection: {
+      host: process.env.DB_HOST,
+      port: parseInt(process.env.DB_PORT || '5432', 10),
+      database: process.env.DB_NAME,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      ssl: { rejectUnauthorized: false }
+    },
+    migrations: baseEnvConfig.migrations || {},
+    seeds: baseEnvConfig.seeds || {},
+    pool: baseEnvConfig.pool || { min: 2, max: 10 }
+  };
+  
+  console.log('✅ Using individual DB variables for connection');
+  console.log('DB_HOST =', process.env.DB_HOST || 'N/A');
+  console.log('DB_NAME =', process.env.DB_NAME || 'N/A');
+  console.log('DB_USER =', process.env.DB_USER || 'N/A');
+}
+
+// Final fallback: use knexfile config
+if (!knexConfig) {
   knexConfig = baseConfig[environment] || {};
-  console.log('⚠️  WARNING: DATABASE_URL not found, using fallback config');
+  console.log('⚠️  WARNING: No database configuration found, using knexfile fallback');
   console.log('DB_HOST =', process.env.DB_HOST || 'N/A');
   console.log('DB_NAME =', process.env.DB_NAME || 'N/A');
 }
