@@ -2,6 +2,7 @@
 /**
  * Entry point for FutureLabs Backend
  * Runs migrations before starting the server
+ * Version: 2.0
  */
 
 const { exec } = require('child_process');
@@ -12,9 +13,10 @@ const execPromise = util.promisify(exec);
 async function start() {
   const environment = process.env.NODE_ENV || 'production';
   
-  console.log('🚀 FutureLabs Backend Startup');
+  console.log('🚀 FutureLabs Backend Startup - v2.0');
   console.log('📡 Environment:', environment);
   console.log('🔄 Running database migrations...');
+  console.log('📍 Working directory:', process.cwd());
 
   try {
     // Run migrations
