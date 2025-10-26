@@ -6,6 +6,7 @@ COPY backend/package.json ./
 COPY backend/knexfile.js ./
 COPY backend/server.js ./
 COPY backend/routes ./routes
+COPY backend/models ./models
 COPY backend/database ./database
 RUN npm install
 
