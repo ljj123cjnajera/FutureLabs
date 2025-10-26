@@ -67,28 +67,40 @@ if (dbUrl && !isPlaceholder) {
 }
 
 // Use individual DB variables if DATABASE_URL is not available or is a placeholder
-if (!knexConfig && (process.env.DB_HOST || isPlaceholder)) {
-  const baseEnvConfig = baseConfig[environment] || {};
+// BUT only if all required variables are present
+if (!knexConfig && (isPlaceholder || process.env.DB_HOST)) {
+  // Check if all required DB variables are present
+  const hasAllVars = process.env.DB_HOST && process.env.DB_NAME && process.env.DB_USER && process.env.DB_PASSWORD;
   
-  knexConfig = {
-    client: 'postgresql',
-    connection: {
-      host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT || '5432', 10),
-      database: process.env.DB_NAME,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      ssl: { rejectUnauthorized: false }
-    },
-    migrations: baseEnvConfig.migrations || {},
-    seeds: baseEnvConfig.seeds || {},
-    pool: baseEnvConfig.pool || { min: 2, max: 10 }
-  };
-  
-  console.log('✅ Using individual DB variables for connection');
-  console.log('DB_HOST =', process.env.DB_HOST || 'N/A');
-  console.log('DB_NAME =', process.env.DB_NAME || 'N/A');
-  console.log('DB_USER =', process.env.DB_USER || 'N/A');
+  if (hasAllVars) {
+    const baseEnvConfig = baseConfig[environment] || {};
+    
+    knexConfig = {
+      client: 'postgresql',
+      connection: {
+        host: process.env.DB_HOST,
+        port: parseInt(process.env.DB_PORT || '5432', 10),
+        database: process.env.DB_NAME,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        ssl: { rejectUnauthorized: false }
+      },
+      migrations: baseEnvConfig.migrations || {},
+      seeds: baseEnvConfig.seeds || {},
+      pool: baseEnvConfig.pool || { min: 2, max: 10 }
+    };
+    
+    console.log('✅ Using individual DB variables for connection');
+    console.log('DB_HOST =', process.env.DB_HOST);
+    console.log('DB_NAME =', process.env.DB_NAME);
+    console.log('DB_USER =', process.env.DB_USER);
+  } else {
+    console.log('⚠️  DATABASE_URL is placeholder but individual DB variables are missing');
+    console.log('DB_HOST =', process.env.DB_HOST || 'N/A');
+    console.log('DB_NAME =', process.env.DB_NAME || 'N/A');
+    console.log('DB_USER =', process.env.DB_USER || 'N/A');
+    console.log('DB_PASSWORD =', process.env.DB_PASSWORD ? '***' : 'N/A');
+  }
 }
 
 // Final fallback: use knexfile config
