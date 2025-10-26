@@ -13,15 +13,20 @@ let knexConfig;
 
 // If a DATABASE_URL is present, prefer it and add SSL options for providers like Railway
 if (process.env.DATABASE_URL) {
-  // Parse DATABASE_URL manually to ensure it works correctly with Knex
+  // Parse DATABASE_URL using Node.js URL module for robust parsing
   const dbUrl = process.env.DATABASE_URL;
   
-  // Parse the PostgreSQL URL manually
-  // Format: postgres://user:password@host:port/database
-  const urlMatch = dbUrl.match(/^postgres:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)$/);
-  
-  if (urlMatch) {
-    const [, user, password, host, port, database] = urlMatch;
+  try {
+    // Use URL module to parse the connection string
+    const url = new URL(dbUrl);
+    
+    // Extract components
+    const host = url.hostname;
+    const port = parseInt(url.port || '5432', 10);
+    const user = url.username;
+    const password = url.password;
+    // Database name is the pathname without leading slash
+    const database = url.pathname.slice(1) || url.pathname.substring(1);
     
     // Get migrations/seeds from baseConfig but create fresh config
     const baseEnvConfig = baseConfig[environment] || {};
@@ -29,7 +34,7 @@ if (process.env.DATABASE_URL) {
     // Create connection object with SSL for Railway
     const connectionObj = {
       host: host,
-      port: parseInt(port, 10),
+      port: port,
       user: user,
       password: password,
       database: database,
@@ -48,9 +53,10 @@ if (process.env.DATABASE_URL) {
     // Log connection info (safe - no password)
     console.log('DB Connection: postgres://' + user + '@' + host + ':' + port + '/' + database);
     console.log('✅ Using DATABASE_URL for connection (parsed as object)');
-  } else {
+  } catch (error) {
     // Fallback: use URL string if parsing fails
-    console.log('⚠️  Could not parse DATABASE_URL, using as string');
+    console.log('⚠️  Could not parse DATABASE_URL:', error.message);
+    console.log('Falling back to URL string format');
     const baseEnvConfig = baseConfig[environment] || {};
     knexConfig = {
       client: 'postgresql',
