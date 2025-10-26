@@ -4,10 +4,10 @@
   "description": "Backend API para FutureLabs - Tienda de tecnología",
   "main": "server.js",
   "scripts": {
-    "start": "npm run migrate && node server.js",
+    "start": "echo 'Running migrations...' && NODE_ENV=production npm run migrate && echo 'Migrations completed, starting server...' && node server.js",
     "start:migrate": "npm run migrate && npm start",
     "dev": "nodemon server.js",
-    "migrate": "knex migrate:latest",
+    "migrate": "knex migrate:latest --debug",
     "migrate:rollback": "knex migrate:rollback",
     "seed": "knex seed:run"
   },
