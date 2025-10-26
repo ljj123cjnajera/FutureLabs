@@ -1,4 +1,7 @@
-require('dotenv').config();
+// Only load dotenv in development to avoid overriding Railway env vars
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
 
 /*
   Knex configuration
