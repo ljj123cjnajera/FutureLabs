@@ -13,38 +13,53 @@ let knexConfig;
 
 // If a DATABASE_URL is present, prefer it and add SSL options for providers like Railway
 if (process.env.DATABASE_URL) {
-  // Parse DATABASE_URL to ensure SSL is configured properly for Railway
+  // Parse DATABASE_URL manually to ensure it works correctly with Knex
   const dbUrl = process.env.DATABASE_URL;
   
-  // For Railway, we need to ensure SSL is enabled
-  // Parse the URL and rebuild it with SSL parameters if needed
-  let connectionString = dbUrl;
+  // Parse the PostgreSQL URL manually
+  // Format: postgres://user:password@host:port/database
+  const urlMatch = dbUrl.match(/^postgres:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)$/);
   
-  // If the URL doesn't have sslmode parameter, add it for Railway
-  if (!dbUrl.includes('sslmode=')) {
-    const separator = dbUrl.includes('?') ? '&' : '?';
-    connectionString = `${dbUrl}${separator}sslmode=require`;
+  if (urlMatch) {
+    const [, user, password, host, port, database] = urlMatch;
+    
+    // Get migrations/seeds from baseConfig but create fresh config
+    const baseEnvConfig = baseConfig[environment] || {};
+    
+    // Create connection object with SSL for Railway
+    const connectionObj = {
+      host: host,
+      port: parseInt(port, 10),
+      user: user,
+      password: password,
+      database: database,
+      ssl: { rejectUnauthorized: false }
+    };
+    
+    // Create a completely new config object to avoid any conflicts
+    knexConfig = {
+      client: 'postgresql',
+      connection: connectionObj,
+      migrations: baseEnvConfig.migrations || {},
+      seeds: baseEnvConfig.seeds || {},
+      pool: baseEnvConfig.pool || { min: 2, max: 10 }
+    };
+    
+    // Log connection info (safe - no password)
+    console.log('DB Connection: postgres://' + user + '@' + host + ':' + port + '/' + database);
+    console.log('✅ Using DATABASE_URL for connection (parsed as object)');
+  } else {
+    // Fallback: use URL string if parsing fails
+    console.log('⚠️  Could not parse DATABASE_URL, using as string');
+    const baseEnvConfig = baseConfig[environment] || {};
+    knexConfig = {
+      client: 'postgresql',
+      connection: dbUrl,
+      migrations: baseEnvConfig.migrations || {},
+      seeds: baseEnvConfig.seeds || {},
+      pool: baseEnvConfig.pool || { min: 2, max: 10 }
+    };
   }
-  
-  // Get migrations/seeds from baseConfig but create fresh config
-  const baseEnvConfig = baseConfig[environment] || {};
-  
-  // Create a completely new config object to avoid any conflicts
-  knexConfig = {
-    client: 'postgresql',
-    connection: connectionString,
-    migrations: baseEnvConfig.migrations || {},
-    seeds: baseEnvConfig.seeds || {},
-    pool: baseEnvConfig.pool || { min: 2, max: 10 }
-  };
-  
-  // Log connection info
-  const match = dbUrl.match(/^postgres:\/\/([^:]+):[^@]+@([^:]+):(\d+)\/(.+)$/);
-  if (match) {
-    console.log('DB Connection: postgres://' + match[1] + '@' + match[2] + ':' + match[3] + '/' + match[4]);
-  }
-  console.log('✅ Using DATABASE_URL for connection');
-  console.log('Connection type: URL string');
 } else {
   // No DATABASE_URL — use the knexfile config as-is (fallback to DB_HOST/DB_* vars)
   knexConfig = baseConfig[environment] || {};
