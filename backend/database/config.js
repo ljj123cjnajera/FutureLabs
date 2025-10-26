@@ -20,15 +20,14 @@ if (process.env.DATABASE_URL) {
   // No DATABASE_URL — use the knexfile config as-is (fallback to DB_HOST/DB_* vars)
 }
 
-// DEBUG: print environment info (temporary — remove after debug)
-console.log('--- DB DEBUG START ---');
-console.log('NODE_ENV =', environment);
-console.log('DATABASE_URL present =', !!process.env.DATABASE_URL);
-console.log('DB_HOST =', process.env.DB_HOST);
-console.log('DB_PORT =', process.env.DB_PORT);
-console.log('DB_NAME =', process.env.DB_NAME);
-console.log('PGSSLMODE =', process.env.PGSSLMODE);
-console.log('--- DB DEBUG END ---');
+// Log environment info (production-safe)
+if (process.env.NODE_ENV === 'development') {
+  console.log('--- DB Config ---');
+  console.log('NODE_ENV =', environment);
+  console.log('DATABASE_URL present =', !!process.env.DATABASE_URL);
+  console.log('DB_HOST =', process.env.DB_HOST || 'N/A');
+  console.log('--- DB Config End ---');
+}
 
 const db = knex(knexConfig);
 
