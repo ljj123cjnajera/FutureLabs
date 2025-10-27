@@ -175,6 +175,14 @@ class ModalManager {
     document.removeEventListener('keydown', this.handleEscapeKey);
   }
 
+  hideRegisterModal() {
+    this.closeRegister();
+  }
+
+  showLoginModal() {
+    this.showLogin();
+  }
+
   handleEscapeKey = (e) => {
     if (e.key === 'Escape') {
       this.closeLogin();
@@ -225,11 +233,19 @@ class ModalManager {
       });
       
       if (success) {
-        this.closeRegister();
-        // Recargar página para actualizar UI
-        setTimeout(() => {
-          window.location.href = 'index.html';
-        }, 500);
+        // El modal se cerrará automáticamente desde auth.js si requiere verificación
+        // Solo recargar si NO requiere verificación
+        if (!window.authManager.currentUser) {
+          // Si no hay usuario, significa que requiere verificación
+          // El modal de verificación se mostrará automáticamente
+          console.log('Registro exitoso, mostrando modal de verificación...');
+        } else {
+          // Si ya hay usuario, significa que el registro fue exitoso sin verificación
+          this.closeRegister();
+          setTimeout(() => {
+            window.location.href = 'index.html';
+          }, 500);
+        }
       }
     } catch (error) {
       console.error('Error en registro:', error);
@@ -239,6 +255,14 @@ class ModalManager {
 
 // Crear instancia global
 window.modalManager = new ModalManager();
+
+// Exponer métodos globalmente para compatibilidad
+window.modals = {
+  showLoginModal: () => window.modalManager.showLogin(),
+  showRegisterModal: () => window.modalManager.showRegister(),
+  hideLoginModal: () => window.modalManager.closeLogin(),
+  hideRegisterModal: () => window.modalManager.closeRegister()
+};
 
 // Agregar estilos
 const modalStyles = document.createElement('style');

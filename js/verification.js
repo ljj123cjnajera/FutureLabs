@@ -25,9 +25,9 @@ class VerificationManager {
 
     const modal = document.createElement('div');
     modal.id = 'verificationModal';
-    modal.className = 'modal';
+    modal.className = 'modal-overlay';
     modal.innerHTML = `
-      <div class="modal-content">
+      <div class="modal-content verification-modal">
         <span class="close">&times;</span>
         <div class="modal-header">
           <h2>✉️ Verifica tu Email</h2>
@@ -80,7 +80,7 @@ class VerificationManager {
     });
 
     // Click fuera del modal
-    window.addEventListener('click', (e) => {
+    this.verificationModal.addEventListener('click', (e) => {
       if (e.target === this.verificationModal) {
         this.hideModal();
       }
@@ -113,7 +113,8 @@ class VerificationManager {
     const emailElement = document.getElementById('verificationEmail');
     emailElement.textContent = email;
     
-    this.verificationModal.style.display = 'block';
+    this.verificationModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
     
     // Focus en el input
     const codeInput = document.getElementById('verificationCode');
@@ -121,7 +122,8 @@ class VerificationManager {
   }
 
   hideModal() {
-    this.verificationModal.style.display = 'none';
+    this.verificationModal.classList.remove('active');
+    document.body.style.overflow = '';
     this.currentEmail = null;
     
     // Limpiar formulario
