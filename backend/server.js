@@ -18,22 +18,28 @@ const PORT = process.env.PORT || 3000;
 // Auto-run seeds if products table is empty
 async function ensureDataSeeded() {
   try {
+    console.log('🔍 Checking if products exist...');
     // Check if products table has any data
     const products = await db('products').select('id').limit(1);
+    console.log(`📊 Products found: ${products.length}`);
     
     if (products.length === 0) {
       console.log('📦 Products table is empty, running seeds...');
       const { execSync } = require('child_process');
-      execSync('npx knex seed:run', { stdio: 'inherit' });
+      // Use absolute path to knexfile.js
+      execSync('npx knex seed:run --knexfile=./knexfile.js', { 
+        stdio: 'inherit',
+        cwd: process.cwd()
+      });
       console.log('✅ Seeds completed');
+    } else {
+      console.log('✅ Products already exist, skipping seeds');
     }
   } catch (error) {
     console.log('⚠️  Could not check/seed products:', error.message);
+    console.log('⚠️  Error stack:', error.stack);
   }
 }
-
-// Run seeds check
-ensureDataSeeded();
 
 // Agrega esta línea para el proxy:
 app.set('trust proxy', 1);
@@ -155,9 +161,22 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Iniciar servidor
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 FutureLabs API corriendo en puerto ${PORT}`);
-  console.log(`📡 Ambiente: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🌐 Escuchando en 0.0.0.0:${PORT}`);
-});
+// Iniciar servidor después de que las seeds se ejecuten
+ensureDataSeeded()
+  .then(() => {
+    console.log('✅ Seed check completed, starting server...');
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`🚀 FutureLabs API corriendo en puerto ${PORT}`);
+      console.log(`📡 Ambiente: ${process.env.NODE_ENV || 'development'}`);
+      console.log(`🌐 Escuchando en 0.0.0.0:${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.log('⚠️  Seed check failed:', error.message);
+    console.log('⚠️  Starting server anyway...');
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`🚀 FutureLabs API corriendo en puerto ${PORT}`);
+      console.log(`📡 Ambiente: ${process.env.NODE_ENV || 'development'}`);
+      console.log(`🌐 Escuchando en 0.0.0.0:${PORT}`);
+    });
+  });
