@@ -39,8 +39,6 @@ const createOrderValidation = [
     .withMessage('El costo de envío debe ser un número válido'),
   body('coupon_code')
     .optional()
-    .trim()
-    .withMessage('Código de cupón inválido')
 ];
 
 // POST /api/orders - Crear pedido desde carrito
