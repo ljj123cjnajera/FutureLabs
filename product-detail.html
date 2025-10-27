@@ -394,6 +394,15 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 // Agregar al carrito
 async function addToCart() {
+    // Obtener ID del producto de la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('id');
+    
+    if (!productId) {
+        window.notifications.error('Error: ID de producto no encontrado');
+        return;
+    }
+    
     await window.cartManager.add(productId, 1);
 }
 
@@ -404,6 +413,15 @@ function addToFavorites() {
 
 // Comprar ahora
 async function buyNow() {
+    // Obtener ID del producto de la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('id');
+    
+    if (!productId) {
+        window.notifications.error('Error: ID de producto no encontrado');
+        return;
+    }
+    
     await window.cartManager.add(productId, 1);
     window.notifications.success('Redirigiendo al checkout...');
     setTimeout(() => {

@@ -417,6 +417,39 @@
     <script src="js/cart.js"></script>
     
     <script>
+        // ==================== FUNCIONES GLOBALES ====================
+        // Agregar al carrito (global)
+        async function addToCart(productId) {
+            try {
+                await window.cartManager.add(productId, 1);
+                window.notifications.show('Producto agregado al carrito', 'success');
+            } catch (error) {
+                window.notifications.show('Error al agregar producto', 'error');
+                console.error('Error en addToCart:', error);
+            }
+        }
+        
+        // Resetear filtros (global)
+        function resetFilters() {
+            const searchInput = document.getElementById('searchFilter');
+            const categoryFilter = document.getElementById('categoryFilter');
+            const brandFilter = document.getElementById('brandFilter');
+            const priceFilter = document.getElementById('priceFilter');
+            const sortSelect = document.getElementById('sortSelect');
+            
+            if (searchInput) searchInput.value = '';
+            if (categoryFilter) categoryFilter.value = '';
+            if (brandFilter) brandFilter.value = '';
+            if (priceFilter) priceFilter.value = '';
+            if (sortSelect) sortSelect.value = 'name';
+            
+            // Recargar productos sin filtros
+            if (typeof loadProducts === 'function') {
+                loadProducts();
+            }
+        }
+        // =============================================================
+        
         // Inicializar header dinámico (sin barra de búsqueda)
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🔧 Inicializando header en products.html...');
@@ -545,18 +578,7 @@
             renderProducts();
         }
 
-        // Resetear filtros
-        function resetFilters() {
-            document.getElementById('searchFilter').value = '';
-            document.getElementById('categoryFilter').value = '';
-            document.getElementById('brandFilter').value = '';
-            document.getElementById('minPrice').value = '';
-            document.getElementById('maxPrice').value = '';
-            
-            filteredProducts = [...allProducts];
-            currentPage = 1;
-            renderProducts();
-        }
+        // Resetear filtros (ya definido en scope global arriba)
 
         // Aplicar ordenamiento
         function applySort() {
@@ -697,16 +719,6 @@
                     </button>
                 </div>
             `;
-        }
-
-        // Agregar al carrito
-        async function addToCart(productId) {
-            try {
-                await window.cartManager.add(productId, 1);
-                window.notifications.show('Producto agregado al carrito', 'success');
-            } catch (error) {
-                window.notifications.show('Error al agregar producto', 'error');
-            }
         }
 
             // Actualizar contador de carrito
