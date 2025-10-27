@@ -106,7 +106,19 @@ class AuthManager {
       return false;
     } catch (error) {
       console.error('❌ Error en login:', error);
-      this.showNotification('Error al iniciar sesión: ' + error.message, 'error');
+      
+      // Verificar si el error es porque el email no está verificado
+      if (error.message && error.message.includes('verifica tu email')) {
+        this.showNotification(error.message + ' Por favor, ingresa el código de verificación.', 'warning');
+        
+        // Mostrar modal de verificación
+        if (window.verificationManager) {
+          window.verificationManager.showModal(email);
+        }
+      } else {
+        this.showNotification('Error al iniciar sesión: ' + error.message, 'error');
+      }
+      
       return false;
     }
   }

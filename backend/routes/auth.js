@@ -151,6 +151,15 @@ router.post('/login', loginValidation, async (req, res) => {
       });
     }
 
+    // Verificar si el email está verificado
+    if (!user.email_verified) {
+      return res.status(403).json({
+        success: false,
+        message: 'Por favor verifica tu email antes de iniciar sesión. Revisa tu bandeja de entrada.',
+        requires_verification: true
+      });
+    }
+
     // Generar token
     const token = generateToken(user.id);
 
