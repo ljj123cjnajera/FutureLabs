@@ -54,7 +54,7 @@ router.post('/verify-email', [
     }
 
     // Marcar código como usado
-    await VerificationCode.markAsVerified(verificationCode.id);
+    await VerificationCode.markAsUsed(verificationCode.id);
 
     // Marcar email como verificado
     await User.verifyEmail(user.id);
