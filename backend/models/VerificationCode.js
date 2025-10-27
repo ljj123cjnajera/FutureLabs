@@ -16,7 +16,7 @@ class VerificationCode {
         user_id: userId,
         code,
         type,
-        is_used: false,
+        is_verified: false,  // Tabla usa is_verified, no is_used
         expires_at: expiresAt
       })
       .returning('*');
@@ -29,7 +29,7 @@ class VerificationCode {
     return await db('verification_codes')
       .where({ code, type })
       .where('expires_at', '>', new Date())
-      .where('is_used', false)
+      .where('is_verified', false)
       .first();
   }
 
@@ -38,7 +38,7 @@ class VerificationCode {
     return await db('verification_codes')
       .where({ user_id: userId, type })
       .where('expires_at', '>', new Date())
-      .where('is_used', false)
+      .where('is_verified', false)
       .orderBy('created_at', 'desc')
       .first();
   }
@@ -47,14 +47,14 @@ class VerificationCode {
   static async markAsUsed(codeId) {
     return await db('verification_codes')
       .where({ id: codeId })
-      .update({ is_used: true });
+      .update({ is_verified: true, verified_at: new Date() });
   }
 
   // Invalidar todos los códigos de un usuario por tipo
   static async invalidateUserCodes(userId, type) {
     return await db('verification_codes')
       .where({ user_id: userId, type })
-      .update({ is_used: true }); // Marcar como usados
+      .update({ is_verified: true }); // Marcar como verificados
   }
 
   // Eliminar códigos expirados (cleanup)
