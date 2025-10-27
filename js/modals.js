@@ -246,12 +246,26 @@ class ModalManager {
           // Si no hay usuario, significa que requiere verificación
           // El modal de verificación se mostrará automáticamente
           console.log('Registro exitoso, mostrando modal de verificación...');
+          
+          // Restaurar botón después de mostrar modal de verificación
+          const submitBtn = document.querySelector('#registerForm button[type="submit"]');
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Crear Cuenta';
+          }
         } else {
           // Si ya hay usuario, significa que el registro fue exitoso sin verificación
           this.closeRegister();
           setTimeout(() => {
             window.location.href = 'index.html';
           }, 500);
+        }
+      } else {
+        // Si success es false, restaurar botón
+        const submitBtn = document.querySelector('#registerForm button[type="submit"]');
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Crear Cuenta';
         }
       }
     } catch (error) {
@@ -264,15 +278,6 @@ class ModalManager {
         submitBtn.disabled = false;
         submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Crear Cuenta';
       }
-    } finally {
-      // Asegurar que el botón se restaure después de 3 segundos
-      setTimeout(() => {
-        const submitBtn = document.querySelector('#registerForm button[type="submit"]');
-        if (submitBtn && !submitBtn.disabled) {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Crear Cuenta';
-        }
-      }, 3000);
     }
   }
 
