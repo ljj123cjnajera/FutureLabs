@@ -14,13 +14,33 @@ class EmailService {
     });
   }
 
+  // Obtener transporter (lazy initialization)
+  getTransporter() {
+    if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+      throw new Error('SMTP credentials not configured. Please set SMTP_USER and SMTP_PASS environment variables.');
+    }
+
+    return nodemailer.createTransport({
+      host: process.env.SMTP_HOST || 'smtp.gmail.com',
+      port: parseInt(process.env.SMTP_PORT || '587'),
+      secure: false,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS
+      }
+    });
+  }
+
   // Enviar código de verificación por email
   async sendVerificationCode(email, code, userName) {
-    const mailOptions = {
-      from: `FutureLabs <${process.env.SMTP_USER}>`,
-      to: email,
-      subject: 'Verifica tu cuenta - FutureLabs',
-      html: `
+    try {
+      const transporter = this.getTransporter();
+      
+      const mailOptions = {
+        from: `FutureLabs <${process.env.SMTP_USER}>`,
+        to: email,
+        subject: 'Verifica tu cuenta - FutureLabs',
+        html: `
         <!DOCTYPE html>
         <html>
         <head>
@@ -62,12 +82,12 @@ class EmailService {
       `
     };
 
-    try {
-      await this.transporter.sendMail(mailOptions);
+      await transporter.sendMail(mailOptions);
       console.log(`✅ Email de verificación enviado a ${email}`);
       return true;
     } catch (error) {
-      console.error('❌ Error enviando email:', error);
+      console.error('❌ Error enviando email:', error.message);
+      console.error('Error completo:', error);
       throw error;
     }
   }
