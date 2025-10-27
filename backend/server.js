@@ -9,9 +9,31 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const compression = require('compression');
 const slowDown = require('express-slow-down');
+const { exec } = require('child_process');
+const db = require('./database/config');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Auto-run seeds if products table is empty
+async function ensureDataSeeded() {
+  try {
+    // Check if products table has any data
+    const products = await db('products').select('id').limit(1);
+    
+    if (products.length === 0) {
+      console.log('📦 Products table is empty, running seeds...');
+      const { execSync } = require('child_process');
+      execSync('npx knex seed:run', { stdio: 'inherit' });
+      console.log('✅ Seeds completed');
+    }
+  } catch (error) {
+    console.log('⚠️  Could not check/seed products:', error.message);
+  }
+}
+
+// Run seeds check
+ensureDataSeeded();
 
 // Agrega esta línea para el proxy:
 app.set('trust proxy', 1);
