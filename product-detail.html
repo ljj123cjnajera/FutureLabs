@@ -394,16 +394,11 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 // Agregar al carrito
 async function addToCart() {
-    console.log('🛒 addToCart() llamada desde product-detail.html');
-    
     // Obtener ID del producto de la URL
     const urlParams = new URLSearchParams(window.location.search);
     const productId = urlParams.get('id');
     
-    console.log('📦 productId obtenido de URL:', productId);
-    
     if (!productId) {
-        console.error('❌ addToCart: ID de producto no encontrado en URL');
         window.notifications.error('Error: ID de producto no encontrado');
         return;
     }

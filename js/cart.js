@@ -31,12 +31,7 @@ class CartManager {
 
   async add(productId, quantity = 1) {
     try {
-      console.log('🛒 CartManager.add() - Iniciando');
-      console.log('📦 productId:', productId);
-      console.log('📊 quantity:', quantity);
-      
       if (!productId) {
-        console.error('❌ ProductId es undefined');
         this.showNotification('Error: ID de producto no válido', 'error');
         return false;
       }

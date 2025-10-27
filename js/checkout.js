@@ -540,14 +540,20 @@ async function processOrder() {
         
         // Crear pedido
         const orderData = {
-            shipping_address: shippingData,
+            // Datos de envío (formato plano para el backend)
+            shipping_address: shippingData.address,
+            shipping_city: shippingData.city,
+            shipping_country: shippingData.country,
+            shipping_postal_code: shippingData.postalCode,
+            shipping_phone: shippingData.phone,
+            shipping_email: shippingData.email,
+            shipping_full_name: shippingData.fullName,
+            // Método de pago
             payment_method: selectedPaymentMethod,
-            payment_details: paymentData,
-            items: cartData.items,
-            subtotal: cartData.subtotal,
-            shipping: cartData.shipping || 30.00,
-            discount: discount,
-            total: cartData.total,
+            // No enviamos payment_details por ahora
+            // shipping cost viene del carrito
+            shipping_cost: cartData.shipping || 30.00,
+            // Código de cupón si aplicó
             coupon_code: appliedCoupon
         };
         

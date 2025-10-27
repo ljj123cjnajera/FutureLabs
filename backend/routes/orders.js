@@ -18,9 +18,29 @@ const createOrderValidation = [
     .trim()
     .notEmpty()
     .withMessage('El país es requerido'),
+  body('shipping_full_name')
+    .trim()
+    .notEmpty()
+    .withMessage('El nombre completo es requerido'),
+  body('shipping_email')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Email inválido'),
+  body('shipping_phone')
+    .trim()
+    .notEmpty()
+    .withMessage('El teléfono es requerido'),
   body('payment_method')
     .isIn(['stripe', 'paypal', 'yape', 'plin', 'cash'])
-    .withMessage('Método de pago inválido')
+    .withMessage('Método de pago inválido'),
+  body('shipping_cost')
+    .optional()
+    .isFloat({ min: 0 })
+    .withMessage('El costo de envío debe ser un número válido'),
+  body('coupon_code')
+    .optional()
+    .trim()
+    .withMessage('Código de cupón inválido')
 ];
 
 // POST /api/orders - Crear pedido desde carrito

@@ -165,6 +165,8 @@ class Order {
           shipping_country: orderData.shipping_country,
           shipping_postal_code: orderData.shipping_postal_code,
           shipping_phone: orderData.shipping_phone,
+          shipping_email: orderData.shipping_email,
+          shipping_full_name: orderData.shipping_full_name,
           notes: orderData.notes
         })
         .returning('*');

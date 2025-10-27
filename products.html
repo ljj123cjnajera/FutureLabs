@@ -420,18 +420,13 @@
         // ==================== FUNCIONES GLOBALES ====================
         // Agregar al carrito (global)
         async function addToCart(productId) {
-            console.log('🛒 addToCart() llamada desde products.html');
-            console.log('📦 productId recibido:', productId);
-            
             if (!productId) {
-                console.error('❌ addToCart: productId es undefined');
                 window.notifications.show('Error: ID de producto no válido', 'error');
                 return;
             }
             
             try {
                 await window.cartManager.add(productId, 1);
-                // No mostrar notificación aquí porque cartManager ya la muestra
             } catch (error) {
                 console.error('Error en addToCart:', error);
             }
