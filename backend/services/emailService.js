@@ -27,7 +27,17 @@ class EmailService {
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS
-      }
+      },
+      connectionTimeout: 10000, // 10 segundos
+      greetingTimeout: 10000,
+      socketTimeout: 10000,
+      // Configuración adicional para Gmail
+      tls: {
+        rejectUnauthorized: false
+      },
+      pool: true,
+      maxConnections: 1,
+      maxMessages: 1
     });
   }
 
