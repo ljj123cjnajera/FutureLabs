@@ -521,6 +521,11 @@
                 console.log('✅ Contador de carrito inicializado');
             }
             
+            // Inicializar búsqueda
+            if (window.Components) {
+                window.Components.initSearch();
+            }
+            
             // Inicializar modales
             if (window.modalManager) {
                 console.log('✅ Modal manager inicializado');

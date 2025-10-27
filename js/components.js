@@ -179,15 +179,79 @@ class Components {
       }
       
       // Escuchar cambios en el estado de autenticación
-      document.addEventListener('authStateChanged', () => {
+      document.addEventListener('authStateChanged', async () => {
         if (window.authManager && window.authManager.isAuthenticated()) {
           accountText.textContent = 'Mi Cuenta';
+          
+          // Verificar si es admin y mostrar botón de admin
+          try {
+            const user = await window.authManager.getCurrentUser();
+            if (user && (user.role === 'admin' || user.role === 'moderator')) {
+              this.showAdminButton();
+            } else {
+              this.hideAdminButton();
+            }
+          } catch (error) {
+            console.error('Error checking user role:', error);
+          }
         } else {
           accountText.textContent = 'Cuenta';
+          this.hideAdminButton();
         }
       });
+      
+      // Verificar si ya hay usuario admin al inicializar
+      setTimeout(async () => {
+        await this.checkAndShowAdminButton();
+      }, 500);
     }
+  }
 
+  static async showAdminButton() {
+    // Verificar si el botón ya existe
+    if (document.getElementById('adminButton')) {
+      return;
+    }
+    
+    const userActions = document.querySelector('.user-actions');
+    if (!userActions) return;
+    
+    // Crear botón de admin
+    const adminButton = document.createElement('a');
+    adminButton.href = 'admin.html';
+    adminButton.className = 'admin-link';
+    adminButton.id = 'adminButton';
+    adminButton.innerHTML = '<i class="fas fa-cog"></i> Admin';
+    adminButton.style.cssText = 'color: #667eea; font-weight: 600;';
+    
+    // Insertar antes del botón de cuenta
+    const accountLink = document.getElementById('accountLink');
+    if (accountLink && accountLink.parentNode) {
+      userActions.insertBefore(adminButton, accountLink);
+    }
+  }
+  
+  static hideAdminButton() {
+    const adminButton = document.getElementById('adminButton');
+    if (adminButton) {
+      adminButton.remove();
+    }
+  }
+  
+  static async checkAndShowAdminButton() {
+    try {
+      if (window.authManager && window.authManager.isAuthenticated()) {
+        const user = await window.authManager.getCurrentUser();
+        if (user && (user.role === 'admin' || user.role === 'moderator')) {
+          this.showAdminButton();
+        }
+      }
+    } catch (error) {
+      console.error('Error checking admin status:', error);
+    }
+  }
+
+  static initSearch() {
     // Búsqueda con Enter
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
