@@ -98,6 +98,17 @@ class Cart {
       .sum('quantity as total')
       .first();
 
+    // Manejar el caso cuando no hay items (result.total puede ser null o un objeto)
+    if (!result || result.total === null) {
+      return 0;
+    }
+    
+    // Si result.total es un string, parsearlo
+    if (typeof result.total === 'string') {
+      return parseInt(result.total) || 0;
+    }
+    
+    // Si result.total es un número
     return parseInt(result.total) || 0;
   }
 

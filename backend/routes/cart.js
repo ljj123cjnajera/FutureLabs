@@ -45,9 +45,14 @@ router.get('/', authenticateToken, async (req, res) => {
 // POST /api/cart/add - Agregar producto al carrito
 router.post('/add', authenticateToken, addToCartValidation, async (req, res) => {
   try {
+    console.log('🛒 POST /api/cart/add - Request recibido');
+    console.log('📝 Body:', req.body);
+    console.log('👤 Usuario:', req.user.id);
+    
     // Verificar errores de validación
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('❌ Errores de validación:', errors.array());
       return res.status(400).json({
         success: false,
         message: 'Errores de validación',
@@ -56,8 +61,10 @@ router.post('/add', authenticateToken, addToCartValidation, async (req, res) => 
     }
 
     const { product_id, quantity } = req.body;
+    console.log('📦 Agregando producto:', product_id, 'cantidad:', quantity || 1);
 
     const item = await Cart.add(req.user.id, product_id, quantity || 1);
+    console.log('✅ Item agregado al carrito:', item.id);
 
     res.status(201).json({
       success: true,
@@ -65,10 +72,12 @@ router.post('/add', authenticateToken, addToCartValidation, async (req, res) => 
       data: { item }
     });
   } catch (error) {
-    console.error('Error agregando al carrito:', error);
+    console.error('❌ Error agregando al carrito:', error.message);
+    console.error('Stack:', error.stack);
     res.status(500).json({
       success: false,
-      message: 'Error agregando producto al carrito'
+      message: 'Error agregando producto al carrito',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
