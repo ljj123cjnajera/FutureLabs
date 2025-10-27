@@ -223,6 +223,13 @@ class ModalManager {
       return;
     }
 
+    // Deshabilitar botón de submit para evitar doble click
+    const submitBtn = document.querySelector('#registerForm button[type="submit"]');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = '⏳ Creando cuenta...';
+    }
+
     try {
       const success = await window.authManager.register({
         first_name: firstName,
@@ -250,6 +257,22 @@ class ModalManager {
     } catch (error) {
       console.error('Error en registro:', error);
       this.showError('Error al registrarse: ' + (error.message || 'Error desconocido'));
+      
+      // Rehabilitar botón en caso de error
+      const submitBtn = document.querySelector('#registerForm button[type="submit"]');
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Crear Cuenta';
+      }
+    } finally {
+      // Asegurar que el botón se restaure después de 3 segundos
+      setTimeout(() => {
+        const submitBtn = document.querySelector('#registerForm button[type="submit"]');
+        if (submitBtn && !submitBtn.disabled) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Crear Cuenta';
+        }
+      }, 3000);
     }
   }
 
