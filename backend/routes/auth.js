@@ -85,30 +85,46 @@ router.post('/register', registerValidation, async (req, res) => {
     // Crear código de verificación
     const verificationCode = await VerificationCode.create(user.id, 'email');
 
-    // Enviar respuesta inmediatamente sin esperar email
-    const responseData = {
+    // Verificar si Resend está configurado
+    const resendConfigured = !!process.env.RESEND_API_KEY;
+
+    // Respuesta inicial
+    let responseData = {
       user,
-      requires_verification: true,
-      verification_code: verificationCode.code // Incluir código siempre
+      requires_verification: true
     };
+
+    // Solo incluir código si Resend NO está configurado (para fallback)
+    if (!resendConfigured) {
+      responseData.verification_code = verificationCode.code;
+    }
+
+    let message = 'Usuario registrado exitosamente. ';
+    if (resendConfigured) {
+      message += 'Por favor, revisa tu email para el código de verificación.';
+    } else {
+      message += `El código de verificación es: ${verificationCode.code}. Revisa también tu email.`;
+    }
 
     res.status(201).json({
       success: true,
-      message: 'Usuario registrado exitosamente. El código de verificación es: ' + verificationCode.code + '. Revisa también tu email.',
+      message: message,
       data: responseData
     });
 
-    // Enviar email en background (no bloquea la respuesta)
-    emailService.sendVerificationCode(
-      user.email,
-      verificationCode.code,
-      `${user.first_name} ${user.last_name}`
-    ).then(() => {
-      console.log('✅ Email de verificación enviado exitosamente a', user.email);
-    }).catch((emailError) => {
-      console.error('❌ Error enviando email:', emailError.message);
-      console.log('⚠️  Usuario debe usar el código mostrado en pantalla');
-    });
+    // Si Resend está configurado, enviar email en background
+    if (resendConfigured) {
+      emailService.sendVerificationCode(
+        user.email,
+        verificationCode.code,
+        `${user.first_name} ${user.last_name}`
+      ).then(() => {
+        console.log('✅ Email de verificación enviado exitosamente a', user.email);
+      }).catch((emailError) => {
+        console.error('❌ Error enviando email:', emailError.message);
+        console.log('⚠️  Error al enviar email, pero el código está guardado en la base de datos');
+      });
+    }
   } catch (error) {
     console.error('Error en registro:', error);
     res.status(500).json({

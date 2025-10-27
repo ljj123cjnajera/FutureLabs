@@ -141,15 +141,8 @@ class AuthManager {
             window.modals.hideRegisterModal();
           }
           
-          // Si hay código de verificación en la respuesta (SMTP no configurado), mostrarlo
-          if (response.data.verification_code) {
-            console.log('📝 Mostrando código de verificación (SMTP no configurado)');
-            setTimeout(() => {
-              alert(`Código de verificación: ${response.data.verification_code}\n\n(Por favor, configura SMTP en Railway para envío automático de emails)`);
-            }, 500);
-          }
-          
-          // Mostrar modal de verificación
+          // Mostrar modal de verificación directamente
+          // (Ya no mostramos el código en alert, el modal tiene su propio input)
           if (window.verificationManager) {
             await window.verificationManager.showModal(userData.email);
           }
