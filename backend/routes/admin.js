@@ -133,6 +133,30 @@ router.delete('/products/:id', requireAdmin, async (req, res) => {
 });
 
 // ===== CATEGORÍAS =====
+router.get('/categories/:id', requireAdmin, async (req, res) => {
+  try {
+    const category = await Category.getById(req.params.id);
+    
+    if (!category) {
+      return res.status(404).json({
+        success: false,
+        message: 'Categoría no encontrada'
+      });
+    }
+    
+    res.json({
+      success: true,
+      data: { category }
+    });
+  } catch (error) {
+    console.error('Error fetching category:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener categoría'
+    });
+  }
+});
+
 router.post('/categories', requireAdmin, async (req, res) => {
   try {
     const category = await Category.create(req.body);
@@ -186,7 +210,7 @@ router.delete('/categories/:id', requireAdmin, async (req, res) => {
 // ===== USUARIOS =====
 router.get('/users', requireAdmin, async (req, res) => {
   try {
-    const users = await User.findAll();
+    const users = await User.getAll();
     res.json({
       success: true,
       data: { users }
@@ -200,10 +224,33 @@ router.get('/users', requireAdmin, async (req, res) => {
   }
 });
 
+router.get('/users/:id', requireAdmin, async (req, res) => {
+  try {
+    const user = await User.getById(req.params.id);
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Usuario no encontrado'
+      });
+    }
+    
+    res.json({
+      success: true,
+      data: { user }
+    });
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener usuario'
+    });
+  }
+});
+
 router.put('/users/:id', requireAdmin, async (req, res) => {
   try {
-    const { role, email_verified } = req.body;
-    const user = await User.update(req.params.id, { role, email_verified });
+    const user = await User.update(req.params.id, req.body);
     res.json({
       success: true,
       message: 'Usuario actualizado exitosamente',
@@ -253,22 +300,21 @@ router.get('/orders', requireAdmin, async (req, res) => {
 
 router.get('/orders/:id', requireAdmin, async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id);
+    const orderData = await Order.findById(req.params.id);
     
-    if (!order) {
+    if (!orderData) {
       return res.status(404).json({
         success: false,
         message: 'Pedido no encontrado'
       });
     }
     
-    // Obtener items del pedido
-    const items = await knex('order_items')
-      .where('order_id', req.params.id);
+    // Separar order de items
+    const { items, ...order } = orderData;
     
     res.json({
       success: true,
-      data: { order, items }
+      data: { order, items: items || [] }
     });
   } catch (error) {
     console.error('Error fetching order details:', error);
@@ -307,13 +353,37 @@ router.get('/reviews', requireAdmin, async (req, res) => {
   }
 });
 
-router.put('/reviews/:id/approve', requireAdmin, async (req, res) => {
+router.get('/reviews/:id', requireAdmin, async (req, res) => {
   try {
-    const { is_approved } = req.body;
-    await Review.update(req.params.id, { is_approved });
+    const review = await Review.findById(req.params.id);
+    
+    if (!review) {
+      return res.status(404).json({
+        success: false,
+        message: 'Reseña no encontrada'
+      });
+    }
+    
     res.json({
       success: true,
-      message: 'Reseña actualizada exitosamente'
+      data: { review }
+    });
+  } catch (error) {
+    console.error('Error fetching review:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener reseña'
+    });
+  }
+});
+
+router.put('/reviews/:id', requireAdmin, async (req, res) => {
+  try {
+    const review = await Review.update(req.params.id, req.body);
+    res.json({
+      success: true,
+      message: 'Reseña actualizada exitosamente',
+      data: { review }
     });
   } catch (error) {
     console.error('Error updating review:', error);

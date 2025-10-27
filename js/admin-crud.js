@@ -372,41 +372,100 @@ class AdminCRUD {
       
       if (response.success) {
         const order = response.data.order;
-        const items = response.data.items;
+        const items = response.data.items || [];
         
         // Actualizar información del pedido
         document.getElementById('orderDetailsNumber').textContent = order.order_number;
         document.getElementById('orderDetailsCustomer').textContent = 
-          `${order.first_name} ${order.last_name}`;
-        document.getElementById('orderDetailsEmail').textContent = order.email;
-        document.getElementById('orderDetailsPhone').textContent = order.phone || '-';
+          order.shipping_full_name || 'N/A';
+        document.getElementById('orderDetailsEmail').textContent = order.shipping_email || '-';
+        document.getElementById('orderDetailsPhone').textContent = order.shipping_phone || '-';
         document.getElementById('orderDetailsDate').textContent = 
           new Date(order.created_at).toLocaleString('es-PE');
-        document.getElementById('orderDetailsStatus').textContent = order.status;
-        document.getElementById('orderDetailsPaymentStatus').textContent = order.payment_status;
+        
+        // Estado del pedido
+        const statusText = this.getStatusText(order.status);
+        const statusBadge = this.getStatusBadgeClass(order.status);
+        document.getElementById('orderDetailsStatus').innerHTML = 
+          `<span class="badge badge-${statusBadge}">${statusText}</span>`;
+        
+        // Estado de pago
+        const paymentText = this.getPaymentText(order.payment_status);
+        const paymentBadge = this.getPaymentBadgeClass(order.payment_status);
+        document.getElementById('orderDetailsPaymentStatus').innerHTML = 
+          `<span class="badge badge-${paymentBadge}">${paymentText}</span>`;
+        
         document.getElementById('orderDetailsPaymentMethod').textContent = order.payment_method || '-';
-        document.getElementById('orderDetailsSubtotal').textContent = `S/ ${parseFloat(order.subtotal).toFixed(2)}`;
-        document.getElementById('orderDetailsShipping').textContent = `S/ ${parseFloat(order.shipping_cost).toFixed(2)}`;
-        document.getElementById('orderDetailsTax').textContent = `S/ ${parseFloat(order.tax).toFixed(2)}`;
-        document.getElementById('orderDetailsTotal').textContent = `S/ ${parseFloat(order.total_amount).toFixed(2)}`;
+        document.getElementById('orderDetailsSubtotal').textContent = `S/ ${parseFloat(order.subtotal || 0).toFixed(2)}`;
+        document.getElementById('orderDetailsShipping').textContent = `S/ ${parseFloat(order.shipping_cost || 0).toFixed(2)}`;
+        document.getElementById('orderDetailsTax').textContent = `S/ ${parseFloat(order.tax || 0).toFixed(2)}`;
+        document.getElementById('orderDetailsTotal').textContent = `S/ ${parseFloat(order.total_amount || 0).toFixed(2)}`;
         document.getElementById('orderDetailsAddress').textContent = 
           `${order.shipping_address}, ${order.shipping_city}, ${order.shipping_country}`;
         
         // Actualizar items
         const itemsContainer = document.getElementById('orderDetailsItems');
-        itemsContainer.innerHTML = items.map(item => `
-          <tr>
-            <td>${item.product_name}</td>
-            <td>${item.product_sku}</td>
-            <td>S/ ${parseFloat(item.price).toFixed(2)}</td>
-            <td>${item.quantity}</td>
-            <td>S/ ${parseFloat(item.total).toFixed(2)}</td>
-          </tr>
-        `).join('');
+        if (items.length === 0) {
+          itemsContainer.innerHTML = '<tr><td colspan="5" style="text-align: center;">No hay items</td></tr>';
+        } else {
+          itemsContainer.innerHTML = items.map(item => `
+            <tr>
+              <td>${item.product_name || '-'}</td>
+              <td>${item.product_sku || '-'}</td>
+              <td>S/ ${parseFloat(item.price || 0).toFixed(2)}</td>
+              <td>${item.quantity}</td>
+              <td>S/ ${parseFloat(item.total || 0).toFixed(2)}</td>
+            </tr>
+          `).join('');
+        }
       }
     } catch (error) {
+      console.error('Error loading order details:', error);
       window.notifications.error('Error al cargar detalles del pedido');
     }
+  }
+  
+  // Helpers para status
+  getStatusText(status) {
+    const statusTexts = {
+      'pending': 'Pendiente',
+      'processing': 'Procesando',
+      'shipped': 'Enviado',
+      'delivered': 'Entregado',
+      'cancelled': 'Cancelado'
+    };
+    return statusTexts[status] || status;
+  }
+  
+  getStatusBadgeClass(status) {
+    const classes = {
+      'pending': 'warning',
+      'processing': 'info',
+      'shipped': 'info',
+      'delivered': 'success',
+      'cancelled': 'danger'
+    };
+    return classes[status] || 'info';
+  }
+  
+  getPaymentText(status) {
+    const texts = {
+      'pending': 'Pendiente',
+      'paid': 'Pagado',
+      'failed': 'Fallido',
+      'refunded': 'Reembolsado'
+    };
+    return texts[status] || status;
+  }
+  
+  getPaymentBadgeClass(status) {
+    const classes = {
+      'pending': 'warning',
+      'paid': 'success',
+      'failed': 'danger',
+      'refunded': 'info'
+    };
+    return classes[status] || 'info';
   }
 }
 
