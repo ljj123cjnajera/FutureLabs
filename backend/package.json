@@ -1,7 +1,7 @@
 {
   "name": "futurelabs-backend",
   "version": "1.0.0",
-  "description": "Backend API para FutureLabs - Tienda de tecnología",
+  "description": "Backend API para FutureLabs - Tienda de tecnología 1.0",
   "main": "server.js",
   "scripts": {
     "start": "npm run migrate && npm run seed && node server.js",
