@@ -249,6 +249,15 @@ class ModalManager {
       }
     } catch (error) {
       console.error('Error en registro:', error);
+      this.showError('Error al registrarse: ' + (error.message || 'Error desconocido'));
+    }
+  }
+
+  showError(message) {
+    if (window.notifications && window.notifications.error) {
+      window.notifications.error(message);
+    } else {
+      alert(message);
     }
   }
 }

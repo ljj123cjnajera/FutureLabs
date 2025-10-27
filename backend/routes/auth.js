@@ -86,25 +86,36 @@ router.post('/register', registerValidation, async (req, res) => {
     const verificationCode = await VerificationCode.create(user.id, 'email');
 
     // Enviar email con código
+    let emailSent = false;
     try {
       await emailService.sendVerificationCode(
         user.email,
         verificationCode.code,
         `${user.first_name} ${user.last_name}`
       );
+      emailSent = true;
+      console.log('✅ Email de verificación enviado exitosamente a', user.email);
     } catch (emailError) {
-      console.error('Error enviando email:', emailError);
-      // Continuar aunque falle el email (el código está en la BD)
+      console.error('❌ Error enviando email:', emailError.message);
+      // Si SMTP no está configurado, devolver el código en desarrollo
+      if (process.env.NODE_ENV === 'development') {
+        console.log('⚠️  SMTP no configurado. Código de verificación (solo desarrollo):', verificationCode.code);
+      }
     }
 
     // NO generar token todavía - el usuario debe verificar email primero
+    const responseData = {
+      user,
+      requires_verification: true,
+      verification_code: emailSent ? undefined : verificationCode.code // Solo en producción sin SMTP
+    };
+
     res.status(201).json({
       success: true,
-      message: 'Usuario registrado exitosamente. Verifica tu email con el código enviado.',
-      data: {
-        user,
-        requires_verification: true
-      }
+      message: emailSent 
+        ? 'Usuario registrado exitosamente. Revisa tu email para el código de verificación.' 
+        : 'Usuario registrado exitosamente. El código de verificación es: ' + verificationCode.code,
+      data: responseData
     });
   } catch (error) {
     console.error('Error en registro:', error);
