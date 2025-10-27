@@ -3,6 +3,8 @@ const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const VerificationCode = require('../models/VerificationCode');
+const emailService = require('../services/emailService');
 const { authenticateToken } = require('../middleware/auth');
 
 // Generar token JWT
@@ -80,15 +82,28 @@ router.post('/register', registerValidation, async (req, res) => {
       phone
     });
 
-    // Generar token
-    const token = generateToken(user.id);
+    // Crear código de verificación
+    const verificationCode = await VerificationCode.create(user.id, 'email');
 
+    // Enviar email con código
+    try {
+      await emailService.sendVerificationCode(
+        user.email,
+        verificationCode.code,
+        `${user.first_name} ${user.last_name}`
+      );
+    } catch (emailError) {
+      console.error('Error enviando email:', emailError);
+      // Continuar aunque falle el email (el código está en la BD)
+    }
+
+    // NO generar token todavía - el usuario debe verificar email primero
     res.status(201).json({
       success: true,
-      message: 'Usuario registrado exitosamente',
+      message: 'Usuario registrado exitosamente. Verifica tu email con el código enviado.',
       data: {
         user,
-        token
+        requires_verification: true
       }
     });
   } catch (error) {

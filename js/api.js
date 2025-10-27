@@ -300,6 +300,21 @@ class FutureLabsAPI {
     });
   }
 
+  // ===== VERIFICATION =====
+  async verifyEmail(email, code) {
+    return this.request('/verification/verify-email', {
+      method: 'POST',
+      body: JSON.stringify({ email, code })
+    });
+  }
+
+  async resendVerificationCode(email) {
+    return this.request('/verification/resend-code', {
+      method: 'POST',
+      body: JSON.stringify({ email })
+    });
+  }
+
   // ===== PASSWORD RECOVERY =====
   async requestPasswordRecovery(email) {
     return this.request('/password-recovery/request', {

@@ -1,0 +1,70 @@
+const db = require('../database/config');
+
+class VerificationCode {
+  // Crear nuevo código de verificación
+  static async create(userId, type = 'email') {
+    // Generar código de 6 dígitos
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // Expira en 10 minutos
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + 10);
+    
+    const [verificationCode] = await db('verification_codes')
+      .insert({
+        user_id: userId,
+        code,
+        type,
+        expires_at: expiresAt
+      })
+      .returning('*');
+    
+    return verificationCode;
+  }
+
+  // Buscar código por código y tipo
+  static async findByCode(code, type = 'email') {
+    return await db('verification_codes')
+      .where({ code, type })
+      .where('expires_at', '>', new Date())
+      .where('is_verified', false)
+      .first();
+  }
+
+  // Buscar código activo por usuario
+  static async findActiveCodeByUser(userId, type = 'email') {
+    return await db('verification_codes')
+      .where({ user_id: userId, type })
+      .where('expires_at', '>', new Date())
+      .where('is_verified', false)
+      .orderBy('created_at', 'desc')
+      .first();
+  }
+
+  // Marcar código como verificado
+  static async markAsVerified(codeId) {
+    return await db('verification_codes')
+      .where({ id: codeId })
+      .update({
+        is_verified: true,
+        verified_at: new Date()
+      });
+  }
+
+  // Invalidar todos los códigos de un usuario por tipo
+  static async invalidateUserCodes(userId, type) {
+    return await db('verification_codes')
+      .where({ user_id: userId, type })
+      .update({ is_verified: true }); // Marcar como usados
+  }
+
+  // Eliminar códigos expirados (cleanup)
+  static async deleteExpired() {
+    return await db('verification_codes')
+      .where('expires_at', '<', new Date())
+      .del();
+  }
+}
+
+module.exports = VerificationCode;
+

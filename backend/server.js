@@ -105,6 +105,7 @@ app.get('/', (req, res) => {
 
 // API Routes
 const authRoutes = require('./routes/auth');
+const verificationRoutes = require('./routes/verification');
 const productsRoutes = require('./routes/products');
 const categoriesRoutes = require('./routes/categories');
 const cartRoutes = require('./routes/cart');
@@ -121,6 +122,7 @@ const relatedProductsRoutes = require('./routes/related-products');
 const searchRoutes = require('./routes/search');
 
 app.use('/api/auth', authRoutes);
+app.use('/api/verification', verificationRoutes);
 app.use('/api/products', productsRoutes);
 app.use('/api/categories', categoriesRoutes);
 app.use('/api/cart', cartRoutes);

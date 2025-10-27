@@ -118,18 +118,33 @@ class AuthManager {
       console.log('📥 Respuesta del servidor:', response);
       
       if (response.success) {
+        console.log('✅ Usuario registrado:', userData.email);
+        
+        // Si requiere verificación de email, mostrar modal
+        if (response.data.requires_verification) {
+          console.log('✉️ Usuario necesita verificar email');
+          
+          // Cerrar modal de registro
+          if (window.modals && window.modals.hideRegisterModal) {
+            window.modals.hideRegisterModal();
+          }
+          
+          // Mostrar modal de verificación
+          if (window.verificationManager) {
+            await window.verificationManager.showModal(userData.email);
+          }
+          
+          this.showNotification('Te hemos enviado un código de verificación al email', 'success');
+          return true;
+        }
+        
+        // Si no requiere verificación (login antiguo)
         this.currentUser = response.data.user;
-        console.log('✅ Usuario registrado:', this.currentUser.email);
-        
-        // Guardar token usando el método del API client
         window.api.setToken(response.data.token);
-        console.log('💾 Token guardado en API client');
         
-        // Verificar que el token se guardó correctamente
         const savedToken = localStorage.getItem('auth_token');
         console.log('🔍 Token verificado en localStorage:', savedToken ? savedToken.substring(0, 20) + '...' : 'NO ENCONTRADO');
         
-        // Disparar evento de cambio de estado
         document.dispatchEvent(new Event('authStateChanged'));
         console.log('🎉 Evento authStateChanged disparado');
         
