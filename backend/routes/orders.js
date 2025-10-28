@@ -3,6 +3,8 @@ const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const Order = require('../models/Order');
 const { authenticateToken, requireAdmin } = require('../middleware/auth');
+const User = require('../models/User');
+const emailService = require('../services/emailService');
 
 // Validaciones
 const createOrderValidation = [
@@ -55,6 +57,24 @@ router.post('/', authenticateToken, createOrderValidation, async (req, res) => {
     }
 
     const order = await Order.createFromCart(req.user.id, req.body);
+
+    // Enviar email de confirmación en background
+    const user = await User.getById(req.user.id);
+    if (user && user.email) {
+      emailService.sendOrderConfirmation(
+        user.email,
+        {
+          order_number: order.order_number,
+          total_amount: order.total_amount,
+          items: order.items,
+          shipping_address: order.shipping_address,
+          shipping_city: order.shipping_city,
+          shipping_country: order.shipping_country
+        },
+        `${user.first_name} ${user.last_name}`
+      ).then(() => console.log('✅ Email de confirmación de pedido enviado'))
+       .catch((error) => console.log('⚠️  Error enviando email de confirmación:', error.message));
+    }
 
     res.status(201).json({
       success: true,

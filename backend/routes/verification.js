@@ -37,27 +37,25 @@ router.post('/verify-email', [
     }
 
     // Verificar código
-    const verificationCode = await VerificationCode.findByCode(code, 'email');
+    const validCode = await VerificationCode.findValidCode(user.id, code, 'email');
     
-    if (!verificationCode) {
+    if (!validCode) {
       return res.status(400).json({
         success: false,
         message: 'Código inválido o expirado'
       });
     }
 
-    if (verificationCode.user_id !== user.id) {
-      return res.status(400).json({
-        success: false,
-        message: 'Código no válido para este usuario'
-      });
-    }
-
     // Marcar código como usado
-    await VerificationCode.markAsUsed(verificationCode.id);
+    await VerificationCode.markAsUsed(validCode.id);
 
     // Marcar email como verificado
     await User.verifyEmail(user.id);
+
+    // Enviar email de bienvenida (en background)
+    emailService.sendWelcomeEmail(user.email, `${user.first_name} ${user.last_name}`)
+      .then(() => console.log('✅ Email de bienvenida enviado'))
+      .catch((error) => console.log('⚠️  Error enviando email de bienvenida:', error.message));
 
     res.json({
       success: true,
