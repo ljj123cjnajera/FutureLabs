@@ -197,6 +197,7 @@
     </div>
 
     <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
     <script>
         const form = document.getElementById('loginForm');
         const alert = document.getElementById('alert');
@@ -216,9 +217,18 @@
                     // Verificar que sea admin o moderador
                     if (user.role === 'admin' || user.role === 'moderator') {
                         showAlert('Ingreso exitoso. Redirigiendo...', 'success');
-                        setTimeout(() => {
-                            window.location.href = 'admin.html';
-                        }, 1000);
+                        
+                        // Esperar a que el authManager se inicialice correctamente
+                        setTimeout(async () => {
+                            // Verificar que el usuario esté autenticado antes de redirigir
+                            if (window.authManager && window.authManager.isAuthenticated()) {
+                                // Esperar un poco más para asegurar que el estado se guardó
+                                await new Promise(resolve => setTimeout(resolve, 300));
+                                window.location.href = 'admin.html';
+                            } else {
+                                showAlert('Error: Sesión no iniciada correctamente', 'error');
+                            }
+                        }, 1500);
                     } else {
                         showAlert('No tienes permisos de administrador', 'error');
                         window.api.logout();

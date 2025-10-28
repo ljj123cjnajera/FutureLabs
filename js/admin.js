@@ -6,16 +6,39 @@ class AdminManager {
   }
 
   async init() {
-    // Verificar autenticación
+    // Esperar a que authManager se inicialice
+    let attempts = 0;
+    const maxAttempts = 10;
+    
+    while (!window.authManager && attempts < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      attempts++;
+    }
+    
+    // Verificar autenticación con retry
     if (!window.authManager || !window.authManager.isAuthenticated()) {
       window.location.href = 'admin-login.html';
       return;
     }
 
-    // Verificar rol
-    const user = await window.authManager.getCurrentUser();
+    // Verificar rol con retry
+    let user;
+    attempts = 0;
+    while (!user && attempts < maxAttempts) {
+      try {
+        user = await window.authManager.getCurrentUser();
+        if (user) break;
+      } catch (error) {
+        console.error('Error obteniendo usuario:', error);
+      }
+      await new Promise(resolve => setTimeout(resolve, 100));
+      attempts++;
+    }
+    
     if (!user || (user.role !== 'admin' && user.role !== 'moderator')) {
-      window.notifications.error('No tienes permisos de administrador');
+      if (window.notifications) {
+        window.notifications.error('No tienes permisos de administrador');
+      }
       window.location.href = 'index.html';
       return;
     }
