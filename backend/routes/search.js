@@ -114,6 +114,22 @@ router.get('/advanced', async (req, res) => {
       query = query.where('products.price', '<=', max_price);
     }
     
+    // Filtrar por productos en oferta
+    const onSale = req.query.on_sale === 'true';
+    if (onSale) {
+      query = query.whereNotNull('products.discount_price');
+    }
+    
+    // Filtrar por rating
+    if (req.query.min_rating) {
+      query = query.where('products.rating', '>=', req.query.min_rating);
+    }
+    
+    // Filtrar por stock disponible
+    if (req.query.in_stock === 'true') {
+      query = query.where('products.stock_quantity', '>', 0);
+    }
+    
     // Ordenamiento
     switch(sort) {
       case 'price_asc':
@@ -130,6 +146,12 @@ router.get('/advanced', async (req, res) => {
         break;
       case 'newest':
         query = query.orderBy('products.created_at', 'desc');
+        break;
+      case 'popular':
+        query = query.orderBy('products.view_count', 'desc');
+        break;
+      case 'rating':
+        query = query.orderBy('products.rating', 'desc');
         break;
       default:
         query = query.orderBy('products.created_at', 'desc');

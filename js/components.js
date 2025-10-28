@@ -79,6 +79,7 @@ class Components {
             <div class="search-bar">
               <input type="text" placeholder="Busca en FutureLabs.com" id="searchInput">
               <button class="search-btn" onclick="performSearch()"><i class="fas fa-search"></i></button>
+              <div id="searchSuggestions" class="search-suggestions" style="display: none;"></div>
             </div>
     ` : '';
     
@@ -252,17 +253,90 @@ class Components {
   }
 
   static initSearch() {
-    // Búsqueda con Enter
     const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-      searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          performSearch();
+    if (!searchInput) return;
+    
+    let debounceTimer;
+    
+    // Búsqueda con Enter
+    searchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        this.hideSuggestions();
+        performSearch();
+      }
+    });
+    
+    // Autocomplete en tiempo real
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.trim();
+      
+      // Limpiar timer anterior
+      clearTimeout(debounceTimer);
+      
+      // Si está vacío, ocultar sugerencias
+      if (query.length < 2) {
+        this.hideSuggestions();
+        return;
+      }
+      
+      // Debounce: esperar 300ms antes de buscar
+      debounceTimer = setTimeout(async () => {
+        await this.showSuggestions(query);
+      }, 300);
+    });
+    
+    // Ocultar sugerencias al hacer click fuera
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.search-bar')) {
+        this.hideSuggestions();
+      }
+    });
+  }
+  
+  static async showSuggestions(query) {
+    try {
+      const response = await window.api.getSearchSuggestions(query);
+      
+      if (response.success && response.data.suggestions.length > 0) {
+        const suggestionsContainer = document.getElementById('searchSuggestions');
+        if (suggestionsContainer) {
+          suggestionsContainer.innerHTML = response.data.suggestions.map(item => {
+            if (item.type === 'product') {
+              return `
+                <div class="suggestion-item" onclick="this.parentElement.style.display='none'; performSearchWithQuery('${item.name.replace(/'/g, "\\'")}')">
+                  <i class="fas fa-box"></i>
+                  <span>${item.name}</span>
+                  <small>S/ ${parseFloat(item.discount_price || item.price).toFixed(2)}</small>
+                </div>
+              `;
+            } else if (item.type === 'category') {
+              return `
+                <div class="suggestion-item" onclick="this.parentElement.style.display='none'; window.location.href='products.html?category=${item.slug}'">
+                  <i class="fas fa-tag"></i>
+                  <span>${item.name}</span>
+                  <small>Categoría</small>
+                </div>
+              `;
+            }
+          }).join('');
+          suggestionsContainer.style.display = 'block';
         }
-      });
+      } else {
+        this.hideSuggestions();
+      }
+    } catch (error) {
+      console.error('Error loading search suggestions:', error);
+      this.hideSuggestions();
     }
   }
-
+  
+  static hideSuggestions() {
+    const suggestionsContainer = document.getElementById('searchSuggestions');
+    if (suggestionsContainer) {
+      suggestionsContainer.style.display = 'none';
+    }
+  }
+  
   static initCartCounter() {
     // Actualizar contador de carrito
     document.addEventListener('cartUpdated', (e) => {
@@ -280,6 +354,11 @@ function performSearch() {
   if (searchInput && searchInput.value.trim()) {
     window.location.href = `products.html?search=${encodeURIComponent(searchInput.value)}`;
   }
+}
+
+// Función de búsqueda con query específica
+function performSearchWithQuery(query) {
+  window.location.href = `products.html?search=${encodeURIComponent(query)}`;
 }
 
 // Hacer disponible globalmente
