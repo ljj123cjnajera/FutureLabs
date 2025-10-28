@@ -377,6 +377,21 @@ class FutureLabsAPI {
     return this.request(`/related-products/${productId}?limit=${limit}`);
   }
 
+  async getRecommendedForUser(userId, limit = 8) {
+    return this.request(`/related-products/recommended/${userId}?limit=${limit}`);
+  }
+
+  async getPopularProducts(limit = 8) {
+    return this.request(`/related-products/popular/all?limit=${limit}`);
+  }
+
+  async getTopSellingProducts(limit = 8, categoryId = null) {
+    const url = categoryId 
+      ? `/related-products/popular/top-selling?limit=${limit}&category_id=${categoryId}`
+      : `/related-products/popular/top-selling?limit=${limit}`;
+    return this.request(url);
+  }
+
   // ===== SEARCH =====
   async getSearchSuggestions(query) {
     return this.request(`/search/suggestions?q=${encodeURIComponent(query)}`);
