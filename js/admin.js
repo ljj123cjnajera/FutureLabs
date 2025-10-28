@@ -6,44 +6,39 @@ class AdminManager {
   }
 
   async init() {
-    // Esperar a que authManager se inicialice completamente
-    await new Promise(resolve => setTimeout(resolve, 300));
+    console.log('🔧 AdminManager init() - Iniciando...');
     
-    // Verificar si hay token
+    // Verificar si hay token en localStorage
     const token = localStorage.getItem('auth_token');
     if (!token) {
-      console.log('No hay token, redirigiendo a login...');
+      console.log('❌ No hay token en localStorage, redirigiendo a login...');
       window.location.href = 'admin-login.html';
       return;
     }
 
-    // Verificar que authManager esté disponible
-    if (!window.authManager) {
-      console.error('authManager no disponible después de esperar');
-      window.location.href = 'admin-login.html';
-      return;
-    }
-    
-    // Verificar autenticación
-    if (!window.authManager.isAuthenticated()) {
-      console.log('Usuario no autenticado, redirigiendo a login...');
+    console.log('✅ Token encontrado en localStorage');
+
+    // Obtener usuario guardado en localStorage (desde admin-login.html)
+    const adminUserStr = localStorage.getItem('admin_user');
+    if (!adminUserStr) {
+      console.log('❌ No hay información de usuario guardada, redirigiendo a login...');
       window.location.href = 'admin-login.html';
       return;
     }
 
-    // Obtener usuario actual
     let user;
     try {
-      user = await window.authManager.getCurrentUser();
-      console.log('Usuario cargado:', user);
+      user = JSON.parse(adminUserStr);
+      console.log('✅ Usuario cargado de localStorage:', user.email);
     } catch (error) {
-      console.error('Error obteniendo usuario:', error);
+      console.error('Error parseando usuario:', error);
       window.location.href = 'admin-login.html';
       return;
     }
     
-    if (!user || (user.role !== 'admin' && user.role !== 'moderator')) {
-      console.log('Usuario sin permisos de admin:', user?.role);
+    // Verificar rol
+    if (user.role !== 'admin' && user.role !== 'moderator') {
+      console.log('❌ Usuario sin permisos de admin:', user.role);
       if (window.notifications) {
         window.notifications.error('No tienes permisos de administrador');
       }
@@ -457,7 +452,11 @@ class AdminManager {
 
 // Funciones globales
 function logout() {
-  window.authManager.logout();
+  // Limpiar información de localStorage
+  localStorage.removeItem('auth_token');
+  localStorage.removeItem('admin_user');
+  
+  // Redirigir a home
   window.location.href = 'index.html';
 }
 

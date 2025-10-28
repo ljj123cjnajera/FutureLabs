@@ -216,9 +216,18 @@
                     
                     // Verificar rol
                     if (user.role === 'admin' || user.role === 'moderator') {
-                        // Guardar token en localStorage manualmente
+                        // Guardar token en localStorage
                         localStorage.setItem('auth_token', response.data.token);
                         console.log('✅ Token guardado en localStorage');
+                        
+                        // Guardar información del usuario en localStorage para admin.html
+                        localStorage.setItem('admin_user', JSON.stringify({
+                            id: user.id,
+                            email: user.email,
+                            first_name: user.first_name,
+                            last_name: user.last_name,
+                            role: user.role
+                        }));
                         
                         showAlert('Ingreso exitoso. Redirigiendo...', 'success');
                         
