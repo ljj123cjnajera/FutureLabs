@@ -164,3 +164,52 @@
         justify-content: center;
     }
 }
+
+/* Mejoras generales para móviles */
+@media (max-width: 768px) {
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 15px !important;
+    }
+    
+    .product-card {
+        padding: 15px !important;
+    }
+    
+    .product-card img {
+        height: 150px !important;
+    }
+    
+    .search-suggestions {
+        max-height: 300px !important;
+        font-size: 14px !important;
+    }
+    
+    .suggestion-item {
+        padding: 10px !important;
+    }
+    
+    .modal-content {
+        width: 95% !important;
+        max-width: 95% !important;
+        margin: 10px !important;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .table-container {
+        overflow-x: auto;
+    }
+    
+    table {
+        min-width: 600px;
+    }
+}
+
+@media (max-width: 480px) {
+    .product-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
