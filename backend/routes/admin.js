@@ -5,11 +5,15 @@ const Category = require('../models/Category');
 const User = require('../models/User');
 const Order = require('../models/Order');
 const Review = require('../models/Review');
-const { requireAdmin } = require('../middleware/auth');
+const { authenticateToken, requireAdmin } = require('../middleware/auth');
 const knex = require('../database/config');
 
+// Middleware global para todas las rutas de admin
+// Verifica autenticación y rol de administrador
+router.use(authenticateToken, requireAdmin);
+
 // ===== DASHBOARD =====
-router.get('/dashboard/stats', requireAdmin, async (req, res) => {
+router.get('/dashboard/stats', async (req, res) => {
   try {
     // Estadísticas generales
     const [totalProducts] = await knex('products').count('* as count');
@@ -82,7 +86,7 @@ router.get('/dashboard/stats', requireAdmin, async (req, res) => {
 });
 
 // ===== PRODUCTOS =====
-router.post('/products', requireAdmin, async (req, res) => {
+router.post('/products', async (req, res) => {
   try {
     const product = await Product.create(req.body);
     res.status(201).json({
@@ -99,7 +103,7 @@ router.post('/products', requireAdmin, async (req, res) => {
   }
 });
 
-router.put('/products/:id', requireAdmin, async (req, res) => {
+router.put('/products/:id', async (req, res) => {
   try {
     const product = await Product.update(req.params.id, req.body);
     res.json({
@@ -116,7 +120,7 @@ router.put('/products/:id', requireAdmin, async (req, res) => {
   }
 });
 
-router.delete('/products/:id', requireAdmin, async (req, res) => {
+router.delete('/products/:id', async (req, res) => {
   try {
     await Product.delete(req.params.id);
     res.json({
@@ -133,7 +137,7 @@ router.delete('/products/:id', requireAdmin, async (req, res) => {
 });
 
 // ===== CATEGORÍAS =====
-router.get('/categories/:id', requireAdmin, async (req, res) => {
+router.get('/categories/:id', async (req, res) => {
   try {
     const category = await Category.getById(req.params.id);
     
@@ -157,7 +161,7 @@ router.get('/categories/:id', requireAdmin, async (req, res) => {
   }
 });
 
-router.post('/categories', requireAdmin, async (req, res) => {
+router.post('/categories', async (req, res) => {
   try {
     const category = await Category.create(req.body);
     res.status(201).json({
@@ -174,7 +178,7 @@ router.post('/categories', requireAdmin, async (req, res) => {
   }
 });
 
-router.put('/categories/:id', requireAdmin, async (req, res) => {
+router.put('/categories/:id', async (req, res) => {
   try {
     const category = await Category.update(req.params.id, req.body);
     res.json({
@@ -191,7 +195,7 @@ router.put('/categories/:id', requireAdmin, async (req, res) => {
   }
 });
 
-router.delete('/categories/:id', requireAdmin, async (req, res) => {
+router.delete('/categories/:id', async (req, res) => {
   try {
     await Category.delete(req.params.id);
     res.json({
@@ -208,7 +212,7 @@ router.delete('/categories/:id', requireAdmin, async (req, res) => {
 });
 
 // ===== USUARIOS =====
-router.get('/users', requireAdmin, async (req, res) => {
+router.get('/users', async (req, res) => {
   try {
     const users = await User.getAll();
     res.json({
@@ -224,7 +228,7 @@ router.get('/users', requireAdmin, async (req, res) => {
   }
 });
 
-router.get('/users/:id', requireAdmin, async (req, res) => {
+router.get('/users/:id', async (req, res) => {
   try {
     const user = await User.getById(req.params.id);
     
@@ -248,7 +252,7 @@ router.get('/users/:id', requireAdmin, async (req, res) => {
   }
 });
 
-router.put('/users/:id', requireAdmin, async (req, res) => {
+router.put('/users/:id', async (req, res) => {
   try {
     const user = await User.update(req.params.id, req.body);
     res.json({
@@ -265,7 +269,7 @@ router.put('/users/:id', requireAdmin, async (req, res) => {
   }
 });
 
-router.delete('/users/:id', requireAdmin, async (req, res) => {
+router.delete('/users/:id', async (req, res) => {
   try {
     await User.delete(req.params.id);
     res.json({
@@ -282,7 +286,7 @@ router.delete('/users/:id', requireAdmin, async (req, res) => {
 });
 
 // ===== PEDIDOS =====
-router.get('/orders', requireAdmin, async (req, res) => {
+router.get('/orders', async (req, res) => {
   try {
     const orders = await Order.findAllForAdmin();
     res.json({
@@ -298,7 +302,7 @@ router.get('/orders', requireAdmin, async (req, res) => {
   }
 });
 
-router.get('/orders/:id', requireAdmin, async (req, res) => {
+router.get('/orders/:id', async (req, res) => {
   try {
     const orderData = await Order.getById(req.params.id);
     
@@ -326,7 +330,7 @@ router.get('/orders/:id', requireAdmin, async (req, res) => {
 });
 
 // ===== RESEÑAS =====
-router.get('/reviews', requireAdmin, async (req, res) => {
+router.get('/reviews', async (req, res) => {
   try {
     const reviews = await knex('reviews')
       .select(
@@ -353,7 +357,7 @@ router.get('/reviews', requireAdmin, async (req, res) => {
   }
 });
 
-router.get('/reviews/:id', requireAdmin, async (req, res) => {
+router.get('/reviews/:id', async (req, res) => {
   try {
     const review = await Review.findById(req.params.id);
     
@@ -377,7 +381,7 @@ router.get('/reviews/:id', requireAdmin, async (req, res) => {
   }
 });
 
-router.put('/reviews/:id', requireAdmin, async (req, res) => {
+router.put('/reviews/:id', async (req, res) => {
   try {
     const review = await Review.update(req.params.id, req.body);
     res.json({
@@ -394,7 +398,7 @@ router.put('/reviews/:id', requireAdmin, async (req, res) => {
   }
 });
 
-router.delete('/reviews/:id', requireAdmin, async (req, res) => {
+router.delete('/reviews/:id', async (req, res) => {
   try {
     await Review.delete(req.params.id);
     res.json({

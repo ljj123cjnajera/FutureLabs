@@ -55,7 +55,16 @@ const authenticateToken = async (req, res, next) => {
 
 // Middleware para verificar rol de admin
 const requireAdmin = (req, res, next) => {
-  if (req.user.role !== 'admin') {
+  // Verificar si req.user existe (debe estar establecido por authenticateToken)
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      message: 'Token de acceso requerido'
+    });
+  }
+  
+  // Verificar rol de admin o moderator
+  if (req.user.role !== 'admin' && req.user.role !== 'moderator') {
     return res.status(403).json({
       success: false,
       message: 'Acceso denegado. Se requieren permisos de administrador'
