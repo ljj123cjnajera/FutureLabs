@@ -594,7 +594,13 @@ async function applyCoupon() {
     }
     
     try {
-        const response = await window.api.validateCoupon(couponCode, cartData.total);
+        const items = cartData.items.map(item => ({
+          product_id: item.product_id,
+          category_id: item.category_id,
+          brand: item.brand
+        }));
+        
+        const response = await window.api.validateCoupon(couponCode, cartData.total, items);
         
         if (response.success) {
             appliedCoupon = couponCode;

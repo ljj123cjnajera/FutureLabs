@@ -415,10 +415,10 @@ class FutureLabsAPI {
   }
 
   // ===== COUPONS =====
-  async validateCoupon(code, totalAmount) {
+  async validateCoupon(code, totalAmount, items = []) {
     return this.request('/coupons/validate', {
       method: 'POST',
-      body: JSON.stringify({ code, total_amount: totalAmount })
+      body: JSON.stringify({ code, total_amount: totalAmount, items })
     });
   }
 
