@@ -1,10 +1,14 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripe = process.env.STRIPE_SECRET_KEY ? require('stripe')(process.env.STRIPE_SECRET_KEY) : null;
 const Order = require('../models/Order');
 
 class PaymentService {
   // Procesar pago con Stripe
   static async processStripePayment(orderId, paymentMethodId) {
     try {
+      if (!stripe) {
+        throw new Error('Stripe no está configurado. Configura STRIPE_SECRET_KEY en las variables de entorno.');
+      }
+
       const order = await Order.getById(orderId);
 
       if (!order) {
@@ -52,6 +56,10 @@ class PaymentService {
   // Crear intención de pago con Stripe (para frontend)
   static async createStripePaymentIntent(orderId) {
     try {
+      if (!stripe) {
+        throw new Error('Stripe no está configurado. Configura STRIPE_SECRET_KEY en las variables de entorno.');
+      }
+
       const order = await Order.getById(orderId);
 
       if (!order) {
@@ -180,6 +188,10 @@ class PaymentService {
   // Reembolsar pago
   static async refundPayment(orderId) {
     try {
+      if (!stripe) {
+        throw new Error('Stripe no está configurado. Configura STRIPE_SECRET_KEY en las variables de entorno.');
+      }
+
       const order = await Order.getById(orderId);
 
       if (!order) {
@@ -213,6 +225,10 @@ class PaymentService {
   // Webhook de Stripe
   static async handleStripeWebhook(sig, body) {
     try {
+      if (!stripe) {
+        throw new Error('Stripe no está configurado');
+      }
+
       const event = stripe.webhooks.constructEvent(
         body,
         sig,
