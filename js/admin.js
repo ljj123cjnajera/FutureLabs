@@ -132,7 +132,7 @@ class AdminManager {
       const response = await window.api.request('/admin/dashboard/stats');
       
       if (response.success) {
-        const { overview, orders_by_status, top_products, sales_by_day } = response.data;
+        const { overview, orders_by_status, top_products, sales_by_day, payment_methods } = response.data;
         
         // Actualizar estadísticas
         document.getElementById('totalProducts').textContent = overview.total_products;
@@ -140,12 +140,100 @@ class AdminManager {
         document.getElementById('totalOrders').textContent = overview.total_orders;
         document.getElementById('totalSales').textContent = `S/ ${parseFloat(overview.total_sales).toFixed(2)}`;
         
+        // Renderizar gráficos
+        this.renderCharts(orders_by_status, top_products, sales_by_day, payment_methods);
+        
         // Cargar pedidos recientes
         await this.loadRecentOrders();
       }
     } catch (error) {
       console.error('Error loading dashboard:', error);
       window.notifications.error('Error al cargar dashboard');
+    }
+  }
+  
+  // Renderizar gráficos con Chart.js
+  renderCharts(ordersByStatus, topProducts, salesByDay, paymentMethods) {
+    // 1. Ventas de últimos 7 días (Línea)
+    const salesCtx = document.getElementById('salesChart');
+    if (salesCtx && window.Chart) {
+      new Chart(salesCtx, {
+        type: 'line',
+        data: {
+          labels: salesByDay.map(s => new Date(s.date).toLocaleDateString('es-PE', { month: 'short', day: 'numeric' })),
+          datasets: [{
+            label: 'Ventas (S/)',
+            data: salesByDay.map(s => parseFloat(s.total)),
+            borderColor: '#667eea',
+            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+            tension: 0.4,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false
+        }
+      });
+    }
+    
+    // 2. Pedidos por estado (Dona)
+    const ordersStatusCtx = document.getElementById('ordersStatusChart');
+    if (ordersStatusCtx && window.Chart) {
+      new Chart(ordersStatusCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ordersByStatus.map(s => s.status),
+          datasets: [{
+            data: ordersByStatus.map(s => parseInt(s.count)),
+            backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false
+        }
+      });
+    }
+    
+    // 3. Top productos (Barras)
+    const topProductsCtx = document.getElementById('topProductsChart');
+    if (topProductsCtx && window.Chart) {
+      new Chart(topProductsCtx, {
+        type: 'bar',
+        data: {
+          labels: topProducts.map(p => p.product_name?.substring(0, 20) || 'Sin nombre'),
+          datasets: [{
+            label: 'Vendidos',
+            data: topProducts.map(p => parseInt(p.total_sold)),
+            backgroundColor: '#667eea'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          indexAxis: 'y'
+        }
+      });
+    }
+    
+    // 4. Métodos de pago (Pie)
+    const paymentMethodsCtx = document.getElementById('paymentMethodsChart');
+    if (paymentMethodsCtx && window.Chart) {
+      new Chart(paymentMethodsCtx, {
+        type: 'pie',
+        data: {
+          labels: paymentMethods.map(p => p.payment_method),
+          datasets: [{
+            data: paymentMethods.map(p => parseInt(p.count)),
+            backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#4facfe']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false
+        }
+      });
     }
   }
 

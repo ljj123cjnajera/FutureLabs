@@ -58,6 +58,12 @@ router.get('/dashboard/stats', async (req, res) => {
       .groupBy(knex.raw('DATE(created_at)'))
       .orderBy('date', 'asc');
     
+    // Métodos de pago más utilizados
+    const paymentMethods = await knex('orders')
+      .select('payment_method')
+      .count('* as count')
+      .groupBy('payment_method');
+    
     res.json({
       success: true,
       data: {
@@ -73,7 +79,8 @@ router.get('/dashboard/stats', async (req, res) => {
         },
         orders_by_status: ordersByStatus,
         top_products: topProducts,
-        sales_by_day: salesByDay
+        sales_by_day: salesByDay,
+        payment_methods: paymentMethods
       }
     });
   } catch (error) {
