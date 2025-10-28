@@ -130,6 +130,7 @@ const blogRoutes = require('./routes/blog');
 const relatedProductsRoutes = require('./routes/related-products');
 const searchRoutes = require('./routes/search');
 const uploadRoutes = require('./routes/upload');
+const reportsRoutes = require('./routes/reports');
 
 // Servir archivos estáticos (imágenes subidas)
 app.use('/uploads', express.static('uploads'));
@@ -151,6 +152,7 @@ app.use('/api/blog', blogRoutes);
 app.use('/api/related-products', relatedProductsRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/reports', reportsRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

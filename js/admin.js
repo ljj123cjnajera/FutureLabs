@@ -95,7 +95,8 @@ class AdminManager {
       categories: 'Categorías',
       orders: 'Pedidos',
       users: 'Usuarios',
-      reviews: 'Reseñas'
+      reviews: 'Reseñas',
+      reports: 'Reportes'
     };
     document.getElementById('pageTitle').textContent = titles[section];
 
@@ -122,6 +123,9 @@ class AdminManager {
         break;
       case 'reviews':
         await this.loadReviews();
+        break;
+      case 'reports':
+        // Reportes no necesitan cargar datos por ahora
         break;
     }
   }
@@ -611,4 +615,87 @@ function openCategoryModal() {
 
 // Inicializar
 const adminManager = new AdminManager();
+
+// ===== FUNCIONES DE REPORTES =====
+async function exportSalesReport() {
+  try {
+    const startDate = document.getElementById('salesStartDate').value;
+    const endDate = document.getElementById('salesEndDate').value;
+    
+    let url = '/reports/sales?format=csv';
+    if (startDate) url += `&start_date=${startDate}`;
+    if (endDate) url += `&end_date=${endDate}`;
+    
+    const token = window.api.token;
+    const response = await fetch(window.api.baseURL + url, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    if (response.ok) {
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = `ventas_${Date.now()}.csv`;
+      a.click();
+      window.notifications.success('Reporte descargado exitosamente');
+    } else {
+      throw new Error('Error al generar reporte');
+    }
+  } catch (error) {
+    console.error('Error exporting sales report:', error);
+    window.notifications.error('Error al exportar reporte de ventas');
+  }
+}
+
+async function exportProductsReport() {
+  try {
+    const token = window.api.token;
+    const response = await fetch(window.api.baseURL + '/reports/products?format=csv', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    if (response.ok) {
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = `productos_${Date.now()}.csv`;
+      a.click();
+      window.notifications.success('Reporte descargado exitosamente');
+    } else {
+      throw new Error('Error al generar reporte');
+    }
+  } catch (error) {
+    console.error('Error exporting products report:', error);
+    window.notifications.error('Error al exportar reporte de productos');
+  }
+}
+
+async function exportCustomersReport() {
+  try {
+    const token = window.api.token;
+    const response = await window.api.request('/reports/customers');
+    
+    if (response.success) {
+      const data = JSON.stringify(response.data, null, 2);
+      const blob = new Blob([data], { type: 'application/json' });
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = `clientes_${Date.now()}.json`;
+      a.click();
+      window.notifications.success('Reporte descargado exitosamente');
+    } else {
+      throw new Error('Error al generar reporte');
+    }
+  } catch (error) {
+    console.error('Error exporting customers report:', error);
+    window.notifications.error('Error al exportar reporte de clientes');
+  }
+}
 

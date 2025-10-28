@@ -498,6 +498,39 @@
             max-height: 300px;
         }
         
+        /* Report Cards */
+        .report-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .report-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        .report-card h3 {
+            margin: 15px 0 10px 0;
+            font-size: 20px;
+            color: #333;
+        }
+        
+        .report-card p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .report-filters {
+            margin: 15px 0;
+        }
+        
+        .report-filters input {
+            width: 100%;
+        }
+        
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -560,6 +593,10 @@
                 <div class="menu-item" data-section="reviews">
                     <i class="fas fa-star"></i>
                     <span>Reseñas</span>
+                </div>
+                <div class="menu-item" data-section="reports">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Reportes</span>
                 </div>
             </div>
         </div>
@@ -821,6 +858,51 @@
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+                </div>
+
+                <!-- Reports Section -->
+                <div class="section" id="reports">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+                        <!-- Reporte de Ventas -->
+                        <div class="report-card">
+                            <div class="report-icon">
+                                <i class="fas fa-chart-line" style="color: #667eea;"></i>
+                            </div>
+                            <h3>Reporte de Ventas</h3>
+                            <p>Exporta tus ventas en formato CSV</p>
+                            <div class="report-filters">
+                                <input type="date" id="salesStartDate" style="margin-bottom: 10px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                <input type="date" id="salesEndDate" style="margin-bottom: 10px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            </div>
+                            <button class="btn-primary" onclick="exportSalesReport()">
+                                <i class="fas fa-download"></i> Exportar CSV
+                            </button>
+                        </div>
+
+                        <!-- Reporte de Productos -->
+                        <div class="report-card">
+                            <div class="report-icon">
+                                <i class="fas fa-box" style="color: #764ba2;"></i>
+                            </div>
+                            <h3>Reporte de Productos</h3>
+                            <p>Lista completa de productos con ventas</p>
+                            <button class="btn-primary" onclick="exportProductsReport()">
+                                <i class="fas fa-download"></i> Exportar CSV
+                            </button>
+                        </div>
+
+                        <!-- Reporte de Clientes -->
+                        <div class="report-card">
+                            <div class="report-icon">
+                                <i class="fas fa-users" style="color: #4facfe;"></i>
+                            </div>
+                            <h3>Reporte de Clientes</h3>
+                            <p>Base de datos de clientes y compras</p>
+                            <button class="btn-primary" onclick="exportCustomersReport()">
+                                <i class="fas fa-download"></i> Exportar JSON
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
