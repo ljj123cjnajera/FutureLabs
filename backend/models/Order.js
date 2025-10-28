@@ -17,8 +17,17 @@ class Order {
 
     if (!order) return null;
 
-    // Obtener items del pedido
+    // Obtener items del pedido con información del producto
     const items = await db('order_items')
+      .select(
+        'order_items.*',
+        'products.name as product_name',
+        'products.slug as product_slug',
+        'products.image_url as image_url',
+        'products.brand as product_brand',
+        'products.sku as product_sku'
+      )
+      .leftJoin('products', 'order_items.product_id', 'products.id')
       .where({ order_id: id });
 
     return {
@@ -62,10 +71,18 @@ class Order {
 
     const orders = await query;
 
-    // Obtener items para cada pedido
+    // Obtener items para cada pedido con información del producto
     const ordersWithItems = await Promise.all(
       orders.map(async (order) => {
         const items = await db('order_items')
+          .select(
+            'order_items.*',
+            'products.name as product_name',
+            'products.slug as product_slug',
+            'products.image_url as image_url',
+            'products.brand as product_brand'
+          )
+          .leftJoin('products', 'order_items.product_id', 'products.id')
           .where({ order_id: order.id });
         return {
           ...order,
