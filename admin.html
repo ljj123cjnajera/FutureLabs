@@ -1068,8 +1068,188 @@
         </div>
     </div>
 
+    <!-- MODALS -->
+    <!-- Product Modal -->
+    <div class="modal" id="productModal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h2 id="productModalTitle">Crear Producto</h2>
+            <form id="productForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nombre *</label>
+                        <input type="text" id="productName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Slug *</label>
+                        <input type="text" id="productSlug" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Precio *</label>
+                        <input type="number" step="0.01" id="productPrice" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Precio Descuento</label>
+                        <input type="number" step="0.01" id="productDiscountPrice">
+                    </div>
+                    <div class="form-group">
+                        <label>Stock *</label>
+                        <input type="number" id="productStock" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Categoría *</label>
+                        <select id="productCategory" required>
+                            <option value="">Seleccionar...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Marca</label>
+                        <input type="text" id="productBrand">
+                    </div>
+                    <div class="form-group">
+                        <label>SKU</label>
+                        <input type="text" id="productSKU">
+                    </div>
+                    <div class="form-group">
+                        <label>URL Imagen</label>
+                        <input type="url" id="productImage">
+                    </div>
+                    <div class="form-group">
+                        <label>Peso (kg)</label>
+                        <input type="number" step="0.01" id="productWeight">
+                    </div>
+                    <div class="form-group">
+                        <label>Dimensiones (cm)</label>
+                        <input type="text" id="productDimensions" placeholder="L x A x A">
+                    </div>
+                    <div class="form-group">
+                        <label>Activo</label>
+                        <input type="checkbox" id="productIsActive" checked>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Descripción</label>
+                    <textarea id="productDescription" rows="4"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="document.getElementById('productModal').style.display='none'">Cancelar</button>
+                    <button type="submit" class="btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Category Modal -->
+    <div class="modal" id="categoryModal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h2 id="categoryModalTitle">Crear Categoría</h2>
+            <form id="categoryForm">
+                <div class="form-group">
+                    <label>Nombre *</label>
+                    <input type="text" id="categoryName" required>
+                </div>
+                <div class="form-group">
+                    <label>Slug *</label>
+                    <input type="text" id="categorySlug" required>
+                </div>
+                <div class="form-group">
+                    <label>URL Imagen</label>
+                    <input type="url" id="categoryImage">
+                </div>
+                <div class="form-group">
+                    <label>Descripción</label>
+                    <textarea id="categoryDescription" rows="4"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="document.getElementById('categoryModal').style.display='none'">Cancelar</button>
+                    <button type="submit" class="btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- User Modal -->
+    <div class="modal" id="userModal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h2 id="userModalTitle">Editar Usuario</h2>
+            <form id="userForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nombre *</label>
+                        <input type="text" id="userFirstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Apellido *</label>
+                        <input type="text" id="userLastName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email *</label>
+                        <input type="email" id="userEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Teléfono</label>
+                        <input type="tel" id="userPhone">
+                    </div>
+                    <div class="form-group">
+                        <label>Rol *</label>
+                        <select id="userRole" required>
+                            <option value="client">Cliente</option>
+                            <option value="moderator">Moderador</option>
+                            <option value="admin">Administrador</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Email Verificado</label>
+                        <input type="checkbox" id="userEmailVerified">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="document.getElementById('userModal').style.display='none'">Cancelar</button>
+                    <button type="submit" class="btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Review Modal -->
+    <div class="modal" id="reviewModal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h2 id="reviewModalTitle">Editar Reseña</h2>
+            <form id="reviewForm">
+                <div class="form-group">
+                    <label>Rating *</label>
+                    <select id="reviewRating" required>
+                        <option value="1">1 Estrella</option>
+                        <option value="2">2 Estrellas</option>
+                        <option value="3">3 Estrellas</option>
+                        <option value="4">4 Estrellas</option>
+                        <option value="5">5 Estrellas</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Título</label>
+                    <input type="text" id="reviewTitle">
+                </div>
+                <div class="form-group">
+                    <label>Comentario</label>
+                    <textarea id="reviewComment" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Aprobado</label>
+                    <input type="checkbox" id="reviewIsApproved">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="document.getElementById('reviewModal').style.display='none'">Cancelar</button>
+                    <button type="submit" class="btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="js/api.js"></script>
-    <script src="js/auth.js"></script>
     <script src="js/notifications.js"></script>
     <script src="js/admin.js"></script>
     <script src="js/admin-crud.js"></script>

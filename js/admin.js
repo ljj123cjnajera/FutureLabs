@@ -197,22 +197,22 @@ class AdminManager {
         }
         
         tbody.innerHTML = products.map(product => `
-          <tr>
-            <td>${product.id.substring(0, 8)}...</td>
-            <td>${product.name}</td>
-            <td>${product.category_name || 'Sin categoría'}</td>
-            <td>S/ ${parseFloat(product.price).toFixed(2)}</td>
-            <td>${product.stock_quantity}</td>
-            <td><span class="badge badge-${product.is_active ? 'success' : 'danger'}">${product.is_active ? 'Activo' : 'Inactivo'}</span></td>
-            <td>
-              <button class="btn-action btn-edit" onclick="editProduct('${product.id}')">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="btn-action btn-delete" onclick="deleteProduct('${product.id}')">
-                <i class="fas fa-trash"></i>
-              </button>
-            </td>
-          </tr>
+              <tr>
+                <td>${product.id.substring(0, 8)}...</td>
+                <td>${product.name}</td>
+                <td>${product.category_name || 'Sin categoría'}</td>
+                <td>S/ ${parseFloat(product.price).toFixed(2)}</td>
+                <td>${product.stock_quantity}</td>
+                <td><span class="badge badge-${product.is_active ? 'success' : 'danger'}">${product.is_active ? 'Activo' : 'Inactivo'}</span></td>
+                <td>
+                  <button class="btn-action btn-edit" onclick="window.editProduct('${product.id}')">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="btn-action btn-delete" onclick="window.deleteProduct('${product.id}')">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
         `).join('');
         
         // Cargar categorías en el select del modal
@@ -254,22 +254,22 @@ class AdminManager {
           return;
         }
         
-        tbody.innerHTML = categories.map(category => `
-          <tr>
-            <td>${category.id.substring(0, 8)}...</td>
-            <td>${category.name}</td>
-            <td>${category.slug}</td>
-            <td>${category.description || '-'}</td>
-            <td>
-              <button class="btn-action btn-edit" onclick="editCategory('${category.id}')">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="btn-action btn-delete" onclick="deleteCategory('${category.id}')">
-                <i class="fas fa-trash"></i>
-              </button>
-            </td>
-          </tr>
-        `).join('');
+            tbody.innerHTML = categories.map(category => `
+              <tr>
+                <td>${category.id.substring(0, 8)}...</td>
+                <td>${category.name}</td>
+                <td>${category.slug}</td>
+                <td>${category.description || '-'}</td>
+                <td>
+                  <button class="btn-action btn-edit" onclick="window.editCategory('${category.id}')">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="btn-action btn-delete" onclick="window.deleteCategory('${category.id}')">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            `).join('');
       }
     } catch (error) {
       console.error('Error loading categories:', error);
@@ -300,7 +300,7 @@ class AdminManager {
             <td><span class="badge badge-${this.getPaymentBadgeClass(order.payment_status)}">${this.getPaymentText(order.payment_status)}</span></td>
             <td>${new Date(order.created_at).toLocaleDateString('es-PE')}</td>
             <td>
-              <button class="btn-action btn-view" onclick="viewOrder('${order.id}')">
+              <button class="btn-action btn-view" onclick="window.viewOrder('${order.id}')">
                 <i class="fas fa-eye"></i>
               </button>
             </td>
@@ -327,21 +327,21 @@ class AdminManager {
           return;
         }
         
-        tbody.innerHTML = users.map(user => `
-          <tr>
-            <td>${user.id.substring(0, 8)}...</td>
-            <td>${user.first_name} ${user.last_name}</td>
-            <td>${user.email}</td>
-            <td><span class="badge badge-${this.getRoleBadgeClass(user.role)}">${this.getRoleText(user.role)}</span></td>
-            <td><span class="badge badge-${user.email_verified ? 'success' : 'warning'}">${user.email_verified ? 'Sí' : 'No'}</span></td>
-            <td>${new Date(user.created_at).toLocaleDateString('es-PE')}</td>
-            <td>
-              <button class="btn-action btn-edit" onclick="editUser('${user.id}')">
-                <i class="fas fa-edit"></i>
-              </button>
-            </td>
-          </tr>
-        `).join('');
+            tbody.innerHTML = users.map(user => `
+              <tr>
+                <td>${user.id.substring(0, 8)}...</td>
+                <td>${user.first_name} ${user.last_name}</td>
+                <td>${user.email}</td>
+                <td><span class="badge badge-${this.getRoleBadgeClass(user.role)}">${this.getRoleText(user.role)}</span></td>
+                <td><span class="badge badge-${user.email_verified ? 'success' : 'warning'}">${user.email_verified ? 'Sí' : 'No'}</span></td>
+                <td>${new Date(user.created_at).toLocaleDateString('es-PE')}</td>
+                <td>
+                  <button class="btn-action btn-edit" onclick="window.editUser('${user.id}')">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                </td>
+              </tr>
+            `).join('');
       }
     } catch (error) {
       console.error('Error loading users:', error);
@@ -363,24 +363,24 @@ class AdminManager {
           return;
         }
         
-        tbody.innerHTML = reviews.map(review => `
-          <tr>
-            <td>${review.id.substring(0, 8)}...</td>
-            <td>${review.first_name} ${review.last_name}</td>
-            <td>${review.product_name}</td>
-            <td>${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}</td>
-            <td>${review.title || '-'}</td>
-            <td><span class="badge badge-${review.is_approved ? 'success' : 'warning'}">${review.is_approved ? 'Sí' : 'No'}</span></td>
-            <td>
-              <button class="btn-action btn-edit" onclick="editReview('${review.id}')">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="btn-action btn-delete" onclick="deleteReview('${review.id}')">
-                <i class="fas fa-trash"></i>
-              </button>
-            </td>
-          </tr>
-        `).join('');
+            tbody.innerHTML = reviews.map(review => `
+              <tr>
+                <td>${review.id.substring(0, 8)}...</td>
+                <td>${review.first_name} ${review.last_name}</td>
+                <td>${review.product_name}</td>
+                <td>${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}</td>
+                <td>${review.title || '-'}</td>
+                <td><span class="badge badge-${review.is_approved ? 'success' : 'warning'}">${review.is_approved ? 'Sí' : 'No'}</span></td>
+                <td>
+                  <button class="btn-action btn-edit" onclick="window.editReview('${review.id}')">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="btn-action btn-delete" onclick="window.deleteReview('${review.id}')">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            `).join('');
       }
     } catch (error) {
       console.error('Error loading reviews:', error);
@@ -460,60 +460,65 @@ function logout() {
   window.location.href = 'index.html';
 }
 
-function viewOrder(orderId) {
-  window.notifications.info('Ver detalles del pedido #' + orderId);
-  // Implementar modal de detalles
+async function viewOrder(orderId) {
+  if (window.adminCRUD) {
+    await window.adminCRUD.loadOrderDetails(orderId);
+    document.getElementById('orderModal').style.display = 'flex';
+  }
 }
 
 function editProduct(productId) {
-  window.notifications.info('Editar producto #' + productId);
-  // Implementar modal de edición
+  if (window.adminCRUD) {
+    window.editProduct(productId);
+  }
 }
 
 function deleteProduct(productId) {
-  if (confirm('¿Estás seguro de eliminar este producto?')) {
-    window.notifications.info('Eliminar producto #' + productId);
-    // Implementar eliminación
+  if (window.deleteProduct) {
+    window.deleteProduct(productId);
   }
 }
 
 function editCategory(categoryId) {
-  window.notifications.info('Editar categoría #' + categoryId);
-  // Implementar modal de edición
+  if (window.editCategory) {
+    window.editCategory(categoryId);
+  }
 }
 
 function deleteCategory(categoryId) {
-  if (confirm('¿Estás seguro de eliminar esta categoría?')) {
-    window.notifications.info('Eliminar categoría #' + categoryId);
-    // Implementar eliminación
+  if (window.deleteCategory) {
+    window.deleteCategory(categoryId);
   }
 }
 
 function editUser(userId) {
-  window.notifications.info('Editar usuario #' + userId);
-  // Implementar modal de edición
+  if (window.editUser) {
+    window.editUser(userId);
+  }
 }
 
 function editReview(reviewId) {
-  window.notifications.info('Editar reseña #' + reviewId);
-  // Implementar modal de edición
+  if (window.editReview) {
+    window.editReview(reviewId);
+  }
 }
 
 function deleteReview(reviewId) {
-  if (confirm('¿Estás seguro de eliminar esta reseña?')) {
-    window.notifications.info('Eliminar reseña #' + reviewId);
-    // Implementar eliminación
+  if (window.deleteReview) {
+    window.deleteReview(reviewId);
   }
 }
 
 function openProductModal() {
-  window.notifications.info('Crear nuevo producto');
-  // Implementar modal de creación
+  if (window.openProductModal) {
+    window.openProductModal();
+  }
 }
 
 function openCategoryModal() {
-  window.notifications.info('Crear nueva categoría');
-  // Implementar modal de creación
+  if (window.openCategoryModal) {
+    window.openCategoryModal();
+  }
 }
 
 // Inicializar

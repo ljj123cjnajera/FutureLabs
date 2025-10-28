@@ -471,6 +471,7 @@ class AdminCRUD {
 
 // Inicializar CRUD
 const adminCRUD = new AdminCRUD();
+window.adminCRUD = adminCRUD;
 
 
 
