@@ -300,7 +300,7 @@ router.get('/orders', requireAdmin, async (req, res) => {
 
 router.get('/orders/:id', requireAdmin, async (req, res) => {
   try {
-    const orderData = await Order.findById(req.params.id);
+    const orderData = await Order.getById(req.params.id);
     
     if (!orderData) {
       return res.status(404).json({
@@ -336,8 +336,8 @@ router.get('/reviews', requireAdmin, async (req, res) => {
         'users.email',
         'products.name as product_name'
       )
-      .join('users', 'reviews.user_id', 'users.id')
-      .join('products', 'reviews.product_id', 'products.id')
+      .leftJoin('users', 'reviews.user_id', 'users.id')
+      .leftJoin('products', 'reviews.product_id', 'products.id')
       .orderBy('reviews.created_at', 'desc');
     
     res.json({
