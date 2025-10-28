@@ -6,17 +6,20 @@ class AdminManager {
   }
 
   async init() {
-    // Esperar a que authManager se inicialice (máximo 2 segundos)
-    let attempts = 0;
-    const maxAttempts = 20;
+    // Esperar a que authManager se inicialice completamente
+    await new Promise(resolve => setTimeout(resolve, 300));
     
-    while (!window.authManager && attempts < maxAttempts) {
-      await new Promise(resolve => setTimeout(resolve, 100));
-      attempts++;
+    // Verificar si hay token
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      console.log('No hay token, redirigiendo a login...');
+      window.location.href = 'admin-login.html';
+      return;
     }
-    
+
+    // Verificar que authManager esté disponible
     if (!window.authManager) {
-      console.error('authManager no disponible');
+      console.error('authManager no disponible después de esperar');
       window.location.href = 'admin-login.html';
       return;
     }

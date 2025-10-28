@@ -197,7 +197,6 @@
     </div>
 
     <script src="js/api.js"></script>
-    <script src="js/auth.js"></script>
     <script>
         const form = document.getElementById('loginForm');
         const loginAlert = document.getElementById('loginAlert');
@@ -209,26 +208,29 @@
             const password = document.getElementById('password').value;
             
             try {
-                // Usar authManager.login() para que actualice el estado
-                const success = await window.authManager.login(email, password);
+                // Hacer login directamente con la API
+                const response = await window.api.login(email, password);
                 
-                if (success) {
-                    // Obtener el usuario actual para verificar rol
-                    const user = await window.authManager.getCurrentUser();
+                if (response.success) {
+                    const user = response.data.user;
                     
-                    if (user && (user.role === 'admin' || user.role === 'moderator')) {
+                    // Verificar rol
+                    if (user.role === 'admin' || user.role === 'moderator') {
+                        // Guardar token en localStorage manualmente
+                        localStorage.setItem('auth_token', response.data.token);
+                        console.log('✅ Token guardado en localStorage');
+                        
                         showAlert('Ingreso exitoso. Redirigiendo...', 'success');
                         
-                        // Esperar un poco para asegurar que el estado se guardó
+                        // Redirigir al panel admin
                         setTimeout(() => {
                             window.location.href = 'admin.html';
                         }, 500);
                     } else {
                         showAlert('No tienes permisos de administrador', 'error');
-                        window.authManager.logout();
                     }
                 } else {
-                    showAlert('Credenciales incorrectas', 'error');
+                    showAlert(response.message || 'Credenciales incorrectas', 'error');
                 }
             } catch (error) {
                 console.error('Error en login:', error);
