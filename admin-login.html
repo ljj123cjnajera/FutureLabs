@@ -209,34 +209,29 @@
             const password = document.getElementById('password').value;
             
             try {
-                const response = await window.api.login(email, password);
+                // Usar authManager.login() para que actualice el estado
+                const success = await window.authManager.login(email, password);
                 
-                if (response.success) {
-                    const user = response.data.user;
+                if (success) {
+                    // Obtener el usuario actual para verificar rol
+                    const user = await window.authManager.getCurrentUser();
                     
-                    // Verificar que sea admin o moderador
-                    if (user.role === 'admin' || user.role === 'moderator') {
+                    if (user && (user.role === 'admin' || user.role === 'moderator')) {
                         showAlert('Ingreso exitoso. Redirigiendo...', 'success');
                         
-                        // Esperar a que el authManager se inicialice correctamente
-                        setTimeout(async () => {
-                            // Verificar que el usuario esté autenticado antes de redirigir
-                            if (window.authManager && window.authManager.isAuthenticated()) {
-                                // Esperar un poco más para asegurar que el estado se guardó
-                                await new Promise(resolve => setTimeout(resolve, 300));
-                                window.location.href = 'admin.html';
-                            } else {
-                                showAlert('Error: Sesión no iniciada correctamente', 'error');
-                            }
-                        }, 1500);
+                        // Esperar un poco para asegurar que el estado se guardó
+                        setTimeout(() => {
+                            window.location.href = 'admin.html';
+                        }, 500);
                     } else {
                         showAlert('No tienes permisos de administrador', 'error');
-                        window.api.logout();
+                        window.authManager.logout();
                     }
                 } else {
-                    showAlert(response.message || 'Error al iniciar sesión', 'error');
+                    showAlert('Credenciales incorrectas', 'error');
                 }
             } catch (error) {
+                console.error('Error en login:', error);
                 showAlert('Error al conectar con el servidor', 'error');
             }
         });

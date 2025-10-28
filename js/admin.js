@@ -6,42 +6,51 @@ class AdminManager {
   }
 
   async init() {
-    // Esperar a que authManager se inicialice
+    // Esperar a que authManager se inicialice (máximo 2 segundos)
     let attempts = 0;
-    const maxAttempts = 10;
+    const maxAttempts = 20;
     
     while (!window.authManager && attempts < maxAttempts) {
       await new Promise(resolve => setTimeout(resolve, 100));
       attempts++;
     }
     
-    // Verificar autenticación con retry
-    if (!window.authManager || !window.authManager.isAuthenticated()) {
+    if (!window.authManager) {
+      console.error('authManager no disponible');
+      window.location.href = 'admin-login.html';
+      return;
+    }
+    
+    // Verificar autenticación
+    if (!window.authManager.isAuthenticated()) {
+      console.log('Usuario no autenticado, redirigiendo a login...');
       window.location.href = 'admin-login.html';
       return;
     }
 
-    // Verificar rol con retry
+    // Obtener usuario actual
     let user;
-    attempts = 0;
-    while (!user && attempts < maxAttempts) {
-      try {
-        user = await window.authManager.getCurrentUser();
-        if (user) break;
-      } catch (error) {
-        console.error('Error obteniendo usuario:', error);
-      }
-      await new Promise(resolve => setTimeout(resolve, 100));
-      attempts++;
+    try {
+      user = await window.authManager.getCurrentUser();
+      console.log('Usuario cargado:', user);
+    } catch (error) {
+      console.error('Error obteniendo usuario:', error);
+      window.location.href = 'admin-login.html';
+      return;
     }
     
     if (!user || (user.role !== 'admin' && user.role !== 'moderator')) {
+      console.log('Usuario sin permisos de admin:', user?.role);
       if (window.notifications) {
         window.notifications.error('No tienes permisos de administrador');
       }
-      window.location.href = 'index.html';
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 1000);
       return;
     }
+
+    console.log('✅ Usuario admin autenticado correctamente');
 
     // Actualizar UI del usuario
     this.updateUserInfo(user);
