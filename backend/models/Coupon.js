@@ -41,7 +41,7 @@ class Coupon {
     return { valid: true, coupon };
   }
 
-  static async apply(code, totalAmount) {
+  static async apply(code, totalAmount, items = []) {
     const validation = await this.validate(code);
     
     if (!validation.valid) {
@@ -58,12 +58,45 @@ class Coupon {
       };
     }
 
+    // Verificar restricciones de categoría/marca si existen
+    if (coupon.restricted_to_categories && items.length > 0) {
+      const allowedCategories = JSON.parse(coupon.restricted_to_categories || '[]');
+      const cartCategories = items.map(item => item.category_id).filter(Boolean);
+      
+      if (allowedCategories.length > 0 && !cartCategories.some(cat => allowedCategories.includes(cat))) {
+        return {
+          valid: false,
+          message: 'Este cupón no aplica a los productos en tu carrito'
+        };
+      }
+    }
+
+    if (coupon.restricted_to_brands && items.length > 0) {
+      const allowedBrands = JSON.parse(coupon.restricted_to_brands || '[]');
+      const cartBrands = items.map(item => item.brand).filter(Boolean);
+      
+      if (allowedBrands.length > 0 && !cartBrands.some(brand => allowedBrands.includes(brand))) {
+        return {
+          valid: false,
+          message: 'Este cupón no aplica a las marcas en tu carrito'
+        };
+      }
+    }
+
     // Calcular descuento
     let discount = 0;
     if (coupon.type === 'percentage') {
       discount = (totalAmount * coupon.value) / 100;
     } else {
       discount = coupon.value;
+    }
+
+    // Aplicar monto mínimo del cupón
+    if (coupon.min_order_amount && totalAmount < coupon.min_order_amount) {
+      return {
+        valid: false,
+        message: `El cupón requiere un pedido mínimo de S/ ${coupon.min_order_amount}`
+      };
     }
 
     return {

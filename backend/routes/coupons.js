@@ -6,7 +6,7 @@ const { requireAdmin } = require('../middleware/auth');
 // Validar cupón (público)
 router.post('/validate', async (req, res) => {
   try {
-    const { code, total_amount } = req.body;
+    const { code, total_amount, items = [] } = req.body;
     
     if (!code) {
       return res.status(400).json({
@@ -15,7 +15,7 @@ router.post('/validate', async (req, res) => {
       });
     }
 
-    const result = await Coupon.apply(code, total_amount || 0);
+    const result = await Coupon.apply(code, total_amount || 0, items);
     
     res.json({
       success: result.valid,
@@ -55,7 +55,19 @@ router.get('/', requireAdmin, async (req, res) => {
 // Crear cupón (admin)
 router.post('/', requireAdmin, async (req, res) => {
   try {
-    const { code, type, value, min_purchase, max_uses, valid_from, valid_until, description } = req.body;
+    const { 
+      code, 
+      type, 
+      value, 
+      min_purchase, 
+      min_order_amount,
+      max_uses, 
+      valid_from, 
+      valid_until, 
+      description,
+      restricted_to_categories,
+      restricted_to_brands 
+    } = req.body;
     
     // Validaciones
     if (!code || !type || !value || !valid_from || !valid_until) {
@@ -77,11 +89,14 @@ router.post('/', requireAdmin, async (req, res) => {
       type,
       value,
       min_purchase: min_purchase || 0,
+      min_order_amount: min_order_amount || null,
       max_uses,
       valid_from,
       valid_until,
       description,
-      is_active: true
+      is_active: true,
+      restricted_to_categories: restricted_to_categories ? JSON.stringify(restricted_to_categories) : null,
+      restricted_to_brands: restricted_to_brands ? JSON.stringify(restricted_to_brands) : null
     });
     
     res.status(201).json({
@@ -109,7 +124,18 @@ router.post('/', requireAdmin, async (req, res) => {
 // Actualizar cupón (admin)
 router.put('/:id', requireAdmin, async (req, res) => {
   try {
-    const coupon = await Coupon.update(req.params.id, req.body);
+    // Procesar campos especiales
+    const updateData = { ...req.body };
+    
+    if (updateData.restricted_to_categories) {
+      updateData.restricted_to_categories = JSON.stringify(updateData.restricted_to_categories);
+    }
+    
+    if (updateData.restricted_to_brands) {
+      updateData.restricted_to_brands = JSON.stringify(updateData.restricted_to_brands);
+    }
+    
+    const coupon = await Coupon.update(req.params.id, updateData);
     
     if (!coupon) {
       return res.status(404).json({
