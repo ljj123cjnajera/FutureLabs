@@ -167,7 +167,7 @@
             <p>Panel de Administración</p>
         </div>
         
-        <div id="alert" class="alert"></div>
+        <div id="loginAlert" class="alert"></div>
         
         <form id="loginForm">
             <div class="form-group">
@@ -200,7 +200,7 @@
     <script src="js/auth.js"></script>
     <script>
         const form = document.getElementById('loginForm');
-        const alert = document.getElementById('alert');
+        const loginAlert = document.getElementById('loginAlert');
         
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -237,9 +237,9 @@
         });
         
         function showAlert(message, type) {
-            alert.textContent = message;
-            alert.className = `alert alert-${type}`;
-            alert.style.display = 'block';
+            loginAlert.textContent = message;
+            loginAlert.className = `alert alert-${type}`;
+            loginAlert.style.display = 'block';
         }
     </script>
 </body>

@@ -265,7 +265,7 @@ class AuthManager {
     } else if (typeof window.showNotification === 'function') {
       window.showNotification(message, type);
     } else {
-      alert(message);
+      window.alert(message);
     }
   }
 }
