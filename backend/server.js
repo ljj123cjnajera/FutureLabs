@@ -12,10 +12,19 @@ const morgan = require('morgan');
 const compression = require('compression');
 const slowDown = require('express-slow-down');
 const { exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
 const db = require('./database/config');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Crear directorio uploads si no existe
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+  console.log('📁 Directorio uploads creado');
+}
 
 // Auto-run seeds if products table is empty
 async function ensureDataSeeded() {
@@ -120,6 +129,10 @@ const passwordRecoveryRoutes = require('./routes/password-recovery');
 const blogRoutes = require('./routes/blog');
 const relatedProductsRoutes = require('./routes/related-products');
 const searchRoutes = require('./routes/search');
+const uploadRoutes = require('./routes/upload');
+
+// Servir archivos estáticos (imágenes subidas)
+app.use('/uploads', express.static('uploads'));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/verification', verificationRoutes);
@@ -137,6 +150,7 @@ app.use('/api/password-recovery', passwordRecoveryRoutes);
 app.use('/api/blog', blogRoutes);
 app.use('/api/related-products', relatedProductsRoutes);
 app.use('/api/search', searchRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

@@ -132,6 +132,24 @@ class AdminCRUD {
       await this.saveProduct();
     });
 
+    // Preview de imagen en modal de productos
+    const imageFileInput = document.getElementById('productImageFile');
+    if (imageFileInput) {
+      imageFileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            document.getElementById('previewImage').src = event.target.result;
+            document.getElementById('imagePreview').style.display = 'block';
+          };
+          reader.readAsDataURL(file);
+        } else {
+          document.getElementById('imagePreview').style.display = 'none';
+        }
+      });
+    }
+
     // Category Form
     document.getElementById('categoryForm').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -195,6 +213,18 @@ class AdminCRUD {
     };
 
     try {
+      // Si hay una imagen para subir, subirla primero
+      const imageFileInput = document.getElementById('productImageFile');
+      if (imageFileInput.files.length > 0) {
+        window.notifications.show('Subiendo imagen...', 'info');
+        const uploadResponse = await window.api.uploadImage(imageFileInput.files[0]);
+        if (uploadResponse.success) {
+          // Usar la URL de la imagen subida
+          productData.image_url = uploadResponse.data.url;
+          window.notifications.show('Imagen subida exitosamente', 'success');
+        }
+      }
+      
       const url = this.currentEditId 
         ? `/admin/products/${this.currentEditId}`
         : '/admin/products';
@@ -211,12 +241,18 @@ class AdminCRUD {
           this.currentEditId ? 'Producto actualizado exitosamente' : 'Producto creado exitosamente'
         );
         document.getElementById('productModal').style.display = 'none';
+        
+        // Resetear formulario y preview
+        document.getElementById('productForm').reset();
+        document.getElementById('imagePreview').style.display = 'none';
+        document.getElementById('previewImage').src = '';
+        
         adminManager.loadProducts();
       } else {
         window.notifications.error(response.message || 'Error al guardar producto');
       }
     } catch (error) {
-      window.notifications.error('Error al guardar producto');
+      window.notifications.error('Error al guardar producto: ' + error.message);
     }
   }
 

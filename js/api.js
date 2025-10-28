@@ -470,6 +470,47 @@ class FutureLabsAPI {
       method: 'DELETE'
     });
   }
+
+  // ===== UPLOAD =====
+  async uploadImage(file) {
+    const formData = new FormData();
+    formData.append('image', file);
+    
+    const response = await fetch(`${this.baseURL}/upload/image`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.token}`
+      },
+      body: formData
+    });
+    
+    const data = await response.json();
+    return data;
+  }
+
+  async uploadImages(files) {
+    const formData = new FormData();
+    files.forEach(file => {
+      formData.append('images', file);
+    });
+    
+    const response = await fetch(`${this.baseURL}/upload/images`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.token}`
+      },
+      body: formData
+    });
+    
+    const data = await response.json();
+    return data;
+  }
+
+  async deleteImage(filename) {
+    return this.request(`/upload/${filename}`, {
+      method: 'DELETE'
+    });
+  }
 }
 
 // Crear instancia global
