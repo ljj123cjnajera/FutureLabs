@@ -38,16 +38,26 @@ const mobilePaymentValidation = [
 // POST /api/payments/stripe/create-intent - Crear intención de pago con Stripe
 router.post('/stripe/create-intent', authenticateToken, async (req, res) => {
   try {
-    const { order_id } = req.body;
+    const { order_id, amount, currency } = req.body;
 
-    if (!order_id) {
-      return res.status(400).json({
-        success: false,
-        message: 'El ID del pedido es requerido'
+    // Si tenemos order_id, usamos el servicio existente
+    if (order_id) {
+      const result = await PaymentService.createStripePaymentIntent(order_id);
+      return res.json({
+        success: true,
+        data: result
       });
     }
 
-    const result = await PaymentService.createStripePaymentIntent(order_id);
+    // Si no, creamos directamente con amount y currency (checkout directo)
+    if (!amount || !currency) {
+      return res.status(400).json({
+        success: false,
+        message: 'Monto y moneda son requeridos'
+      });
+    }
+
+    const result = await PaymentService.createDirectPaymentIntent(amount, currency);
 
     res.json({
       success: true,

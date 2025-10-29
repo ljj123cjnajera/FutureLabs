@@ -87,6 +87,29 @@ class PaymentService {
     }
   }
 
+  // Crear payment intent directamente (checkout sin pedido)
+  static async createDirectPaymentIntent(amount, currency = 'pen') {
+    try {
+      if (!stripe) {
+        throw new Error('Stripe no está configurado');
+      }
+
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: Math.round(amount * 100), // Convertir a centavos
+        currency: currency,
+      });
+
+      return {
+        success: true,
+        client_secret: paymentIntent.client_secret,
+        payment_intent_id: paymentIntent.id
+      };
+    } catch (error) {
+      console.error('Error creando payment intent directo:', error);
+      throw error;
+    }
+  }
+
   // Procesar pago con PayPal (simulado)
   static async processPayPalPayment(orderId, paypalOrderId) {
     try {

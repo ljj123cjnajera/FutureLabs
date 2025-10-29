@@ -210,10 +210,10 @@ class FutureLabsAPI {
 
   // ========== PAGOS ==========
 
-  async createStripePaymentIntent(orderId) {
+  async createStripePaymentIntent(orderData) {
     return this.request('/payments/stripe/create-intent', {
       method: 'POST',
-      body: JSON.stringify({ order_id: orderId })
+      body: JSON.stringify(orderData)
     });
   }
 
@@ -221,6 +221,13 @@ class FutureLabsAPI {
     return this.request('/payments/stripe/process', {
       method: 'POST',
       body: JSON.stringify({ order_id: orderId, payment_method_id: paymentMethodId })
+    });
+  }
+
+  async confirmStripePayment(orderId, clientSecret) {
+    return this.request('/payments/stripe/confirm', {
+      method: 'POST',
+      body: JSON.stringify({ order_id: orderId, client_secret: clientSecret })
     });
   }
 
@@ -390,6 +397,22 @@ class FutureLabsAPI {
       ? `/related-products/popular/top-selling?limit=${limit}&category_id=${categoryId}`
       : `/related-products/popular/top-selling?limit=${limit}`;
     return this.request(url);
+  }
+
+  // ===== LOYALTY POINTS =====
+  async getLoyaltyPoints() {
+    return this.request('/loyalty/points');
+  }
+
+  async getLoyaltyTransactions(limit = 20) {
+    return this.request(`/loyalty/transactions?limit=${limit}`);
+  }
+
+  async calculateLoyaltyDiscount(totalAmount) {
+    return this.request('/loyalty/calculate-discount', {
+      method: 'POST',
+      body: JSON.stringify({ total_amount: totalAmount })
+    });
   }
 
   // ===== SEARCH =====
