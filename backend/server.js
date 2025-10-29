@@ -131,6 +131,7 @@ const relatedProductsRoutes = require('./routes/related-products');
 const searchRoutes = require('./routes/search');
 const uploadRoutes = require('./routes/upload');
 const reportsRoutes = require('./routes/reports');
+const loyaltyRoutes = require('./routes/loyalty');
 
 // Servir archivos estáticos (imágenes subidas)
 app.use('/uploads', express.static('uploads'));
@@ -153,6 +154,7 @@ app.use('/api/related-products', relatedProductsRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/reports', reportsRoutes);
+app.use('/api/loyalty', loyaltyRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

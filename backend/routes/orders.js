@@ -5,6 +5,7 @@ const Order = require('../models/Order');
 const { authenticateToken, requireAdmin } = require('../middleware/auth');
 const User = require('../models/User');
 const emailService = require('../services/emailService');
+const LoyaltyPoints = require('../models/LoyaltyPoints');
 
 // Validaciones
 const createOrderValidation = [
@@ -57,6 +58,15 @@ router.post('/', authenticateToken, createOrderValidation, async (req, res) => {
     }
 
     const order = await Order.createFromCart(req.user.id, req.body);
+
+    // Otorgar puntos de fidelidad si el pedido es pagado
+    if (order.payment_status === 'paid') {
+      const pointsToAdd = await LoyaltyPoints.calculatePointsFromOrder(order.total_amount);
+      if (pointsToAdd > 0) {
+        await LoyaltyPoints.addPoints(req.user.id, pointsToAdd, `Compra: ${order.order_number}`);
+        console.log(`✅ Otorgados ${pointsToAdd} puntos al usuario ${req.user.id}`);
+      }
+    }
 
     // Enviar email de confirmación en background
     const user = await User.getById(req.user.id);
