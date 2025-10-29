@@ -1086,3 +1086,63 @@ button {
         gap: 10px;
     }
 }
+/* Editor WYSIWYG Styles */
+.editor-wrapper {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.editor-toolbar {
+  background: #f5f5f5;
+  border-bottom: 1px solid #ddd;
+  padding: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.editor-toolbar button {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.editor-toolbar button:hover {
+  background: #667eea;
+  color: white;
+}
+
+.toolbar-separator {
+  width: 1px;
+  background: #ddd;
+  margin: 0 4px;
+}
+
+.editor-content {
+  min-height: 300px;
+  padding: 15px;
+  outline: none;
+  line-height: 1.6;
+}
+
+.editor-content:focus {
+  outline: 2px solid #667eea;
+  outline-offset: -2px;
+}
+
+.editor-content h1, .editor-content h2, .editor-content h3 {
+  margin: 15px 0 10px 0;
+}
+
+.editor-content p {
+  margin: 10px 0;
+}
+
+.editor-content ul, .editor-content ol {
+  margin: 10px 0 10px 20px;
+}
+
