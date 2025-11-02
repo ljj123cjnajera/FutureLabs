@@ -63,7 +63,18 @@ router.post('/image', authenticateToken, upload.single('image'), async (req, res
     
     // Generar URL para la imagen - usar URL del backend directamente
     // El backend sirve las imágenes estáticas desde /uploads
-    const backendUrl = process.env.BACKEND_URL || req.protocol + '://' + req.get('host');
+    // En Railway, usar la URL del servicio o la variable de entorno
+    let backendUrl = process.env.RAILWAY_PUBLIC_DOMAIN || process.env.BACKEND_URL;
+    
+    if (!backendUrl) {
+      // Construir desde los headers si está detrás de un proxy (Railway)
+      const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
+      const host = req.headers['x-forwarded-host'] || req.get('host') || req.headers.host;
+      backendUrl = `${protocol}://${host}`;
+    }
+    
+    // Asegurar que no tenga trailing slash
+    backendUrl = backendUrl.replace(/\/$/, '');
     const imageUrl = `${backendUrl}/uploads/${req.file.filename}`;
     
     console.log('Image uploaded successfully:', {
