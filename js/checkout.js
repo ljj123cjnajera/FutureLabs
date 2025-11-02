@@ -10,6 +10,8 @@ let discount = 0;
 let loyaltyPointsUsed = 0;
 let loyaltyPointsDiscount = 0;
 let availableLoyaltyPoints = 0;
+let savedAddresses = [];
+let selectedAddressId = null;
 let shippingData = {};
 let paymentData = {};
 let orderNumber = null;
@@ -85,6 +87,22 @@ async function loadCheckout() {
             }
         } catch (error) {
             console.log('No se pudieron cargar puntos de fidelidad:', error);
+        }
+
+        // Cargar direcciones guardadas
+        try {
+            const addressesResponse = await window.api.getAddresses();
+            if (addressesResponse.success) {
+                savedAddresses = addressesResponse.data.addresses || [];
+                // Si hay una dirección por defecto, seleccionarla
+                const defaultAddress = savedAddresses.find(addr => addr.is_default);
+                if (defaultAddress) {
+                    selectedAddressId = defaultAddress.id;
+                    loadAddressData(defaultAddress);
+                }
+            }
+        } catch (error) {
+            console.log('No se pudieron cargar direcciones guardadas:', error);
         }
         
         // Renderizar paso 1
@@ -203,6 +221,35 @@ function renderShippingStep() {
         <div class="checkout-form-section">
             <h2><i class="fas fa-map-marker-alt"></i> Dirección de Envío</h2>
             
+            ${savedAddresses.length > 0 ? `
+            <div class="saved-addresses" style="margin-bottom: 25px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                <h3 style="margin: 0 0 15px 0; font-size: 16px;">Direcciones Guardadas</h3>
+                <div style="display: grid; gap: 10px;">
+                    ${savedAddresses.map(addr => `
+                        <label style="display: flex; align-items: start; gap: 10px; padding: 15px; border: 2px solid ${selectedAddressId === addr.id ? '#667eea' : '#ddd'}; border-radius: 8px; background: white; cursor: pointer; transition: all 0.3s;">
+                            <input type="radio" name="savedAddress" value="${addr.id}" ${selectedAddressId === addr.id ? 'checked' : ''} 
+                                   onchange="selectSavedAddress('${addr.id}')" style="margin-top: 4px;">
+                            <div style="flex: 1;">
+                                <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 5px;">
+                                    <strong>${addr.label || 'Dirección'}</strong>
+                                    ${addr.is_default ? '<span style="background: #10b981; color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px;">POR DEFECTO</span>' : ''}
+                                </div>
+                                <p style="margin: 0; color: #666; font-size: 14px; line-height: 1.5;">
+                                    ${addr.full_name}<br>
+                                    ${addr.address}, ${addr.city}, ${addr.country}<br>
+                                    Tel: ${addr.phone}
+                                </p>
+                            </div>
+                        </label>
+                    `).join('')}
+                </div>
+                <button type="button" class="btn btn-outline" onclick="useNewAddress()" style="margin-top: 15px; padding: 8px 16px; font-size: 14px;">
+                    <i class="fas fa-plus"></i> Usar Nueva Dirección
+                </button>
+            </div>
+            ` : ''}
+            
+            <div id="shippingFormSection" style="${savedAddresses.length > 0 && selectedAddressId ? 'display: none;' : ''}">
             <div class="form-group">
                 <label class="form-label required">Nombre Completo</label>
                 <input type="text" class="form-input" id="fullName" placeholder="Juan Pérez" required>
