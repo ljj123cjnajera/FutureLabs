@@ -144,6 +144,7 @@ const reportsRoutes = require('./routes/reports');
 const loyaltyRoutes = require('./routes/loyalty');
 const chatRoutes = require('./routes/chat');
 const addressesRoutes = require('./routes/addresses');
+const homeContentRoutes = require('./routes/home-content');
 
 // Servir archivos estáticos (imágenes subidas) - usar ruta absoluta
 // Agregar headers CORS y CORP para permitir acceso a imágenes
@@ -177,6 +178,7 @@ app.use('/api/reports', reportsRoutes);
 app.use('/api/loyalty', loyaltyRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/addresses', addressesRoutes);
+app.use('/api/home-content', homeContentRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
