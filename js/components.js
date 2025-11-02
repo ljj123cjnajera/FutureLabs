@@ -127,6 +127,20 @@ class Components {
   }
 
   static initHeader() {
+    // FORZAR VISIBILIDAD DEL BOTÓN INICIO INMEDIATAMENTE
+    setTimeout(() => {
+      const homeLink = document.querySelector('a.home-link');
+      if (homeLink) {
+        homeLink.style.cssText = 'background: #ffffff !important; background-color: #ffffff !important; color: #374151 !important; border: 1px solid #e5e7eb !important; opacity: 1 !important; visibility: visible !important; display: flex !important; padding: 10px 20px !important; border-radius: 8px !important; font-weight: 600 !important; box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important; position: relative !important; z-index: 10 !important;';
+        const icon = homeLink.querySelector('i');
+        if (icon) {
+          icon.style.cssText = 'color: #374151 !important; opacity: 1 !important; visibility: visible !important;';
+        }
+        // Forzar también con setAttribute
+        homeLink.setAttribute('style', homeLink.getAttribute('style') + ' background: #ffffff !important; background-color: #ffffff !important;');
+      }
+    }, 100);
+    
     // Manejar botón de cuenta
     const accountLink = document.getElementById('accountLink');
     const accountText = document.getElementById('accountText');
