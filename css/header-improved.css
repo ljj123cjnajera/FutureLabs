@@ -209,16 +209,20 @@
 
 /* Links específicos del header */
 .affiliate-link,
-.account-link {
+.account-link,
+.home-link {
     background: var(--white) !important;
     border: 1px solid var(--border) !important;
+    box-shadow: var(--shadow-sm) !important;
 }
 
 .affiliate-link:hover,
-.account-link:hover {
+.account-link:hover,
+.home-link:hover {
     background: var(--primary) !important;
     color: var(--white) !important;
     border-color: var(--primary) !important;
+    box-shadow: var(--shadow) !important;
 }
 
 /* Cart Badge Mejorado */
@@ -337,6 +341,10 @@
     font-weight: 600;
     position: relative;
     overflow: hidden;
+    background: var(--white) !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: var(--shadow-sm) !important;
+    color: var(--gray-700) !important;
 }
 
 .top-bar.header-simple .user-actions a::before {
@@ -352,13 +360,15 @@
 }
 
 .top-bar.header-simple .user-actions a:hover {
-    color: var(--white);
+    color: var(--white) !important;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4) !important;
+    border-color: var(--primary) !important;
 }
 
 .top-bar.header-simple .user-actions a:hover::before {
     left: 0;
+    z-index: -1;
 }
 
 /* Responsive */
