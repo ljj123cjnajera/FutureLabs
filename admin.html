@@ -598,6 +598,22 @@
                     <i class="fas fa-file-alt"></i>
                     <span>Reportes</span>
                 </div>
+                <div class="menu-item" data-section="hero-slides" style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px; padding-top: 20px;">
+                    <i class="fas fa-sliders-h"></i>
+                    <span>Hero Slides</span>
+                </div>
+                <div class="menu-item" data-section="banners">
+                    <i class="fas fa-image"></i>
+                    <span>Banners</span>
+                </div>
+                <div class="menu-item" data-section="benefits">
+                    <i class="fas fa-gift"></i>
+                    <span>Beneficios</span>
+                </div>
+                <div class="menu-item" data-section="home-sections">
+                    <i class="fas fa-th-large"></i>
+                    <span>Secciones Home</span>
+                </div>
             </div>
         </div>
         
@@ -904,6 +920,50 @@
                             </button>
                         </div>
                     </div>
+                </div>
+
+                <!-- Hero Slides Section -->
+                <div class="section" id="hero-slides">
+                    <div class="section-header">
+                        <h3>Hero Slides (Carrusel Principal)</h3>
+                        <button class="btn-primary" onclick="openHeroSlideModal()">
+                            <i class="fas fa-plus"></i> Nuevo Slide
+                        </button>
+                    </div>
+                    <div id="heroSlidesTable"></div>
+                </div>
+
+                <!-- Banners Section -->
+                <div class="section" id="banners">
+                    <div class="section-header">
+                        <h3>Banners Promocionales</h3>
+                        <button class="btn-primary" onclick="openBannerModal()">
+                            <i class="fas fa-plus"></i> Nuevo Banner
+                        </button>
+                    </div>
+                    <div id="bannersTable"></div>
+                </div>
+
+                <!-- Benefits Section -->
+                <div class="section" id="benefits">
+                    <div class="section-header">
+                        <h3>Beneficios</h3>
+                        <button class="btn-primary" onclick="openBenefitModal()">
+                            <i class="fas fa-plus"></i> Nuevo Beneficio
+                        </button>
+                    </div>
+                    <div id="benefitsTable"></div>
+                </div>
+
+                <!-- Home Sections Section -->
+                <div class="section" id="home-sections">
+                    <div class="section-header">
+                        <h3>Secciones del Home</h3>
+                        <button class="btn-primary" onclick="openHomeSectionModal()">
+                            <i class="fas fa-plus"></i> Nueva Sección
+                        </button>
+                    </div>
+                    <div id="homeSectionsTable"></div>
                 </div>
             </div>
         </div>
@@ -1416,6 +1476,9 @@
     <!-- Chart.js for Dashboard Graphics -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
     
+    <!-- Admin Home Content Management -->
+    <script src="js/admin-home-content.js"></script>
+    
     <script src="js/api.js"></script>
     <script src="js/notifications.js"></script>
     <script src="js/admin.js"></script>
@@ -1463,6 +1526,243 @@
         window.previewProductImage = previewProductImage;
         window.clearImagePreview = clearImagePreview;
     </script>
+
+    <!-- Hero Slide Modal -->
+    <div id="heroSlideModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="heroSlideModalTitle">Crear Hero Slide</h3>
+                <span class="modal-close" onclick="document.getElementById('heroSlideModal').style.display='none'">&times;</span>
+            </div>
+            <form id="heroSlideForm">
+                <div class="form-group">
+                    <label>Título *</label>
+                    <input type="text" id="heroSlideTitle" required>
+                </div>
+                <div class="form-group">
+                    <label>Descripción</label>
+                    <textarea id="heroSlideDescription" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Texto del Botón</label>
+                    <input type="text" id="heroSlideButtonText">
+                </div>
+                <div class="form-group">
+                    <label>Link del Botón</label>
+                    <input type="text" id="heroSlideButtonLink">
+                </div>
+                <div class="form-group">
+                    <label>URL de Imagen</label>
+                    <input type="text" id="heroSlideImageUrl">
+                    <input type="file" id="heroSlideImageFile" accept="image/*" onchange="previewHeroSlideImage(this)">
+                    <div id="heroSlidePreviewContainer" style="margin-top: 10px; display: none;">
+                        <img id="heroSlidePreview" src="" alt="Preview" style="max-width: 200px; border-radius: 4px;">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Color de Fondo (hex)</label>
+                    <input type="color" id="heroSlideBackgroundColor" value="#667eea">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Orden</label>
+                        <input type="number" id="heroSlideOrder" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="heroSlideIsActive" checked> Activo
+                        </label>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="document.getElementById('heroSlideModal').style.display='none'">Cancelar</button>
+                    <button type="submit" class="btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Banner Modal -->
+    <div id="bannerModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="bannerModalTitle">Crear Banner</h3>
+                <span class="modal-close" onclick="document.getElementById('bannerModal').style.display='none'">&times;</span>
+            </div>
+            <form id="bannerForm">
+                <div class="form-group">
+                    <label>Título *</label>
+                    <input type="text" id="bannerTitle" required>
+                </div>
+                <div class="form-group">
+                    <label>Descripción</label>
+                    <textarea id="bannerDescription" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Texto del Botón</label>
+                    <input type="text" id="bannerButtonText">
+                </div>
+                <div class="form-group">
+                    <label>Link del Botón</label>
+                    <input type="text" id="bannerButtonLink">
+                </div>
+                <div class="form-group">
+                    <label>URL de Imagen</label>
+                    <input type="text" id="bannerImageUrl">
+                    <input type="file" id="bannerImageFile" accept="image/*" onchange="previewBannerImage(this)">
+                    <div id="bannerPreviewContainer" style="margin-top: 10px; display: none;">
+                        <img id="bannerPreview" src="" alt="Preview" style="max-width: 200px; border-radius: 4px;">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Tipo de Banner *</label>
+                        <select id="bannerType" required>
+                            <option value="promo">Promoción</option>
+                            <option value="affiliate">Afiliado</option>
+                            <option value="grid">Grid</option>
+                            <option value="flash">Flash</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Posición</label>
+                        <select id="bannerPosition">
+                            <option value="hero">Hero</option>
+                            <option value="benefits">Benefits</option>
+                            <option value="middle">Middle</option>
+                            <option value="bottom">Bottom</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Fecha Inicio</label>
+                        <input type="date" id="bannerStartDate">
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha Fin</label>
+                        <input type="date" id="bannerEndDate">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Orden</label>
+                        <input type="number" id="bannerOrder" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="bannerIsActive" checked> Activo
+                        </label>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="document.getElementById('bannerModal').style.display='none'">Cancelar</button>
+                    <button type="submit" class="btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Benefit Modal -->
+    <div id="benefitModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="benefitModalTitle">Crear Beneficio</h3>
+                <span class="modal-close" onclick="document.getElementById('benefitModal').style.display='none'">&times;</span>
+            </div>
+            <form id="benefitForm">
+                <div class="form-group">
+                    <label>Título *</label>
+                    <input type="text" id="benefitTitle" required>
+                </div>
+                <div class="form-group">
+                    <label>Descripción</label>
+                    <textarea id="benefitDescription" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Icono (Font Awesome class)</label>
+                    <input type="text" id="benefitIcon" placeholder="fas fa-gift">
+                </div>
+                <div class="form-group">
+                    <label>URL de Imagen</label>
+                    <input type="text" id="benefitImageUrl">
+                    <input type="file" id="benefitImageFile" accept="image/*" onchange="previewBenefitImage(this)">
+                    <div id="benefitPreviewContainer" style="margin-top: 10px; display: none;">
+                        <img id="benefitPreview" src="" alt="Preview" style="max-width: 200px; border-radius: 4px;">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Color de Fondo (hex)</label>
+                    <input type="color" id="benefitBackgroundColor" value="#667eea">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Orden</label>
+                        <input type="number" id="benefitOrder" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="benefitIsActive" checked> Activo
+                        </label>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="document.getElementById('benefitModal').style.display='none'">Cancelar</button>
+                    <button type="submit" class="btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Home Section Modal -->
+    <div id="homeSectionModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="homeSectionModalTitle">Crear Sección del Home</h3>
+                <span class="modal-close" onclick="document.getElementById('homeSectionModal').style.display='none'">&times;</span>
+            </div>
+            <form id="homeSectionForm">
+                <div class="form-group">
+                    <label>Tipo de Sección *</label>
+                    <select id="homeSectionType" required>
+                        <option value="category_carousel">Carrusel de Categoría</option>
+                        <option value="categories_grid">Grid de Categorías</option>
+                        <option value="featured_products">Productos Destacados</option>
+                        <option value="flash_offers">Ofertas Flash</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Título</label>
+                    <input type="text" id="homeSectionTitle">
+                </div>
+                <div class="form-group">
+                    <label>Categoría (para carruseles)</label>
+                    <select id="homeSectionCategory">
+                        <option value="">Seleccionar...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Límite de Productos</label>
+                    <input type="number" id="homeSectionLimit" value="8">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Orden</label>
+                        <input type="number" id="homeSectionOrder" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="homeSectionIsActive" checked> Activo
+                        </label>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="document.getElementById('homeSectionModal').style.display='none'">Cancelar</button>
+                    <button type="submit" class="btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 </html>
 
