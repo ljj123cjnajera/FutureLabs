@@ -324,11 +324,10 @@ button {
     border: 1px solid var(--border) !important;
     opacity: 1 !important;
     visibility: visible !important;
-    color: white !important;
     padding: 10px 20px !important;
     border-radius: 8px !important;
     font-weight: 600 !important;
-    box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+    box-shadow: var(--shadow-sm) !important;
 }
 
 .home-link:hover {
