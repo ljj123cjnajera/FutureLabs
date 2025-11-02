@@ -415,6 +415,13 @@ class FutureLabsAPI {
     });
   }
 
+  async redeemLoyaltyPoints(pointsToRedeem) {
+    return this.request('/loyalty/redeem', {
+      method: 'POST',
+      body: JSON.stringify({ points_to_redeem: pointsToRedeem })
+    });
+  }
+
   // ===== SEARCH =====
   async getSearchSuggestions(query) {
     return this.request(`/search/suggestions?q=${encodeURIComponent(query)}`);

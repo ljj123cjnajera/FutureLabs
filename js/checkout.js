@@ -7,6 +7,9 @@ let selectedPaymentMethod = 'stripe';
 let cartData = null;
 let appliedCoupon = null;
 let discount = 0;
+let loyaltyPointsUsed = 0;
+let loyaltyPointsDiscount = 0;
+let availableLoyaltyPoints = 0;
 let shippingData = {};
 let paymentData = {};
 let orderNumber = null;
@@ -73,6 +76,16 @@ async function loadCheckout() {
         }
 
         cartData = cartResponse.data;
+        
+        // Cargar puntos de fidelidad disponibles
+        try {
+            const pointsResponse = await window.api.getLoyaltyPoints();
+            if (pointsResponse.success) {
+                availableLoyaltyPoints = pointsResponse.data.points || 0;
+            }
+        } catch (error) {
+            console.log('No se pudieron cargar puntos de fidelidad:', error);
+        }
         
         // Renderizar paso 1
         renderStep(1);
@@ -492,6 +505,36 @@ function renderOrderSummary() {
                     </div>
                 `).join('')}
             </div>
+            ${availableLoyaltyPoints > 0 ? `
+            <div class="loyalty-section" style="padding: 15px; background: #f8f9fa; border-radius: 8px; margin: 20px 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <div>
+                        <strong><i class="fas fa-gift"></i> Tus Puntos</strong>
+                        <p style="margin: 5px 0 0 0; color: #666; font-size: 14px;">
+                            ${availableLoyaltyPoints} puntos disponibles (${(availableLoyaltyPoints / 10).toFixed(1)} S/ de descuento)
+                        </p>
+                    </div>
+                    ${loyaltyPointsUsed === 0 ? `
+                    <button class="btn btn-outline" onclick="useLoyaltyPoints()" style="padding: 8px 16px; font-size: 14px;">
+                        <i class="fas fa-star"></i> Usar Puntos
+                    </button>
+                    ` : `
+                    <div>
+                        <strong style="color: #10b981;">-${loyaltyPointsUsed} puntos</strong>
+                        <button class="btn btn-sm" onclick="removeLoyaltyPoints()" style="padding: 4px 8px; font-size: 12px; margin-left: 10px;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    `}
+                </div>
+                ${loyaltyPointsDiscount > 0 ? `
+                <div class="summary-row" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #ddd;">
+                    <span>Descuento por Puntos</span>
+                    <span style="color: #10b981;">-S/ ${loyaltyPointsDiscount.toFixed(2)}</span>
+                </div>
+                ` : ''}
+            </div>
+            ` : ''}
             <div class="summary-totals">
                 <div class="summary-row">
                     <span>Subtotal</span>
@@ -503,13 +546,19 @@ function renderOrderSummary() {
                 </div>
                 ${discount > 0 ? `
                 <div class="summary-row">
-                    <span>Descuento</span>
+                    <span>Descuento Cupón</span>
                     <span>-S/ ${parseFloat(discount).toFixed(2)}</span>
+                </div>
+                ` : ''}
+                ${loyaltyPointsDiscount > 0 ? `
+                <div class="summary-row">
+                    <span>Descuento Puntos</span>
+                    <span style="color: #10b981;">-S/ ${loyaltyPointsDiscount.toFixed(2)}</span>
                 </div>
                 ` : ''}
                 <div class="summary-row total">
                     <span>Total</span>
-                    <span>S/ ${parseFloat(cartData.total).toFixed(2)}</span>
+                    <span>S/ ${(parseFloat(cartData.total) - loyaltyPointsDiscount).toFixed(2)}</span>
                 </div>
             </div>
         </div>
@@ -554,7 +603,20 @@ async function processOrder() {
             }
         }
         
+        // Si se usaron puntos, canjearlos primero
+        if (loyaltyPointsUsed > 0) {
+            try {
+                await window.api.redeemLoyaltyPoints(loyaltyPointsUsed);
+                window.notifications.success(`${loyaltyPointsUsed} puntos canjeados exitosamente`);
+            } catch (error) {
+                console.error('Error canjeando puntos:', error);
+                window.notifications.error('Error al canjear puntos. El pedido continuará sin descuento de puntos.');
+                loyaltyPointsDiscount = 0;
+            }
+        }
+
         // Crear pedido
+        const finalTotal = parseFloat(cartData.total) - discount - loyaltyPointsDiscount;
         const orderData = {
             // Datos de envío (formato plano para el backend)
             shipping_address: shippingData.address,
@@ -567,7 +629,9 @@ async function processOrder() {
             // Método de pago
             payment_method: selectedPaymentMethod,
             shipping_cost: cartData.shipping || 30.00,
-            coupon_code: appliedCoupon
+            coupon_code: appliedCoupon,
+            // Incluir información de puntos (el backend ajustará el total si es necesario)
+            loyalty_points_used: loyaltyPointsUsed
         };
         
         const response = await window.api.createOrder(orderData);
@@ -647,4 +711,41 @@ function selectPaymentMethod(method) {
 
 // Hacer disponible globalmente
 window.selectPaymentMethod = selectPaymentMethod;
+
+// Usar puntos de fidelidad
+async function useLoyaltyPoints() {
+    if (availableLoyaltyPoints === 0) {
+        window.notifications.warning('No tienes puntos disponibles');
+        return;
+    }
+
+    // Calcular el máximo de puntos que se pueden usar (no más del total)
+    const maxDiscount = parseFloat(cartData.total) - discount;
+    const maxPointsDiscount = Math.min(availableLoyaltyPoints / 10, maxDiscount);
+    const pointsToUse = Math.floor(maxPointsDiscount * 10);
+
+    if (pointsToUse === 0) {
+        window.notifications.warning('No puedes usar puntos en este pedido');
+        return;
+    }
+
+    // Usar todos los puntos disponibles o los necesarios
+    loyaltyPointsUsed = Math.min(pointsToUse, availableLoyaltyPoints);
+    loyaltyPointsDiscount = loyaltyPointsUsed / 10;
+
+    window.notifications.success(`Usando ${loyaltyPointsUsed} puntos (S/ ${loyaltyPointsDiscount.toFixed(2)} de descuento)`);
+    renderOrderSummary();
+}
+
+// Remover puntos de fidelidad
+function removeLoyaltyPoints() {
+    loyaltyPointsUsed = 0;
+    loyaltyPointsDiscount = 0;
+    window.notifications.info('Puntos removidos');
+    renderOrderSummary();
+}
+
+// Hacer disponible globalmente
+window.useLoyaltyPoints = useLoyaltyPoints;
+window.removeLoyaltyPoints = removeLoyaltyPoints;
 

@@ -247,6 +247,9 @@
                         <li class="profile-menu-item" data-section="addresses">
                             <i class="fas fa-map-marker-alt"></i> Direcciones
                         </li>
+                        <li class="profile-menu-item" data-section="loyalty">
+                            <i class="fas fa-gift"></i> Puntos de Fidelidad
+                        </li>
                         <li class="profile-menu-item" data-section="security">
                             <i class="fas fa-shield-alt"></i> Seguridad
                         </li>
@@ -282,6 +285,11 @@
                                 <i class="fas fa-heart"></i>
                                 <h3 id="wishlistCount">0</h3>
                                 <p>Favoritos</p>
+                            </div>
+                            <div class="stat-card">
+                                <i class="fas fa-gift"></i>
+                                <h3 id="overviewPoints">0</h3>
+                                <p>Puntos de Fidelidad</p>
                             </div>
                         </div>
                     </div>
@@ -330,6 +338,41 @@
                     <div class="profile-section" id="addresses">
                         <h2 class="section-title">Mis Direcciones</h2>
                         <p>Funcionalidad próximamente...</p>
+                    </div>
+
+                    <!-- Loyalty Points Section -->
+                    <div class="profile-section" id="loyalty">
+                        <h2 class="section-title">Puntos de Fidelidad</h2>
+                        
+                        <div class="loyalty-overview" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px; margin-bottom: 30px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <h3 style="margin: 0; font-size: 14px; opacity: 0.9;">Tus Puntos</h3>
+                                    <p style="font-size: 48px; font-weight: bold; margin: 10px 0;" id="currentPoints">0</p>
+                                    <p style="margin: 0; opacity: 0.9; font-size: 14px;">
+                                        <i class="fas fa-info-circle"></i> 
+                                        10 puntos = S/ 1 de descuento
+                                    </p>
+                                </div>
+                                <div style="text-align: right;">
+                                    <i class="fas fa-gift" style="font-size: 64px; opacity: 0.3;"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="loyalty-info" style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+                            <h3 style="margin-top: 0;"><i class="fas fa-star"></i> ¿Cómo ganar puntos?</h3>
+                            <ul style="margin: 10px 0; padding-left: 20px;">
+                                <li>Ganas <strong>1 punto por cada S/ 1</strong> que gastas</li>
+                                <li>Los puntos se acreditan automáticamente cuando tu pedido está pagado</li>
+                                <li>Puedes canjear puntos por descuentos en tu próxima compra</li>
+                            </ul>
+                        </div>
+
+                        <h3 style="margin-top: 30px;"><i class="fas fa-history"></i> Historial de Transacciones</h3>
+                        <div id="loyaltyTransactions" style="margin-top: 20px;">
+                            <p>Cargando transacciones...</p>
+                        </div>
                     </div>
 
                     <!-- Security Section -->
@@ -431,6 +474,12 @@
                     document.getElementById('completedOrders').textContent = 
                         orders.filter(o => o.status === 'delivered').length;
                 }
+
+                // Cargar puntos de fidelidad
+                const pointsResponse = await window.api.getLoyaltyPoints();
+                if (pointsResponse.success) {
+                    document.getElementById('overviewPoints').textContent = pointsResponse.data.points || 0;
+                }
             } catch (error) {
                 console.error('Error loading stats:', error);
             }
@@ -451,10 +500,69 @@
                     // Cargar datos de la sección
                     if (this.dataset.section === 'orders') {
                         loadOrders();
+                    } else if (this.dataset.section === 'loyalty') {
+                        loadLoyaltyPoints();
                     }
                 }
             });
         });
+
+        // Cargar puntos de fidelidad
+        async function loadLoyaltyPoints() {
+            try {
+                // Cargar puntos actuales
+                const pointsResponse = await window.api.getLoyaltyPoints();
+                if (pointsResponse.success) {
+                    document.getElementById('currentPoints').textContent = pointsResponse.data.points || 0;
+                }
+
+                // Cargar transacciones
+                const transactionsResponse = await window.api.getLoyaltyTransactions();
+                const container = document.getElementById('loyaltyTransactions');
+                
+                if (transactionsResponse.success && transactionsResponse.data.transactions.length > 0) {
+                    container.innerHTML = transactionsResponse.data.transactions.map(transaction => {
+                        const isEarned = transaction.points_change > 0;
+                        const date = new Date(transaction.created_at).toLocaleDateString('es-PE', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                        
+                        return `
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 10px; background: white;">
+                                <div>
+                                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                                        <i class="fas fa-${isEarned ? 'plus-circle' : 'minus-circle'}" 
+                                           style="color: ${isEarned ? '#10b981' : '#ef4444'};"></i>
+                                        <strong style="color: ${isEarned ? '#10b981' : '#ef4444'};">
+                                            ${isEarned ? '+' : ''}${transaction.points_change} puntos
+                                        </strong>
+                                    </div>
+                                    <p style="margin: 0; color: #666; font-size: 14px;">
+                                        ${transaction.description || 'Transacción de puntos'}
+                                    </p>
+                                    <p style="margin: 5px 0 0 0; color: #999; font-size: 12px;">
+                                        ${date}
+                                    </p>
+                                </div>
+                                <span style="padding: 6px 12px; background: ${isEarned ? '#d1fae5' : '#fee2e2'}; 
+                                           color: ${isEarned ? '#065f46' : '#991b1b'}; border-radius: 20px; font-size: 12px; font-weight: 600;">
+                                    ${transaction.type === 'earned' ? 'Ganado' : 'Canjeado'}
+                                </span>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    container.innerHTML = '<p style="color: #999;">No hay transacciones aún. ¡Haz tu primera compra para empezar a ganar puntos!</p>';
+                }
+            } catch (error) {
+                console.error('Error loading loyalty points:', error);
+                document.getElementById('loyaltyTransactions').innerHTML = '<p style="color: #ef4444;">Error al cargar transacciones</p>';
+            }
+        }
 
         // Cargar pedidos
         async function loadOrders() {
