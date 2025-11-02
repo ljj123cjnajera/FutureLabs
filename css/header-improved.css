@@ -386,16 +386,38 @@ a.home-link {
 }
 
 .top-bar.header-simple .user-actions a.home-link::before,
-.user-actions a.home-link::before {
+.user-actions a.home-link::before,
+a.home-link::before {
     display: none !important;
+    content: none !important;
+    background: none !important;
+}
+
+/* Asegurar que NO haya ningún pseudo-elemento interfiriendo */
+.top-bar.header-simple .user-actions a.home-link::after,
+.user-actions a.home-link::after,
+a.home-link::after {
+    display: none !important;
+    content: none !important;
+    background: none !important;
 }
 
 .top-bar.header-simple .user-actions a.home-link:hover,
-.user-actions a.home-link:hover {
+.user-actions a.home-link:hover,
+a.home-link:hover {
     background: var(--primary) !important;
+    background-color: var(--primary) !important;
     color: var(--white) !important;
     border-color: var(--primary) !important;
     box-shadow: var(--shadow) !important;
+    opacity: 1 !important;
+}
+
+/* Forzar color del icono en hover */
+.top-bar.header-simple .user-actions a.home-link:hover i,
+.user-actions a.home-link:hover i,
+a.home-link:hover i {
+    color: var(--white) !important;
 }
 
 .top-bar.header-simple .user-actions a::before {
