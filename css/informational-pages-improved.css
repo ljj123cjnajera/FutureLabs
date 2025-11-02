@@ -10,17 +10,17 @@
 .blog-page,
 .compare-page {
     background: var(--bg-secondary);
-    min-height: 100vh;
-    padding-top: 100px;
-    padding-bottom: 60px;
+    min-height: calc(100vh - 200px);
+    padding-top: 20px;
+    padding-bottom: var(--spacing-xl);
 }
 
 /* Hero Section Mejorada */
 .hero-section {
     background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
     color: var(--white);
-    padding: var(--spacing-3xl) 0;
-    margin-bottom: var(--spacing-3xl);
+    padding: var(--spacing-xl) 0;
+    margin-bottom: var(--spacing-xl);
     position: relative;
     overflow: hidden;
 }

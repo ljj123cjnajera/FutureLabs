@@ -4,17 +4,17 @@
 
 .product-detail-page {
     background: var(--bg-secondary);
-    min-height: 100vh;
-    padding-top: 100px;
-    padding-bottom: 60px;
+    min-height: calc(100vh - 200px);
+    padding-top: 20px;
+    padding-bottom: var(--spacing-xl);
 }
 
 /* Product Detail Container */
 .product-detail-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--spacing-3xl);
-    margin-bottom: var(--spacing-3xl);
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
 }
 
 /* Product Images */
