@@ -29,7 +29,8 @@
 }
 
 .checkout-section:hover {
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-light);
 }
 
 .checkout-section-header {
