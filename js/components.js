@@ -107,7 +107,7 @@ class Components {
             </div>
             ${searchBar}
             <div class="user-actions">
-              ${!showSearch && !showNav ? '<a href="index.html" class="home-link"><i class="fas fa-home"></i> Inicio</a>' : ''}
+              ${!showSearch && !showNav ? '<a href="index.html" class="home-link" style="background: #ffffff !important; background-color: #ffffff !important; color: #374151 !important; border: 1px solid #e5e7eb !important; opacity: 1 !important; visibility: visible !important; display: flex !important; padding: 10px 20px !important; border-radius: 8px !important; font-weight: 600 !important; box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;"><i class="fas fa-home" style="color: #374151 !important;"></i> Inicio</a>' : ''}
               <a href="#" class="affiliate-link"><i class="fas fa-store"></i> Conviértete en Afiliado</a>
               <a href="#" class="account-link" id="accountLink"><i class="fas fa-user"></i> <span id="accountText">Cuenta</span></a>
               <a href="compare.html" class="cart-icon" id="comparatorLink" style="position: relative;">
