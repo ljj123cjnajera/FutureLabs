@@ -96,9 +96,13 @@ class AdminManager {
       orders: 'Pedidos',
       users: 'Usuarios',
       reviews: 'Reseñas',
-      reports: 'Reportes'
+      reports: 'Reportes',
+      'hero-slides': 'Hero Slides',
+      'banners': 'Banners',
+      'benefits': 'Beneficios',
+      'home-sections': 'Secciones del Home'
     };
-    document.getElementById('pageTitle').textContent = titles[section];
+    document.getElementById('pageTitle').textContent = titles[section] || section;
 
     // Cargar datos de la sección
     this.loadSectionData(section);
@@ -126,6 +130,26 @@ class AdminManager {
         break;
       case 'reports':
         // Reportes no necesitan cargar datos por ahora
+        break;
+      case 'hero-slides':
+        if (window.adminHomeContent) {
+          await window.adminHomeContent.loadHeroSlides();
+        }
+        break;
+      case 'banners':
+        if (window.adminHomeContent) {
+          await window.adminHomeContent.loadBanners();
+        }
+        break;
+      case 'benefits':
+        if (window.adminHomeContent) {
+          await window.adminHomeContent.loadBenefits();
+        }
+        break;
+      case 'home-sections':
+        if (window.adminHomeContent) {
+          await window.adminHomeContent.loadHomeSections();
+        }
         break;
     }
   }
