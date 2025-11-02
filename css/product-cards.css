@@ -182,10 +182,11 @@
 
 /* Contenido de la tarjeta */
 .product-content {
-    padding: var(--spacing-lg);
+    padding: var(--spacing-md);
     display: flex;
     flex-direction: column;
     flex: 1;
+    gap: var(--spacing-xs);
 }
 
 /* Categoría */

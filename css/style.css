@@ -393,7 +393,7 @@ button {
 /* Hero Section */
 /* Hero Section */
 .hero {
-    margin-bottom: var(--spacing-3xl);
+    margin-bottom: var(--spacing-2xl);
     position: relative;
 }
 
@@ -593,12 +593,13 @@ button {
 /* Sections */
 .section {
     margin: var(--spacing-xl) 0;
+    padding: var(--spacing-xl) 0;
 }
 
 .section-title {
     font-size: clamp(1.5rem, 4vw, 2rem);
     font-weight: 700;
-    margin-bottom: var(--spacing-2xl);
+    margin-bottom: var(--spacing-xl);
     display: flex;
     align-items: center;
     gap: var(--spacing-md);
@@ -713,7 +714,7 @@ button {
 .affiliate-banner {
     background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
     color: var(--white);
-    padding: var(--spacing-3xl);
+    padding: var(--spacing-2xl);
     text-align: center;
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-lg);
@@ -764,7 +765,7 @@ button {
 /* Flash Offers */
 .flash-offers-message {
     background-color: var(--white);
-    padding: var(--spacing-3xl);
+    padding: var(--spacing-2xl);
     text-align: center;
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow);

@@ -395,7 +395,7 @@
 /* Empty Cart */
 .empty-cart {
     text-align: center;
-    padding: var(--spacing-3xl);
+    padding: var(--spacing-2xl);
     background: var(--white);
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow);

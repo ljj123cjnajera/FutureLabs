@@ -218,7 +218,7 @@
 
 .wishlist-empty {
     text-align: center;
-    padding: var(--spacing-3xl);
+    padding: var(--spacing-2xl);
     background: var(--white);
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow);
@@ -524,7 +524,7 @@
 /* Empty State */
 .empty-state {
     text-align: center;
-    padding: var(--spacing-3xl);
+    padding: var(--spacing-2xl);
     background: var(--white);
     border-radius: var(--radius-xl);
     border: 2px dashed var(--border);
@@ -551,7 +551,7 @@
 /* Loading State */
 .loading {
     text-align: center;
-    padding: var(--spacing-3xl);
+    padding: var(--spacing-2xl);
     color: var(--gray-500);
 }
 
