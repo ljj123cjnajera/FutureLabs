@@ -294,6 +294,13 @@ class AdminCRUD {
       return;
     }
 
+    // Preparar datos del producto
+    const brandValue = document.getElementById('productBrand').value.trim();
+    if (!brandValue) {
+      window.notifications.error('La marca es requerida');
+      return;
+    }
+
     const productData = {
       name: name,
       slug: slug,
@@ -302,26 +309,45 @@ class AdminCRUD {
       discount_price: document.getElementById('productDiscountPrice').value ? parseFloat(document.getElementById('productDiscountPrice').value) : null,
       stock_quantity: parseInt(stock),
       category_id: category,
-      brand: document.getElementById('productBrand').value.trim() || null,
+      brand: brandValue, // Brand es requerido en la BD
       sku: document.getElementById('productSKU').value.trim() || null,
       weight: document.getElementById('productWeight').value.trim() || null,
       dimensions: document.getElementById('productDimensions').value.trim() || null,
-      is_active: document.getElementById('productIsActive').checked,
-      rating: 0, // Rating inicial
-      review_count: 0 // Contador de reseñas inicial
+      is_active: document.getElementById('productIsActive').checked
+      // rating y review_count tienen valores por defecto en la BD, no necesitamos enviarlos
     };
 
     try {
       // Si hay una imagen para subir, subirla primero
       if (imageFileInput.files.length > 0) {
         window.notifications.show('Subiendo imagen...', 'info');
-        const uploadResponse = await window.api.uploadImage(imageFileInput.files[0]);
-        if (uploadResponse.success) {
-          // Usar la URL de la imagen subida
-          productData.image_url = uploadResponse.data.url;
-          window.notifications.show('Imagen subida exitosamente', 'success');
-        } else {
-          throw new Error('Error al subir la imagen');
+        try {
+          const uploadResponse = await window.api.uploadImage(imageFileInput.files[0]);
+          console.log('Upload response:', uploadResponse);
+          
+          if (uploadResponse && uploadResponse.success) {
+            // Usar la URL de la imagen subida - verificar diferentes estructuras posibles
+            const imageUrl = uploadResponse.data?.url || uploadResponse.url || uploadResponse.data?.filename;
+            if (imageUrl) {
+              // Si es solo el filename, construir la URL completa
+              if (!imageUrl.startsWith('http') && !imageUrl.startsWith('/')) {
+                productData.image_url = `/uploads/${imageUrl}`;
+              } else if (!imageUrl.startsWith('http')) {
+                productData.image_url = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
+              } else {
+                productData.image_url = imageUrl;
+              }
+              window.notifications.show('Imagen subida exitosamente', 'success');
+            } else {
+              throw new Error('No se recibió URL de imagen en la respuesta');
+            }
+          } else {
+            throw new Error(uploadResponse?.message || 'Error al subir la imagen');
+          }
+        } catch (uploadError) {
+          console.error('Error uploading image:', uploadError);
+          window.notifications.error('Error al subir imagen: ' + (uploadError.message || 'Error desconocido'));
+          return;
         }
       } else if (imageUrl) {
         // Validar URL de imagen
@@ -335,6 +361,8 @@ class AdminCRUD {
       }
       // Si es edición y no hay nueva imagen ni URL, no incluir image_url para mantener la existente
       
+      console.log('Product data to save:', productData);
+      
       const url = this.currentEditId 
         ? `/admin/products/${this.currentEditId}`
         : '/admin/products';
@@ -346,7 +374,9 @@ class AdminCRUD {
         body: JSON.stringify(productData)
       });
       
-      if (response.success) {
+      console.log('Save product response:', response);
+      
+      if (response && response.success) {
         window.notifications.success(
           this.currentEditId ? 'Producto actualizado exitosamente' : 'Producto creado exitosamente'
         );
@@ -365,10 +395,12 @@ class AdminCRUD {
         
         adminManager.loadProducts();
       } else {
-        window.notifications.error(response.message || 'Error al guardar producto');
+        console.error('Error response:', response);
+        window.notifications.error(response?.message || response?.error || 'Error al guardar producto');
       }
     } catch (error) {
-      window.notifications.error('Error al guardar producto: ' + error.message);
+      console.error('Error saving product:', error);
+      window.notifications.error('Error al guardar producto: ' + (error.message || 'Error desconocido'));
     }
   }
 

@@ -95,6 +95,16 @@ router.get('/dashboard/stats', async (req, res) => {
 // ===== PRODUCTOS =====
 router.post('/products', async (req, res) => {
   try {
+    console.log('Creating product with data:', req.body);
+    
+    // Validaciones básicas
+    if (!req.body.name || !req.body.slug || !req.body.price || !req.body.category_id || !req.body.brand) {
+      return res.status(400).json({
+        success: false,
+        message: 'Faltan campos requeridos: name, slug, price, category_id, brand'
+      });
+    }
+
     const product = await Product.create(req.body);
     res.status(201).json({
       success: true,
@@ -103,16 +113,28 @@ router.post('/products', async (req, res) => {
     });
   } catch (error) {
     console.error('Error creating product:', error);
+    console.error('Error details:', error.message, error.stack);
     res.status(500).json({
       success: false,
-      message: 'Error al crear producto'
+      message: error.message || 'Error al crear producto',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
 
 router.put('/products/:id', async (req, res) => {
   try {
+    console.log('Updating product:', req.params.id, 'with data:', req.body);
+    
     const product = await Product.update(req.params.id, req.body);
+    
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: 'Producto no encontrado'
+      });
+    }
+    
     res.json({
       success: true,
       message: 'Producto actualizado exitosamente',
@@ -120,9 +142,11 @@ router.put('/products/:id', async (req, res) => {
     });
   } catch (error) {
     console.error('Error updating product:', error);
+    console.error('Error details:', error.message, error.stack);
     res.status(500).json({
       success: false,
-      message: 'Error al actualizar producto'
+      message: error.message || 'Error al actualizar producto',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });

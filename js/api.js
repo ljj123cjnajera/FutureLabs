@@ -557,19 +557,35 @@ class FutureLabsAPI {
 
   // ===== UPLOAD =====
   async uploadImage(file) {
-    const formData = new FormData();
-    formData.append('image', file);
-    
-    const response = await fetch(`${this.baseURL}/upload/image`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${this.token}`
-      },
-      body: formData
-    });
-    
-    const data = await response.json();
-    return data;
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      
+      const response = await fetch(`${this.baseURL}/upload/image`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.token}`
+        },
+        body: formData
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        return {
+          success: false,
+          message: data.message || `Error ${response.status}: ${response.statusText}`
+        };
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      return {
+        success: false,
+        message: error.message || 'Error al subir imagen'
+      };
+    }
   }
 
   async uploadImages(files) {

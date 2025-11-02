@@ -56,8 +56,16 @@ router.post('/image', authenticateToken, upload.single('image'), async (req, res
       });
     }
     
-    // Generar URL para la imagen
-    const imageUrl = `/uploads/${req.file.filename}`;
+    // Generar URL para la imagen - usar URL completa accesible
+    // En producción, usar la URL base del servidor
+    const baseUrl = process.env.FRONTEND_URL || req.protocol + '://' + req.get('host');
+    const imageUrl = `${baseUrl}/uploads/${req.file.filename}`;
+    
+    console.log('Image uploaded successfully:', {
+      filename: req.file.filename,
+      url: imageUrl,
+      path: req.file.path
+    });
     
     res.json({
       success: true,
