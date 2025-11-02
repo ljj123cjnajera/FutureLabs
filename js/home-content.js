@@ -70,16 +70,85 @@ class HomeContentManager {
     `;
     sliderContainer.insertAdjacentHTML('beforeend', controlsHTML);
 
-    // Reinicializar el carrusel si existe la función
-    if (window.initHeroSlider) {
-      window.initHeroSlider();
+    // Reinicializar el carrusel después de un pequeño delay para asegurar que el DOM esté actualizado
+    setTimeout(() => {
+      this.initHeroSlider();
+    }, 100);
+  }
+
+  initHeroSlider() {
+    const sliderContainer = document.querySelector('.hero-slider');
+    if (!sliderContainer) return;
+
+    const slides = sliderContainer.querySelectorAll('.slide:not(.slider-arrow):not(.slider-controls)');
+    if (slides.length === 0) return;
+
+    let currentSlide = 0;
+
+    // Función para cambiar slide
+    const changeSlide = (index) => {
+      slides.forEach((slide, i) => {
+        slide.classList.remove('active');
+        if (i === index) {
+          slide.classList.add('active');
+        }
+      });
+
+      // Actualizar dots
+      const dots = sliderContainer.querySelectorAll('.slider-dot');
+      dots.forEach((dot, i) => {
+        dot.classList.remove('active');
+        if (i === index) {
+          dot.classList.add('active');
+        }
+      });
+    };
+
+    // Event listeners para las flechas
+    const prevArrow = sliderContainer.querySelector('.slider-arrow.prev');
+    const nextArrow = sliderContainer.querySelector('.slider-arrow.next');
+
+    if (prevArrow) {
+      prevArrow.onclick = () => {
+        currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+        changeSlide(currentSlide);
+      };
     }
+
+    if (nextArrow) {
+      nextArrow.onclick = () => {
+        currentSlide = (currentSlide + 1) % slides.length;
+        changeSlide(currentSlide);
+      };
+    }
+
+    // Event listeners para los dots
+    const dots = sliderContainer.querySelectorAll('.slider-dot');
+    dots.forEach((dot, index) => {
+      dot.onclick = () => {
+        currentSlide = index;
+        changeSlide(currentSlide);
+      };
+    });
+
+    // Auto-play del carrusel
+    setInterval(() => {
+      currentSlide = (currentSlide + 1) % slides.length;
+      changeSlide(currentSlide);
+    }, 5000);
   }
 
   renderBenefits() {
     const benefitsContainer = document.querySelector('.benefits-slider');
-    if (!benefitsContainer || this.benefits.length === 0) return;
+    if (!benefitsContainer) return;
+    
+    // Si no hay beneficios, mantener el contenido por defecto
+    if (this.benefits.length === 0) {
+      // Ocultar el contenedor de beneficios por defecto si hay beneficios dinámicos en el futuro
+      return;
+    }
 
+    // Reemplazar contenido solo si hay beneficios dinámicos
     benefitsContainer.innerHTML = this.benefits.map(benefit => `
       <div class="benefit-card">
         <div class="benefit-image" style="${benefit.background_color ? `background: ${benefit.background_color};` : ''}">
