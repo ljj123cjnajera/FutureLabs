@@ -310,11 +310,31 @@ document.addEventListener('DOMContentLoaded', async function() {
         if (response.success && response.data.product) {
             const product = response.data.product;
             
+            // Normalizar la URL de la imagen
+            let imageUrl = product.image_url || 'assets/images/products/placeholder.jpg';
+            
+            // Si la URL no comienza con http/https, verificar si es relativa o necesita el protocolo
+            if (imageUrl && !imageUrl.startsWith('http://') && !imageUrl.startsWith('https://') && !imageUrl.startsWith('/')) {
+                // Si es una URL del backend sin protocolo, agregar https://
+                if (imageUrl.includes('railway.app') || imageUrl.includes('futurelabs')) {
+                    imageUrl = `https://${imageUrl}`;
+                }
+            }
+            
+            // Si es una URL relativa que empieza con /uploads, convertir a URL completa del backend
+            if (imageUrl.startsWith('/uploads/')) {
+                imageUrl = `https://futurelabs-production.up.railway.app${imageUrl}`;
+            }
+            
+            console.log('Product image URL:', imageUrl);
+            
             container.innerHTML = `
                 <div class="product-detail-container">
                     <div class="product-images">
                         <div class="main-image">
-                            <img src="${product.image_url || 'assets/images/products/placeholder.jpg'}" alt="${product.name}">
+                            <img src="${imageUrl}" 
+                                 alt="${product.name}"
+                                 onerror="this.onerror=null; this.src='assets/images/products/placeholder.jpg';">
                         </div>
                     </div>
                     
