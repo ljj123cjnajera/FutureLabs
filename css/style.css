@@ -592,7 +592,7 @@ button {
 
 /* Sections */
 .section {
-    margin: var(--spacing-3xl) 0;
+    margin: var(--spacing-xl) 0;
 }
 
 .section-title {
