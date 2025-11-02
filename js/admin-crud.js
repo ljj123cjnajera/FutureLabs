@@ -242,8 +242,22 @@ class AdminCRUD {
           document.getElementById('imageFileName').textContent = 'Imagen actual';
         }
         
-        document.getElementById('productWeight').value = product.weight || '';
-        document.getElementById('productDimensions').value = product.dimensions || '';
+        // Cargar weight y dimensions desde specifications si existen
+        let weight = '';
+        let dimensions = '';
+        if (product.specifications) {
+          try {
+            const specs = typeof product.specifications === 'string' 
+              ? JSON.parse(product.specifications) 
+              : product.specifications;
+            weight = specs.weight || '';
+            dimensions = specs.dimensions || '';
+          } catch (e) {
+            console.log('Error parsing specifications:', e);
+          }
+        }
+        document.getElementById('productWeight').value = weight;
+        document.getElementById('productDimensions').value = dimensions;
         document.getElementById('productIsActive').checked = product.is_active !== false;
       }
     } catch (error) {
@@ -311,11 +325,20 @@ class AdminCRUD {
       category_id: category,
       brand: brandValue, // Brand es requerido en la BD
       sku: document.getElementById('productSKU').value.trim() || null,
-      weight: document.getElementById('productWeight').value.trim() || null,
-      dimensions: document.getElementById('productDimensions').value.trim() || null,
+      // weight y dimensions no existen en la tabla products, se guardan en specifications si es necesario
       is_active: document.getElementById('productIsActive').checked
       // rating y review_count tienen valores por defecto en la BD, no necesitamos enviarlos
     };
+
+    // Si hay peso o dimensiones, guardarlos en specifications como JSON
+    const weight = document.getElementById('productWeight').value.trim();
+    const dimensions = document.getElementById('productDimensions').value.trim();
+    if (weight || dimensions) {
+      productData.specifications = JSON.stringify({
+        ...(weight ? { weight: weight } : {}),
+        ...(dimensions ? { dimensions: dimensions } : {})
+      });
+    }
 
     try {
       // Si hay una imagen para subir, subirla primero
