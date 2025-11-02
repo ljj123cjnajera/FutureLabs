@@ -145,8 +145,8 @@ const loyaltyRoutes = require('./routes/loyalty');
 const chatRoutes = require('./routes/chat');
 const addressesRoutes = require('./routes/addresses');
 
-// Servir archivos estáticos (imágenes subidas)
-app.use('/uploads', express.static('uploads'));
+// Servir archivos estáticos (imágenes subidas) - usar ruta absoluta
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/verification', verificationRoutes);
