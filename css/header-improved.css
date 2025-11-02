@@ -163,17 +163,18 @@
     border-radius: var(--radius-lg);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     font-weight: 600;
-    color: var(--gray-700);
+    color: var(--gray-700) !important;
     display: flex;
     align-items: center;
     gap: var(--spacing-xs);
     text-decoration: none;
     border: 1px solid var(--border);
-    background: var(--white);
+    background: var(--white) !important;
     cursor: pointer;
     font-size: 0.9375rem;
     white-space: nowrap;
     box-shadow: var(--shadow-sm);
+    opacity: 1 !important;
 }
 
 .user-actions a:hover,
