@@ -214,6 +214,8 @@
     background: var(--white) !important;
     border: 1px solid var(--border) !important;
     box-shadow: var(--shadow-sm) !important;
+    color: var(--gray-700) !important;
+    opacity: 1 !important;
 }
 
 .affiliate-link:hover,
@@ -345,6 +347,25 @@
     border: 1px solid var(--border) !important;
     box-shadow: var(--shadow-sm) !important;
     color: var(--gray-700) !important;
+    opacity: 1 !important;
+}
+
+/* Asegurar visibilidad específica del home-link */
+.top-bar.header-simple .user-actions a.home-link,
+.user-actions a.home-link {
+    background: var(--white) !important;
+    color: var(--gray-700) !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: var(--shadow-sm) !important;
+    opacity: 1 !important;
+}
+
+.top-bar.header-simple .user-actions a.home-link:hover,
+.user-actions a.home-link:hover {
+    background: var(--primary) !important;
+    color: var(--white) !important;
+    border-color: var(--primary) !important;
+    box-shadow: var(--shadow) !important;
 }
 
 .top-bar.header-simple .user-actions a::before {
