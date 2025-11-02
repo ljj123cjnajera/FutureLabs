@@ -5,11 +5,19 @@
     bottom: 20px;
     right: 20px;
     width: 350px;
-    background: white;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
     border-radius: 12px;
     box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     z-index: 1000;
     animation: slideUp 0.3s ease;
+    transition: var(--transition);
+}
+
+.floating-comparator:hover {
+    box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+    transform: translateY(-4px);
 }
 
 @keyframes slideUp {
