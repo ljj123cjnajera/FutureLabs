@@ -11,6 +11,39 @@ class AdminCRUD {
     
     // Setup formularios
     this.setupForms();
+    
+    // Generación automática de slug
+    this.setupSlugGeneration();
+  }
+
+  setupSlugGeneration() {
+    const nameInput = document.getElementById('productName');
+    const slugInput = document.getElementById('productSlug');
+    
+    if (nameInput && slugInput) {
+      nameInput.addEventListener('input', () => {
+        // Solo generar slug si está vacío o si el usuario no lo ha modificado manualmente
+        if (!slugInput.dataset.manualEdit) {
+          const slug = this.generateSlug(nameInput.value);
+          slugInput.value = slug;
+        }
+      });
+
+      // Marcar cuando el usuario edita el slug manualmente
+      slugInput.addEventListener('input', () => {
+        slugInput.dataset.manualEdit = 'true';
+      });
+
+    }
+  }
+
+  generateSlug(text) {
+    return text
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // Eliminar acentos
+      .replace(/[^a-z0-9]+/g, '-') // Reemplazar espacios y caracteres especiales con guiones
+      .replace(/^-+|-+$/g, ''); // Eliminar guiones al inicio y final
   }
 
   setupModals() {
@@ -20,6 +53,16 @@ class AdminCRUD {
       document.getElementById('productForm').reset();
       document.getElementById('productModalTitle').textContent = 'Crear Producto';
       document.getElementById('productModal').style.display = 'flex';
+      // Resetear preview de imagen
+      document.getElementById('imagePreviewContainer').style.display = 'none';
+      document.getElementById('previewImage').src = '';
+      document.getElementById('imageFileName').textContent = '';
+      document.getElementById('productImageFile').value = '';
+      // Resetear flag de edición manual de slug
+      const slugInput = document.getElementById('productSlug');
+      if (slugInput) {
+        slugInput.dataset.manualEdit = '';
+      }
     };
 
     window.editProduct = async (id) => {
@@ -178,6 +221,11 @@ class AdminCRUD {
         const product = response.data.product;
         document.getElementById('productName').value = product.name;
         document.getElementById('productSlug').value = product.slug;
+        // Marcar slug como editado manualmente al cargar para edición
+        const slugInput = document.getElementById('productSlug');
+        if (slugInput) {
+          slugInput.dataset.manualEdit = 'true';
+        }
         document.getElementById('productDescription').value = product.description || '';
         document.getElementById('productPrice').value = product.price;
         document.getElementById('productDiscountPrice').value = product.discount_price || '';
@@ -185,7 +233,15 @@ class AdminCRUD {
         document.getElementById('productCategory').value = product.category_id;
         document.getElementById('productBrand').value = product.brand || '';
         document.getElementById('productSKU').value = product.sku || '';
-        document.getElementById('productImage').value = product.image_url || '';
+        
+        // Mostrar imagen existente si hay
+        if (product.image_url) {
+          document.getElementById('productImage').value = product.image_url;
+          document.getElementById('previewImage').src = product.image_url;
+          document.getElementById('imagePreviewContainer').style.display = 'block';
+          document.getElementById('imageFileName').textContent = 'Imagen actual';
+        }
+        
         document.getElementById('productWeight').value = product.weight || '';
         document.getElementById('productDimensions').value = product.dimensions || '';
         document.getElementById('productIsActive').checked = product.is_active !== false;
@@ -196,25 +252,66 @@ class AdminCRUD {
   }
 
   async saveProduct() {
+    // Validaciones
+    const name = document.getElementById('productName').value.trim();
+    const slug = document.getElementById('productSlug').value.trim();
+    const price = document.getElementById('productPrice').value;
+    const category = document.getElementById('productCategory').value;
+    const stock = document.getElementById('productStock').value;
+
+    if (!name || name.length < 3) {
+      window.notifications.error('El nombre debe tener al menos 3 caracteres');
+      return;
+    }
+
+    if (!slug || slug.length < 3) {
+      window.notifications.error('El slug debe tener al menos 3 caracteres');
+      return;
+    }
+
+    if (!price || parseFloat(price) <= 0) {
+      window.notifications.error('El precio debe ser mayor a 0');
+      return;
+    }
+
+    if (!category) {
+      window.notifications.error('Debes seleccionar una categoría');
+      return;
+    }
+
+    if (!stock || parseInt(stock) < 0) {
+      window.notifications.error('El stock debe ser mayor o igual a 0');
+      return;
+    }
+
+    // Verificar que haya una imagen (URL o archivo)
+    const imageFileInput = document.getElementById('productImageFile');
+    const imageUrl = document.getElementById('productImage').value.trim();
+    
+    if (!imageFileInput.files.length && !imageUrl) {
+      window.notifications.error('Debes subir una imagen o ingresar una URL de imagen');
+      return;
+    }
+
     const productData = {
-      name: document.getElementById('productName').value,
-      slug: document.getElementById('productSlug').value,
-      description: document.getElementById('productDescription').value,
-      price: parseFloat(document.getElementById('productPrice').value),
+      name: name,
+      slug: slug,
+      description: document.getElementById('productDescription').value.trim() || null,
+      price: parseFloat(price),
       discount_price: document.getElementById('productDiscountPrice').value ? parseFloat(document.getElementById('productDiscountPrice').value) : null,
-      stock_quantity: parseInt(document.getElementById('productStock').value),
-      category_id: document.getElementById('productCategory').value,
-      brand: document.getElementById('productBrand').value,
-      sku: document.getElementById('productSKU').value,
-      image_url: document.getElementById('productImage').value,
-      weight: document.getElementById('productWeight').value,
-      dimensions: document.getElementById('productDimensions').value,
-      is_active: document.getElementById('productIsActive').checked
+      stock_quantity: parseInt(stock),
+      category_id: category,
+      brand: document.getElementById('productBrand').value.trim() || null,
+      sku: document.getElementById('productSKU').value.trim() || null,
+      weight: document.getElementById('productWeight').value.trim() || null,
+      dimensions: document.getElementById('productDimensions').value.trim() || null,
+      is_active: document.getElementById('productIsActive').checked,
+      rating: 0, // Rating inicial
+      review_count: 0 // Contador de reseñas inicial
     };
 
     try {
       // Si hay una imagen para subir, subirla primero
-      const imageFileInput = document.getElementById('productImageFile');
       if (imageFileInput.files.length > 0) {
         window.notifications.show('Subiendo imagen...', 'info');
         const uploadResponse = await window.api.uploadImage(imageFileInput.files[0]);
@@ -222,6 +319,17 @@ class AdminCRUD {
           // Usar la URL de la imagen subida
           productData.image_url = uploadResponse.data.url;
           window.notifications.show('Imagen subida exitosamente', 'success');
+        } else {
+          throw new Error('Error al subir la imagen');
+        }
+      } else if (imageUrl) {
+        // Validar URL de imagen
+        try {
+          new URL(imageUrl);
+          productData.image_url = imageUrl;
+        } catch (e) {
+          window.notifications.error('URL de imagen inválida');
+          return;
         }
       }
       
@@ -244,8 +352,14 @@ class AdminCRUD {
         
         // Resetear formulario y preview
         document.getElementById('productForm').reset();
-        document.getElementById('imagePreview').style.display = 'none';
+        document.getElementById('imagePreviewContainer').style.display = 'none';
         document.getElementById('previewImage').src = '';
+        document.getElementById('imageFileName').textContent = '';
+        document.getElementById('productImageFile').value = '';
+        const slugInput = document.getElementById('productSlug');
+        if (slugInput) {
+          slugInput.dataset.manualEdit = '';
+        }
         
         adminManager.loadProducts();
       } else {

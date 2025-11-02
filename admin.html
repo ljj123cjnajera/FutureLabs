@@ -964,8 +964,30 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>Imagen URL</label>
-                    <input type="url" id="productImage">
+                    <label>Imagen del Producto *</label>
+                    <div style="margin-bottom: 10px;">
+                        <label class="btn btn-outline" style="display: inline-block; cursor: pointer; padding: 8px 16px; border-radius: 4px; border: 1px solid #ddd;">
+                            <i class="fas fa-upload"></i> Subir Imagen
+                            <input type="file" id="productImageFile" accept="image/*" style="display: none;" onchange="previewProductImage(this)">
+                        </label>
+                        <span id="imageFileName" style="margin-left: 10px; color: #666;"></span>
+                    </div>
+                    
+                    <!-- Preview de imagen -->
+                    <div id="imagePreviewContainer" style="margin-top: 15px; display: none;">
+                        <div style="position: relative; display: inline-block;">
+                            <img id="previewImage" src="" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 1px solid #ddd;">
+                            <button type="button" onclick="clearImagePreview()" style="position: absolute; top: -10px; right: -10px; background: #ef4444; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-size: 14px;">
+                                ×
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- O usar URL -->
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
+                        <label style="font-size: 12px; color: #666;">O ingresa una URL de imagen:</label>
+                        <input type="url" id="productImage" placeholder="https://ejemplo.com/imagen.jpg" style="margin-top: 5px;">
+                    </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
@@ -1398,6 +1420,49 @@
     <script src="js/notifications.js"></script>
     <script src="js/admin.js"></script>
     <script src="js/admin-crud.js"></script>
+    
+    <script>
+        // Funciones para preview de imagen
+        function previewProductImage(input) {
+            const file = input.files[0];
+            if (file) {
+                // Validar tipo de archivo
+                if (!file.type.startsWith('image/')) {
+                    window.notifications.error('Por favor selecciona un archivo de imagen');
+                    input.value = '';
+                    return;
+                }
+
+                // Validar tamaño (máx 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    window.notifications.error('La imagen no puede ser mayor a 5MB');
+                    input.value = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    document.getElementById('previewImage').src = event.target.result;
+                    document.getElementById('imagePreviewContainer').style.display = 'block';
+                    document.getElementById('imageFileName').textContent = file.name;
+                    // Limpiar URL de imagen si había una
+                    document.getElementById('productImage').value = '';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function clearImagePreview() {
+            document.getElementById('imagePreviewContainer').style.display = 'none';
+            document.getElementById('previewImage').src = '';
+            document.getElementById('imageFileName').textContent = '';
+            document.getElementById('productImageFile').value = '';
+        }
+
+        // Hacer funciones globales
+        window.previewProductImage = previewProductImage;
+        window.clearImagePreview = clearImagePreview;
+    </script>
 </body>
 </html>
 
