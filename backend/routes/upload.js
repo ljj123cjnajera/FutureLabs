@@ -70,7 +70,18 @@ router.post('/image', authenticateToken, upload.single('image'), async (req, res
       // Construir desde los headers si está detrás de un proxy (Railway)
       const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
       const host = req.headers['x-forwarded-host'] || req.get('host') || req.headers.host;
-      backendUrl = `${protocol}://${host}`;
+      
+      // Asegurar que el protocolo esté presente
+      if (host && !host.startsWith('http')) {
+        backendUrl = `${protocol}://${host}`;
+      } else {
+        backendUrl = host || 'https://futurelabs-production.up.railway.app';
+      }
+    } else {
+      // Si backendUrl viene sin protocolo, agregarlo
+      if (!backendUrl.startsWith('http://') && !backendUrl.startsWith('https://')) {
+        backendUrl = `https://${backendUrl}`;
+      }
     }
     
     // Asegurar que no tenga trailing slash

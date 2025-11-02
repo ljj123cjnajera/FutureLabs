@@ -146,7 +146,15 @@ const chatRoutes = require('./routes/chat');
 const addressesRoutes = require('./routes/addresses');
 
 // Servir archivos estáticos (imágenes subidas) - usar ruta absoluta
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Agregar headers CORS y CORP para permitir acceso a imágenes
+app.use('/uploads', (req, res, next) => {
+  // Permitir acceso a imágenes desde cualquier origen
+  res.header('Cross-Origin-Resource-Policy', 'cross-origin');
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  next();
+}, express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/verification', verificationRoutes);
