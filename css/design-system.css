@@ -5,16 +5,21 @@
    ============================================ */
 
 :root {
-    /* Colores Principales */
-    --primary: #3498db;
-    --primary-dark: #2980b9;
-    --primary-light: #5dade2;
-    --primary-hover: #2980b9;
+    /* Colores Principales - Modernos y Profesionales */
+    --primary: #6366f1;          /* Indigo vibrante - Moderno y confiable */
+    --primary-dark: #4f46e5;
+    --primary-light: #818cf8;
+    --primary-lighter: #c7d2fe;
+    --primary-hover: #4f46e5;
     
-    /* Colores Secundarios */
-    --secondary: #2c3e50;
-    --secondary-dark: #1a252f;
-    --secondary-light: #34495e;
+    /* Colores Secundarios - Elegantes */
+    --secondary: #8b5cf6;        /* Púrpura elegante - Creatividad */
+    --secondary-dark: #7c3aed;
+    --secondary-light: #a78bfa;
+    
+    /* Gradiente Principal */
+    --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+    --gradient-primary-subtle: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
     
     /* Colores de Estado */
     --success: #10b981;
@@ -91,8 +96,9 @@
     --border-width: 1px;
     --border-color: var(--gray-200);
     
-    /* Tipografía */
+    /* Tipografía - Google Fonts */
     --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    --font-heading: 'Poppins', 'Inter', sans-serif;
     
     --font-size-xs: 0.75rem;     /* 12px */
     --font-size-sm: 0.875rem;    /* 14px */
@@ -145,6 +151,14 @@ body {
     line-height: var(--line-height-normal);
     color: var(--text-primary);
     background-color: var(--bg-secondary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: var(--font-weight-bold);
 }
 
 a {

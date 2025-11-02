@@ -4,8 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Perfil - FutureLabs</title>
+    
+    <!-- Google Fonts - Fuentes Profesionales -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS del Sistema -->
     <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/header-improved.css">
     <link rel="stylesheet" href="css/footer-improved.css">
     <link rel="stylesheet" href="css/forms-improved.css">
@@ -14,7 +24,697 @@
     <link rel="stylesheet" href="css/profile-wishlist-orders.css">
     <link rel="stylesheet" href="css/loading-states-improved.css">
     <link rel="stylesheet" href="css/micro-interactions.css">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/animations-enhanced.css">
+    <link rel="stylesheet" href="css/components-enhanced.css">
     <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="css/notifications.css">
-    <!-- Estilos inline removidos - migrados a CSS externo -->
+</head>
+<body>
+    <!-- Header Dinámico -->
+    <header id="mainHeader"></header>
+
+    <!-- Profile Page -->
+    <div class="profile-page">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="container">
+                <div class="profile-header-content">
+                    <div class="profile-avatar" id="profileAvatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="profile-info">
+                        <h1 id="profileName">Cargando...</h1>
+                        <p id="profileEmail">Cargando email...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Profile Tabs -->
+            <div class="profile-tabs">
+                <button class="profile-tab active" data-tab="overview">
+                    <i class="fas fa-home"></i>
+                    <span>Resumen</span>
+                </button>
+                <button class="profile-tab" data-tab="personal">
+                    <i class="fas fa-user"></i>
+                    <span>Datos Personales</span>
+                </button>
+                <button class="profile-tab" data-tab="addresses">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Direcciones</span>
+                </button>
+                <button class="profile-tab" data-tab="security">
+                    <i class="fas fa-lock"></i>
+                    <span>Seguridad</span>
+                </button>
+                <button class="profile-tab" data-tab="points">
+                    <i class="fas fa-star"></i>
+                    <span>Puntos de Lealtad</span>
+                </button>
+            </div>
+
+            <!-- Profile Content Sections -->
+            <div class="profile-content-wrapper">
+                <!-- Overview Tab -->
+                <div class="profile-section active" id="overview">
+                    <!-- Loyalty Points Card -->
+                    <div class="loyalty-points-card">
+                        <div class="loyalty-points-value" id="loyaltyPointsValue">0</div>
+                        <div class="loyalty-points-label">Puntos de Lealtad Disponibles</div>
+                        <p>Usa tus puntos para obtener descuentos en tus compras</p>
+                    </div>
+
+                    <!-- Stats Grid -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-card-header">
+                                <span class="stat-card-title">Pedidos</span>
+                                <div class="stat-card-icon" style="background: rgba(102, 126, 234, 0.1); color: #667eea;">
+                                    <i class="fas fa-shopping-bag"></i>
+                                </div>
+                            </div>
+                            <div class="stat-card-value" id="totalOrders">0</div>
+                            <div class="stat-card-change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>Total de pedidos</span>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-card-header">
+                                <span class="stat-card-title">Gastado</span>
+                                <div class="stat-card-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                </div>
+                            </div>
+                            <div class="stat-card-value" id="totalSpent">S/ 0</div>
+                            <div class="stat-card-change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>Total acumulado</span>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-card-header">
+                                <span class="stat-card-title">Wishlist</span>
+                                <div class="stat-card-icon" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
+                                    <i class="fas fa-heart"></i>
+                                </div>
+                            </div>
+                            <div class="stat-card-value" id="wishlistCount">0</div>
+                            <div class="stat-card-change positive">
+                                <i class="fas fa-heart"></i>
+                                <span>Productos favoritos</span>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-card-header">
+                                <span class="stat-card-title">Reseñas</span>
+                                <div class="stat-card-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                                    <i class="fas fa-star"></i>
+                                </div>
+                            </div>
+                            <div class="stat-card-value" id="reviewsCount">0</div>
+                            <div class="stat-card-change positive">
+                                <i class="fas fa-star"></i>
+                                <span>Reseñas realizadas</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Personal Data Tab -->
+                <div class="profile-section" id="personal">
+                    <div class="profile-content-section">
+                        <div class="profile-content-section-header">
+                            <h2><i class="fas fa-user"></i> Información Personal</h2>
+                        </div>
+                        <form id="personalDataForm">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Nombre</label>
+                                    <input type="text" class="form-input" id="firstName" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Apellidos</label>
+                                    <input type="text" class="form-input" id="lastName" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-input" id="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Teléfono</label>
+                                <input type="tel" class="form-input" id="phone">
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary" onclick="cancelEdit('personal')">Cancelar</button>
+                                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Addresses Tab -->
+                <div class="profile-section" id="addresses">
+                    <div class="profile-content-section">
+                        <div class="profile-content-section-header">
+                            <h2><i class="fas fa-map-marker-alt"></i> Mis Direcciones</h2>
+                            <button class="btn btn-primary" onclick="openAddressModal()">
+                                <i class="fas fa-plus"></i> Nueva Dirección
+                            </button>
+                        </div>
+                        <div id="addressesList" class="address-list">
+                            <div class="loading">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <p>Cargando direcciones...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Tab -->
+                <div class="profile-section" id="security">
+                    <div class="profile-content-section">
+                        <div class="profile-content-section-header">
+                            <h2><i class="fas fa-lock"></i> Seguridad</h2>
+                        </div>
+                        <form id="changePasswordForm">
+                            <div class="form-group">
+                                <label class="form-label">Contraseña Actual</label>
+                                <input type="password" class="form-input" id="currentPassword" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Nueva Contraseña</label>
+                                <input type="password" class="form-input" id="newPassword" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Confirmar Nueva Contraseña</label>
+                                <input type="password" class="form-input" id="confirmPassword" required>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary" onclick="cancelEdit('security')">Cancelar</button>
+                                <button type="submit" class="btn btn-primary">Cambiar Contraseña</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Points Tab -->
+                <div class="profile-section" id="points">
+                    <div class="profile-content-section">
+                        <div class="profile-content-section-header">
+                            <h2><i class="fas fa-star"></i> Historial de Puntos</h2>
+                        </div>
+                        <div id="loyaltyTransactions" class="loyalty-transactions">
+                            <div class="loading">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <p>Cargando transacciones...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer id="mainFooter"></footer>
+
+    <!-- Address Modal -->
+    <div id="addressModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="addressModalTitle">Nueva Dirección</h3>
+                <span class="modal-close" onclick="closeAddressModal()">&times;</span>
+            </div>
+            <form id="addressForm">
+                <input type="hidden" id="addressId">
+                <div class="form-group">
+                    <label class="form-label">Tipo de Dirección</label>
+                    <select class="form-select" id="addressType" required>
+                        <option value="home">Casa</option>
+                        <option value="work">Trabajo</option>
+                        <option value="other">Otra</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Dirección</label>
+                    <input type="text" class="form-input" id="addressStreet" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Ciudad</label>
+                        <input type="text" class="form-input" id="addressCity" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Región</label>
+                        <input type="text" class="form-input" id="addressRegion" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Código Postal</label>
+                        <input type="text" class="form-input" id="addressPostalCode">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">País</label>
+                        <input type="text" class="form-input" id="addressCountry" value="Perú" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="addressIsDefault"> 
+                        Establecer como dirección predeterminada
+                    </label>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeAddressModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Dirección</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/skeleton.js"></script>
+    <script src="js/modals.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/components.js"></script>
+    
+    <script>
+        // Esperar a que todo se cargue
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Inicializar header y footer
+            const headerContainer = document.getElementById('mainHeader');
+            const footerContainer = document.getElementById('mainFooter');
+            
+            if (headerContainer && window.Components) {
+                headerContainer.innerHTML = window.Components.getHeader(false, false);
+                window.Components.initHeader();
+            }
+            
+            if (footerContainer && window.Components) {
+                footerContainer.innerHTML = window.Components.getFooter();
+            }
+
+            // Verificar autenticación con retry
+            let retries = 0;
+            const maxRetries = 5;
+            
+            const checkAuth = setInterval(() => {
+                retries++;
+                if (window.authManager && window.authManager.isAuthenticated()) {
+                    clearInterval(checkAuth);
+                    console.log('✅ Usuario autenticado, cargando perfil');
+                    initializeProfile();
+                } else if (retries >= maxRetries) {
+                    clearInterval(checkAuth);
+                    console.log('❌ Usuario no autenticado, redirigiendo');
+                    window.location.href = 'index.html';
+                }
+            }, 200);
+
+            // Inicializar tabs
+            document.querySelectorAll('.profile-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.dataset.tab;
+                    switchTab(tabId);
+                });
+            });
+        });
+
+        // Cambiar de tab
+        function switchTab(tabId) {
+            // Actualizar tabs
+            document.querySelectorAll('.profile-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+
+            // Actualizar secciones
+            document.querySelectorAll('.profile-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(tabId).classList.add('active');
+
+            // Cargar datos específicos de la sección
+            if (tabId === 'addresses') {
+                loadAddresses();
+            } else if (tabId === 'points') {
+                loadLoyaltyTransactions();
+            }
+        }
+
+        // Inicializar perfil
+        async function initializeProfile() {
+            await Promise.all([
+                loadUserData(),
+                loadStats(),
+                loadAddresses(),
+                loadLoyaltyPoints()
+            ]);
+        }
+
+        // Cargar datos del usuario
+        async function loadUserData() {
+            try {
+                const response = await window.api.getProfile();
+                
+                if (response.success && response.data.user) {
+                    const user = response.data.user;
+                    
+                    // Actualizar header
+                    document.getElementById('profileName').textContent = 
+                        `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email || 'Usuario';
+                    document.getElementById('profileEmail').textContent = user.email || '';
+                    
+                    // Actualizar avatar
+                    const avatar = document.getElementById('profileAvatar');
+                    const initials = `${(user.first_name || 'U')[0]}${(user.last_name || '')[0]}`.toUpperCase() || 'U';
+                    avatar.textContent = initials;
+                    
+                    // Llenar formulario
+                    document.getElementById('firstName').value = user.first_name || '';
+                    document.getElementById('lastName').value = user.last_name || '';
+                    document.getElementById('email').value = user.email || '';
+                    document.getElementById('phone').value = user.phone || '';
+                } else {
+                    window.notifications.error('Error al cargar datos del perfil');
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                window.notifications.error('Error al cargar datos del perfil');
+            }
+        }
+
+        // Cargar estadísticas
+        async function loadStats() {
+            try {
+                // Cargar pedidos
+                const ordersResponse = await window.api.getOrders();
+                if (ordersResponse.success) {
+                    const orders = ordersResponse.data.orders || [];
+                    document.getElementById('totalOrders').textContent = orders.length;
+                    
+                    const totalSpent = orders.reduce((sum, order) => sum + parseFloat(order.total || 0), 0);
+                    document.getElementById('totalSpent').textContent = `S/ ${totalSpent.toFixed(2)}`;
+                }
+
+                // Cargar wishlist
+                const wishlistResponse = await window.api.getWishlist();
+                if (wishlistResponse.success) {
+                    const items = wishlistResponse.data.items || [];
+                    document.getElementById('wishlistCount').textContent = items.length;
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Cargar direcciones
+        async function loadAddresses() {
+            const container = document.getElementById('addressesList');
+            
+            try {
+                const response = await window.api.getAddresses();
+                
+                if (response.success && response.data.addresses) {
+                    const addresses = response.data.addresses;
+                    
+                    if (addresses.length === 0) {
+                        container.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <h3>No tienes direcciones guardadas</h3>
+                                <p>Agrega una dirección para facilitar tus compras</p>
+                                <button class="btn btn-primary" onclick="openAddressModal()">
+                                    <i class="fas fa-plus"></i> Agregar Dirección
+                                </button>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    container.innerHTML = addresses.map(addr => `
+                        <div class="address-item ${addr.is_default ? 'default' : ''}">
+                            <div class="address-item-header">
+                                <div class="address-item-title">
+                                    <i class="fas fa-${addr.type === 'home' ? 'home' : addr.type === 'work' ? 'briefcase' : 'map-marker-alt'}"></i>
+                                    <span>${addr.type === 'home' ? 'Casa' : addr.type === 'work' ? 'Trabajo' : 'Otra'}</span>
+                                    ${addr.is_default ? '<span class="default-badge"><i class="fas fa-check"></i> Predeterminada</span>' : ''}
+                                </div>
+                                <div class="address-item-actions">
+                                    <button class="btn btn-sm btn-ghost" onclick="editAddress('${addr.id}')">
+                                        <i class="fas fa-edit"></i> Editar
+                                    </button>
+                                    <button class="btn btn-sm btn-error" onclick="deleteAddress('${addr.id}')">
+                                        <i class="fas fa-trash"></i> Eliminar
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="address-item-content">
+                                ${addr.street}<br>
+                                ${addr.city}, ${addr.region}<br>
+                                ${addr.postal_code || ''} ${addr.country}
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <h3>Error al cargar direcciones</h3>
+                            <p>${response.message || 'Error desconocido'}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>Error al cargar direcciones</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Cargar puntos de lealtad
+        async function loadLoyaltyPoints() {
+            try {
+                const response = await window.api.getLoyaltyPoints();
+                if (response.success && response.data.points !== undefined) {
+                    document.getElementById('loyaltyPointsValue').textContent = response.data.points;
+                }
+            } catch (error) {
+                console.error('Error loading loyalty points:', error);
+            }
+        }
+
+        // Cargar transacciones de lealtad
+        async function loadLoyaltyTransactions() {
+            const container = document.getElementById('loyaltyTransactions');
+            
+            try {
+                const response = await window.api.getLoyaltyTransactions();
+                
+                if (response.success && response.data.transactions) {
+                    const transactions = response.data.transactions;
+                    
+                    if (transactions.length === 0) {
+                        container.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-star"></i>
+                                <h3>No hay transacciones de puntos</h3>
+                                <p>Comienza a comprar para ganar puntos</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    container.innerHTML = transactions.map(trans => `
+                        <div class="loyalty-transaction">
+                            <div>
+                                <div class="loyalty-transaction-type">${trans.description || 'Transacción'}</div>
+                                <div style="font-size: 0.875rem; color: var(--gray-500); margin-top: 4px;">
+                                    ${new Date(trans.created_at).toLocaleDateString('es-PE')}
+                                </div>
+                            </div>
+                            <div class="loyalty-transaction-amount ${trans.points > 0 ? 'positive' : 'negative'}">
+                                ${trans.points > 0 ? '+' : ''}${trans.points}
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>Error al cargar transacciones</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Guardar datos personales
+        document.getElementById('personalDataForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const data = {
+                first_name: document.getElementById('firstName').value,
+                last_name: document.getElementById('lastName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value
+            };
+
+            try {
+                const response = await window.api.updateProfile(data);
+                
+                if (response.success) {
+                    window.notifications.success('Perfil actualizado correctamente');
+                    await loadUserData();
+                } else {
+                    window.notifications.error(response.message || 'Error al actualizar perfil');
+                }
+            } catch (error) {
+                window.notifications.error('Error al actualizar perfil');
+            }
+        });
+
+        // Cambiar contraseña
+        document.getElementById('changePasswordForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (newPassword !== confirmPassword) {
+                window.notifications.error('Las contraseñas no coinciden');
+                return;
+            }
+
+            try {
+                const response = await window.api.changePassword({
+                    current_password: currentPassword,
+                    new_password: newPassword
+                });
+
+                if (response.success) {
+                    window.notifications.success('Contraseña cambiada correctamente');
+                    document.getElementById('changePasswordForm').reset();
+                } else {
+                    window.notifications.error(response.message || 'Error al cambiar contraseña');
+                }
+            } catch (error) {
+                window.notifications.error('Error al cambiar contraseña');
+            }
+        });
+
+        // Gestión de direcciones
+        function openAddressModal(addressId = null) {
+            const modal = document.getElementById('addressModal');
+            const form = document.getElementById('addressForm');
+            const title = document.getElementById('addressModalTitle');
+            
+            if (addressId) {
+                title.textContent = 'Editar Dirección';
+                // Cargar datos de la dirección
+                // TODO: Implementar carga de datos
+            } else {
+                title.textContent = 'Nueva Dirección';
+                form.reset();
+            }
+            
+            modal.classList.add('active');
+        }
+
+        function closeAddressModal() {
+            const modal = document.getElementById('addressModal');
+            modal.classList.remove('active');
+            document.getElementById('addressForm').reset();
+        }
+
+        document.getElementById('addressForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const data = {
+                type: document.getElementById('addressType').value,
+                street: document.getElementById('addressStreet').value,
+                city: document.getElementById('addressCity').value,
+                region: document.getElementById('addressRegion').value,
+                postal_code: document.getElementById('addressPostalCode').value,
+                country: document.getElementById('addressCountry').value,
+                is_default: document.getElementById('addressIsDefault').checked
+            };
+
+            const addressId = document.getElementById('addressId').value;
+            
+            try {
+                let response;
+                if (addressId) {
+                    response = await window.api.updateAddress(addressId, data);
+                } else {
+                    response = await window.api.createAddress(data);
+                }
+
+                if (response.success) {
+                    window.notifications.success(addressId ? 'Dirección actualizada' : 'Dirección creada');
+                    closeAddressModal();
+                    await loadAddresses();
+                } else {
+                    window.notifications.error(response.message || 'Error al guardar dirección');
+                }
+            } catch (error) {
+                window.notifications.error('Error al guardar dirección');
+            }
+        });
+
+        function editAddress(addressId) {
+            openAddressModal(addressId);
+            // TODO: Cargar datos de la dirección
+        }
+
+        async function deleteAddress(addressId) {
+            if (!confirm('¿Estás seguro de eliminar esta dirección?')) return;
+
+            try {
+                const response = await window.api.deleteAddress(addressId);
+                
+                if (response.success) {
+                    window.notifications.success('Dirección eliminada');
+                    await loadAddresses();
+                } else {
+                    window.notifications.error('Error al eliminar dirección');
+                }
+            } catch (error) {
+                window.notifications.error('Error al eliminar dirección');
+            }
+        }
+
+        function cancelEdit(section) {
+            // Recargar datos para descartar cambios
+            if (section === 'personal') {
+                loadUserData();
+            }
+        }
+
+        // Cerrar modal al hacer click fuera
+        document.getElementById('addressModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAddressModal();
+            }
+        });
+    </script>
+</body>
+</html>

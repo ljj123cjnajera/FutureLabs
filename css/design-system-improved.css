@@ -1,0 +1,189 @@
+/* ============================================
+   FUTURELABS - SISTEMA DE DISEÑO MEJORADO
+   Paleta de Colores Profesional Moderna
+   ============================================ */
+
+:root {
+    /* ========================================
+       COLORES PRINCIPALES - Modernos y Profesionales
+       ======================================== */
+    --primary: #6366f1;          /* Indigo vibrante - Moderno y confiable */
+    --primary-dark: #4f46e5;
+    --primary-light: #818cf8;
+    --primary-lighter: #c7d2fe;
+    --primary-darkest: #312e81;
+    
+    --secondary: #8b5cf6;        /* Púrpura elegante - Creatividad */
+    --secondary-dark: #7c3aed;
+    --secondary-light: #a78bfa;
+    
+    /* Gradiente Principal */
+    --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+    --gradient-primary-subtle: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+    
+    /* ========================================
+       COLORES DE ESTADO - Claros y Profesionales
+       ======================================== */
+    --success: #10b981;          /* Verde esmeralda - Éxito */
+    --success-dark: #059669;
+    --success-light: #34d399;
+    --success-lighter: #d1fae5;
+    
+    --warning: #f59e0b;          /* Ámbar - Advertencia */
+    --warning-dark: #d97706;
+    --warning-light: #fbbf24;
+    --warning-lighter: #fef3c7;
+    
+    --error: #ef4444;            /* Rojo coral - Error */
+    --error-dark: #dc2626;
+    --error-light: #f87171;
+    --error-lighter: #fee2e2;
+    
+    --info: #3b82f6;             /* Azul cielo - Información */
+    --info-dark: #2563eb;
+    --info-light: #60a5fa;
+    --info-lighter: #dbeafe;
+    
+    /* ========================================
+       COLORES NEUTROS - Escala de Grises Moderna
+       ======================================== */
+    --white: #ffffff;
+    --black: #000000;
+    
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    
+    /* ========================================
+       COLORES DE TEXTO
+       ======================================== */
+    --text-primary: #111827;
+    --text-secondary: #4b5563;
+    --text-tertiary: #6b7280;
+    --text-quaternary: #9ca3af;
+    --text-white: #ffffff;
+    --text-inverse: #ffffff;
+    
+    /* ========================================
+       COLORES DE FONDO
+       ======================================== */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f9fafb;
+    --bg-tertiary: #f3f4f6;
+    --bg-dark: #111827;
+    --bg-overlay: rgba(17, 24, 39, 0.75);
+    
+    /* ========================================
+       BORDES
+       ======================================== */
+    --border: #e5e7eb;
+    --border-light: #f3f4f6;
+    --border-dark: #d1d5db;
+    --border-focus: var(--primary);
+    
+    /* ========================================
+       SOMBRAS - Sistema Profesional
+       ======================================== */
+    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    
+    /* Sombras con Color */
+    --shadow-primary: 0 10px 25px -5px rgba(99, 102, 241, 0.3), 0 4px 6px -2px rgba(99, 102, 241, 0.2);
+    --shadow-success: 0 10px 25px -5px rgba(16, 185, 129, 0.3), 0 4px 6px -2px rgba(16, 185, 129, 0.2);
+    --shadow-error: 0 10px 25px -5px rgba(239, 68, 68, 0.3), 0 4px 6px -2px rgba(239, 68, 68, 0.2);
+    
+    /* ========================================
+       TRANSICIONES
+       ======================================== */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: 600ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    
+    /* ========================================
+       ESPACIADO - Sistema 8px
+       ======================================== */
+    --spacing-xs: 0.25rem;    /* 4px */
+    --spacing-sm: 0.5rem;     /* 8px */
+    --spacing-md: 1rem;       /* 16px */
+    --spacing-lg: 1.5rem;     /* 24px */
+    --spacing-xl: 2rem;       /* 32px */
+    --spacing-2xl: 3rem;      /* 48px */
+    --spacing-3xl: 4rem;      /* 64px */
+    --spacing-4xl: 6rem;      /* 96px */
+    
+    /* ========================================
+       BORDER RADIUS
+       ======================================== */
+    --radius-xs: 0.125rem;    /* 2px */
+    --radius-sm: 0.25rem;     /* 4px */
+    --radius-md: 0.5rem;      /* 8px */
+    --radius-lg: 0.75rem;     /* 12px */
+    --radius-xl: 1rem;        /* 16px */
+    --radius-2xl: 1.5rem;     /* 24px */
+    --radius-3xl: 2rem;       /* 32px */
+    --radius-full: 9999px;
+    
+    /* ========================================
+       TIPOGRAFÍA
+       ======================================== */
+    --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    --font-heading: 'Poppins', 'Inter', sans-serif;
+    
+    /* ========================================
+       Z-INDEX
+       ======================================== */
+    --z-base: 0;
+    --z-dropdown: 1000;
+    --z-sticky: 1020;
+    --z-fixed: 1030;
+    --z-modal-backdrop: 1040;
+    --z-modal: 1050;
+    --z-popover: 1060;
+    --z-tooltip: 1070;
+    --z-toast: 1080;
+}
+
+/* Aplicar Colores Mejorados al Body */
+body {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+/* Mejorar Contraste y Legibilidad */
+.container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-lg);
+}
+
+/* Cards con Mejor Delimitación */
+.card,
+.profile-content-section,
+.stat-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+}
+
+.card:hover,
+.profile-content-section:hover,
+.stat-card:hover {
+    border-color: var(--primary-light);
+    box-shadow: var(--shadow-md);
+}
+
