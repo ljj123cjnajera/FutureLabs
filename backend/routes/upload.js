@@ -46,6 +46,11 @@ const upload = multer({
   fileFilter: fileFilter
 });
 
+// Manejar OPTIONS para CORS preflight
+router.options('/image', (req, res) => {
+  res.status(200).end();
+});
+
 // POST /api/upload/image - Subir imagen única
 router.post('/image', authenticateToken, upload.single('image'), async (req, res) => {
   try {

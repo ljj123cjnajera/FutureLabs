@@ -3,6 +3,11 @@ const User = require('../models/User');
 
 // Middleware para verificar token JWT
 const authenticateToken = async (req, res, next) => {
+  // Permitir solicitudes OPTIONS (preflight de CORS) sin autenticación
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   try {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
