@@ -290,9 +290,48 @@ function renderShippingStep() {
                 <label class="form-label required">Email</label>
                 <input type="email" class="form-input" id="email" placeholder="juan@example.com" required>
             </div>
+            </div>
         </div>
     `;
 }
+
+// Seleccionar dirección guardada
+function selectSavedAddress(addressId) {
+    selectedAddressId = addressId;
+    const address = savedAddresses.find(addr => addr.id === addressId);
+    if (address) {
+        loadAddressData(address);
+        document.getElementById('shippingFormSection').style.display = 'none';
+        renderOrderSummary();
+    }
+}
+
+// Usar nueva dirección
+function useNewAddress() {
+    selectedAddressId = null;
+    document.getElementById('shippingFormSection').style.display = 'block';
+    // Desmarcar radio buttons
+    document.querySelectorAll('input[name="savedAddress"]').forEach(radio => {
+        radio.checked = false;
+    });
+}
+
+// Cargar datos de dirección en el formulario
+function loadAddressData(address) {
+    shippingData = {
+        fullName: address.full_name,
+        address: address.address,
+        city: address.city,
+        country: address.country,
+        postalCode: address.postal_code || '',
+        phone: address.phone,
+        email: address.email || ''
+    };
+}
+
+// Hacer funciones globales
+window.selectSavedAddress = selectSavedAddress;
+window.useNewAddress = useNewAddress;
 
 // Renderizar Paso 2: Método de Pago
 function renderPaymentStep() {
@@ -446,11 +485,29 @@ function getPaymentMethodName(method) {
 
 // Validar formulario de envío
 function validateShippingForm() {
-    const fullName = document.getElementById('fullName').value;
-    const address = document.getElementById('address').value;
-    const city = document.getElementById('city').value;
-    const phone = document.getElementById('phone').value;
-    const email = document.getElementById('email').value;
+    // Si hay una dirección seleccionada, usar esos datos
+    if (selectedAddressId) {
+        const address = savedAddresses.find(addr => addr.id === selectedAddressId);
+        if (address) {
+            shippingData = {
+                fullName: address.full_name,
+                address: address.address,
+                city: address.city,
+                country: address.country,
+                postalCode: address.postal_code || '',
+                phone: address.phone,
+                email: address.email || ''
+            };
+            return true;
+        }
+    }
+
+    // Validar formulario manual
+    const fullName = document.getElementById('fullName')?.value;
+    const address = document.getElementById('address')?.value;
+    const city = document.getElementById('city')?.value;
+    const phone = document.getElementById('phone')?.value;
+    const email = document.getElementById('email')?.value;
     
     const errors = [];
     
