@@ -422,6 +422,45 @@ class FutureLabsAPI {
     });
   }
 
+  // ===== ADDRESSES =====
+  async getAddresses() {
+    return this.request('/addresses');
+  }
+
+  async getAddress(addressId) {
+    return this.request(`/addresses/${addressId}`);
+  }
+
+  async getDefaultAddress() {
+    return this.request('/addresses/default');
+  }
+
+  async createAddress(addressData) {
+    return this.request('/addresses', {
+      method: 'POST',
+      body: JSON.stringify(addressData)
+    });
+  }
+
+  async updateAddress(addressId, addressData) {
+    return this.request(`/addresses/${addressId}`, {
+      method: 'PUT',
+      body: JSON.stringify(addressData)
+    });
+  }
+
+  async deleteAddress(addressId) {
+    return this.request(`/addresses/${addressId}`, {
+      method: 'DELETE'
+    });
+  }
+
+  async setDefaultAddress(addressId) {
+    return this.request(`/addresses/${addressId}/set-default`, {
+      method: 'PUT'
+    });
+  }
+
   // ===== SEARCH =====
   async getSearchSuggestions(query) {
     return this.request(`/search/suggestions?q=${encodeURIComponent(query)}`);

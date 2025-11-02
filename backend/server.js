@@ -133,6 +133,7 @@ const uploadRoutes = require('./routes/upload');
 const reportsRoutes = require('./routes/reports');
 const loyaltyRoutes = require('./routes/loyalty');
 const chatRoutes = require('./routes/chat');
+const addressesRoutes = require('./routes/addresses');
 
 // Servir archivos estáticos (imágenes subidas)
 app.use('/uploads', express.static('uploads'));
@@ -157,6 +158,7 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/reports', reportsRoutes);
 app.use('/api/loyalty', loyaltyRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/addresses', addressesRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

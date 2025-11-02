@@ -336,8 +336,16 @@
 
                     <!-- Addresses Section -->
                     <div class="profile-section" id="addresses">
-                        <h2 class="section-title">Mis Direcciones</h2>
-                        <p>Funcionalidad próximamente...</p>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h2 class="section-title" style="margin: 0;">Mis Direcciones</h2>
+                            <button class="btn btn-primary" onclick="openAddressModal()" style="padding: 10px 20px;">
+                                <i class="fas fa-plus"></i> Agregar Dirección
+                            </button>
+                        </div>
+                        
+                        <div id="addressesList" style="margin-top: 20px;">
+                            <p>Cargando direcciones...</p>
+                        </div>
                     </div>
 
                     <!-- Loyalty Points Section -->
@@ -401,6 +409,84 @@
                         </form>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Agregar/Editar Dirección -->
+    <div id="addressModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2 id="addressModalTitle">Agregar Dirección</h2>
+                <span class="modal-close" onclick="closeAddressModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="addressForm">
+                    <input type="hidden" id="addressId">
+                    
+                    <div class="form-group">
+                        <label>Etiqueta (opcional)</label>
+                        <input type="text" id="addressLabel" placeholder="Ej: Casa, Trabajo, etc." class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="required">Nombre Completo</label>
+                        <input type="text" id="addressFullName" required class="form-input" placeholder="Juan Pérez">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="required">Dirección</label>
+                        <input type="text" id="addressStreet" required class="form-input" placeholder="Av. Principal 123">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="required">Ciudad</label>
+                            <input type="text" id="addressCity" required class="form-input" placeholder="Lima">
+                        </div>
+                        <div class="form-group">
+                            <label>Estado/Región</label>
+                            <input type="text" id="addressState" class="form-input" placeholder="Lima">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="required">País</label>
+                            <select id="addressCountry" required class="form-select">
+                                <option value="Perú">Perú</option>
+                                <option value="Chile">Chile</option>
+                                <option value="Colombia">Colombia</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Código Postal</label>
+                            <input type="text" id="addressPostalCode" class="form-input" placeholder="15001">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="required">Teléfono</label>
+                        <input type="tel" id="addressPhone" required class="form-input" placeholder="+51 987 654 321">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="addressEmail" class="form-input" placeholder="juan@example.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                            <input type="checkbox" id="addressIsDefault" style="width: auto;">
+                            <span>Establecer como dirección por defecto</span>
+                        </label>
+                    </div>
+                    
+                    <div class="modal-actions" style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+                        <button type="button" class="btn btn-outline" onclick="closeAddressModal()">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar Dirección</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -502,6 +588,8 @@
                         loadOrders();
                     } else if (this.dataset.section === 'loyalty') {
                         loadLoyaltyPoints();
+                    } else if (this.dataset.section === 'addresses') {
+                        loadAddresses();
                     }
                 }
             });
@@ -682,6 +770,207 @@
                 cartCount.textContent = e.detail.count;
             }
         });
+
+        // ===== GESTIÓN DE DIRECCIONES =====
+        
+        // Cargar direcciones
+        async function loadAddresses() {
+            const container = document.getElementById('addressesList');
+            try {
+                const response = await window.api.getAddresses();
+                if (response.success && response.data.addresses.length > 0) {
+                    container.innerHTML = response.data.addresses.map(address => {
+                        const date = new Date(address.created_at).toLocaleDateString('es-PE');
+                        return `
+                            <div style="border: 1px solid #eee; border-radius: 8px; padding: 20px; margin-bottom: 15px; background: white; ${address.is_default ? 'border-color: #667eea; border-width: 2px;' : ''}">
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
+                                    <div style="flex: 1;">
+                                        ${address.label ? `<div style="display: inline-block; background: #667eea; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-bottom: 8px;">${address.label}</div>` : ''}
+                                        ${address.is_default ? `<span style="display: inline-block; background: #10b981; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-left: 8px;">POR DEFECTO</span>` : ''}
+                                        <h3 style="margin: 10px 0 5px 0; font-size: 18px;">${address.full_name}</h3>
+                                        <p style="margin: 5px 0; color: #666; line-height: 1.6;">
+                                            ${address.address}<br>
+                                            ${address.city}${address.state ? ', ' + address.state : ''}, ${address.country}<br>
+                                            ${address.postal_code ? 'CP: ' + address.postal_code + '<br>' : ''}
+                                            Tel: ${address.phone}
+                                            ${address.email ? '<br>Email: ' + address.email : ''}
+                                        </p>
+                                        <p style="margin: 10px 0 0 0; color: #999; font-size: 12px;">Agregada: ${date}</p>
+                                    </div>
+                                    <div style="display: flex; gap: 8px; flex-direction: column;">
+                                        ${!address.is_default ? `
+                                        <button class="btn btn-sm" onclick="setDefaultAddress('${address.id}')" style="padding: 6px 12px; font-size: 12px;">
+                                            <i class="fas fa-star"></i> Por Defecto
+                                        </button>
+                                        ` : ''}
+                                        <button class="btn btn-sm btn-outline" onclick="editAddress('${address.id}')" style="padding: 6px 12px; font-size: 12px;">
+                                            <i class="fas fa-edit"></i> Editar
+                                        </button>
+                                        <button class="btn btn-sm" onclick="deleteAddress('${address.id}')" style="padding: 6px 12px; font-size: 12px; background: #ef4444; color: white; border: none;">
+                                            <i class="fas fa-trash"></i> Eliminar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: #999;">
+                            <i class="fas fa-map-marker-alt" style="font-size: 48px; margin-bottom: 15px; opacity: 0.3;"></i>
+                            <p>No tienes direcciones guardadas</p>
+                            <p style="font-size: 14px; margin-top: 5px;">Agrega una dirección para agilizar tus compras</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading addresses:', error);
+                container.innerHTML = '<p style="color: #ef4444;">Error al cargar direcciones</p>';
+            }
+        }
+
+        // Abrir modal de dirección
+        function openAddressModal(addressId = null) {
+            const modal = document.getElementById('addressModal');
+            const form = document.getElementById('addressForm');
+            const title = document.getElementById('addressModalTitle');
+            
+            if (addressId) {
+                title.textContent = 'Editar Dirección';
+                loadAddressForEdit(addressId);
+            } else {
+                title.textContent = 'Agregar Dirección';
+                form.reset();
+                document.getElementById('addressId').value = '';
+            }
+            
+            modal.style.display = 'block';
+        }
+
+        // Cerrar modal
+        function closeAddressModal() {
+            document.getElementById('addressModal').style.display = 'none';
+            document.getElementById('addressForm').reset();
+        }
+
+        // Cargar dirección para editar
+        async function loadAddressForEdit(addressId) {
+            try {
+                const response = await window.api.getAddress(addressId);
+                if (response.success) {
+                    const addr = response.data.address;
+                    document.getElementById('addressId').value = addr.id;
+                    document.getElementById('addressLabel').value = addr.label || '';
+                    document.getElementById('addressFullName').value = addr.full_name;
+                    document.getElementById('addressStreet').value = addr.address;
+                    document.getElementById('addressCity').value = addr.city;
+                    document.getElementById('addressState').value = addr.state || '';
+                    document.getElementById('addressCountry').value = addr.country;
+                    document.getElementById('addressPostalCode').value = addr.postal_code || '';
+                    document.getElementById('addressPhone').value = addr.phone;
+                    document.getElementById('addressEmail').value = addr.email || '';
+                    document.getElementById('addressIsDefault').checked = addr.is_default || false;
+                }
+            } catch (error) {
+                console.error('Error loading address:', error);
+                window.notifications.error('Error al cargar dirección');
+            }
+        }
+
+        // Guardar dirección
+        document.getElementById('addressForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const addressId = document.getElementById('addressId').value;
+            const addressData = {
+                label: document.getElementById('addressLabel').value.trim() || null,
+                full_name: document.getElementById('addressFullName').value.trim(),
+                address: document.getElementById('addressStreet').value.trim(),
+                city: document.getElementById('addressCity').value.trim(),
+                state: document.getElementById('addressState').value.trim() || null,
+                country: document.getElementById('addressCountry').value,
+                postal_code: document.getElementById('addressPostalCode').value.trim() || null,
+                phone: document.getElementById('addressPhone').value.trim(),
+                email: document.getElementById('addressEmail').value.trim() || null,
+                is_default: document.getElementById('addressIsDefault').checked
+            };
+
+            try {
+                let response;
+                if (addressId) {
+                    response = await window.api.updateAddress(addressId, addressData);
+                } else {
+                    response = await window.api.createAddress(addressData);
+                }
+
+                if (response.success) {
+                    window.notifications.success(response.message || 'Dirección guardada exitosamente');
+                    closeAddressModal();
+                    loadAddresses();
+                } else {
+                    throw new Error(response.message || 'Error al guardar dirección');
+                }
+            } catch (error) {
+                console.error('Error saving address:', error);
+                window.notifications.error(error.message || 'Error al guardar dirección');
+            }
+        });
+
+        // Establecer como por defecto
+        async function setDefaultAddress(addressId) {
+            try {
+                const response = await window.api.setDefaultAddress(addressId);
+                if (response.success) {
+                    window.notifications.success('Dirección establecida como por defecto');
+                    loadAddresses();
+                } else {
+                    throw new Error(response.message);
+                }
+            } catch (error) {
+                console.error('Error setting default address:', error);
+                window.notifications.error(error.message || 'Error al establecer dirección por defecto');
+            }
+        }
+
+        // Eliminar dirección
+        async function deleteAddress(addressId) {
+            if (!confirm('¿Estás seguro de que quieres eliminar esta dirección?')) {
+                return;
+            }
+
+            try {
+                const response = await window.api.deleteAddress(addressId);
+                if (response.success) {
+                    window.notifications.success('Dirección eliminada exitosamente');
+                    loadAddresses();
+                } else {
+                    throw new Error(response.message);
+                }
+            } catch (error) {
+                console.error('Error deleting address:', error);
+                window.notifications.error(error.message || 'Error al eliminar dirección');
+            }
+        }
+
+        // Editar dirección
+        function editAddress(addressId) {
+            openAddressModal(addressId);
+        }
+
+        // Cerrar modal al hacer click fuera
+        window.onclick = function(event) {
+            const modal = document.getElementById('addressModal');
+            if (event.target === modal) {
+                closeAddressModal();
+            }
+        }
+
+        // Hacer funciones globales
+        window.openAddressModal = openAddressModal;
+        window.closeAddressModal = closeAddressModal;
+        window.setDefaultAddress = setDefaultAddress;
+        window.deleteAddress = deleteAddress;
+        window.editAddress = editAddress;
     </script>
 </body>
 </html>
