@@ -284,11 +284,12 @@ class AdminCRUD {
       return;
     }
 
-    // Verificar que haya una imagen (URL o archivo)
+    // Verificar que haya una imagen (URL o archivo) solo si es un producto nuevo
     const imageFileInput = document.getElementById('productImageFile');
     const imageUrl = document.getElementById('productImage').value.trim();
     
-    if (!imageFileInput.files.length && !imageUrl) {
+    // Solo validar imagen si es un producto nuevo, si es edición y no hay cambios, mantener la existente
+    if (!this.currentEditId && !imageFileInput.files.length && !imageUrl) {
       window.notifications.error('Debes subir una imagen o ingresar una URL de imagen');
       return;
     }
@@ -332,6 +333,7 @@ class AdminCRUD {
           return;
         }
       }
+      // Si es edición y no hay nueva imagen ni URL, no incluir image_url para mantener la existente
       
       const url = this.currentEditId 
         ? `/admin/products/${this.currentEditId}`
