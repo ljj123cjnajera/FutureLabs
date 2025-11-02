@@ -611,6 +611,132 @@ class FutureLabsAPI {
       method: 'DELETE'
     });
   }
+
+  // ===== HOME CONTENT =====
+  // Público
+  async getHomeContent() {
+    return this.request('/home-content/all');
+  }
+
+  async getHeroSlides() {
+    return this.request('/home-content/hero-slides');
+  }
+
+  async getBanners(type = null, position = null) {
+    const params = new URLSearchParams();
+    if (type) params.append('type', type);
+    if (position) params.append('position', position);
+    const query = params.toString();
+    return this.request(`/home-content/banners${query ? '?' + query : ''}`);
+  }
+
+  async getBenefits() {
+    return this.request('/home-content/benefits');
+  }
+
+  async getHomeSections() {
+    return this.request('/home-content/sections');
+  }
+
+  // Admin - Hero Slides
+  async getAdminHeroSlides() {
+    return this.request('/home-content/admin/hero-slides');
+  }
+
+  async createHeroSlide(slideData) {
+    return this.request('/home-content/admin/hero-slides', {
+      method: 'POST',
+      body: JSON.stringify(slideData)
+    });
+  }
+
+  async updateHeroSlide(slideId, slideData) {
+    return this.request(`/home-content/admin/hero-slides/${slideId}`, {
+      method: 'PUT',
+      body: JSON.stringify(slideData)
+    });
+  }
+
+  async deleteHeroSlide(slideId) {
+    return this.request(`/home-content/admin/hero-slides/${slideId}`, {
+      method: 'DELETE'
+    });
+  }
+
+  // Admin - Banners
+  async getAdminBanners() {
+    return this.request('/home-content/admin/banners');
+  }
+
+  async createBanner(bannerData) {
+    return this.request('/home-content/admin/banners', {
+      method: 'POST',
+      body: JSON.stringify(bannerData)
+    });
+  }
+
+  async updateBanner(bannerId, bannerData) {
+    return this.request(`/home-content/admin/banners/${bannerId}`, {
+      method: 'PUT',
+      body: JSON.stringify(bannerData)
+    });
+  }
+
+  async deleteBanner(bannerId) {
+    return this.request(`/home-content/admin/banners/${bannerId}`, {
+      method: 'DELETE'
+    });
+  }
+
+  // Admin - Benefits
+  async getAdminBenefits() {
+    return this.request('/home-content/admin/benefits');
+  }
+
+  async createBenefit(benefitData) {
+    return this.request('/home-content/admin/benefits', {
+      method: 'POST',
+      body: JSON.stringify(benefitData)
+    });
+  }
+
+  async updateBenefit(benefitId, benefitData) {
+    return this.request(`/home-content/admin/benefits/${benefitId}`, {
+      method: 'PUT',
+      body: JSON.stringify(benefitData)
+    });
+  }
+
+  async deleteBenefit(benefitId) {
+    return this.request(`/home-content/admin/benefits/${benefitId}`, {
+      method: 'DELETE'
+    });
+  }
+
+  // Admin - Home Sections
+  async getAdminSections() {
+    return this.request('/home-content/admin/sections');
+  }
+
+  async createHomeSection(sectionData) {
+    return this.request('/home-content/admin/sections', {
+      method: 'POST',
+      body: JSON.stringify(sectionData)
+    });
+  }
+
+  async updateHomeSection(sectionId, sectionData) {
+    return this.request(`/home-content/admin/sections/${sectionId}`, {
+      method: 'PUT',
+      body: JSON.stringify(sectionData)
+    });
+  }
+
+  async deleteHomeSection(sectionId) {
+    return this.request(`/home-content/admin/sections/${sectionId}`, {
+      method: 'DELETE'
+    });
+  }
 }
 
 // Crear instancia global
