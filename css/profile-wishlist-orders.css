@@ -6,8 +6,10 @@
 .profile-page {
     background: var(--bg-secondary);
     min-height: calc(100vh - 200px);
-    padding-top: 20px;
-    padding-bottom: var(--spacing-xl);
+    padding-top: 10px !important;
+    padding-bottom: var(--spacing-lg) !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
 }
 
 /* Profile Header */
