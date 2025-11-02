@@ -359,6 +359,13 @@
     border: 1px solid var(--border) !important;
     box-shadow: var(--shadow-sm) !important;
     opacity: 1 !important;
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+.top-bar.header-simple .user-actions a.home-link::before,
+.user-actions a.home-link::before {
+    display: none !important;
 }
 
 .top-bar.header-simple .user-actions a.home-link:hover,
@@ -381,14 +388,19 @@
     z-index: -1;
 }
 
-.top-bar.header-simple .user-actions a:hover {
+/* Asegurar que el ::before no se aplique a home-link */
+.top-bar.header-simple .user-actions a.home-link::before {
+    display: none !important;
+}
+
+.top-bar.header-simple .user-actions a:not(.home-link):hover {
     color: var(--white) !important;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4) !important;
     border-color: var(--primary) !important;
 }
 
-.top-bar.header-simple .user-actions a:hover::before {
+.top-bar.header-simple .user-actions a:not(.home-link):hover::before {
     left: 0;
     z-index: -1;
 }
