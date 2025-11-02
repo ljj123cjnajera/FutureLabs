@@ -326,19 +326,15 @@ class AdminCRUD {
           console.log('Upload response:', uploadResponse);
           
           if (uploadResponse && uploadResponse.success) {
-            // Usar la URL de la imagen subida - verificar diferentes estructuras posibles
-            const imageUrl = uploadResponse.data?.url || uploadResponse.url || uploadResponse.data?.filename;
+            // Usar la URL de la imagen subida
+            const imageUrl = uploadResponse.data?.url;
             if (imageUrl) {
-              // Si es solo el filename, construir la URL completa
-              if (!imageUrl.startsWith('http') && !imageUrl.startsWith('/')) {
-                productData.image_url = `/uploads/${imageUrl}`;
-              } else if (!imageUrl.startsWith('http')) {
-                productData.image_url = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
-              } else {
-                productData.image_url = imageUrl;
-              }
+              // Usar la URL completa tal como viene del backend
+              productData.image_url = imageUrl;
+              console.log('Image URL set to:', productData.image_url);
               window.notifications.show('Imagen subida exitosamente', 'success');
             } else {
+              console.error('Upload response structure:', uploadResponse);
               throw new Error('No se recibió URL de imagen en la respuesta');
             }
           } else {
