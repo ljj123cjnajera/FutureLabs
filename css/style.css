@@ -797,14 +797,13 @@ button {
 }
 
 .banner {
-    background: linear-gradient(135deg, var(--white) 0%, var(--gray-50) 100%);
-    padding: var(--spacing-2xl);
+    background: var(--white);
+    padding: var(--spacing-xl);
     border-radius: var(--radius-xl);
-    box-shadow: var(--shadow);
+    box-shadow: var(--shadow-sm);
     text-align: center;
     transition: var(--transition);
     border: 1px solid var(--border);
-    min-height: 200px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -828,8 +827,8 @@ button {
 }
 
 .banner:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
     border-color: var(--primary-light);
 }
 
