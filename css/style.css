@@ -318,7 +318,12 @@ button {
 }
 
 .home-link {
-    background-color: var(--secondary);
+    background-color: var(--white) !important;
+    background: var(--white) !important;
+    color: var(--gray-700) !important;
+    border: 1px solid var(--border) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
     color: white !important;
     padding: 10px 20px !important;
     border-radius: 8px !important;
