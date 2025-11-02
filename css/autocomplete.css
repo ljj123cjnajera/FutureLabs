@@ -9,13 +9,15 @@
     top: calc(100% + 10px);
     left: 0;
     right: 0;
-    background: white;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
     border-radius: 12px;
     box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    border: 1px solid var(--border);
     z-index: 1000;
     max-height: 500px;
     overflow-y: auto;
-    animation: slideDown 0.3s ease;
+    animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes slideDown {
@@ -58,8 +60,9 @@
 
 .suggestion-item:hover,
 .suggestion-item.selected {
-    background: #f8f9fa;
-    border-left-color: #667eea;
+    background: linear-gradient(90deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.05) 100%);
+    border-left-color: var(--primary);
+    transform: translateX(4px);
 }
 
 .suggestion-item img {
