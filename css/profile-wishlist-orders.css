@@ -5,6 +5,9 @@
 /* Profile Page */
 .profile-page {
     background: var(--bg-secondary);
+    min-height: 100vh;
+    padding-top: 100px;
+    padding-bottom: 60px;
 }
 
 /* Profile Header */
@@ -190,6 +193,9 @@
 /* Wishlist Page */
 .wishlist-page {
     background: var(--bg-secondary);
+    min-height: 100vh;
+    padding-top: 100px;
+    padding-bottom: 60px;
 }
 
 .wishlist-grid {
@@ -210,6 +216,9 @@
 /* Orders Page */
 .orders-page {
     background: var(--bg-secondary);
+    min-height: 100vh;
+    padding-top: 100px;
+    padding-bottom: 60px;
 }
 
 .orders-list {
