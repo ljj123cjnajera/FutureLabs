@@ -3,9 +3,22 @@
   'use strict';
   
   function forceHomeLinkVisibility() {
-    const homeLinks = document.querySelectorAll('a.home-link, .home-link, [href="index.html"].home-link');
+    // Múltiples selectores para encontrar el botón
+    const homeLinks = document.querySelectorAll('a.home-link, .home-link, [href="index.html"].home-link, a[href="index.html"], .user-actions a[href="index.html"], .top-bar.header-simple a[href="index.html"]');
     
-    console.log('🔍 Buscando botones Inicio...', homeLinks.length, 'encontrados');
+    console.log('🔍 [FIX-HOME-LINK] Buscando botones Inicio...', homeLinks.length, 'encontrados');
+    
+    if (homeLinks.length === 0) {
+      console.warn('⚠️ [FIX-HOME-LINK] No se encontró ningún botón Inicio. Buscando alternativas...');
+      // Buscar cualquier enlace que contenga "Inicio" como texto
+      const allLinks = document.querySelectorAll('.user-actions a, .top-bar a');
+      allLinks.forEach(link => {
+        if (link.textContent.includes('Inicio') || link.querySelector('i.fa-home')) {
+          console.log('✅ [FIX-HOME-LINK] Encontrado botón Inicio alternativo:', link);
+          homeLinks.push(link);
+        }
+      });
+    }
     
     homeLinks.forEach(function(homeLink, index) {
       if (homeLink) {
@@ -74,16 +87,43 @@
   }
   
   // Ejecutar cuando el DOM esté listo
+  console.log('🚀 [FIX-HOME-LINK] Script cargado. Estado del DOM:', document.readyState);
+  
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', forceHomeLinkVisibility);
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('✅ [FIX-HOME-LINK] DOMContentLoaded - ejecutando fix');
+      forceHomeLinkVisibility();
+    });
   } else {
+    console.log('✅ [FIX-HOME-LINK] DOM ya listo - ejecutando fix inmediatamente');
     forceHomeLinkVisibility();
   }
   
   // Ejecutar después de un delay para asegurar que se ejecute después del render
-  setTimeout(forceHomeLinkVisibility, 100);
-  setTimeout(forceHomeLinkVisibility, 500);
-  setTimeout(forceHomeLinkVisibility, 1000);
+  setTimeout(() => {
+    console.log('⏰ [FIX-HOME-LINK] Ejecutando fix después de 100ms');
+    forceHomeLinkVisibility();
+  }, 100);
+  
+  setTimeout(() => {
+    console.log('⏰ [FIX-HOME-LINK] Ejecutando fix después de 300ms');
+    forceHomeLinkVisibility();
+  }, 300);
+  
+  setTimeout(() => {
+    console.log('⏰ [FIX-HOME-LINK] Ejecutando fix después de 500ms');
+    forceHomeLinkVisibility();
+  }, 500);
+  
+  setTimeout(() => {
+    console.log('⏰ [FIX-HOME-LINK] Ejecutando fix después de 1000ms');
+    forceHomeLinkVisibility();
+  }, 1000);
+  
+  setTimeout(() => {
+    console.log('⏰ [FIX-HOME-LINK] Ejecutando fix después de 2000ms (último intento)');
+    forceHomeLinkVisibility();
+  }, 2000);
   
   // Observar cambios en el DOM
   const observer = new MutationObserver(function(mutations) {

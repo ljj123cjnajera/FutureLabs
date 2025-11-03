@@ -325,8 +325,30 @@
                 
                 // Forzar visibilidad del botón Inicio - MÚLTIPLES INTENTOS
                 function forceHomeLinkVisibility() {
-                    const homeLink = document.querySelector('a.home-link, .home-link, [href="index.html"].home-link');
+                    // Buscar con múltiples selectores
+                    let homeLink = document.querySelector('a.home-link');
+                    if (!homeLink) homeLink = document.querySelector('.home-link');
+                    if (!homeLink) homeLink = document.querySelector('[href="index.html"].home-link');
+                    if (!homeLink) {
+                        // Buscar por texto o icono
+                        const allLinks = document.querySelectorAll('.user-actions a, .top-bar.header-simple a');
+                        for (let link of allLinks) {
+                            if (link.textContent.includes('Inicio') || link.querySelector('i.fa-home')) {
+                                homeLink = link;
+                                break;
+                            }
+                        }
+                    }
+                    
                     if (homeLink) {
+                        console.log('✅ [PROFILE] Botón Inicio encontrado:', homeLink);
+                        
+                        // Verificar estilos ANTES
+                        const beforeBg = window.getComputedStyle(homeLink).backgroundColor;
+                        const beforeColor = window.getComputedStyle(homeLink).color;
+                        const beforeOpacity = window.getComputedStyle(homeLink).opacity;
+                        console.log('   ANTES - bg:', beforeBg, 'color:', beforeColor, 'opacity:', beforeOpacity);
+                        
                         // Método 1: style.cssText
                         homeLink.style.cssText = 'background: #ffffff !important; background-color: #ffffff !important; color: #374151 !important; border: 1px solid #e5e7eb !important; opacity: 1 !important; visibility: visible !important; display: flex !important; padding: 10px 20px !important; border-radius: 8px !important; font-weight: 600 !important; box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important; position: relative !important; z-index: 10 !important;';
                         
@@ -336,6 +358,11 @@
                         homeLink.style.setProperty('color', '#374151', 'important');
                         homeLink.style.setProperty('opacity', '1', 'important');
                         homeLink.style.setProperty('visibility', 'visible', 'important');
+                        homeLink.style.setProperty('display', 'flex', 'important');
+                        homeLink.style.setProperty('padding', '10px 20px', 'important');
+                        homeLink.style.setProperty('border', '1px solid #e5e7eb', 'important');
+                        homeLink.style.setProperty('border-radius', '8px', 'important');
+                        homeLink.style.setProperty('font-weight', '600', 'important');
                         
                         // Icono
                         const icon = homeLink.querySelector('i');
@@ -348,17 +375,31 @@
                         // Remover clases que puedan causar transparencia
                         homeLink.classList.remove('btn-ghost', 'btn-outline');
                         
-                        console.log('✅ Botón Inicio forzado en profile.html - bg:', window.getComputedStyle(homeLink).backgroundColor);
+                        // Verificar estilos DESPUÉS
+                        setTimeout(() => {
+                            const afterBg = window.getComputedStyle(homeLink).backgroundColor;
+                            const afterColor = window.getComputedStyle(homeLink).color;
+                            const afterOpacity = window.getComputedStyle(homeLink).opacity;
+                            console.log('   DESPUÉS - bg:', afterBg, 'color:', afterColor, 'opacity:', afterOpacity);
+                            
+                            if (afterBg === 'rgba(0, 0, 0, 0)' || afterBg === 'transparent') {
+                                console.error('❌ [PROFILE] El background sigue siendo transparente!');
+                            } else {
+                                console.log('✅ [PROFILE] Botón Inicio forzado correctamente');
+                            }
+                        }, 50);
                     } else {
-                        console.warn('⚠️ Botón Inicio no encontrado en profile.html');
+                        console.warn('⚠️ [PROFILE] Botón Inicio NO encontrado');
                     }
                 }
                 
                 // Ejecutar múltiples veces para asegurar
+                console.log('🚀 [PROFILE] Iniciando fixes del botón Inicio...');
                 forceHomeLinkVisibility();
                 setTimeout(forceHomeLinkVisibility, 100);
                 setTimeout(forceHomeLinkVisibility, 300);
                 setTimeout(forceHomeLinkVisibility, 500);
+                setTimeout(forceHomeLinkVisibility, 1000);
             }
             
             if (footerContainer && window.Components) {
