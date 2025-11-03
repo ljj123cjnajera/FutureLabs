@@ -187,15 +187,23 @@
 }
 
 /* ASEGURAR QUE HOME-LINK TENGA FONDO VISIBLE SIEMPRE, NO SOLO EN HOVER */
-.user-actions a.home-link {
+.user-actions a.home-link,
+a.home-link,
+.home-link {
     background: var(--white) !important;
     background-color: var(--white) !important;
     opacity: 1 !important;
     visibility: visible !important;
     pointer-events: auto !important;
+    position: relative !important;
+    z-index: 9999 !important;
+    /* Asegurar que no haya nada encima */
+    isolation: isolate !important;
 }
 
-.user-actions a.home-link:hover {
+.user-actions a.home-link:hover,
+a.home-link:hover,
+.home-link:hover {
     background: var(--primary) !important;
     background-color: var(--primary) !important;
     color: var(--white) !important;
