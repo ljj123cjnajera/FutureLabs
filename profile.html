@@ -374,15 +374,26 @@
     <script src="js/fix-home-link.js"></script>
     
     <script>
+        // Logging inicial para verificar que el script se carga
+        console.log('🔵 [PROFILE] Script profile.html cargado');
+        
         // Esperar a que todo se cargue
         document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🔵 [PROFILE] DOMContentLoaded ejecutado');
+            
             // Inicializar header y footer
             const headerContainer = document.getElementById('mainHeader');
             const footerContainer = document.getElementById('mainFooter');
             
+            console.log('🔵 [PROFILE] headerContainer:', headerContainer);
+            console.log('🔵 [PROFILE] window.Components:', window.Components);
+            
             if (headerContainer && window.Components) {
+                console.log('🔵 [PROFILE] Renderizando header...');
                 headerContainer.innerHTML = window.Components.getHeader(false, false);
+                console.log('🔵 [PROFILE] Header renderizado, llamando initHeader()...');
                 window.Components.initHeader();
+                console.log('🔵 [PROFILE] initHeader() ejecutado');
                 
                 // Forzar visibilidad del botón Inicio - MÚLTIPLES INTENTOS
                 function forceHomeLinkVisibility() {
@@ -526,6 +537,7 @@
                 
                 // Ejecutar múltiples veces para asegurar
                 console.log('🚀 [PROFILE] Iniciando fixes del botón Inicio...');
+                console.log('🔵 [PROFILE] Ejecutando forceHomeLinkVisibility inmediatamente');
                 forceHomeLinkVisibility();
                 setTimeout(forceHomeLinkVisibility, 50);
                 setTimeout(forceHomeLinkVisibility, 100);

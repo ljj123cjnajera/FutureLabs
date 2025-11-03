@@ -86,6 +86,9 @@
     }
   }
   
+  // Logging inmediato al cargar el script
+  console.log('🔵 [FIX-HOME-LINK] Script fix-home-link.js CARGADO');
+  
   // Ejecutar cuando el DOM esté listo
   console.log('🚀 [FIX-HOME-LINK] Script cargado. Estado del DOM:', document.readyState);
   

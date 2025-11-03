@@ -127,9 +127,13 @@ class Components {
   }
 
   static initHeader() {
+    console.log('🔵 [COMPONENTS] initHeader() ejecutado');
+    
     // FORZAR VISIBILIDAD DEL BOTÓN INICIO - FIX NUCLEAR
     function forceHomeLink() {
+      console.log('🔵 [COMPONENTS] forceHomeLink() ejecutado');
       const homeLink = document.querySelector('a.home-link, .home-link');
+      console.log('🔵 [COMPONENTS] homeLink encontrado:', homeLink);
       if (homeLink) {
         // Eliminar todos los estilos primero
         homeLink.removeAttribute('style');
