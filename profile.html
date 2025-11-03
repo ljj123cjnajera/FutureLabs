@@ -36,17 +36,26 @@
     <link rel="stylesheet" href="css/force-home-link.css?v=1.0">
     
     <!-- ESTILO CRÍTICO - DEBE ESTAR AL FINAL PARA MÁXIMA PRIORIDAD -->
-    <!-- v2.4 - Nuclear fix -->
+    <!-- v2.5 - Incluir HOME-LINK en fix -->
     <style>
-        /* FORZAR TODOS LOS BOTONES DEL HEADER */
+        /* FORZAR TODOS LOS BOTONES DEL HEADER - INCLUIR HOME-LINK */
+        body .user-actions a.home-link,
         body .user-actions a.affiliate-link,
         body .user-actions a.account-link,
+        body .user-actions a.admin-link,
+        .user-actions a.home-link,
         .user-actions a.affiliate-link,
         .user-actions a.account-link,
+        .user-actions a.admin-link,
+        .home-link,
         .affiliate-link,
-        .account-link {
+        .account-link,
+        .admin-link,
+        a[href="index.html"],
+        header a[href="index.html"] {
             background: #ffffff !important;
             background-color: #ffffff !important;
+            background-image: none !important;
             color: #374151 !important;
             border: 1px solid #e5e7eb !important;
             opacity: 1 !important;
@@ -57,19 +66,60 @@
             font-weight: 600 !important;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
             position: relative !important;
-            z-index: 1000 !important;
+            z-index: 9999 !important;
+            filter: none !important;
+            backdrop-filter: none !important;
+            pointer-events: auto !important;
         }
         
+        /* Eliminar pseudo-elementos de TODOS los botones */
+        .home-link::before,
+        .home-link::after,
         .affiliate-link::before,
         .affiliate-link::after,
         .account-link::before,
-        .account-link::after {
+        .account-link::after,
+        .admin-link::before,
+        .admin-link::after,
+        .user-actions a::before,
+        .user-actions a::after,
+        .top-bar.header-simple .user-actions a::before,
+        .top-bar.header-simple .user-actions a::after {
             display: none !important;
-            content: '' !important;
+            content: none !important;
             background: none !important;
+            background-color: transparent !important;
             opacity: 0 !important;
             width: 0 !important;
             height: 0 !important;
+            pointer-events: none !important;
+        }
+        
+        /* Hover para todos */
+        .home-link:hover,
+        .affiliate-link:hover,
+        .account-link:hover,
+        .admin-link:hover {
+            background: #6366f1 !important;
+            background-color: #6366f1 !important;
+            color: #ffffff !important;
+            border-color: #6366f1 !important;
+        }
+        
+        /* Iconos */
+        .home-link i,
+        .affiliate-link i,
+        .account-link i,
+        .admin-link i {
+            color: #374151 !important;
+            opacity: 1 !important;
+        }
+        
+        .home-link:hover i,
+        .affiliate-link:hover i,
+        .account-link:hover i,
+        .admin-link:hover i {
+            color: #ffffff !important;
         }
     </style>
 </head>
