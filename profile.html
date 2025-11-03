@@ -323,18 +323,42 @@
                 headerContainer.innerHTML = window.Components.getHeader(false, false);
                 window.Components.initHeader();
                 
-                // Forzar visibilidad del botón Inicio después de inicializar header
-                setTimeout(() => {
-                    const homeLink = document.querySelector('a.home-link');
+                // Forzar visibilidad del botón Inicio - MÚLTIPLES INTENTOS
+                function forceHomeLinkVisibility() {
+                    const homeLink = document.querySelector('a.home-link, .home-link, [href="index.html"].home-link');
                     if (homeLink) {
+                        // Método 1: style.cssText
                         homeLink.style.cssText = 'background: #ffffff !important; background-color: #ffffff !important; color: #374151 !important; border: 1px solid #e5e7eb !important; opacity: 1 !important; visibility: visible !important; display: flex !important; padding: 10px 20px !important; border-radius: 8px !important; font-weight: 600 !important; box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important; position: relative !important; z-index: 10 !important;';
+                        
+                        // Método 2: setProperty individual
+                        homeLink.style.setProperty('background', '#ffffff', 'important');
+                        homeLink.style.setProperty('background-color', '#ffffff', 'important');
+                        homeLink.style.setProperty('color', '#374151', 'important');
+                        homeLink.style.setProperty('opacity', '1', 'important');
+                        homeLink.style.setProperty('visibility', 'visible', 'important');
+                        
+                        // Icono
                         const icon = homeLink.querySelector('i');
                         if (icon) {
-                            icon.style.cssText = 'color: #374151 !important; opacity: 1 !important; visibility: visible !important;';
+                            icon.style.setProperty('color', '#374151', 'important');
+                            icon.style.setProperty('opacity', '1', 'important');
+                            icon.style.setProperty('visibility', 'visible', 'important');
                         }
-                        console.log('✅ Botón Inicio forzado en profile.html');
+                        
+                        // Remover clases que puedan causar transparencia
+                        homeLink.classList.remove('btn-ghost', 'btn-outline');
+                        
+                        console.log('✅ Botón Inicio forzado en profile.html - bg:', window.getComputedStyle(homeLink).backgroundColor);
+                    } else {
+                        console.warn('⚠️ Botón Inicio no encontrado en profile.html');
                     }
-                }, 200);
+                }
+                
+                // Ejecutar múltiples veces para asegurar
+                forceHomeLinkVisibility();
+                setTimeout(forceHomeLinkVisibility, 100);
+                setTimeout(forceHomeLinkVisibility, 300);
+                setTimeout(forceHomeLinkVisibility, 500);
             }
             
             if (footerContainer && window.Components) {
