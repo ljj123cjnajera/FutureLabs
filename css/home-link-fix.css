@@ -1,7 +1,10 @@
 /* ============================================
    FIX ESPECÍFICO PARA BOTÓN INICIO
    Asegurar visibilidad completa - MÁXIMA PRIORIDAD
+   ESTE ARCHIVO DEBE CARGARSE AL FINAL
    ============================================ */
+
+/* ANULAR CUALQUIER ESTILO DE TRANSPARENCIA */
 
 /* Resetear CUALQUIER estilo que pueda causar transparencia */
 a.home-link,
@@ -14,14 +17,24 @@ a[href*="index.html"].home-link,
 .top-bar.header-simple a.home-link,
 header a.home-link,
 .header a.home-link {
-    /* Forzar fondo blanco */
+    /* Forzar fondo blanco - VALORES ABSOLUTOS */
     background: #ffffff !important;
     background-color: #ffffff !important;
     background-image: none !important;
+    background-clip: padding-box !important;
     
-    /* Forzar texto visible */
+    /* Eliminar cualquier transparencia */
+    -webkit-background-clip: padding-box !important;
+    
+    /* Forzar texto visible - VALORES ABSOLUTOS */
     color: #374151 !important;
     -webkit-text-fill-color: #374151 !important;
+    text-fill-color: #374151 !important;
+    
+    /* Remover cualquier filtro o efecto */
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-filter: none !important;
     
     /* Forzar visibilidad */
     opacity: 1 !important;
