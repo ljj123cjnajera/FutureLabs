@@ -310,6 +310,7 @@
     <script src="js/modals.js"></script>
     <script src="js/cart.js"></script>
     <script src="js/components.js"></script>
+    <script src="js/fix-home-link.js"></script>
     
     <script>
         // Esperar a que todo se cargue
@@ -321,6 +322,19 @@
             if (headerContainer && window.Components) {
                 headerContainer.innerHTML = window.Components.getHeader(false, false);
                 window.Components.initHeader();
+                
+                // Forzar visibilidad del botón Inicio después de inicializar header
+                setTimeout(() => {
+                    const homeLink = document.querySelector('a.home-link');
+                    if (homeLink) {
+                        homeLink.style.cssText = 'background: #ffffff !important; background-color: #ffffff !important; color: #374151 !important; border: 1px solid #e5e7eb !important; opacity: 1 !important; visibility: visible !important; display: flex !important; padding: 10px 20px !important; border-radius: 8px !important; font-weight: 600 !important; box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important; position: relative !important; z-index: 10 !important;';
+                        const icon = homeLink.querySelector('i');
+                        if (icon) {
+                            icon.style.cssText = 'color: #374151 !important; opacity: 1 !important; visibility: visible !important;';
+                        }
+                        console.log('✅ Botón Inicio forzado en profile.html');
+                    }
+                }, 200);
             }
             
             if (footerContainer && window.Components) {
