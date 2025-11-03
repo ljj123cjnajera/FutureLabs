@@ -313,6 +313,14 @@ button {
     background-color: var(--light);
 }
 
+/* FORZAR FONDO BLANCO EN TODOS LOS BOTONES DEL HEADER */
+.user-actions a {
+    background: var(--white) !important;
+    background-color: var(--white) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
 .user-actions a i {
     font-size: 16px;
 }

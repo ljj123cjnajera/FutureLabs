@@ -489,7 +489,9 @@ a.home-link:hover i {
 }
 
 /* DESACTIVADO - Causa problemas de visibilidad en botones */
-/* .top-bar.header-simple .user-actions a::before {
+/* /* COMENTADO - Este ::before está causando el problema de transparencia */
+/*
+.top-bar.header-simple .user-actions a::before {
     content: '';
     position: absolute;
     top: 0;
@@ -499,7 +501,8 @@ a.home-link:hover i {
     background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
     transition: left 0.3s ease;
     z-index: -1;
-} */
+}
+*/ */
 
 /* Asegurar que el ::before NO se aplique a home-link - FIX CRÍTICO */
 .top-bar.header-simple .user-actions a.home-link::before,
