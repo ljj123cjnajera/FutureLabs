@@ -5,8 +5,18 @@
   function forceHomeLinkVisibility() {
     const homeLinks = document.querySelectorAll('a.home-link, .home-link, [href="index.html"].home-link');
     
-    homeLinks.forEach(function(homeLink) {
+    console.log('🔍 Buscando botones Inicio...', homeLinks.length, 'encontrados');
+    
+    homeLinks.forEach(function(homeLink, index) {
       if (homeLink) {
+        console.log(`✅ Aplicando estilos al botón Inicio #${index + 1}:`, homeLink);
+        
+        // Verificar estilos actuales ANTES de aplicar
+        const currentBg = window.getComputedStyle(homeLink).backgroundColor;
+        const currentColor = window.getComputedStyle(homeLink).color;
+        const currentOpacity = window.getComputedStyle(homeLink).opacity;
+        console.log(`   Estilos ANTES: bg=${currentBg}, color=${currentColor}, opacity=${currentOpacity}`);
+        
         // Aplicar estilos inline con máxima prioridad
         homeLink.style.setProperty('background', '#ffffff', 'important');
         homeLink.style.setProperty('background-color', '#ffffff', 'important');
@@ -32,24 +42,35 @@
           icon.style.setProperty('visibility', 'visible', 'important');
         }
         
-        // Remover cualquier pseudo-elemento
-        const style = document.createElement('style');
-        style.textContent = `
-          a.home-link::before,
-          a.home-link::after,
-          .home-link::before,
-          .home-link::after {
-            display: none !important;
-            content: none !important;
-            background: none !important;
-            opacity: 0 !important;
-            width: 0 !important;
-            height: 0 !important;
-          }
-        `;
-        document.head.appendChild(style);
+        // Verificar estilos DESPUÉS de aplicar
+        setTimeout(() => {
+          const newBg = window.getComputedStyle(homeLink).backgroundColor;
+          const newColor = window.getComputedStyle(homeLink).color;
+          const newOpacity = window.getComputedStyle(homeLink).opacity;
+          console.log(`   Estilos DESPUÉS: bg=${newBg}, color=${newColor}, opacity=${newOpacity}`);
+        }, 50);
       }
     });
+    
+    // Remover cualquier pseudo-elemento (solo una vez)
+    if (!document.getElementById('home-link-fix-style')) {
+      const style = document.createElement('style');
+      style.id = 'home-link-fix-style';
+      style.textContent = `
+        a.home-link::before,
+        a.home-link::after,
+        .home-link::before,
+        .home-link::after {
+          display: none !important;
+          content: none !important;
+          background: none !important;
+          opacity: 0 !important;
+          width: 0 !important;
+          height: 0 !important;
+        }
+      `;
+      document.head.appendChild(style);
+    }
   }
   
   // Ejecutar cuando el DOM esté listo
