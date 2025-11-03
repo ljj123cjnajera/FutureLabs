@@ -273,9 +273,17 @@ a.home-link:hover,
     visibility: hidden !important;
 }
 
-/* Solo permitir ::before en botones que NO sean estos específicos */
-.top-bar.header-simple .user-actions a:not(.affiliate-link):not(.account-link):not(.home-link):not(.admin-link)::before {
-    /* Permitir ::before solo para otros botones si es necesario */
+/* FORZAR que NINGÚN botón tenga ::before en el header simple */
+.top-bar.header-simple .user-actions a::before,
+.top-bar.header-simple .user-actions a::after {
+    content: none !important;
+    display: none !important;
+    background: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
+    pointer-events: none !important;
 }
 
 .affiliate-link:hover,
@@ -480,7 +488,8 @@ a.home-link:hover i {
     color: var(--white) !important;
 }
 
-.top-bar.header-simple .user-actions a::before {
+/* DESACTIVADO - Causa problemas de visibilidad en botones */
+/* .top-bar.header-simple .user-actions a::before {
     content: '';
     position: absolute;
     top: 0;
@@ -490,7 +499,7 @@ a.home-link:hover i {
     background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
     transition: left 0.3s ease;
     z-index: -1;
-}
+} */
 
 /* Asegurar que el ::before NO se aplique a home-link - FIX CRÍTICO */
 .top-bar.header-simple .user-actions a.home-link::before,
@@ -508,17 +517,22 @@ a.home-link::before,
     pointer-events: none !important;
 }
 
-.top-bar.header-simple .user-actions a:not(.home-link):hover {
+/* Hover effects para header simple - SIN pseudo-elementos */
+.top-bar.header-simple .user-actions a:hover {
     color: var(--white) !important;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4) !important;
     border-color: var(--primary) !important;
+    background: var(--primary) !important;
+    background-color: var(--primary) !important;
 }
 
+/* DESACTIVADO - Causa problemas de visibilidad
 .top-bar.header-simple .user-actions a:not(.home-link):hover::before {
     left: 0;
     z-index: -1;
 }
+*/
 
 /* Responsive */
 @media (max-width: 1024px) {
