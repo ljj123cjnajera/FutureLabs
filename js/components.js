@@ -127,19 +127,66 @@ class Components {
   }
 
   static initHeader() {
-    // FORZAR VISIBILIDAD DEL BOTÓN INICIO INMEDIATAMENTE
-    setTimeout(() => {
-      const homeLink = document.querySelector('a.home-link');
+    // FORZAR VISIBILIDAD DEL BOTÓN INICIO - FIX NUCLEAR
+    function forceHomeLink() {
+      const homeLink = document.querySelector('a.home-link, .home-link');
       if (homeLink) {
-        homeLink.style.cssText = 'background: #ffffff !important; background-color: #ffffff !important; color: #374151 !important; border: 1px solid #e5e7eb !important; opacity: 1 !important; visibility: visible !important; display: flex !important; padding: 10px 20px !important; border-radius: 8px !important; font-weight: 600 !important; box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important; position: relative !important; z-index: 10 !important;';
+        // Eliminar todos los estilos primero
+        homeLink.removeAttribute('style');
+        
+        // Aplicar estilos críticos con valores RGB absolutos
+        const criticalStyle = `
+          background: rgb(255, 255, 255) !important;
+          background-color: rgb(255, 255, 255) !important;
+          background-image: none !important;
+          color: rgb(55, 65, 81) !important;
+          border: 1px solid rgb(229, 231, 235) !important;
+          opacity: 1 !important;
+          visibility: visible !important;
+          display: flex !important;
+          padding: 10px 20px !important;
+          border-radius: 8px !important;
+          font-weight: 600 !important;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+          position: relative !important;
+          z-index: 999 !important;
+          filter: none !important;
+          backdrop-filter: none !important;
+          transform: none !important;
+          -webkit-background-clip: padding-box !important;
+          background-clip: padding-box !important;
+        `;
+        homeLink.style.cssText = criticalStyle.trim();
+        
+        // También aplicar con setProperty para máxima compatibilidad
+        homeLink.style.setProperty('background', 'rgb(255, 255, 255)', 'important');
+        homeLink.style.setProperty('background-color', 'rgb(255, 255, 255)', 'important');
+        homeLink.style.setProperty('color', 'rgb(55, 65, 81)', 'important');
+        homeLink.style.setProperty('opacity', '1', 'important');
+        homeLink.style.setProperty('visibility', 'visible', 'important');
+        
+        // Icono
         const icon = homeLink.querySelector('i');
         if (icon) {
-          icon.style.cssText = 'color: #374151 !important; opacity: 1 !important; visibility: visible !important;';
+          icon.style.setProperty('color', 'rgb(55, 65, 81)', 'important');
+          icon.style.setProperty('opacity', '1', 'important');
+          icon.style.setProperty('visibility', 'visible', 'important');
         }
-        // Forzar también con setAttribute
-        homeLink.setAttribute('style', homeLink.getAttribute('style') + ' background: #ffffff !important; background-color: #ffffff !important;');
+        
+        // Remover clases problemáticas
+        homeLink.classList.remove('btn-ghost', 'btn-outline');
+        
+        console.log('✅ [COMPONENTS] Botón Inicio forzado - bg:', window.getComputedStyle(homeLink).backgroundColor);
       }
-    }, 100);
+    }
+    
+    // Ejecutar inmediatamente y varias veces
+    forceHomeLink();
+    setTimeout(forceHomeLink, 0);
+    setTimeout(forceHomeLink, 50);
+    setTimeout(forceHomeLink, 100);
+    setTimeout(forceHomeLink, 300);
+    setTimeout(forceHomeLink, 500);
     
     // Manejar botón de cuenta
     const accountLink = document.getElementById('accountLink');
