@@ -303,9 +303,10 @@ input, textarea, select {
 }
 
 .btn-ghost {
-    background: var(--gray-100);
-    color: var(--text-primary);
-    border: 1px solid var(--border);
+    background: var(--gray-100) !important;
+    background-color: var(--gray-100) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border) !important;
     transition: all var(--transition-base);
 }
 
