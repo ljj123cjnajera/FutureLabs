@@ -1,0 +1,131 @@
+/* ============================================
+   FIX NUCLEAR PARA BOTÓN INICIO
+   ESTE ARCHIVO DEBE CARGARSE AL FINAL
+   MÁXIMA PRIORIDAD Y ESPECIFICIDAD
+   ============================================ */
+
+/* RESETEAR ABSOLUTAMENTE TODO */
+html body header .header .container .top-bar .user-actions a.home-link,
+html body .top-bar.header-simple .user-actions a.home-link,
+html body .user-actions a.home-link,
+html body a.home-link,
+body .home-link,
+.home-link {
+    /* BACKGROUND */
+    background: rgb(255, 255, 255) !important;
+    background-color: rgb(255, 255, 255) !important;
+    background-image: none !important;
+    
+    /* COLOR */
+    color: rgb(55, 65, 81) !important;
+    -webkit-text-fill-color: rgb(55, 65, 81) !important;
+    
+    /* VISIBILIDAD */
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: flex !important;
+    
+    /* POSICIÓN Y STACKING */
+    position: relative !important;
+    z-index: 99999 !important;
+    
+    /* BORDE */
+    border: 1px solid rgb(229, 231, 235) !important;
+    border-width: 1px !important;
+    border-style: solid !important;
+    border-color: rgb(229, 231, 235) !important;
+    
+    /* SOMBRA */
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
+    
+    /* ESPACIADO */
+    padding: 10px 20px !important;
+    margin: 0 !important;
+    
+    /* BORDER RADIUS */
+    border-radius: 8px !important;
+    
+    /* TIPOGRAFÍA */
+    font-weight: 600 !important;
+    font-size: 0.9375rem !important;
+    
+    /* ELIMINAR EFECTOS */
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    transform: none !important;
+    -webkit-transform: none !important;
+    
+    /* CLIP PATH */
+    -webkit-background-clip: padding-box !important;
+    background-clip: padding-box !important;
+    
+    /* POINTER EVENTS */
+    pointer-events: auto !important;
+    
+    /* ISOLATION */
+    isolation: isolate !important;
+    
+    /* OVERFLOW */
+    overflow: visible !important;
+    
+    /* MIX BLEND MODE */
+    mix-blend-mode: normal !important;
+}
+
+/* ICONOS DENTRO DEL BOTÓN */
+html body .home-link i,
+.home-link i,
+a.home-link i {
+    color: rgb(55, 65, 81) !important;
+    -webkit-text-fill-color: rgb(55, 65, 81) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: inline-block !important;
+}
+
+/* ELIMINAR ABSOLUTAMENTE TODOS LOS PSEUDO-ELEMENTOS */
+html body .home-link::before,
+html body .home-link::after,
+html body a.home-link::before,
+html body a.home-link::after,
+.home-link::before,
+.home-link::after,
+a.home-link::before,
+a.home-link::after,
+.user-actions .home-link::before,
+.user-actions .home-link::after,
+.top-bar .home-link::before,
+.top-bar .home-link::after {
+    display: none !important;
+    content: none !important;
+    content: '' !important;
+    background: none !important;
+    background-color: transparent !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    position: absolute !important;
+    z-index: -99999 !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+}
+
+/* HOVER STATE */
+html body .home-link:hover,
+.home-link:hover,
+a.home-link:hover {
+    background: rgb(99, 102, 241) !important;
+    background-color: rgb(99, 102, 241) !important;
+    color: rgb(255, 255, 255) !important;
+    border-color: rgb(99, 102, 241) !important;
+    opacity: 1 !important;
+}
+
+html body .home-link:hover i,
+.home-link:hover i {
+    color: rgb(255, 255, 255) !important;
+    -webkit-text-fill-color: rgb(255, 255, 255) !important;
+}
+
