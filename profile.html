@@ -514,21 +514,37 @@
                             document.head.appendChild(style);
                         }
                         
-                        // Verificar estilos DESPUÉS
+                        // Verificar estilos DESPUÉS y forzar si es necesario
                         setTimeout(() => {
                             const afterBg = window.getComputedStyle(homeLink).backgroundColor;
                             const afterColor = window.getComputedStyle(homeLink).color;
                             const afterOpacity = window.getComputedStyle(homeLink).opacity;
                             const afterDisplay = window.getComputedStyle(homeLink).display;
-                            console.log('   DESPUÉS - bg:', afterBg, 'color:', afterColor, 'opacity:', afterOpacity, 'display:', afterDisplay);
+                            const afterVisibility = window.getComputedStyle(homeLink).visibility;
+                            const rect = homeLink.getBoundingClientRect();
                             
-                            if (afterBg === 'rgba(0, 0, 0, 0)' || afterBg === 'transparent' || afterBg === '') {
-                                console.error('❌ [PROFILE] El background sigue siendo transparente!');
-                                // Último recurso: usar setAttribute con inline style
-                                homeLink.setAttribute('style', homeLink.getAttribute('style') + ' background: rgb(255, 255, 255) !important; background-color: rgb(255, 255, 255) !important;');
-                            } else {
-                                console.log('✅ [PROFILE] Botón Inicio forzado correctamente');
+                            console.log('   DESPUÉS - bg:', afterBg, 'color:', afterColor, 'opacity:', afterOpacity, 'display:', afterDisplay, 'visibility:', afterVisibility);
+                            console.log('   POSICIÓN - x:', rect.x, 'y:', rect.y, 'width:', rect.width, 'height:', rect.height);
+                            
+                            // Forzar NUEVAMENTE usando múltiples métodos
+                            const currentStyle = homeLink.getAttribute('style') || '';
+                            homeLink.setAttribute('style', currentStyle + ' background: rgb(255, 255, 255) !important; background-color: rgb(255, 255, 255) !important; opacity: 1 !important; visibility: visible !important; display: flex !important;');
+                            
+                            // También forzar directamente en el objeto style
+                            homeLink.style.background = 'rgb(255, 255, 255)';
+                            homeLink.style.backgroundColor = 'rgb(255, 255, 255)';
+                            homeLink.style.opacity = '1';
+                            homeLink.style.visibility = 'visible';
+                            homeLink.style.display = 'flex';
+                            
+                            // Verificar si hay elementos encima que puedan estar cubriendo
+                            const elementsAtPoint = document.elementsFromPoint(rect.left + rect.width/2, rect.top + rect.height/2);
+                            const homeLinkIndex = elementsAtPoint.indexOf(homeLink);
+                            if (homeLinkIndex > 0) {
+                                console.warn('⚠️ [PROFILE] Hay elementos encima del botón:', elementsAtPoint.slice(0, homeLinkIndex));
                             }
+                            
+                            console.log('✅ [PROFILE] Botón Inicio forzado - Verificación final');
                         }, 50);
                     } else {
                         console.warn('⚠️ [PROFILE] Botón Inicio NO encontrado');

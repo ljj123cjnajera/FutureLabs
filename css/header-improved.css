@@ -432,9 +432,20 @@ a.home-link:hover i {
     z-index: -1;
 }
 
-/* Asegurar que el ::before no se aplique a home-link */
-.top-bar.header-simple .user-actions a.home-link::before {
+/* Asegurar que el ::before NO se aplique a home-link - FIX CRÍTICO */
+.top-bar.header-simple .user-actions a.home-link::before,
+a.home-link::before,
+.home-link::before {
     display: none !important;
+    content: none !important;
+    background: none !important;
+    background-color: transparent !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    position: absolute !important;
+    z-index: -999 !important;
+    pointer-events: none !important;
 }
 
 .top-bar.header-simple .user-actions a:not(.home-link):hover {
