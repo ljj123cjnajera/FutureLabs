@@ -108,8 +108,8 @@ class Components {
             ${searchBar}
             <div class="user-actions">
               ${!showSearch && !showNav ? '<a href="index.html" class="home-link" style="background: rgb(255, 255, 255) !important; background-color: rgb(255, 255, 255) !important; background-image: none !important; color: rgb(55, 65, 81) !important; border: 1px solid rgb(229, 231, 235) !important; opacity: 1 !important; visibility: visible !important; display: flex !important; padding: 10px 20px !important; border-radius: 8px !important; font-weight: 600 !important; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important; position: relative !important; z-index: 999 !important; filter: none !important; backdrop-filter: none !important; transform: none !important;"><i class="fas fa-home" style="color: rgb(55, 65, 81) !important; opacity: 1 !important; visibility: visible !important; display: inline-block !important;"></i> Inicio</a>' : ''}
-              <a href="#" class="affiliate-link"><i class="fas fa-store"></i> Conviértete en Afiliado</a>
-              <a href="#" class="account-link" id="accountLink"><i class="fas fa-user"></i> <span id="accountText">Cuenta</span></a>
+              <a href="#" class="affiliate-link" style="background: rgb(255, 255, 255) !important; background-color: rgb(255, 255, 255) !important; color: rgb(55, 65, 81) !important; border: 1px solid rgb(229, 231, 235) !important; opacity: 1 !important; visibility: visible !important; display: flex !important; padding: 10px 20px !important; border-radius: 8px !important; font-weight: 600 !important; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;"><i class="fas fa-store"></i> Conviértete en Afiliado</a>
+              <a href="#" class="account-link" id="accountLink" style="background: rgb(255, 255, 255) !important; background-color: rgb(255, 255, 255) !important; color: rgb(55, 65, 81) !important; border: 1px solid rgb(229, 231, 235) !important; opacity: 1 !important; visibility: visible !important; display: flex !important; padding: 10px 20px !important; border-radius: 8px !important; font-weight: 600 !important; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;"><i class="fas fa-user"></i> <span id="accountText">Cuenta</span></a>
               <a href="compare.html" class="cart-icon" id="comparatorLink" style="position: relative;">
                 <i class="fas fa-balance-scale"></i>
                 <span class="cart-count" id="comparator-count" style="display: none;">0</span>
@@ -129,7 +129,58 @@ class Components {
   static initHeader() {
     console.log('🔵 [COMPONENTS] initHeader() ejecutado');
     
-    // FORZAR VISIBILIDAD DEL BOTÓN INICIO - FIX NUCLEAR
+    // FORZAR VISIBILIDAD DE TODOS LOS BOTONES DEL HEADER - FIX NUCLEAR
+    function forceAllHeaderButtons() {
+      console.log('🔵 [COMPONENTS] forceAllHeaderButtons() ejecutado');
+      
+      // Lista de todos los botones que necesitan fix
+      const buttonsToFix = [
+        'a.home-link',
+        '.home-link',
+        'a.affiliate-link',
+        '.affiliate-link',
+        'a.account-link',
+        '.account-link',
+        'a.admin-link',
+        '.admin-link'
+      ];
+      
+      buttonsToFix.forEach(selector => {
+        const buttons = document.querySelectorAll(selector);
+        buttons.forEach(button => {
+          if (button) {
+            console.log(`🔵 [COMPONENTS] Aplicando fix a: ${selector}`, button);
+            
+            // Eliminar estilos primero
+            button.removeAttribute('style');
+            
+            // Aplicar estilos críticos
+            button.style.setProperty('background', 'rgb(255, 255, 255)', 'important');
+            button.style.setProperty('background-color', 'rgb(255, 255, 255)', 'important');
+            button.style.setProperty('color', 'rgb(55, 65, 81)', 'important');
+            button.style.setProperty('opacity', '1', 'important');
+            button.style.setProperty('visibility', 'visible', 'important');
+            button.style.setProperty('display', 'flex', 'important');
+            button.style.setProperty('position', 'relative', 'important');
+            button.style.setProperty('z-index', '1000', 'important');
+            button.style.setProperty('pointer-events', 'auto', 'important');
+            
+            // Iconos dentro del botón
+            const icons = button.querySelectorAll('i');
+            icons.forEach(icon => {
+              icon.style.setProperty('color', 'rgb(55, 65, 81)', 'important');
+              icon.style.setProperty('opacity', '1', 'important');
+              icon.style.setProperty('visibility', 'visible', 'important');
+            });
+            
+            // Remover clases problemáticas
+            button.classList.remove('btn-ghost', 'btn-outline');
+          }
+        });
+      });
+    }
+    
+    // FORZAR VISIBILIDAD DEL BOTÓN INICIO - FIX NUCLEAR (mantener para compatibilidad)
     function forceHomeLink() {
       console.log('🔵 [COMPONENTS] forceHomeLink() ejecutado');
       const homeLink = document.querySelector('a.home-link, .home-link');
@@ -184,13 +235,16 @@ class Components {
       }
     }
     
-    // Ejecutar inmediatamente y varias veces
+    // Ejecutar para TODOS los botones
+    forceAllHeaderButtons();
     forceHomeLink();
-    setTimeout(forceHomeLink, 0);
-    setTimeout(forceHomeLink, 50);
-    setTimeout(forceHomeLink, 100);
-    setTimeout(forceHomeLink, 300);
-    setTimeout(forceHomeLink, 500);
+    
+    // Ejecutar inmediatamente y varias veces
+    setTimeout(() => { forceAllHeaderButtons(); forceHomeLink(); }, 0);
+    setTimeout(() => { forceAllHeaderButtons(); forceHomeLink(); }, 50);
+    setTimeout(() => { forceAllHeaderButtons(); forceHomeLink(); }, 100);
+    setTimeout(() => { forceAllHeaderButtons(); forceHomeLink(); }, 300);
+    setTimeout(() => { forceAllHeaderButtons(); forceHomeLink(); }, 500);
     
     // Manejar botón de cuenta
     const accountLink = document.getElementById('accountLink');
