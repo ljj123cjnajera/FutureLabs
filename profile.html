@@ -542,6 +542,30 @@
                             const homeLinkIndex = elementsAtPoint.indexOf(homeLink);
                             if (homeLinkIndex > 0) {
                                 console.warn('⚠️ [PROFILE] Hay elementos encima del botón:', elementsAtPoint.slice(0, homeLinkIndex));
+                                // Si hay elementos encima, desactivar pointer-events en ellos
+                                elementsAtPoint.slice(0, homeLinkIndex).forEach(el => {
+                                    if (el !== homeLink && !el.contains(homeLink) && !homeLink.contains(el)) {
+                                        const computed = window.getComputedStyle(el);
+                                        if (computed.pointerEvents !== 'none') {
+                                            console.log('   Desactivando pointer-events en:', el);
+                                            el.style.pointerEvents = 'none';
+                                        }
+                                    }
+                                });
+                            }
+                            
+                            // Asegurar que el botón tenga pointer-events activo
+                            homeLink.style.pointerEvents = 'auto';
+                            homeLink.style.zIndex = '9999';
+                            
+                            // Eliminar cualquier overlay o elemento que pueda estar interfiriendo
+                            const parent = homeLink.parentElement;
+                            if (parent) {
+                                // Verificar si el padre tiene pseudo-elementos
+                                const parentBefore = window.getComputedStyle(parent, '::before');
+                                if (parentBefore.content && parentBefore.content !== 'none') {
+                                    console.warn('⚠️ [PROFILE] El padre tiene ::before que puede interferir');
+                                }
                             }
                             
                             console.log('✅ [PROFILE] Botón Inicio forzado - Verificación final');

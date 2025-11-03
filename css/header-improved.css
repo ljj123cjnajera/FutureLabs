@@ -186,6 +186,21 @@
     box-shadow: var(--shadow);
 }
 
+/* ASEGURAR QUE HOME-LINK TENGA FONDO VISIBLE SIEMPRE, NO SOLO EN HOVER */
+.user-actions a.home-link {
+    background: var(--white) !important;
+    background-color: var(--white) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+.user-actions a.home-link:hover {
+    background: var(--primary) !important;
+    background-color: var(--primary) !important;
+    color: var(--white) !important;
+}
+
 .user-actions a:active,
 .user-actions button:active {
     transform: translateY(0);
