@@ -29,7 +29,67 @@
     <link rel="stylesheet" href="css/components-enhanced.css">
     <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="css/notifications.css">
-    <link rel="stylesheet" href="css/home-link-fix.css?v=2.0">
+    <link rel="stylesheet" href="css/home-link-fix.css?v=2.1">
+    
+    <!-- ESTILO CRÍTICO - DEBE ESTAR AL FINAL PARA MÁXIMA PRIORIDAD -->
+    <style>
+        /* FORZAR VISIBILIDAD DEL BOTÓN INICIO - MÁXIMA ESPECIFICIDAD */
+        a.home-link,
+        .home-link,
+        [href="index.html"].home-link,
+        .user-actions a.home-link,
+        .top-bar.header-simple .user-actions a.home-link,
+        .top-bar a.home-link,
+        header a.home-link {
+            background: rgb(255, 255, 255) !important;
+            background-color: rgb(255, 255, 255) !important;
+            background-image: none !important;
+            color: rgb(55, 65, 81) !important;
+            border: 1px solid rgb(229, 231, 235) !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: flex !important;
+            padding: 10px 20px !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+            position: relative !important;
+            z-index: 10 !important;
+            filter: none !important;
+            backdrop-filter: none !important;
+        }
+        
+        a.home-link i,
+        .home-link i {
+            color: rgb(55, 65, 81) !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+        
+        a.home-link::before,
+        a.home-link::after,
+        .home-link::before,
+        .home-link::after {
+            display: none !important;
+            content: none !important;
+            background: none !important;
+            opacity: 0 !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
+        
+        a.home-link:hover,
+        .home-link:hover {
+            background: rgb(99, 102, 241) !important;
+            background-color: rgb(99, 102, 241) !important;
+            color: rgb(255, 255, 255) !important;
+            border-color: rgb(99, 102, 241) !important;
+        }
+        
+        a.home-link:hover i {
+            color: rgb(255, 255, 255) !important;
+        }
+    </style>
 </head>
 <body>
     <!-- Header Dinámico -->
