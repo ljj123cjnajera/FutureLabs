@@ -409,41 +409,111 @@
                         const beforeOpacity = window.getComputedStyle(homeLink).opacity;
                         console.log('   ANTES - bg:', beforeBg, 'color:', beforeColor, 'opacity:', beforeOpacity);
                         
-                        // Método 1: style.cssText
-                        homeLink.style.cssText = 'background: #ffffff !important; background-color: #ffffff !important; color: #374151 !important; border: 1px solid #e5e7eb !important; opacity: 1 !important; visibility: visible !important; display: flex !important; padding: 10px 20px !important; border-radius: 8px !important; font-weight: 600 !important; box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important; position: relative !important; z-index: 10 !important;';
+                        // ELIMINAR TODOS LOS ESTILOS EXISTENTES PRIMERO
+                        homeLink.removeAttribute('style');
                         
-                        // Método 2: setProperty individual
-                        homeLink.style.setProperty('background', '#ffffff', 'important');
-                        homeLink.style.setProperty('background-color', '#ffffff', 'important');
-                        homeLink.style.setProperty('color', '#374151', 'important');
-                        homeLink.style.setProperty('opacity', '1', 'important');
-                        homeLink.style.setProperty('visibility', 'visible', 'important');
-                        homeLink.style.setProperty('display', 'flex', 'important');
-                        homeLink.style.setProperty('padding', '10px 20px', 'important');
-                        homeLink.style.setProperty('border', '1px solid #e5e7eb', 'important');
-                        homeLink.style.setProperty('border-radius', '8px', 'important');
-                        homeLink.style.setProperty('font-weight', '600', 'important');
+                        // Método 1: style.cssText con TODOS los estilos necesarios
+                        const criticalStyles = `
+                            background: rgb(255, 255, 255) !important;
+                            background-color: rgb(255, 255, 255) !important;
+                            background-image: none !important;
+                            color: rgb(55, 65, 81) !important;
+                            border: 1px solid rgb(229, 231, 235) !important;
+                            opacity: 1 !important;
+                            visibility: visible !important;
+                            display: flex !important;
+                            padding: 10px 20px !important;
+                            border-radius: 8px !important;
+                            font-weight: 600 !important;
+                            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+                            position: relative !important;
+                            z-index: 999 !important;
+                            filter: none !important;
+                            backdrop-filter: none !important;
+                            transform: none !important;
+                            -webkit-background-clip: padding-box !important;
+                            background-clip: padding-box !important;
+                        `;
+                        homeLink.style.cssText = criticalStyles;
+                        
+                        // Método 2: setProperty individual para cada propiedad crítica
+                        const criticalProps = {
+                            'background': 'rgb(255, 255, 255)',
+                            'background-color': 'rgb(255, 255, 255)',
+                            'background-image': 'none',
+                            'color': 'rgb(55, 65, 81)',
+                            'border': '1px solid rgb(229, 231, 235)',
+                            'opacity': '1',
+                            'visibility': 'visible',
+                            'display': 'flex',
+                            'padding': '10px 20px',
+                            'border-radius': '8px',
+                            'font-weight': '600',
+                            'box-shadow': '0 1px 3px rgba(0, 0, 0, 0.1)',
+                            'position': 'relative',
+                            'z-index': '999',
+                            'filter': 'none',
+                            'backdrop-filter': 'none',
+                            'transform': 'none'
+                        };
+                        
+                        Object.entries(criticalProps).forEach(([prop, value]) => {
+                            homeLink.style.setProperty(prop, value, 'important');
+                        });
                         
                         // Icono
                         const icon = homeLink.querySelector('i');
                         if (icon) {
-                            icon.style.setProperty('color', '#374151', 'important');
+                            icon.removeAttribute('style');
+                            icon.style.setProperty('color', 'rgb(55, 65, 81)', 'important');
                             icon.style.setProperty('opacity', '1', 'important');
                             icon.style.setProperty('visibility', 'visible', 'important');
+                            icon.style.setProperty('display', 'inline-block', 'important');
                         }
                         
                         // Remover clases que puedan causar transparencia
                         homeLink.classList.remove('btn-ghost', 'btn-outline');
+                        
+                        // Crear estilo dinámico para anular pseudo-elementos
+                        if (!document.getElementById('profile-home-link-nuclear-fix')) {
+                            const style = document.createElement('style');
+                            style.id = 'profile-home-link-nuclear-fix';
+                            style.textContent = `
+                                a.home-link::before,
+                                a.home-link::after,
+                                .home-link::before,
+                                .home-link::after,
+                                .user-actions a.home-link::before,
+                                .user-actions a.home-link::after,
+                                header a.home-link::before,
+                                header a.home-link::after {
+                                    display: none !important;
+                                    content: none !important;
+                                    background: none !important;
+                                    background-color: transparent !important;
+                                    opacity: 0 !important;
+                                    width: 0 !important;
+                                    height: 0 !important;
+                                    position: absolute !important;
+                                    z-index: -999 !important;
+                                    pointer-events: none !important;
+                                }
+                            `;
+                            document.head.appendChild(style);
+                        }
                         
                         // Verificar estilos DESPUÉS
                         setTimeout(() => {
                             const afterBg = window.getComputedStyle(homeLink).backgroundColor;
                             const afterColor = window.getComputedStyle(homeLink).color;
                             const afterOpacity = window.getComputedStyle(homeLink).opacity;
-                            console.log('   DESPUÉS - bg:', afterBg, 'color:', afterColor, 'opacity:', afterOpacity);
+                            const afterDisplay = window.getComputedStyle(homeLink).display;
+                            console.log('   DESPUÉS - bg:', afterBg, 'color:', afterColor, 'opacity:', afterOpacity, 'display:', afterDisplay);
                             
-                            if (afterBg === 'rgba(0, 0, 0, 0)' || afterBg === 'transparent') {
+                            if (afterBg === 'rgba(0, 0, 0, 0)' || afterBg === 'transparent' || afterBg === '') {
                                 console.error('❌ [PROFILE] El background sigue siendo transparente!');
+                                // Último recurso: usar setAttribute con inline style
+                                homeLink.setAttribute('style', homeLink.getAttribute('style') + ' background: rgb(255, 255, 255) !important; background-color: rgb(255, 255, 255) !important;');
                             } else {
                                 console.log('✅ [PROFILE] Botón Inicio forzado correctamente');
                             }
@@ -456,10 +526,30 @@
                 // Ejecutar múltiples veces para asegurar
                 console.log('🚀 [PROFILE] Iniciando fixes del botón Inicio...');
                 forceHomeLinkVisibility();
+                setTimeout(forceHomeLinkVisibility, 50);
                 setTimeout(forceHomeLinkVisibility, 100);
+                setTimeout(forceHomeLinkVisibility, 200);
                 setTimeout(forceHomeLinkVisibility, 300);
                 setTimeout(forceHomeLinkVisibility, 500);
+                setTimeout(forceHomeLinkVisibility, 800);
                 setTimeout(forceHomeLinkVisibility, 1000);
+                setTimeout(forceHomeLinkVisibility, 2000);
+                
+                // Usar MutationObserver para detectar cambios en el DOM
+                const observer = new MutationObserver(() => {
+                    forceHomeLinkVisibility();
+                });
+                
+                // Observar cambios en el header
+                const header = document.querySelector('header');
+                if (header) {
+                    observer.observe(header, {
+                        childList: true,
+                        subtree: true,
+                        attributes: true,
+                        attributeFilter: ['style', 'class']
+                    });
+                }
             }
             
             if (footerContainer && window.Components) {
