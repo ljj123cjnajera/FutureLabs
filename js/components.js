@@ -107,7 +107,6 @@ class Components {
             </div>
             ${searchBar}
             <div class="user-actions">
-              ${!showSearch && !showNav ? '<a href="index.html" class="home-link" style="background: rgb(255, 255, 255) !important; background-color: rgb(255, 255, 255) !important; background-image: none !important; color: rgb(55, 65, 81) !important; border: 1px solid rgb(229, 231, 235) !important; opacity: 1 !important; visibility: visible !important; display: flex !important; padding: 10px 20px !important; border-radius: 8px !important; font-weight: 600 !important; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important; position: relative !important; z-index: 999 !important; filter: none !important; backdrop-filter: none !important; transform: none !important;"><i class="fas fa-home" style="color: rgb(55, 65, 81) !important; opacity: 1 !important; visibility: visible !important; display: inline-block !important;"></i> Inicio</a>' : ''}
               <a href="#" class="affiliate-link" style="background: rgb(255, 255, 255) !important; background-color: rgb(255, 255, 255) !important; color: rgb(55, 65, 81) !important; border: 1px solid rgb(229, 231, 235) !important; opacity: 1 !important; visibility: visible !important; display: flex !important; padding: 10px 20px !important; border-radius: 8px !important; font-weight: 600 !important; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;"><i class="fas fa-store"></i> Conviértete en Afiliado</a>
               <a href="#" class="account-link" id="accountLink" style="background: rgb(255, 255, 255) !important; background-color: rgb(255, 255, 255) !important; color: rgb(55, 65, 81) !important; border: 1px solid rgb(229, 231, 235) !important; opacity: 1 !important; visibility: visible !important; display: flex !important; padding: 10px 20px !important; border-radius: 8px !important; font-weight: 600 !important; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;"><i class="fas fa-user"></i> <span id="accountText">Cuenta</span></a>
               <a href="compare.html" class="cart-icon" id="comparatorLink" style="position: relative;">
@@ -129,14 +128,12 @@ class Components {
   static initHeader() {
     console.log('🔵 [COMPONENTS] initHeader() ejecutado');
     
-    // FORZAR VISIBILIDAD DE TODOS LOS BOTONES DEL HEADER - FIX NUCLEAR
+    // FORZAR VISIBILIDAD DE TODOS LOS BOTONES DEL HEADER
     function forceAllHeaderButtons() {
       console.log('🔵 [COMPONENTS] forceAllHeaderButtons() ejecutado');
       
-      // Lista de todos los botones que necesitan fix
+      // Lista de todos los botones que necesitan fix (sin home-link que fue eliminado)
       const buttonsToFix = [
-        'a.home-link',
-        '.home-link',
         'a.affiliate-link',
         '.affiliate-link',
         'a.account-link',
@@ -180,71 +177,15 @@ class Components {
       });
     }
     
-    // FORZAR VISIBILIDAD DEL BOTÓN INICIO - FIX NUCLEAR (mantener para compatibilidad)
-    function forceHomeLink() {
-      console.log('🔵 [COMPONENTS] forceHomeLink() ejecutado');
-      const homeLink = document.querySelector('a.home-link, .home-link');
-      console.log('🔵 [COMPONENTS] homeLink encontrado:', homeLink);
-      if (homeLink) {
-        // Eliminar todos los estilos primero
-        homeLink.removeAttribute('style');
-        
-        // Aplicar estilos críticos con valores RGB absolutos
-        const criticalStyle = `
-          background: rgb(255, 255, 255) !important;
-          background-color: rgb(255, 255, 255) !important;
-          background-image: none !important;
-          color: rgb(55, 65, 81) !important;
-          border: 1px solid rgb(229, 231, 235) !important;
-          opacity: 1 !important;
-          visibility: visible !important;
-          display: flex !important;
-          padding: 10px 20px !important;
-          border-radius: 8px !important;
-          font-weight: 600 !important;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
-          position: relative !important;
-          z-index: 999 !important;
-          filter: none !important;
-          backdrop-filter: none !important;
-          transform: none !important;
-          -webkit-background-clip: padding-box !important;
-          background-clip: padding-box !important;
-        `;
-        homeLink.style.cssText = criticalStyle.trim();
-        
-        // También aplicar con setProperty para máxima compatibilidad
-        homeLink.style.setProperty('background', 'rgb(255, 255, 255)', 'important');
-        homeLink.style.setProperty('background-color', 'rgb(255, 255, 255)', 'important');
-        homeLink.style.setProperty('color', 'rgb(55, 65, 81)', 'important');
-        homeLink.style.setProperty('opacity', '1', 'important');
-        homeLink.style.setProperty('visibility', 'visible', 'important');
-        
-        // Icono
-        const icon = homeLink.querySelector('i');
-        if (icon) {
-          icon.style.setProperty('color', 'rgb(55, 65, 81)', 'important');
-          icon.style.setProperty('opacity', '1', 'important');
-          icon.style.setProperty('visibility', 'visible', 'important');
-        }
-        
-        // Remover clases problemáticas
-        homeLink.classList.remove('btn-ghost', 'btn-outline');
-        
-        console.log('✅ [COMPONENTS] Botón Inicio forzado - bg:', window.getComputedStyle(homeLink).backgroundColor);
-      }
-    }
-    
     // Ejecutar para TODOS los botones
     forceAllHeaderButtons();
-    forceHomeLink();
     
-    // Ejecutar inmediatamente y varias veces
-    setTimeout(() => { forceAllHeaderButtons(); forceHomeLink(); }, 0);
-    setTimeout(() => { forceAllHeaderButtons(); forceHomeLink(); }, 50);
-    setTimeout(() => { forceAllHeaderButtons(); forceHomeLink(); }, 100);
-    setTimeout(() => { forceAllHeaderButtons(); forceHomeLink(); }, 300);
-    setTimeout(() => { forceAllHeaderButtons(); forceHomeLink(); }, 500);
+    // Ejecutar inmediatamente y varias veces para asegurar que se apliquen los estilos
+    setTimeout(() => { forceAllHeaderButtons(); }, 0);
+    setTimeout(() => { forceAllHeaderButtons(); }, 50);
+    setTimeout(() => { forceAllHeaderButtons(); }, 100);
+    setTimeout(() => { forceAllHeaderButtons(); }, 300);
+    setTimeout(() => { forceAllHeaderButtons(); }, 500);
     
     // Manejar botón de cuenta
     const accountLink = document.getElementById('accountLink');
