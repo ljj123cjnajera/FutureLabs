@@ -224,6 +224,17 @@
                                 <button type="submit" class="btn btn-primary">Cambiar Contraseña</button>
                             </div>
                         </form>
+                        
+                        <!-- Logout Section -->
+                        <div class="profile-content-section" style="margin-top: 30px; border-top: 1px solid var(--border); padding-top: 30px;">
+                            <div class="profile-content-section-header">
+                                <h3><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</h3>
+                                <p style="color: var(--gray-600); font-size: 0.9rem; margin-top: 8px;">Cierra tu sesión de forma segura en este dispositivo</p>
+                            </div>
+                            <button type="button" id="logoutButton" class="btn btn-danger" style="margin-top: 20px;">
+                                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -728,6 +739,48 @@
                 closeAddressModal();
             }
         });
+
+        // Logout Button
+        const logoutButton = document.getElementById('logoutButton');
+        if (logoutButton) {
+            logoutButton.addEventListener('click', async function() {
+                if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+                    try {
+                        console.log('🔴 [PROFILE] Cerrando sesión...');
+                        
+                        // Llamar a logout de authManager
+                        if (window.authManager) {
+                            await window.authManager.logout();
+                        }
+                        
+                        // Limpiar cualquier dato local adicional
+                        localStorage.removeItem('token');
+                        sessionStorage.clear();
+                        
+                        // Mostrar notificación
+                        if (window.notifications) {
+                            window.notifications.success('Sesión cerrada exitosamente');
+                        }
+                        
+                        // Esperar un momento para que se vea la notificación
+                        setTimeout(() => {
+                            // Redirigir a la página principal
+                            window.location.href = 'index.html';
+                        }, 500);
+                        
+                    } catch (error) {
+                        console.error('Error al cerrar sesión:', error);
+                        if (window.notifications) {
+                            window.notifications.error('Error al cerrar sesión');
+                        }
+                        // Redirigir de todas formas
+                        setTimeout(() => {
+                            window.location.href = 'index.html';
+                        }, 500);
+                    }
+                }
+            });
+        }
     </script>
 </body>
 </html>
