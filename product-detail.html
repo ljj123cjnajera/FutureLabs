@@ -25,11 +25,16 @@
     <link rel="stylesheet" href="css/notifications.css">
     <link rel="stylesheet" href="css/reviews.css">
     <link rel="stylesheet" href="css/home-link-fix.css?v=2.0">
+    <link rel="stylesheet" href="css/product-gallery.css?v=1.0">
+    <link rel="stylesheet" href="css/breadcrumbs.css?v=1.0">
     <!-- Estilos inline removidos - migrados a product-detail-page.css -->
 </head>
 <body>
     <!-- Header Dinámico -->
     <header id="mainHeader"></header>
+    
+    <!-- Breadcrumbs -->
+    <nav id="breadcrumbs"></nav>
 
     <!-- Product Detail Page -->
     <div class="product-detail-page">
@@ -60,6 +65,8 @@
     <script src="js/related-products.js"></script>
     <script src="js/components.js"></script>
     <script src="js/fix-home-link.js"></script>
+    <script src="js/product-gallery.js"></script>
+    <script src="js/breadcrumbs.js"></script>
     
     <script>
 // Inicializar header dinámico y cargar producto
@@ -127,14 +134,25 @@ document.addEventListener('DOMContentLoaded', async function() {
             
             console.log('Product image URL:', imageUrl);
             
+            // Generar múltiples imágenes para la galería
+            let galleryImages = [];
+            if (product.gallery_images && product.gallery_images.length > 0) {
+              galleryImages = product.gallery_images;
+            } else {
+              // Si solo hay una imagen, duplicarla para mejor UX
+              galleryImages = [imageUrl, imageUrl, imageUrl, imageUrl];
+            }
+            
+            // Guardar producto globalmente para breadcrumbs
+            window.currentProduct = product;
+            if (window.breadcrumbs) {
+              window.breadcrumbs.updateProductName(product.name);
+            }
+            
             container.innerHTML = `
                 <div class="product-detail-container">
-                    <div class="product-images">
-                        <div class="main-image">
-                            <img src="${imageUrl}" 
-                                 alt="${product.name}"
-                                 onerror="this.onerror=null; this.src='assets/images/products/placeholder.jpg';">
-                        </div>
+                    <div id="productGallery">
+                        <!-- Galería se renderizará aquí -->
                     </div>
                     
                     <div class="product-info-detail">
@@ -188,6 +206,11 @@ document.addEventListener('DOMContentLoaded', async function() {
                     </div>
                 </div>
             `;
+            
+            // Renderizar galería de imágenes
+            if (window.productGallery && galleryImages) {
+              window.productGallery.render(galleryImages, product);
+            }
             
             // Cargar reseñas
             await loadReviews();
