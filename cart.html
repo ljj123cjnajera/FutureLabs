@@ -116,6 +116,43 @@
                 if (response.success && response.data.items.length > 0) {
                     const items = response.data.items;
                     const total = response.data.total;
+                    
+                    // Calcular envío gratis (umbral: S/ 200)
+                    const FREE_SHIPPING_THRESHOLD = 200;
+                    const remaining = Math.max(0, FREE_SHIPPING_THRESHOLD - total);
+                    const progress = Math.min(100, (total / FREE_SHIPPING_THRESHOLD) * 100);
+                    const hasFreeShipping = total >= FREE_SHIPPING_THRESHOLD;
+                    
+                    function renderShippingProgressBar(total, remaining, progress, hasFreeShipping) {
+                        if (hasFreeShipping) {
+                            return `
+                                <div class="shipping-progress-bar shipping-achieved">
+                                    <div class="shipping-progress-header">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>¡Envío gratis activado!</span>
+                                    </div>
+                                    <div class="shipping-progress-full">
+                                        <div class="shipping-progress-fill" style="width: 100%"></div>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                        return `
+                            <div class="shipping-progress-bar">
+                                <div class="shipping-progress-header">
+                                    <i class="fas fa-truck"></i>
+                                    <span>Te faltan S/ ${remaining.toFixed(2)} para envío gratis</span>
+                                </div>
+                                <div class="shipping-progress-full">
+                                    <div class="shipping-progress-fill" style="width: ${progress}%"></div>
+                                </div>
+                                <div class="shipping-progress-text">
+                                    <span>S/ ${total.toFixed(2)}</span>
+                                    <span>S/ ${FREE_SHIPPING_THRESHOLD.toFixed(2)}</span>
+                                </div>
+                            </div>
+                        `;
+                    }
             
             container.innerHTML = `
                 <div class="cart-container">
@@ -147,6 +184,9 @@
                     
                             <div class="cart-summary">
                                 <h2 style="margin-bottom: 20px;">Resumen</h2>
+                                
+                                <!-- Progress Bar Envío Gratis -->
+                                ${renderShippingProgressBar(total, remaining, progress, hasFreeShipping)}
                                 
                                 <!-- Sección de Cupón -->
                                 <div id="couponSection"></div>

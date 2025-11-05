@@ -24,6 +24,7 @@
     <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="css/notifications.css">
     <link rel="stylesheet" href="css/home-link-fix.css?v=2.0">
+    <link rel="stylesheet" href="css/quick-view.css?v=1.0">
     <!-- Estilos inline removidos - migrados a products-page.css -->
 </head>
 <body>
@@ -116,6 +117,7 @@
     <script src="js/fix-home-link.js"></script>
     <script src="js/modals.js"></script>
     <script src="js/cart.js"></script>
+    <script src="js/quick-view.js"></script>
     
     <script>
         // ==================== FUNCIONES GLOBALES ====================
@@ -331,6 +333,9 @@
                                 <div class="product-image-page">
                                     <img src="${product.image_url || 'assets/images/products/placeholder.jpg'}" alt="${product.name}">
                                     ${product.discount_price && product.discount_price < product.price ? '<div class="product-badge-page">Oferta</div>' : ''}
+                                    <button class="quick-view-btn" onclick="event.stopPropagation(); window.quickView?.show('${product.id}')" title="Vista rápida">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
                                 </div>
                                 <div class="product-info-page">
                                     <h3>${product.name}</h3>
