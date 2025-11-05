@@ -1,4 +1,5 @@
 // 🧩 Componentes Reutilizables
+// Versión: 2.0 - Sin botón Inicio (eliminado 2024-11-04)
 class Components {
   static getFooter() {
     return `
