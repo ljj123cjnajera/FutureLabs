@@ -426,7 +426,7 @@
 ### Fase 4: Mejorar UX
 
 #### 4.1 Estados de Carga
-- [ ] Skeleton loaders
+- [x] Skeleton loaders
 - [ ] Spinners consistentes
 - [ ] Progress bars
 - [ ] Loading states en todos los componentes
