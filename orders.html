@@ -23,7 +23,8 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="css/notifications.css">
-    <link rel="stylesheet" href="css/home-link-fix.css?v=2.0">
+    <link rel="stylesheet" href="css/breadcrumbs.css?v=1.0">
+    <link rel="stylesheet" href="css/order-tracking.css?v=1.0">
     <!-- Estilos inline removidos - migrados a CSS externo -->
     <style>
         .orders-page {
@@ -216,6 +217,9 @@
     <!-- Header Dinámico -->
     <header id="mainHeader"></header>
 
+    <!-- Breadcrumbs -->
+    <nav id="breadcrumbs"></nav>
+
     <!-- Orders Page -->
     <div class="orders-page">
         <div class="orders-header">
@@ -240,136 +244,220 @@
     <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/notifications.js"></script>
+    <script src="js/order-tracking.js"></script>
     <script src="js/skeleton.js"></script>
     <script src="js/modals.js"></script>
     <script src="js/cart.js"></script>
     <script src="js/components.js"></script>
-    <script src="js/fix-home-link.js"></script>
+    <script src="js/breadcrumbs.js"></script>
     
     <script>
-        // Inicializar header dinámico (sin barra de búsqueda)
-        document.addEventListener('DOMContentLoaded', function() {
-            const headerContainer = document.getElementById('mainHeader');
-            if (headerContainer && window.Components) {
-                headerContainer.innerHTML = window.Components.getHeader(false, false); // false = sin barra de búsqueda, false = sin navegación
-                window.Components.initHeader();
-            }
-        // Cargar pedidos
-        async function loadOrders() {
-            const container = document.getElementById('ordersContainer');
-            
-            try {
-                // Verificar autenticación
-                if (!window.authManager.isAuthenticated()) {
-                    container.innerHTML = `
-                        <div class="empty-orders">
-                            <i class="fas fa-lock"></i>
-                            <h2>Inicia sesión para ver tus pedidos</h2>
-                            <p>Necesitas estar autenticado para ver tu historial de compras</p>
-                            <button onclick="window.location.href='index.html'" style="padding: 12px 24px; background: #3498db; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Ir a Inicio</button>
-                        </div>
-                    `;
-                    return;
-                }
+        (function() {
+            const STATUS_CLASSES = {
+                pending: 'status-pending',
+                processing: 'status-processing',
+                shipped: 'status-shipped',
+                delivered: 'status-delivered',
+                cancelled: 'status-cancelled'
+            };
 
-                const response = await window.api.getOrders();
-                
-                if (response.success && response.data.orders.length > 0) {
-                    container.innerHTML = response.data.orders.map(order => `
-                        <div class="order-card">
-                            <div class="order-header">
-                                <div>
-                                    <div class="order-number">Pedido ${order.order_number}</div>
-                                    <div class="order-date">${new Date(order.created_at).toLocaleDateString('es-PE')}</div>
-                                </div>
-                                <div class="order-status status-${order.status}">
-                                    ${getStatusText(order.status)}
-                                </div>
-                            </div>
-                            
-                            <div class="order-items">
-                                ${order.items.map(item => `
-                                    <div class="order-item">
-                                        <div class="order-item-image">
-                                            <img src="${item.image_url || 'assets/images/products/placeholder.jpg'}" alt="${item.product_name}">
-                                        </div>
-                                        <div class="order-item-info">
-                                            <div class="order-item-name">${item.product_name}</div>
-                                            <div class="order-item-price">S/ ${item.price}</div>
-                                            <div class="order-item-quantity">Cantidad: ${item.quantity}</div>
-                                        </div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                            
-                            <div class="order-summary">
-                                <div class="order-total">Total: S/ ${parseFloat(order.total_amount).toFixed(2)}</div>
-                                <div class="order-actions">
-                                    <button class="btn-view-order" onclick="viewOrder('${order.id}')">
-                                        Ver Detalles
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    `).join('');
-                } else {
-                    container.innerHTML = `
-                        <div class="empty-orders">
-                            <i class="fas fa-box-open"></i>
-                            <h2>No tienes pedidos aún</h2>
-                            <p>Realiza tu primera compra para ver tus pedidos aquí</p>
-                            <button onclick="window.location.href='products.html'" style="padding: 12px 24px; background: #3498db; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Ver Productos</button>
-                        </div>
-                    `;
+            const STATUS_TEXTS = {
+                pending: 'Pendiente',
+                processing: 'Procesando',
+                shipped: 'Enviado',
+                delivered: 'Entregado',
+                cancelled: 'Cancelado'
+            };
+
+            document.addEventListener('DOMContentLoaded', () => {
+                initHeader();
+                loadOrders();
+            });
+
+            function initHeader() {
+                const headerContainer = document.getElementById('mainHeader');
+                if (headerContainer && window.Components) {
+                    headerContainer.innerHTML = window.Components.getHeader(false, false);
+                    window.Components.initHeader();
                 }
-            } catch (error) {
-                container.innerHTML = `
-                    <div class="empty-orders">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <h2>Error al cargar los pedidos</h2>
-                        <p>${error.message}</p>
+            }
+
+            async function loadOrders() {
+                const container = document.getElementById('ordersContainer');
+                if (!container) return;
+
+                container.innerHTML = renderLoadingState();
+
+                try {
+                    if (!window.authManager || !window.authManager.isAuthenticated()) {
+                        container.innerHTML = renderAuthRequiredState();
+                        return;
+                    }
+
+                    const response = await window.api.getOrders();
+
+                    if (!response?.success) {
+                        throw new Error(response?.message || 'No se pudo cargar tus pedidos');
+                    }
+
+                    const orders = response?.data?.orders || [];
+                    if (orders.length === 0) {
+                        container.innerHTML = renderEmptyState();
+                        return;
+                    }
+
+                    container.innerHTML = orders.map(renderOrderCard).join('');
+                } catch (error) {
+                    console.error('Error al cargar pedidos', error);
+                    container.innerHTML = renderErrorState(error);
+                }
+            }
+
+            function renderOrderCard(order) {
+                const statusClass = STATUS_CLASSES[order.status] || STATUS_CLASSES.pending;
+                const statusText = STATUS_TEXTS[order.status] || order.status;
+                const orderDate = formatDate(order.created_at);
+                const total = formatCurrency(order.total_amount);
+                const trackingTimeline = window.orderTracking ? window.orderTracking.render(order) : '';
+
+                return `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div>
+                                <div class="order-number">Pedido ${order.order_number}</div>
+                                <div class="order-date">${orderDate}</div>
+                            </div>
+                            <div class="order-status ${statusClass}">
+                                ${statusText}
+                            </div>
+                        </div>
+
+                        <div class="order-items">
+                            ${renderOrderItems(order.items)}
+                        </div>
+
+                        <div class="order-summary">
+                            <div class="order-total">Total: ${total}</div>
+                            <div class="order-actions">
+                                <button class="btn-view-order" data-order-id="${order.id}">
+                                    Ver Detalles
+                                </button>
+                            </div>
+                        </div>
+
+                        ${trackingTimeline}
                     </div>
                 `;
             }
-        }
 
-        // Obtener texto del estado
-        function getStatusText(status) {
-            const statusTexts = {
-                'pending': 'Pendiente',
-                'processing': 'Procesando',
-                'shipped': 'Enviado',
-                'delivered': 'Entregado',
-                'cancelled': 'Cancelado'
-            };
-            return statusTexts[status] || status;
-        }
+            function renderOrderItems(items = []) {
+                if (!items.length) {
+                    return `
+                        <div class="order-item">
+                            <div class="order-item-info">
+                                <div class="order-item-name">Sin productos registrados</div>
+                            </div>
+                        </div>
+                    `;
+                }
 
-        // Ver detalles del pedido
-        function viewOrder(orderId) {
-            window.notifications.info('Ver detalles del pedido #' + orderId);
-            // Aquí podrías abrir un modal o redirigir a una página de detalle
-        }
-
-        // Actualizar contador de carrito
-        document.addEventListener('cartUpdated', (e) => {
-            const cartCount = document.querySelector('.cart-count');
-            if (cartCount) {
-                cartCount.textContent = e.detail.count;
+                return items.map(item => `
+                    <div class="order-item">
+                        <div class="order-item-image">
+                            <img src="${item.image_url || 'assets/images/products/placeholder.jpg'}" alt="${item.product_name}">
+                        </div>
+                        <div class="order-item-info">
+                            <div class="order-item-name">${item.product_name}</div>
+                            <div class="order-item-price">${formatCurrency(item.price)}</div>
+                            <div class="order-item-quantity">Cantidad: ${item.quantity}</div>
+                        </div>
+                    </div>
+                `).join('');
             }
-        });
 
-        // Inicializar header dinámico (sin barra de búsqueda)
-        document.addEventListener('DOMContentLoaded', function() {
-            const headerContainer = document.getElementById('mainHeader');
-            if (headerContainer && window.Components) {
-                headerContainer.innerHTML = window.Components.getHeader(false, false); // false = sin barra de búsqueda, false = sin navegación
-                window.Components.initHeader();
+            function renderLoadingState() {
+                return `
+                    <div style="text-align: center; padding: 80px;">
+                        <i class="fas fa-spinner fa-spin fa-3x"></i>
+                        <p style="margin-top: 18px;">Cargando pedidos...</p>
+                    </div>
+                `;
             }
-        });
 
-        // Cargar pedidos al iniciar
-        loadOrders();
+            function renderAuthRequiredState() {
+                return `
+                    <div class="empty-orders">
+                        <i class="fas fa-lock"></i>
+                        <h2>Inicia sesión para ver tus pedidos</h2>
+                        <p>Necesitas estar autenticado para consultar tu historial de compras.</p>
+                        <button class="btn-view-order" onclick="window.location.href='index.html'">
+                            Ir al Inicio
+                        </button>
+                    </div>
+                `;
+            }
+
+            function renderEmptyState() {
+                return `
+                    <div class="empty-orders">
+                        <i class="fas fa-box-open"></i>
+                        <h2>No tienes pedidos aún</h2>
+                        <p>Realiza tu primera compra para ver tus pedidos aquí.</p>
+                        <button class="btn-view-order" onclick="window.location.href='products.html'">
+                            Ver Productos
+                        </button>
+                    </div>
+                `;
+            }
+
+            function renderErrorState(error) {
+                const message = error?.message || 'Ocurrió un error inesperado';
+                return `
+                    <div class="empty-orders">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h2>Error al cargar los pedidos</h2>
+                        <p>${message}</p>
+                        <button class="btn-view-order" onclick="location.reload()">
+                            Reintentar
+                        </button>
+                    </div>
+                `;
+            }
+
+            function formatCurrency(value) {
+                const amount = Number(value) || 0;
+                return `S/ ${amount.toFixed(2)}`;
+            }
+
+            function formatDate(dateValue) {
+                if (!dateValue) return '';
+                const date = new Date(dateValue);
+                if (Number.isNaN(date.getTime())) return '';
+                return date.toLocaleDateString('es-PE', {
+                    weekday: 'short',
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric'
+                });
+            }
+
+            function viewOrder(orderId) {
+                window.notifications?.info?.(`Ver detalles del pedido #${orderId}`);
+            }
+
+            function handleActions() {
+                document.addEventListener('click', (event) => {
+                    const button = event.target.closest('.btn-view-order[data-order-id]');
+                    if (button) {
+                        const orderId = button.dataset.orderId;
+                        viewOrder(orderId);
+                    }
+                });
+            }
+
+            handleActions();
+            window.viewOrder = viewOrder;
+        })();
     </script>
 </body>
 </html>
