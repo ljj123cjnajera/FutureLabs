@@ -38,18 +38,31 @@
 
     <!-- Cart Page -->
     <div class="cart-page">
-        <div class="cart-header">
-        <div class="container">
-                <h1>Mi Carrito</h1>
-                <p>Revisa tus productos antes de comprar</p>
+        <section class="cart-hero">
+            <div class="container">
+                <div class="cart-hero-card">
+                    <span class="cart-hero-eyebrow"><i class="fas fa-shopping-cart"></i> Resumen de compra</span>
+                    <h1 class="cart-hero-title">Mi Carrito</h1>
+                    <p class="cart-hero-description">Revisa tus productos, aplica cupones y conoce cuánto falta para tu envío gratis.</p>
+                    <div class="cart-hero-actions">
+                        <button type="button" class="btn btn-primary btn-sm" onclick="window.location.href='products.html'">
+                            <i class="fas fa-plus"></i> Seguir comprando
+                        </button>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="scrollToSummary()">
+                            <i class="fas fa-receipt"></i> Ver resumen
+                        </button>
                     </div>
                 </div>
-                
+            </div>
+        </section>
+
         <div class="container">
-                <div id="cartContainer">
-                <div class="loading">
-                    <div class="loading-spinner"></div>
-                    <p>Cargando carrito...</p>
+            <div id="cartContainer" class="cart-loader">
+                <div class="loading-state">
+                    <div class="loading-state-content">
+                        <div class="loading-spinner large"></div>
+                        <p>Cargando carrito...</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -145,6 +158,13 @@
                 }
             }
 
+            function scrollToSummary() {
+                const summary = document.querySelector('.cart-summary');
+                if (summary) {
+                    summary.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }
+
             function renderCartMarkup(items, total) {
                 const remaining = Math.max(0, FREE_SHIPPING_THRESHOLD - total);
                 const progress = Math.min(100, (total / FREE_SHIPPING_THRESHOLD) * 100);
@@ -153,11 +173,16 @@
                 return `
                     <div class="cart-container">
                         <div class="cart-items">
-                            <h2 style="margin-bottom: 20px;">Productos (${items.length})</h2>
+                            <div class="cart-items-header">
+                                <h2><i class="fas fa-box"></i> Productos (${items.length})</h2>
+                                <button type="button" class="btn btn-outline btn-sm" onclick="window.location.href='products.html'"><i class="fas fa-plus"></i> Añadir más</button>
+                            </div>
                             ${items.map(renderCartItem).join('')}
                         </div>
-                        <div class="cart-summary">
-                            <h2 style="margin-bottom: 20px;">Resumen</h2>
+                        <aside class="cart-summary">
+                            <div class="cart-summary-header">
+                                <h2><i class="fas fa-receipt"></i> Resumen</h2>
+                            </div>
                             ${renderShippingProgressBar(total, remaining, progress, hasFreeShipping)}
                             <div id="couponSection"></div>
                             <div class="summary-row">
@@ -181,7 +206,11 @@
                             <button class="checkout-btn" type="button" onclick="checkout()">
                                 <i class="fas fa-lock"></i> Proceder al Pago
                             </button>
-                        </div>
+                            <div class="cart-secure-badge">
+                                <i class="fas fa-shield-check"></i>
+                                Pago 100% seguro y cifrado
+                            </div>
+                        </aside>
                     </div>
                 `;
             }
@@ -194,8 +223,15 @@
                             <img src="${item.image_url || 'assets/images/products/placeholder.jpg'}" alt="${item.name}">
                         </div>
                         <div class="cart-item-info">
-                            <h3>${item.name}</h3>
-                            ${item.brand ? `<p class="cart-item-brand">${item.brand}</p>` : ''}
+                            <div class="cart-item-header">
+                                <div>
+                                    <h3>${item.name}</h3>
+                                    ${item.brand ? `<p class="cart-item-brand">${item.brand}</p>` : ''}
+                                </div>
+                                <button class="remove-item" type="button" onclick="removeItem('${item.product_id}')">
+                                    <i class="fas fa-trash"></i> Eliminar
+                                </button>
+                            </div>
                             <p class="cart-item-price">S/ ${price.toFixed(2)}</p>
                             <div class="cart-item-actions">
                                 <div class="quantity-controls">
@@ -203,13 +239,21 @@
                                     <input type="text" class="quantity-input" value="${item.quantity}" readonly>
                                     <button class="quantity-btn" type="button" onclick="updateQuantity('${item.product_id}', ${item.quantity + 1})">+</button>
                                 </div>
-                                <button class="remove-btn" type="button" onclick="removeItem('${item.product_id}')">
-                                    <i class="fas fa-trash"></i> Eliminar
+                                <button class="move-to-wishlist" type="button" onclick="moveToWishlist('${item.product_id}')">
+                                    <i class="fas fa-heart"></i> Guardar
                                 </button>
                             </div>
                         </div>
                     </div>
                 `;
+            }
+
+            function moveToWishlist(productId) {
+                if (!window.wishlistManager) return;
+                window.wishlistManager.add(productId).catch((error) => {
+                    console.error('Error al mover a wishlist:', error);
+                    window.notifications?.error?.('No se pudo guardar el producto en tu wishlist');
+                });
             }
 
             function renderShippingProgressBar(total, remaining, progress, hasFreeShipping) {
@@ -246,22 +290,36 @@
 
             function renderAuthRequiredState() {
                 return `
-                    <div class="empty-cart">
-                        <i class="fas fa-shopping-cart"></i>
+                    <div class="cart-empty-state">
+                        <i class="fas fa-user-lock"></i>
                         <h2>Inicia sesión para ver tu carrito</h2>
-                        <p>Necesitas estar autenticado para ver tu carrito de compras</p>
-                        <button class="btn-shop" type="button" onclick="window.location.href='index.html'">Ir a Inicio</button>
+                        <p>Accede a tu cuenta para recuperar tus productos guardados.</p>
+                        <div class="cart-empty-actions">
+                            <button class="btn btn-primary btn-sm" type="button" onclick="window.modalManager?.showLogin?.()">
+                                <i class="fas fa-sign-in-alt"></i> Iniciar sesión
+                            </button>
+                            <button class="btn btn-outline btn-sm" type="button" onclick="window.location.href='index.html'">
+                                <i class="fas fa-home"></i> Volver al inicio
+                            </button>
+                        </div>
                     </div>
                 `;
             }
 
             function renderEmptyCartState() {
                 return `
-                    <div class="empty-cart">
+                    <div class="cart-empty-state">
                         <i class="fas fa-shopping-cart"></i>
                         <h2>Tu carrito está vacío</h2>
-                        <p>Agrega productos para comenzar a comprar</p>
-                        <button class="btn-shop" type="button" onclick="window.location.href='products.html'">Ver Productos</button>
+                        <p>Empieza a explorar nuestras categorías y agrega tus productos favoritos.</p>
+                        <div class="cart-empty-actions">
+                            <button class="btn btn-primary btn-sm" type="button" onclick="window.location.href='products.html'">
+                                <i class="fas fa-search"></i> Ver productos
+                            </button>
+                            <button class="btn btn-outline btn-sm" type="button" onclick="window.location.href='compare.html'">
+                                <i class="fas fa-balance-scale"></i> Comparar productos
+                            </button>
+                        </div>
                     </div>
                 `;
             }
@@ -269,11 +327,18 @@
             function renderErrorState(error) {
                 const message = error?.message || 'Ocurrió un error inesperado';
                 return `
-                    <div class="empty-cart">
+                    <div class="cart-empty-state">
                         <i class="fas fa-exclamation-triangle"></i>
                         <h2>Error al cargar el carrito</h2>
                         <p>${message}</p>
-                        <button class="btn-shop" type="button" onclick="window.location.href='index.html'">Ir a Inicio</button>
+                        <div class="cart-empty-actions">
+                            <button class="btn btn-primary btn-sm" type="button" onclick="loadCart()">
+                                <i class="fas fa-sync"></i> Reintentar
+                            </button>
+                            <button class="btn btn-outline btn-sm" type="button" onclick="window.location.href='index.html'">
+                                <i class="fas fa-home"></i> Volver al inicio
+                            </button>
+                        </div>
                     </div>
                 `;
             }

@@ -32,14 +32,24 @@
     <!-- Header Dinámico -->
     <header id="mainHeader"></header>
 
-    <!-- Checkout Page -->
     <div class="checkout-page">
-        <div class="checkout-header">
+        <section class="checkout-hero">
             <div class="container">
-                <h1>Finalizar Compra</h1>
-                <p>Completa tu información para procesar el pedido</p>
+                <div class="checkout-hero-card">
+                    <span class="checkout-hero-eyebrow"><i class="fas fa-shield-alt"></i> Checkout seguro</span>
+                    <h1 class="checkout-hero-title">Finalizar compra</h1>
+                    <p class="checkout-hero-description">Completa tus datos de envío y pago. Recuerda que puedes aplicar cupones y usar tus puntos en el resumen.</p>
+                    <div class="checkout-hero-actions">
+                        <button type="button" class="btn btn-primary btn-sm" onclick="window.location.href='cart.html'">
+                            <i class="fas fa-arrow-left"></i> Volver al carrito
+                        </button>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="scrollToOrderSummary()">
+                            <i class="fas fa-list"></i> Ver resumen
+                        </button>
+                    </div>
+                </div>
             </div>
-        </div>
+        </section>
 
         <div class="container">
             <!-- Indicador de Progreso -->
@@ -116,6 +126,13 @@
                 window.Components.initCartCounter();
             }
         });
+
+        function scrollToOrderSummary() {
+            const summary = document.getElementById('orderSummary');
+            if (summary) {
+                summary.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
     </script>
 </body>
 </html>
