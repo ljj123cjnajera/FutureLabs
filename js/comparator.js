@@ -4,6 +4,7 @@ class ProductComparator {
     this.maxProducts = 3;
     this.products = [];
     this.init();
+    this.pendingSetFromIds = null;
 
     document.addEventListener('DOMContentLoaded', () => {
       this.updateCompareButtons();
@@ -76,7 +77,7 @@ class ProductComparator {
 
   async addProduct(productId) {
     // Verificar si ya está en el comparador
-    if (this.products.find(p => p.id === productId)) {
+    if (this.products.find(p => String(p.id) === String(productId))) {
       window.notifications?.warning?.('Este producto ya está en el comparador');
       return;
     }
@@ -114,7 +115,7 @@ class ProductComparator {
 
   removeProduct(productId, options = {}) {
     const { silent = false } = options;
-    this.products = this.products.filter(p => p.id !== productId);
+    this.products = this.products.filter(p => String(p.id) !== String(productId));
     this.saveToStorage();
     this.render();
     if (!silent) {
@@ -233,6 +234,47 @@ class ProductComparator {
 
   getProducts() {
     return this.products;
+  }
+
+  getProductIds() {
+    return this.products.map(product => product.id);
+  }
+
+  async setProductsByIds(ids = []) {
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return;
+    }
+
+    const dedupedIds = Array.from(new Set(ids.filter(Boolean).map(id => String(id))));
+    if (dedupedIds.length === 0) {
+      return;
+    }
+
+    this.pendingSetFromIds = dedupedIds;
+
+    try {
+      const products = await Promise.all(
+        dedupedIds.map(async (id) => {
+          try {
+            const response = await window.api.getProductById(id);
+            return response.success ? response.data.product : null;
+          } catch (error) {
+            console.error('Error loading product for comparator:', error);
+            return null;
+          }
+        })
+      );
+
+      if (this.pendingSetFromIds !== dedupedIds) {
+        return;
+      }
+
+      this.products = products.filter(Boolean);
+      this.saveToStorage();
+      this.render();
+    } finally {
+      this.pendingSetFromIds = null;
+    }
   }
 }
 
