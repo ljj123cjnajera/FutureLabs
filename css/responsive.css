@@ -1,8 +1,8 @@
 /* Tablets */
 @media (max-width: 1024px) {
     .hero-slider {
-        min-height: clamp(360px, 55vw, 520px);
-        border-radius: var(--radius-lg);
+        min-height: clamp(360px, 60vw, 520px);
+        border-radius: var(--radius-xl);
     }
     
     .slide h1 {
@@ -44,8 +44,14 @@
         font-size: 0.875rem;
     }
     
+    .hero {
+        margin-bottom: var(--spacing-2xl);
+        padding-top: var(--spacing-lg);
+    }
+    
     .hero-slider {
         min-height: 360px;
+        border-radius: var(--radius-xl);
     }
     
     .slide h1 {
@@ -86,6 +92,16 @@
         font-size: 24px;
     }
     
+    .slide-content {
+        max-width: 90%;
+    }
+
+    .cta-button,
+    .btn-lg {
+        width: 100%;
+        justify-content: center;
+    }
+
     .banner-grid {
         grid-template-columns: 1fr;
         gap: 15px;
@@ -127,6 +143,7 @@
 @media (max-width: 480px) {
     .hero-slider {
         min-height: 280px;
+        border-radius: var(--radius-lg);
     }
     
     .slide h1 {
@@ -165,8 +182,8 @@
 /* Mejoras generales para móviles */
 @media (max-width: 768px) {
     .product-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 15px;
+        grid-template-columns: repeat(2, minmax(140px, 1fr));
+        gap: var(--spacing-md);
     }
     
     .product-card {
