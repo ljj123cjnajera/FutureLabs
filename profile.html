@@ -82,11 +82,64 @@
             <div class="profile-content-wrapper">
                 <!-- Overview Tab -->
                 <div class="profile-section active" id="overview">
-                    <!-- Loyalty Points Card -->
-                    <div class="loyalty-points-card">
-                        <div class="loyalty-points-value" id="loyaltyPointsValue">0</div>
-                        <div class="loyalty-points-label">Puntos de Lealtad Disponibles</div>
-                        <p>Usa tus puntos para obtener descuentos en tus compras</p>
+                    <!-- Loyalty Points Overview -->
+                    <div class="loyalty-overview-grid">
+                        <div class="loyalty-points-card">
+                            <div class="loyalty-card-header">
+                                <div class="loyalty-tier-chip" id="loyaltyTierChip">
+                                    <i class="fas fa-medal"></i>
+                                    <span id="loyaltyTierName">Explorador</span>
+                                </div>
+                                <button type="button" class="btn btn-light btn-sm loyalty-redeem-btn" id="loyaltyRedeemButton">
+                                    <i class="fas fa-gift"></i> Canjear puntos
+                                </button>
+                            </div>
+                            <div class="loyalty-card-body">
+                                <div class="loyalty-points-group">
+                                    <span class="loyalty-points-label">Puntos disponibles</span>
+                                    <div class="loyalty-points-value" id="loyaltyPointsValue">0</div>
+                                </div>
+                                <div class="loyalty-points-meta">
+                                    <div>
+                                        <span class="loyalty-meta-label">Equivalen a</span>
+                                        <span class="loyalty-meta-value" id="loyaltyPointsEquivalent">S/ 0.00</span>
+                                    </div>
+                                    <div>
+                                        <span class="loyalty-meta-label">Multiplicador actual</span>
+                                        <span class="loyalty-meta-value" id="loyaltyPointsMultiplier">1.0x</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="loyalty-progress">
+                                <div class="loyalty-progress-header">
+                                    <span id="loyaltyProgressLabel">Sigue acumulando para subir de nivel</span>
+                                    <span id="loyaltyProgressPercent">0%</span>
+                                </div>
+                                <div class="loyalty-progress-bar">
+                                    <div class="loyalty-progress-fill" id="loyaltyProgressFill"></div>
+                                </div>
+                            </div>
+                            <div class="loyalty-benefits">
+                                <h3>Beneficios actuales</h3>
+                                <ul id="loyaltyBenefitsList">
+                                    <li><i class="fas fa-check-circle"></i> 1x puntos por cada S/ 1</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="loyalty-actions-card">
+                            <h3>Cómo ganar más puntos</h3>
+                            <p class="loyalty-next-tier" id="loyaltyNextTierMessage">Realiza tu próxima compra para desbloquear beneficios.</p>
+                            <ul class="loyalty-actions-list">
+                                <li><i class="fas fa-shopping-bag"></i> Compra en la tienda (+1 punto por S/ 1)</li>
+                                <li><i class="fas fa-star"></i> Deja una reseña verificada (+150 pts)</li>
+                                <li><i class="fas fa-user-friends"></i> Invita a un amigo que compre (+250 pts)</li>
+                                <li><i class="fas fa-bolt"></i> Aprovecha campañas con doble puntos</li>
+                            </ul>
+                            <button type="button" class="btn btn-outline btn-sm" id="loyaltyLearnMoreButton">
+                                <i class="fas fa-info-circle"></i> Ver todas las recompensas
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Stats Grid -->
@@ -327,6 +380,245 @@
         // Logging inicial para verificar que el script se carga
         console.log('🔵 [PROFILE] Script profile.html cargado');
         
+        const LOYALTY_POINTS_TO_CURRENCY_RATE = 10;
+        const LOYALTY_TIERS = [
+            {
+                id: 'bronze',
+                name: 'Bronce',
+                min: 0,
+                multiplier: 1,
+                icon: 'fas fa-medal',
+                gradient: 'linear-gradient(135deg, #b87333 0%, #d97706 100%)',
+                chipBackground: 'rgba(184, 115, 51, 0.35)',
+                chipColor: '#fff7ed',
+                textColor: '#ffffff',
+                benefits: [
+                    '1x puntos por cada S/ 1',
+                    'Acceso a campañas especiales'
+                ]
+            },
+            {
+                id: 'silver',
+                name: 'Plata',
+                min: 500,
+                multiplier: 1.25,
+                icon: 'fas fa-trophy',
+                gradient: 'linear-gradient(135deg, #9ca3af 0%, #cbd5f5 100%)',
+                chipBackground: 'rgba(148, 163, 184, 0.35)',
+                chipColor: '#0f172a',
+                textColor: '#0f172a',
+                benefits: [
+                    '1.25x puntos por cada S/ 1',
+                    'Envío estándar gratis en compras mayores a S/ 250',
+                    'Atención prioritaria en soporte'
+                ]
+            },
+            {
+                id: 'gold',
+                name: 'Oro',
+                min: 1200,
+                multiplier: 1.5,
+                icon: 'fas fa-crown',
+                gradient: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
+                chipBackground: 'rgba(251, 191, 36, 0.45)',
+                chipColor: '#78350f',
+                textColor: '#78350f',
+                benefits: [
+                    '1.5x puntos por cada S/ 1',
+                    'Ofertas exclusivas antes que todos',
+                    'Regalo sorpresa cada trimestre'
+                ]
+            },
+            {
+                id: 'platinum',
+                name: 'Platino',
+                min: 2000,
+                multiplier: 2,
+                icon: 'fas fa-gem',
+                gradient: 'linear-gradient(135deg, #4f46e5 0%, #a855f7 100%)',
+                chipBackground: 'rgba(99, 102, 241, 0.4)',
+                chipColor: '#eef2ff',
+                textColor: '#eef2ff',
+                benefits: [
+                    '2x puntos por cada S/ 1',
+                    'Manager personal de compras',
+                    'Eventos privados y primeras unidades',
+                    'Envío express gratis'
+                ]
+            }
+        ];
+
+        const currencyFormatter = new Intl.NumberFormat('es-PE', {
+            style: 'currency',
+            currency: 'PEN',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+
+        const loyaltyState = {
+            points: 0,
+            tier: LOYALTY_TIERS[0]
+        };
+
+        function setupLoyaltyButtons() {
+            const redeemBtn = document.getElementById('loyaltyRedeemButton');
+            if (redeemBtn && !redeemBtn.dataset.listenerAttached) {
+                redeemBtn.addEventListener('click', handleLoyaltyRedeem);
+                redeemBtn.dataset.listenerAttached = 'true';
+            }
+
+            const learnMoreBtn = document.getElementById('loyaltyLearnMoreButton');
+            if (learnMoreBtn && !learnMoreBtn.dataset.listenerAttached) {
+                learnMoreBtn.addEventListener('click', handleLoyaltyLearnMore);
+                learnMoreBtn.dataset.listenerAttached = 'true';
+            }
+        }
+
+        function handleLoyaltyRedeem() {
+            const equivalent = loyaltyState.points / LOYALTY_POINTS_TO_CURRENCY_RATE;
+            if (loyaltyState.points < 100) {
+                window.notifications?.info?.(`Necesitas al menos 100 puntos para canjear. Actualmente tienes ${loyaltyState.points.toLocaleString('es-PE')} puntos disponibles.`);
+                return;
+            }
+
+            window.notifications?.success?.(`Podrás canjear hasta ${currencyFormatter.format(equivalent)} de descuento usando tus ${loyaltyState.points.toLocaleString('es-PE')} puntos en el proceso de checkout.`);
+        }
+
+        function handleLoyaltyLearnMore() {
+            window.notifications?.info?.('Muy pronto activaremos una sección con todos los beneficios y reglas del programa. Por ahora, revisa este resumen en tu perfil.');
+        }
+
+        function getLoyaltyTier(points) {
+            let currentTier = LOYALTY_TIERS[0];
+            for (const tier of LOYALTY_TIERS) {
+                if (points >= tier.min) {
+                    currentTier = tier;
+                }
+            }
+            return currentTier;
+        }
+
+        function getNextTier(currentTier) {
+            const index = LOYALTY_TIERS.findIndex(tier => tier.id === currentTier.id);
+            if (index === -1 || index === LOYALTY_TIERS.length - 1) {
+                return null;
+            }
+            return LOYALTY_TIERS[index + 1];
+        }
+
+        function updateLoyaltyUI(points) {
+            loyaltyState.points = Math.max(0, Number(points || 0));
+            const tier = getLoyaltyTier(loyaltyState.points);
+            const nextTier = getNextTier(tier);
+            loyaltyState.tier = tier;
+            loyaltyState.nextTier = nextTier;
+
+            const loyaltyCard = document.querySelector('.loyalty-points-card');
+            if (loyaltyCard) {
+                loyaltyCard.style.setProperty('--loyalty-gradient', tier.gradient);
+                loyaltyCard.style.setProperty('--loyalty-text-color', tier.textColor || '#ffffff');
+            }
+
+            const tierChip = document.getElementById('loyaltyTierChip');
+            if (tierChip) {
+                tierChip.style.background = tier.chipBackground;
+                tierChip.style.color = tier.chipColor;
+                const icon = tierChip.querySelector('i');
+                if (icon) {
+                    icon.className = tier.icon;
+                }
+                const tierName = document.getElementById('loyaltyTierName');
+                if (tierName) {
+                    tierName.textContent = `Nivel ${tier.name}`;
+                }
+            }
+
+            const pointsValueEl = document.getElementById('loyaltyPointsValue');
+            if (pointsValueEl) {
+                animateCounter(pointsValueEl, loyaltyState.points, {
+                    formatter: value => Math.round(value).toLocaleString('es-PE')
+                });
+            }
+
+            const equivalentEl = document.getElementById('loyaltyPointsEquivalent');
+            if (equivalentEl) {
+                equivalentEl.textContent = currencyFormatter.format(loyaltyState.points / LOYALTY_POINTS_TO_CURRENCY_RATE);
+            }
+
+            const multiplierEl = document.getElementById('loyaltyPointsMultiplier');
+            if (multiplierEl) {
+                const multiplierText = tier.multiplier % 1 === 0 ? `${tier.multiplier}x` : `${tier.multiplier.toFixed(2)}x`;
+                multiplierEl.textContent = multiplierText;
+            }
+
+            const benefitsList = document.getElementById('loyaltyBenefitsList');
+            if (benefitsList) {
+                benefitsList.innerHTML = tier.benefits.map(benefit => `
+                    <li><i class="fas fa-check-circle"></i> ${benefit}</li>
+                `).join('');
+            }
+
+            const progressFill = document.getElementById('loyaltyProgressFill');
+            const progressPercentEl = document.getElementById('loyaltyProgressPercent');
+            const progressLabelEl = document.getElementById('loyaltyProgressLabel');
+            const nextTierMessageEl = document.getElementById('loyaltyNextTierMessage');
+
+            let progress = 1;
+            let progressLabel = `¡Eres ${tier.name}! Disfruta de todos los beneficios.`;
+
+            if (nextTier) {
+                const range = nextTier.min - tier.min;
+                progress = range > 0 ? (loyaltyState.points - tier.min) / range : 0;
+                progress = Math.max(0, Math.min(progress, 1));
+                const remaining = Math.max(nextTier.min - loyaltyState.points, 0);
+                progressLabel = remaining === 0
+                    ? `¡Listo para subir a ${nextTier.name}!`
+                    : `Te faltan ${remaining} puntos para alcanzar el nivel ${nextTier.name}`;
+
+                if (nextTierMessageEl) {
+                    nextTierMessageEl.textContent = remaining === 0
+                        ? `Una compra más te permitirá desbloquear el nivel ${nextTier.name}.`
+                        : `Suma ${remaining} puntos adicionales para desbloquear el nivel ${nextTier.name}.`;
+                }
+            } else if (nextTierMessageEl) {
+                nextTierMessageEl.textContent = 'Has alcanzado el nivel máximo. Mantén tus compras para conservarlo.';
+            }
+
+            if (progressFill) {
+                progressFill.style.width = `${(progress * 100).toFixed(0)}%`;
+            }
+            if (progressPercentEl) {
+                progressPercentEl.textContent = `${Math.round(progress * 100)}%`;
+            }
+            if (progressLabelEl) {
+                progressLabelEl.textContent = progressLabel;
+            }
+        }
+
+        function animateCounter(element, endValue, options = {}) {
+            const { duration = 800, formatter = value => Math.round(value).toLocaleString('es-PE') } = options;
+            const startValue = Number(element?.dataset?.currentValue || 0);
+            const targetValue = Number(endValue || 0);
+            const startTime = performance.now();
+
+            function step(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easedProgress = 1 - Math.pow(1 - progress, 3);
+                const currentValue = startValue + (targetValue - startValue) * easedProgress;
+                element.textContent = formatter(currentValue);
+
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                } else {
+                    element.textContent = formatter(targetValue);
+                    element.dataset.currentValue = targetValue;
+                }
+            }
+
+            requestAnimationFrame(step);
+        }
+
         // Esperar a que todo se cargue
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('🔵 [PROFILE] DOMContentLoaded ejecutado');
@@ -368,6 +660,9 @@
                     window.location.href = 'index.html';
                 }
             }, 200);
+
+            setupLoyaltyButtons();
+            updateLoyaltyUI(0);
 
             // Inicializar tabs
             document.querySelectorAll('.profile-tab').forEach(tab => {
@@ -449,17 +744,28 @@
                 const ordersResponse = await window.api.getOrders();
                 if (ordersResponse.success) {
                     const orders = ordersResponse.data.orders || [];
-                    document.getElementById('totalOrders').textContent = orders.length;
+                    const totalOrdersEl = document.getElementById('totalOrders');
+                    if (totalOrdersEl) {
+                        animateCounter(totalOrdersEl, orders.length);
+                    }
                     
                     const totalSpent = orders.reduce((sum, order) => sum + parseFloat(order.total || 0), 0);
-                    document.getElementById('totalSpent').textContent = `S/ ${totalSpent.toFixed(2)}`;
+                    const totalSpentEl = document.getElementById('totalSpent');
+                    if (totalSpentEl) {
+                        animateCounter(totalSpentEl, totalSpent, {
+                            formatter: value => currencyFormatter.format(value)
+                        });
+                    }
                 }
 
                 // Cargar wishlist
                 const wishlistResponse = await window.api.getWishlist();
                 if (wishlistResponse.success) {
                     const items = wishlistResponse.data.items || [];
-                    document.getElementById('wishlistCount').textContent = items.length;
+                    const wishlistCountEl = document.getElementById('wishlistCount');
+                    if (wishlistCountEl) {
+                        animateCounter(wishlistCountEl, items.length);
+                    }
                 }
             } catch (error) {
                 console.error('Error loading stats:', error);
@@ -539,7 +845,7 @@
             try {
                 const response = await window.api.getLoyaltyPoints();
                 if (response.success && response.data.points !== undefined) {
-                    document.getElementById('loyaltyPointsValue').textContent = response.data.points;
+                    updateLoyaltyUI(Number(response.data.points || 0));
                 }
             } catch (error) {
                 console.error('Error loading loyalty points:', error);
