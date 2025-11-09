@@ -239,7 +239,7 @@
                             <span>Te faltan S/ ${remaining.toFixed(2)} para envío gratis</span>
                         </div>
                         <div class="shipping-progress-full">
-                            <div class="shipping-progress-fill" style="width: ${progress}%"></div>
+                            <div class="shipping-progress-fill" style="width: ${progress}%" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(progress)}"></div>
                         </div>
                         <div class="shipping-progress-text">
                             <span>S/ ${total.toFixed(2)}</span>

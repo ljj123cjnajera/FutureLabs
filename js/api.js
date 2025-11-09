@@ -1,4 +1,88 @@
 // 🚀 FutureLabs API Client
+
+(function initPageProgress() {
+  if (window.pageProgress) return;
+
+  let container = null;
+  let bar = null;
+  let activeRequests = 0;
+  let progress = 0;
+  let trickleTimer = null;
+
+  const clamp = (value, min = 0, max = 1) => Math.min(Math.max(value, min), max);
+
+  function ensureBar() {
+    if (container && bar) return;
+
+    container = document.createElement('div');
+    container.id = 'pageProgress';
+    container.className = 'page-progress';
+
+    bar = document.createElement('div');
+    bar.className = 'page-progress-bar';
+
+    container.appendChild(bar);
+    document.body.appendChild(container);
+  }
+
+  function setProgress(value) {
+    ensureBar();
+    progress = clamp(value);
+    bar.style.width = `${progress * 100}%`;
+  }
+
+  function startTrickle() {
+    if (trickleTimer) return;
+    trickleTimer = setInterval(() => {
+      if (progress >= 0.95) return;
+      const delta = (Math.random() * 3 + 2) / 100;
+      setProgress(progress + delta);
+    }, 400);
+  }
+
+  function stopTrickle() {
+    if (trickleTimer) {
+      clearInterval(trickleTimer);
+      trickleTimer = null;
+    }
+  }
+
+  function begin() {
+    activeRequests += 1;
+    ensureBar();
+    container.classList.add('is-active');
+    container.classList.remove('is-complete');
+    if (activeRequests === 1) {
+      setProgress(0.08);
+      startTrickle();
+    } else {
+      setProgress(progress + 0.05);
+    }
+  }
+
+  function end() {
+    activeRequests = Math.max(0, activeRequests - 1);
+    if (activeRequests > 0) {
+      setProgress(progress + 0.05);
+      return;
+    }
+
+    stopTrickle();
+    setProgress(1);
+    container.classList.add('is-complete');
+    setTimeout(() => {
+      container.classList.remove('is-active');
+      bar.style.width = '0%';
+      progress = 0;
+    }, 300);
+  }
+
+  window.pageProgress = {
+    begin,
+    end,
+    set: setProgress
+  };
+})();
 class FutureLabsAPI {
   constructor() {
     this.baseURL = 'https://futurelabs-production.up.railway.app/api';
@@ -25,6 +109,7 @@ class FutureLabsAPI {
     }
 
     try {
+      window.pageProgress?.begin?.();
       console.log('📤 Request a:', url);
       const response = await fetch(url, config);
       console.log('📥 Response status:', response.status);
@@ -41,6 +126,8 @@ class FutureLabsAPI {
     } catch (error) {
       console.error('❌ Error en API:', error);
       throw error;
+    } finally {
+      window.pageProgress?.end?.();
     }
   }
 
