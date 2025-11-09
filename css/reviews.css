@@ -224,6 +224,23 @@
     color: var(--text-primary);
 }
 
+.review-verified-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-2xs);
+    margin-left: var(--spacing-xs);
+    padding: 2px 8px;
+    border-radius: var(--border-radius-full);
+    background: rgba(16, 185, 129, 0.15);
+    color: #047857;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+}
+
+.review-verified-badge i {
+    font-size: var(--font-size-sm);
+}
+
 .review-date {
     font-size: var(--font-size-sm);
     color: var(--text-secondary);
@@ -238,6 +255,12 @@
 .review-rating .stars {
     color: var(--warning);
     font-size: var(--font-size-lg);
+}
+
+.review-rating .rating-count {
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+    margin-top: var(--spacing-2xs);
 }
 
 .review-content {

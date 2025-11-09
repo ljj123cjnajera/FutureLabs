@@ -62,9 +62,44 @@
 </section>
 
 <!-- Reviews Section -->
-<div class="container">
-    <div id="reviewsContainer"></div>
-</div>
+<section class="reviews-section">
+    <div class="container">
+        <div class="reviews-header">
+            <h2 class="reviews-title"><i class="fas fa-star"></i> Opiniones de clientes</h2>
+            <button class="btn btn-outline btn-sm" type="button" id="writeReviewBtn">
+                <i class="fas fa-pen"></i> Escribir review
+            </button>
+        </div>
+        <div id="reviewsStats"></div>
+        <div class="reviews-filters">
+            <div class="filter-group">
+                <span class="filter-label">Filtrar:</span>
+                <div class="filter-buttons" id="reviewsFilterButtons">
+                    <button class="filter-btn active" type="button" data-review-filter="all">Todas</button>
+                    <button class="filter-btn" type="button" data-review-filter="5">5 ★</button>
+                    <button class="filter-btn" type="button" data-review-filter="4">4 ★</button>
+                    <button class="filter-btn" type="button" data-review-filter="3">3 ★</button>
+                    <button class="filter-btn" type="button" data-review-filter="2">2 ★</button>
+                    <button class="filter-btn" type="button" data-review-filter="1">1 ★</button>
+                    <button class="filter-btn" type="button" data-review-filter="with-photos">
+                        <i class="fas fa-camera"></i> Con fotos
+                    </button>
+                </div>
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">Ordenar:</span>
+                <select id="reviewsSortSelect" class="form-input">
+                    <option value="recent">Más recientes</option>
+                    <option value="highest">Mejor calificados</option>
+                    <option value="lowest">Peor calificados</option>
+                    <option value="oldest">Más antiguos</option>
+                </select>
+            </div>
+        </div>
+        <div id="reviewFormContainer"></div>
+        <div id="reviewsList"></div>
+    </div>
+</section>
     </div>
 
     <!-- Scripts -->
@@ -98,19 +133,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Obtener ID del producto de la URL
     const urlParams = new URLSearchParams(window.location.search);
     const productId = urlParams.get('id');
-
-    // Cargar reseñas
-    async function loadReviews() {
-        const container = document.getElementById('reviewsContainer');
-        if (!container) return;
-        
-        try {
-            const { reviews, stats } = await window.reviewsManager.loadReviews(productId);
-            window.reviewsManager.renderReviews(container, productId);
-        } catch (error) {
-            console.error('Error loading reviews:', error);
-        }
-    }
+    window.currentProductId = productId;
 
     // Cargar producto
     async function loadProduct() {
@@ -260,9 +283,6 @@ document.addEventListener('DOMContentLoaded', async function() {
               });
               window.recentlyViewed.render('recentlyViewedGrid', { limit: 6, hideWhenEmpty: true });
             }
-            
-            // Cargar reseñas
-            await loadReviews();
         } else {
             container.innerHTML = `
                 <div style="text-align: center; padding: 100px;">
@@ -336,6 +356,17 @@ async function buyNow() {
 
     // Cargar producto al iniciar
     await loadProduct();
+
+    if (productId && window.reviewsManager) {
+        await window.reviewsManager.init(productId, {
+            statsContainerId: 'reviewsStats',
+            listContainerId: 'reviewsList',
+            formContainerId: 'reviewFormContainer',
+            filterContainerId: 'reviewsFilterButtons',
+            sortSelectId: 'reviewsSortSelect',
+            writeButtonId: 'writeReviewBtn'
+        });
+    }
 });
     </script>
 </body>
