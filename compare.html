@@ -33,13 +33,30 @@
 
     <nav id="breadcrumbs"></nav>
 
-    <!-- Compare Page -->
-    <section class="compare-page">
-        <div class="compare-container">
+    <main class="compare-page">
+        <section class="compare-hero">
+            <div class="container">
+                <div class="compare-hero-card">
+                    <span class="compare-hero-eyebrow"><i class="fas fa-balance-scale"></i> Analiza antes de comprar</span>
+                    <h1 class="compare-hero-title">Comparar productos</h1>
+                    <p class="compare-hero-description">Selecciona hasta 3 productos y revisa especificaciones, precios y reseñas lado a lado para tomar la mejor decisión.</p>
+                    <div class="compare-hero-actions">
+                        <button type="button" class="btn btn-primary btn-sm" onclick="window.location.href='products.html'">
+                            <i class="fas fa-plus"></i> Agregar más productos
+                        </button>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="window.location.href='blog.html'">
+                            <i class="fas fa-lightbulb"></i> Consejos del blog
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="container compare-container">
             <div class="compare-header">
                 <div class="compare-header-main">
-                    <h1><i class="fas fa-balance-scale"></i> Comparar Productos</h1>
-                    <p>Compara hasta 3 productos lado a lado</p>
+                    <h2>Resumen de comparación</h2>
+                    <p>Destaca diferencias clave o comparte tu selección con un clic.</p>
                 </div>
                 <div class="compare-actions" id="compareActions" hidden>
                     <button class="btn btn-outline btn-sm" id="toggleDifferences">
@@ -58,13 +75,15 @@
             </div>
 
             <div id="compareContent">
-                <div class="loading">
-                    <div class="loading-spinner large"></div>
-                    <p>Cargando comparación...</p>
+                <div class="loading-state">
+                    <div class="loading-state-content">
+                        <div class="loading-spinner large"></div>
+                        <p>Cargando comparación...</p>
+                    </div>
                 </div>
             </div>
         </div>
-    </section>
+    </main>
 
     <!-- Footer -->
     <footer id="mainFooter"></footer>
@@ -214,13 +233,18 @@
 
             function renderEmptyState() {
                 compareContent.innerHTML = `
-                    <div class="empty-state">
+                    <div class="compare-empty-state">
                         <i class="fas fa-balance-scale"></i>
-                        <h3>No hay productos para comparar</h3>
-                        <p>Agrega productos desde la página de productos para compararlos</p>
-                        <a href="products.html" class="btn-browse">
-                            <i class="fas fa-shopping-bag"></i> Ver Productos
-                        </a>
+                        <h3>Aún no has agregado productos</h3>
+                        <p>Busca en el catálogo y agrega hasta 3 productos a tu comparación.</p>
+                        <div class="compare-actions">
+                            <button class="btn btn-primary btn-sm" onclick="window.location.href='products.html'">
+                                <i class="fas fa-search"></i> Buscar productos
+                            </button>
+                            <button class="btn btn-outline btn-sm" onclick="window.location.href='wishlist.html'">
+                                <i class="fas fa-heart"></i> Ver wishlist
+                            </button>
+                        </div>
                     </div>
                 `;
                 if (actionsBar) actionsBar.hidden = true;
