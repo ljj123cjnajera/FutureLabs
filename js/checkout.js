@@ -4,6 +4,27 @@
 let currentStep = 1;
 const totalSteps = 4;
 let selectedPaymentMethod = 'stripe';
+const shippingOptions = {
+    standard: {
+        label: 'Envío Estándar',
+        description: 'Entrega en 3-5 días hábiles',
+        eta: 'Llegaría entre 3 y 5 días hábiles',
+        amount: 20.0
+    },
+    express: {
+        label: 'Envío Exprés',
+        description: 'Entrega en 24-48 horas hábiles',
+        eta: 'Llegaría en las próximas 24-48 horas',
+        amount: 45.0
+    },
+    pickup: {
+        label: 'Recojo en tienda',
+        description: 'Recojo sin costo en nuestra sede principal',
+        eta: 'Retira en el mismo día desde nuestras oficinas',
+        amount: 0.0
+    }
+};
+let selectedShippingOption = 'standard';
 let cartData = null;
 let appliedCoupon = null;
 let discount = 0;
@@ -12,9 +33,14 @@ let loyaltyPointsDiscount = 0;
 let availableLoyaltyPoints = 0;
 let savedAddresses = [];
 let selectedAddressId = null;
-let shippingData = {};
+let shippingData = { shippingMethod: selectedShippingOption };
 let paymentData = {};
 let orderNumber = null;
+const checkoutCurrencyFormatter = new Intl.NumberFormat('es-PE', {
+    style: 'currency',
+    currency: 'PEN',
+    minimumFractionDigits: 2
+});
 
 window.addEventListener('couponUpdated', handleCouponUpdate);
 
@@ -82,7 +108,10 @@ async function loadCheckout() {
         cartData = cartResponse.data;
         const baseSubtotal = Number(cartData.subtotal ?? cartData.total ?? 0);
         cartData.subtotal = baseSubtotal;
-        cartData.shipping = Number(cartData.shipping ?? 0);
+        if (!shippingOptions[selectedShippingOption]) {
+            selectedShippingOption = 'standard';
+        }
+        updateCartShippingAmount();
         const couponItems = cartData.items.map(item => ({
             product_id: item.product_id,
             category_id: item.category_id,
@@ -146,6 +175,7 @@ function renderStep(step) {
     switch(step) {
         case 1:
             container.innerHTML = renderShippingStep();
+            initializeShippingStep();
             break;
         case 2:
             container.innerHTML = renderPaymentStep();
@@ -232,6 +262,23 @@ function validateCurrentStep() {
 
 // Renderizar Paso 1: Información de Envío
 function renderShippingStep() {
+    const selectedOption = shippingOptions[selectedShippingOption] ? selectedShippingOption : 'standard';
+    const shippingOptionCards = Object.entries(shippingOptions).map(([key, option]) => `
+        <article class="shipping-method-card ${selectedOption === key ? 'is-selected' : ''}" data-shipping-option="${key}">
+            <div class="shipping-method-card-header">
+                <div>
+                    <span class="shipping-method-title">${option.label}</span>
+                    <p class="shipping-method-description">${option.description}</p>
+                </div>
+                <div class="shipping-method-price">${checkoutCurrencyFormatter.format(option.amount)}</div>
+            </div>
+            <div class="shipping-method-meta">
+                <i class="fas fa-shipping-fast"></i>
+                <span>${option.eta}</span>
+            </div>
+        </article>
+    `).join('');
+
     return `
         <div class="checkout-form-section">
             <h2><i class="fas fa-map-marker-alt"></i> Dirección de Envío</h2>
@@ -267,25 +314,25 @@ function renderShippingStep() {
             <div id="shippingFormSection" style="${savedAddresses.length > 0 && selectedAddressId ? 'display: none;' : ''}">
             <div class="form-group">
                 <label class="form-label required">Nombre Completo</label>
-                <input type="text" class="form-input" id="fullName" placeholder="Juan Pérez" required>
+                <input type="text" class="form-input" id="fullName" placeholder="Juan Pérez" value="${shippingData.fullName ?? ''}" required>
             </div>
             
             <div class="form-group">
                 <label class="form-label required">Dirección</label>
-                <input type="text" class="form-input" id="address" placeholder="Av. Principal 123" required>
+                <input type="text" class="form-input" id="address" placeholder="Av. Principal 123" value="${shippingData.address ?? ''}" required>
             </div>
             
             <div class="form-row">
                 <div class="form-group">
                     <label class="form-label required">Ciudad</label>
-                    <input type="text" class="form-input" id="city" placeholder="Lima" required>
+                    <input type="text" class="form-input" id="city" placeholder="Lima" value="${shippingData.city ?? ''}" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label required">País</label>
                     <select class="form-select" id="country" required>
-                        <option value="Perú">Perú</option>
-                        <option value="Chile">Chile</option>
-                        <option value="Colombia">Colombia</option>
+                        <option value="Perú" ${shippingData.country === 'Perú' ? 'selected' : ''}>Perú</option>
+                        <option value="Chile" ${shippingData.country === 'Chile' ? 'selected' : ''}>Chile</option>
+                        <option value="Colombia" ${shippingData.country === 'Colombia' ? 'selected' : ''}>Colombia</option>
                     </select>
                 </div>
             </div>
@@ -293,21 +340,87 @@ function renderShippingStep() {
             <div class="form-row">
                 <div class="form-group">
                     <label class="form-label">Código Postal</label>
-                    <input type="text" class="form-input" id="postalCode" placeholder="15001">
+                    <input type="text" class="form-input" id="postalCode" placeholder="15001" value="${shippingData.postalCode ?? ''}">
                 </div>
                 <div class="form-group">
                     <label class="form-label required">Teléfono</label>
-                    <input type="tel" class="form-input" id="phone" placeholder="+51 987 654 321" required>
+                    <input type="tel" class="form-input" id="phone" placeholder="+51 987 654 321" value="${shippingData.phone ?? ''}" required>
                 </div>
             </div>
             
             <div class="form-group">
                 <label class="form-label required">Email</label>
-                <input type="email" class="form-input" id="email" placeholder="juan@example.com" required>
+                <input type="email" class="form-input" id="email" placeholder="juan@example.com" value="${shippingData.email ?? ''}" required>
             </div>
+            </div>
+
+            <div class="shipping-methods">
+                <h3>Opciones de entrega</h3>
+                <div class="shipping-methods-grid">
+                    ${shippingOptionCards}
+                </div>
             </div>
         </div>
     `;
+}
+
+function initializeShippingStep() {
+    if (shippingData?.shippingMethod && shippingOptions[shippingData.shippingMethod]) {
+        selectedShippingOption = shippingData.shippingMethod;
+        updateCartShippingAmount();
+        renderOrderSummary();
+    }
+
+    const optionCards = document.querySelectorAll('[data-shipping-option]');
+    optionCards.forEach(card => {
+        card.addEventListener('click', () => selectShippingMethod(card.dataset.shippingOption));
+    });
+    highlightShippingSelection();
+
+    const savedAddressInputs = document.querySelectorAll('input[name="savedAddress"]');
+    savedAddressInputs.forEach(input => {
+        input.checked = input.value === selectedAddressId;
+    });
+
+    const formSection = document.getElementById('shippingFormSection');
+    if (formSection) {
+        formSection.style.display = selectedAddressId ? 'none' : 'block';
+    }
+}
+
+function selectShippingMethod(optionKey) {
+    if (!shippingOptions[optionKey]) {
+        return;
+    }
+
+    selectedShippingOption = optionKey;
+    updateCartShippingAmount();
+    highlightShippingSelection();
+    renderOrderSummary();
+}
+
+function highlightShippingSelection() {
+    const optionCards = document.querySelectorAll('[data-shipping-option]');
+    optionCards.forEach(card => {
+        card.classList.toggle('is-selected', card.dataset.shippingOption === selectedShippingOption);
+    });
+}
+
+function updateCartShippingAmount() {
+    const option = shippingOptions[selectedShippingOption];
+    if (!option) return;
+
+    if (!shippingData) {
+        shippingData = {};
+    }
+
+    shippingData.shippingMethod = selectedShippingOption;
+    shippingData.shippingMethodLabel = option.label;
+    shippingData.shippingMethodAmount = option.amount;
+
+    if (cartData) {
+        cartData.shipping = option.amount;
+    }
 }
 
 // Seleccionar dirección guardada
@@ -340,7 +453,8 @@ function loadAddressData(address) {
         country: address.country,
         postalCode: address.postal_code || '',
         phone: address.phone,
-        email: address.email || ''
+        email: address.email || '',
+        shippingMethod: shippingData.shippingMethod || selectedShippingOption
     };
 }
 
@@ -413,6 +527,13 @@ function renderReviewStep() {
                     <span class="review-info-label">Ciudad:</span>
                     <span class="review-info-value">${shippingData.city}, ${shippingData.country}</span>
                 </div>
+            <div class="review-info-item">
+                <span class="review-info-label">Método de envío:</span>
+                <span class="review-info-value">
+                    ${shippingOptions[shippingData.shippingMethod || selectedShippingOption]?.label || shippingOptions.standard.label}
+                    (${checkoutCurrencyFormatter.format(shippingOptions[shippingData.shippingMethod || selectedShippingOption]?.amount ?? shippingOptions.standard.amount)})
+                </span>
+            </div>
                 <div class="review-info-item">
                     <span class="review-info-label">Teléfono:</span>
                     <span class="review-info-value">${shippingData.phone}</span>
@@ -613,7 +734,8 @@ function renderOrderSummary() {
     if (!cartData) return;
 
     const subtotal = Number(cartData.subtotal ?? cartData.total ?? 0);
-    const shippingAmount = Number(cartData.shipping ?? 30.0);
+    const selectedOption = shippingOptions[selectedShippingOption] || shippingOptions.standard;
+    const shippingAmount = Number(cartData.shipping ?? selectedOption.amount ?? 0);
     const couponDiscount = Number(discount || 0);
     const pointsDiscount = Number(loyaltyPointsDiscount || 0);
     const totalBeforePoints = Math.max(subtotal + shippingAmount - couponDiscount, 0);
@@ -667,27 +789,27 @@ function renderOrderSummary() {
             <div class="summary-totals">
                 <div class="summary-row">
                     <span>Subtotal</span>
-                    <span>S/ ${subtotal.toFixed(2)}</span>
+                    <span>${checkoutCurrencyFormatter.format(subtotal)}</span>
                 </div>
                 <div class="summary-row">
-                    <span>Envío</span>
-                    <span>S/ ${shippingAmount.toFixed(2)}</span>
+                    <span>Envío (${selectedOption.label})</span>
+                    <span>${checkoutCurrencyFormatter.format(shippingAmount)}</span>
                 </div>
                 ${couponDiscount > 0 ? `
                 <div class="summary-row">
                     <span>Descuento Cupón</span>
-                    <span>-S/ ${couponDiscount.toFixed(2)}</span>
+                    <span>- ${checkoutCurrencyFormatter.format(couponDiscount)}</span>
                 </div>
                 ` : ''}
                 ${pointsDiscount > 0 ? `
                 <div class="summary-row">
                     <span>Descuento Puntos</span>
-                    <span style="color: #10b981;">-S/ ${pointsDiscount.toFixed(2)}</span>
+                    <span style="color: #10b981;">- ${checkoutCurrencyFormatter.format(pointsDiscount)}</span>
                 </div>
                 ` : ''}
                 <div class="summary-row total">
                     <span>Total</span>
-                    <span>S/ ${totalDue.toFixed(2)}</span>
+                    <span>${checkoutCurrencyFormatter.format(totalDue)}</span>
                 </div>
             </div>
         </div>
@@ -777,7 +899,8 @@ async function processOrder() {
 
         // Crear pedido
         const subtotal = Number(cartData.subtotal ?? cartData.total ?? 0);
-        const shippingAmount = Number(cartData.shipping ?? 30.0);
+        const shippingOption = shippingOptions[selectedShippingOption] || shippingOptions.standard;
+        const shippingAmount = Number(cartData.shipping ?? shippingOption.amount ?? 0);
         const finalTotal = Math.max(subtotal + shippingAmount - discount - loyaltyPointsDiscount, 0);
         const orderData = {
             // Datos de envío (formato plano para el backend)
@@ -790,7 +913,9 @@ async function processOrder() {
             shipping_full_name: shippingData.fullName,
             // Método de pago
             payment_method: selectedPaymentMethod,
-            shipping_cost: cartData.shipping || 30.00,
+            shipping_method: selectedShippingOption,
+            shipping_option_label: shippingOption.label,
+            shipping_cost: shippingAmount,
             coupon_code: appliedCoupon,
             // Incluir información de puntos (el backend ajustará el total si es necesario)
             loyalty_points_used: loyaltyPointsUsed
