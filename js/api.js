@@ -480,25 +480,76 @@ class FutureLabsAPI {
     return this.request('/wishlist');
   }
 
-  async addToWishlist(productId) {
-    return this.request(`/wishlist/${productId}`, {
+  async addToWishlist(productId, listId = null) {
+    const options = { method: 'POST' };
+
+    if (listId) {
+      options.body = JSON.stringify({ list_id: listId });
+    }
+
+    return this.request(`/wishlist/${productId}`, options);
+  }
+
+  async removeFromWishlist(productId, listId = null) {
+    const options = { method: 'DELETE' };
+
+    if (listId) {
+      options.body = JSON.stringify({ list_id: listId });
+    }
+
+    return this.request(`/wishlist/${productId}`, options);
+  }
+
+  async checkWishlist(productId, listId = null) {
+    const query = listId ? `?list_id=${encodeURIComponent(listId)}` : '';
+    return this.request(`/wishlist/check/${productId}${query}`);
+  }
+
+  async clearWishlist(listId = null) {
+    const options = { method: 'DELETE' };
+
+    if (listId) {
+      options.body = JSON.stringify({ list_id: listId });
+    }
+
+    return this.request('/wishlist', options);
+  }
+
+  async createWishlistList(listData) {
+    return this.request('/wishlist/lists', {
+      method: 'POST',
+      body: JSON.stringify(listData)
+    });
+  }
+
+  async updateWishlistList(listId, listData) {
+    return this.request(`/wishlist/lists/${listId}`, {
+      method: 'PUT',
+      body: JSON.stringify(listData)
+    });
+  }
+
+  async deleteWishlistList(listId, { deleteItems = false } = {}) {
+    return this.request(`/wishlist/lists/${listId}`, {
+      method: 'DELETE',
+      body: JSON.stringify({ delete_items: deleteItems })
+    });
+  }
+
+  async setDefaultWishlistList(listId) {
+    return this.request(`/wishlist/lists/${listId}/set-default`, {
       method: 'POST'
     });
   }
 
-  async removeFromWishlist(productId) {
-    return this.request(`/wishlist/${productId}`, {
-      method: 'DELETE'
-    });
-  }
-
-  async checkWishlist(productId) {
-    return this.request(`/wishlist/check/${productId}`);
-  }
-
-  async clearWishlist() {
-    return this.request('/wishlist', {
-      method: 'DELETE'
+  async moveWishlistItem(productId, fromListId, toListId) {
+    return this.request('/wishlist/items/move', {
+      method: 'POST',
+      body: JSON.stringify({
+        product_id: productId,
+        from_list_id: fromListId,
+        to_list_id: toListId
+      })
     });
   }
 

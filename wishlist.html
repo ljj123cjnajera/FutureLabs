@@ -23,234 +23,6 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="css/notifications.css">
-    <link rel="stylesheet" href="css/home-link-fix.css?v=2.0">
-    <!-- Estilos inline removidos - migrados a CSS externo -->
-    <style>
-        .wishlist-page {
-            min-height: 100vh;
-            padding-top: 100px;
-            padding-bottom: 60px;
-        }
-        
-        .wishlist-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 60px 0;
-            margin-bottom: 40px;
-        }
-        
-        .wishlist-header h1 {
-            font-size: 48px;
-            margin-bottom: 10px;
-        }
-        
-        .wishlist-stats {
-            display: flex;
-            gap: 30px;
-            margin-bottom: 30px;
-        }
-        
-        .wishlist-stat {
-            background: white;
-            padding: 20px 30px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .wishlist-stat i {
-            font-size: 32px;
-            color: #667eea;
-        }
-        
-        .wishlist-stat-content h3 {
-            font-size: 28px;
-            margin: 0;
-            color: #333;
-        }
-        
-        .wishlist-stat-content p {
-            color: #999;
-            margin: 0;
-        }
-        
-        .wishlist-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-        
-        .wishlist-filters {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .filter-btn {
-            padding: 10px 20px;
-            border: 1px solid #ddd;
-            background: white;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .filter-btn.active {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
-        
-        .wishlist-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 24px;
-        }
-        
-        .wishlist-item {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        
-        .wishlist-item:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-        }
-        
-        .wishlist-item-header {
-            position: relative;
-            height: 250px;
-            overflow: hidden;
-        }
-        
-        .wishlist-item-header img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .wishlist-item-remove {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: white;
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-        
-        .wishlist-item-remove:hover {
-            background: #e74c3c;
-            color: white;
-        }
-        
-        .wishlist-item-badge {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background: #e74c3c;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        
-        .wishlist-item-content {
-            padding: 20px;
-        }
-        
-        .wishlist-item-brand {
-            font-size: 12px;
-            color: #999;
-            text-transform: uppercase;
-            margin-bottom: 5px;
-        }
-        
-        .wishlist-item-name {
-            font-size: 18px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 10px;
-            cursor: pointer;
-        }
-        
-        .wishlist-item-name:hover {
-            color: #667eea;
-        }
-        
-        .wishlist-item-rating {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            margin-bottom: 10px;
-        }
-        
-        .wishlist-item-price {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        
-        .wishlist-item-price-old {
-            color: #999;
-            text-decoration: line-through;
-        }
-        
-        .wishlist-item-price-new {
-            font-size: 24px;
-            font-weight: 700;
-            color: #e74c3c;
-        }
-        
-        .wishlist-item-actions {
-            display: flex;
-            gap: var(--spacing-sm);
-        }
-        
-        .wishlist-item-actions .btn {
-            flex: 1;
-        }
-        
-        .empty-wishlist {
-            text-align: center;
-            padding: 100px;
-            background: white;
-            border-radius: 12px;
-        }
-        
-        .empty-wishlist i {
-            font-size: 80px;
-            color: #ddd;
-            margin-bottom: 20px;
-        }
-        
-        .empty-wishlist h2 {
-            font-size: 28px;
-            color: #333;
-            margin-bottom: 10px;
-        }
-        
-        .empty-wishlist p {
-            color: #999;
-            margin-bottom: 30px;
-        }
-        
-        /* Los botones ahora usan las clases del sistema de diseño */
-    </style>
 </head>
 <body>
     <!-- Header -->
@@ -258,46 +30,149 @@
     <header id="mainHeader"></header>
 
     <!-- Wishlist Page -->
-    <div class="wishlist-page">
-        <div class="wishlist-header">
+    <main class="wishlist-page">
+        <section class="wishlist-hero">
             <div class="container">
-                <h1>Mi Wishlist</h1>
-                <p>Productos que te gustan</p>
+                <div>
+                    <h1>Mi Wishlist</h1>
+                    <p>Organiza tus productos favoritos en listas personalizadas</p>
+                </div>
             </div>
+        </section>
+
+        <div class="container wishlist-layout">
+            <aside class="wishlist-sidebar">
+                <div class="wishlist-lists-header">
+                    <div>
+                        <h2>Mis listas</h2>
+                        <p>Clasifica tus favoritos por ocasión, persona o proyecto</p>
+                    </div>
+                    <button class="btn btn-outline btn-sm" id="createWishlistBtn">
+                        <i class="fas fa-plus"></i>
+                        Nueva lista
+                    </button>
+                </div>
+                <ul class="wishlist-lists" id="wishlistLists">
+                    <li class="wishlist-list-placeholder">Cargando listas...</li>
+                </ul>
+                <div class="wishlist-sidebar-footer">
+                    <button class="btn btn-ghost btn-sm" id="shareListBtn">
+                        <i class="fas fa-share-alt"></i>
+                        Compartir lista
+                    </button>
+                </div>
+            </aside>
+
+            <section class="wishlist-content">
+                <div class="wishlist-stats">
+                    <div class="wishlist-stat-card">
+                        <div class="wishlist-stat-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div class="wishlist-stat-info">
+                            <span class="wishlist-stat-label">Guardados</span>
+                            <span class="wishlist-stat-value" id="wishlistCount">0</span>
+                        </div>
+                    </div>
+                    <div class="wishlist-stat-card">
+                        <div class="wishlist-stat-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <div class="wishlist-stat-info">
+                            <span class="wishlist-stat-label">En oferta</span>
+                            <span class="wishlist-stat-value" id="onSaleCount">0</span>
+                        </div>
+                    </div>
+                    <div class="wishlist-stat-card">
+                        <div class="wishlist-stat-icon">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <div class="wishlist-stat-info">
+                            <span class="wishlist-stat-label">Listas activas</span>
+                            <span class="wishlist-stat-value" id="listCount">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wishlist-toolbar">
+                    <div class="wishlist-toolbar-info">
+                        <h2 id="activeListName">Lista principal</h2>
+                        <span id="activeListCount" class="wishlist-toolbar-count">0 productos</span>
+                    </div>
+                    <div class="wishlist-toolbar-actions">
+                        <div class="wishlist-filters">
+                            <button class="wishlist-filter-btn active" data-filter="all">Todos</button>
+                            <button class="wishlist-filter-btn" data-filter="on-sale">En oferta</button>
+                            <button class="wishlist-filter-btn" data-filter="available">Disponibles</button>
+                        </div>
+                        <button class="btn btn-light btn-sm" id="clearListBtn">
+                            <i class="fas fa-trash-alt"></i>
+                            Vaciar lista
+                        </button>
+                    </div>
+                </div>
+
+                <div class="wishlist-selection-bar" id="wishlistSelectionBar" hidden>
+                    <div class="wishlist-selection-summary">
+                        <span id="selectedCountLabel">0 seleccionados</span>
+                    </div>
+                    <div class="wishlist-selection-actions">
+                        <select id="moveTargetSelect" class="wishlist-select">
+                            <option value="">Mover a...</option>
+                        </select>
+                        <button class="btn btn-outline btn-sm" id="moveSelectedBtn" disabled>
+                            <i class="fas fa-exchange-alt"></i>
+                            Mover
+                        </button>
+                        <button class="btn btn-primary btn-sm" id="cartSelectedBtn" disabled>
+                            <i class="fas fa-shopping-cart"></i>
+                            Carrito
+                        </button>
+                        <button class="btn btn-error btn-sm" id="deleteSelectedBtn" disabled>
+                            <i class="fas fa-trash"></i>
+                            Eliminar
+                        </button>
+                        <button class="btn btn-link btn-sm" id="selectAllBtn">Seleccionar todo</button>
+                    </div>
+                </div>
+
+                <div id="wishlistContainer" class="wishlist-container">
+                    <div class="wishlist-empty-state loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Cargando wishlist...</p>
+                    </div>
+                </div>
+            </section>
         </div>
+    </main>
 
-        <div class="container">
-            <div class="wishlist-stats">
-                <div class="wishlist-stat">
-                    <i class="fas fa-heart"></i>
-                    <div class="wishlist-stat-content">
-                        <h3 id="wishlistCount">0</h3>
-                        <p>Productos guardados</p>
+    <div id="wishlistListModal" class="modal modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="wishlistListModalTitle">
+                    <i class="fas fa-list-ul"></i>
+                    Nueva lista
+                </h3>
+                <button class="modal-close" type="button" data-modal-close>&times;</button>
+            </div>
+            <form id="wishlistListForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="wishlistListName">Nombre de la lista</label>
+                        <input type="text" id="wishlistListName" class="form-input" placeholder="Ej. Regalos de Navidad" maxlength="80" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="wishlistListDescription">Descripción (opcional)</label>
+                        <textarea id="wishlistListDescription" class="form-textarea" rows="3" maxlength="180" placeholder="Describe qué productos guardarás aquí"></textarea>
                     </div>
                 </div>
-                <div class="wishlist-stat">
-                    <i class="fas fa-percent"></i>
-                    <div class="wishlist-stat-content">
-                        <h3 id="onSaleCount">0</h3>
-                        <p>En oferta</p>
-                    </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-modal-close>Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="wishlistListSubmit">
+                        Guardar
+                    </button>
                 </div>
-            </div>
-
-            <div class="wishlist-actions">
-                <div class="wishlist-filters">
-                    <button class="filter-btn active" data-filter="all">Todos</button>
-                    <button class="filter-btn" data-filter="on-sale">En Oferta</button>
-                    <button class="filter-btn" data-filter="available">Disponibles</button>
-                </div>
-            </div>
-
-            <div id="wishlistContainer">
-                <div style="text-align: center; padding: 100px;">
-                    <i class="fas fa-spinner fa-spin fa-3x"></i>
-                    <p>Cargando wishlist...</p>
-                </div>
-            </div>
+            </form>
         </div>
     </div>
 
@@ -313,219 +188,728 @@
     <script src="js/components.js"></script>
     
     <script>
-        // Inicializar header dinámico con barra de búsqueda
-        document.addEventListener('DOMContentLoaded', function() {
-            const headerContainer = document.getElementById('mainHeader');
-            if (headerContainer && window.Components) {
-                headerContainer.innerHTML = window.Components.getHeader(true, true);
-                window.Components.initHeader();
-                window.Components.initSearch();
-                window.Components.initCartCounter();
-            }
-        let wishlistItems = [];
-        let currentFilter = 'all';
-        
-        // Usar wishlistManager global
-        const wishlistManager = window.wishlistManager;
+        (function () {
+            const state = {
+                filter: 'all',
+                pendingListId: new URLSearchParams(window.location.search).get('list'),
+                processingBulk: false
+            };
 
-        // Cargar wishlist
-        async function loadWishlist() {
-            const container = document.getElementById('wishlistContainer');
-            
-            try {
-                // Verificar autenticación
-                if (!window.authManager || !window.authManager.isAuthenticated()) {
-                    container.innerHTML = `
-                        <div class="empty-wishlist">
-                            <i class="fas fa-lock"></i>
-                            <h2>Inicia sesión para ver tu wishlist</h2>
-                            <p>Necesitas estar autenticado para ver tus productos favoritos</p>
-                            <button onclick="window.location.href='index.html'" class="btn btn-primary">Ir a Inicio</button>
+            const elements = {
+                headerContainer: document.getElementById('mainHeader'),
+                listsContainer: document.getElementById('wishlistLists'),
+                statsProducts: document.getElementById('wishlistCount'),
+                statsOnSale: document.getElementById('onSaleCount'),
+                statsLists: document.getElementById('listCount'),
+                activeListName: document.getElementById('activeListName'),
+                activeListCount: document.getElementById('activeListCount'),
+                container: document.getElementById('wishlistContainer'),
+                createListBtn: document.getElementById('createWishlistBtn'),
+                shareListBtn: document.getElementById('shareListBtn'),
+                filterButtons: Array.from(document.querySelectorAll('.wishlist-filter-btn')),
+                selectionBar: document.getElementById('wishlistSelectionBar'),
+                selectedCountLabel: document.getElementById('selectedCountLabel'),
+                selectAllBtn: document.getElementById('selectAllBtn'),
+                moveTargetSelect: document.getElementById('moveTargetSelect'),
+                moveSelectedBtn: document.getElementById('moveSelectedBtn'),
+                cartSelectedBtn: document.getElementById('cartSelectedBtn'),
+                deleteSelectedBtn: document.getElementById('deleteSelectedBtn'),
+                clearListBtn: document.getElementById('clearListBtn'),
+                listModal: document.getElementById('wishlistListModal'),
+                listForm: document.getElementById('wishlistListForm'),
+                listModalTitle: document.getElementById('wishlistListModalTitle'),
+                listNameInput: document.getElementById('wishlistListName'),
+                listDescriptionInput: document.getElementById('wishlistListDescription'),
+                listSubmitButton: document.getElementById('wishlistListSubmit')
+            };
+
+            const modalState = {
+                mode: 'create',
+                listId: null
+            };
+
+            document.addEventListener('DOMContentLoaded', () => {
+                initHeader();
+                setupListeners();
+
+                if (window.authManager?.isAuthenticated()) {
+                    renderLoading();
+                } else {
+                    renderAuthRequired();
+                }
+            });
+
+            function initHeader() {
+                const { headerContainer } = elements;
+                if (headerContainer && window.Components) {
+                    headerContainer.innerHTML = window.Components.getHeader(true, true);
+                    window.Components.initHeader();
+                    window.Components.initSearch();
+                    window.Components.initCartCounter();
+                }
+            }
+
+            function setupListeners() {
+                elements.createListBtn?.addEventListener('click', () => openListModal('create'));
+                elements.shareListBtn?.addEventListener('click', shareActiveList);
+                elements.clearListBtn?.addEventListener('click', handleClearActiveList);
+
+                elements.filterButtons.forEach((btn) => {
+                    btn.addEventListener('click', handleFilterChange);
+                });
+
+                elements.listsContainer?.addEventListener('click', handleListClick);
+
+                elements.container?.addEventListener('click', handleContainerClick);
+                elements.container?.addEventListener('change', handleContainerChange);
+
+                elements.selectAllBtn?.addEventListener('click', handleSelectAll);
+                elements.moveSelectedBtn?.addEventListener('click', handleMoveSelected);
+                elements.cartSelectedBtn?.addEventListener('click', handleCartSelected);
+                elements.deleteSelectedBtn?.addEventListener('click', handleDeleteSelected);
+
+                elements.listForm?.addEventListener('submit', handleListFormSubmit);
+
+                elements.listModal?.querySelectorAll('[data-modal-close]')?.forEach((btn) => {
+                    btn.addEventListener('click', closeListModal);
+                });
+                elements.listModal?.addEventListener('click', (event) => {
+                    if (event.target === elements.listModal) {
+                        closeListModal();
+                    }
+                });
+
+                window.addEventListener('wishlistUpdated', handleWishlistUpdated);
+                window.addEventListener('wishlistSelectionChanged', handleSelectionChanged);
+
+                if (window.authManager) {
+                    window.authManager.addEventListener('authStateChanged', async () => {
+                        if (window.authManager.isAuthenticated()) {
+                            renderLoading();
+                            await window.wishlistManager.init();
+                        } else {
+                            renderAuthRequired();
+                        }
+                    });
+                }
+            }
+
+            function handleWishlistUpdated(event) {
+                const lists = event.detail?.lists || window.wishlistManager?.lists || [];
+                const activeListId = event.detail?.activeListId || window.wishlistManager?.activeListId || null;
+
+                renderLists(lists, activeListId);
+                renderStats(lists);
+                renderItems();
+                updateMoveTargetOptions(lists, activeListId);
+                updateShareButton();
+
+                if (state.pendingListId) {
+                    const pendingExists = window.wishlistManager?.getListById?.(state.pendingListId);
+                    if (pendingExists && window.wishlistManager.activeListId !== state.pendingListId) {
+                        window.wishlistManager.setActiveList(state.pendingListId);
+                    }
+                    state.pendingListId = null;
+                }
+            }
+
+            function handleSelectionChanged(event) {
+                const totalSelected = event.detail?.totalSelected || 0;
+                if (!elements.selectionBar) return;
+
+                if (totalSelected > 0) {
+                    elements.selectionBar.hidden = false;
+                    elements.selectedCountLabel.textContent = `${totalSelected} ${totalSelected === 1 ? 'producto seleccionado' : 'productos seleccionados'}`;
+                } else {
+                    elements.selectionBar.hidden = true;
+                }
+
+                updateBulkActions();
+            }
+
+            function renderLists(lists, activeListId) {
+                if (!elements.listsContainer) return;
+
+                if (!lists.length) {
+                    elements.listsContainer.innerHTML = `
+                        <li class="wishlist-list-placeholder">
+                            Crea tu primera lista para guardar favoritos personalizados.
+                        </li>
+                    `;
+                    return;
+                }
+
+                elements.listsContainer.innerHTML = lists.map((list) => `
+                    <li class="wishlist-list-item ${list.id === activeListId ? 'is-active' : ''}" data-list-id="${list.id}">
+                        <button class="wishlist-list-main" data-action="activate" type="button">
+                            <span class="wishlist-list-name">${escapeHTML(list.name)}</span>
+                            <span class="wishlist-list-count">${list.items?.length || 0} ${list.items?.length === 1 ? 'producto' : 'productos'}</span>
+                        </button>
+                        <div class="wishlist-list-actions">
+                            ${list.is_default ? '<span class="wishlist-list-badge">Principal</span>' : `
+                                <button class="btn-icon" data-action="set-default" title="Hacer principal" type="button">
+                                    <i class="fas fa-thumbtack"></i>
+                                </button>
+                            `}
+                            <button class="btn-icon" data-action="rename" title="Renombrar lista" type="button">
+                                <i class="fas fa-pen"></i>
+                            </button>
+                            ${list.is_default ? '' : `
+                                <button class="btn-icon btn-danger" data-action="delete" title="Eliminar lista" type="button">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            `}
+                        </div>
+                    </li>
+                `).join('');
+            }
+
+            function renderStats(lists) {
+                const products = lists.reduce((acc, list) => acc + (list.items?.length || 0), 0);
+                const onSale = lists.reduce((acc, list) => acc + (list.items?.filter(item => item.discount_price)?.length || 0), 0);
+
+                if (elements.statsProducts) {
+                    elements.statsProducts.textContent = products;
+                }
+                if (elements.statsOnSale) {
+                    elements.statsOnSale.textContent = onSale;
+                }
+                if (elements.statsLists) {
+                    elements.statsLists.textContent = lists.length;
+                }
+            }
+
+            function renderItems() {
+                const manager = window.wishlistManager;
+                if (!manager || !elements.container) return;
+
+                if (!window.authManager?.isAuthenticated()) {
+                    renderAuthRequired();
+                    return;
+                }
+
+                const activeList = manager.getActiveList();
+
+                if (!activeList) {
+                    elements.container.innerHTML = `
+                        <div class="wishlist-empty-state">
+                            <i class="far fa-heart"></i>
+                            <h2>Aún no tienes listas activas</h2>
+                            <p>Crea una nueva lista para comenzar a guardar tus favoritos.</p>
+                            <button class="btn btn-primary btn-sm" onclick="document.getElementById('createWishlistBtn').click()">
+                                <i class="fas fa-plus"></i> Crear lista
+                            </button>
                         </div>
                     `;
                     return;
                 }
 
-                const response = await window.api.getWishlist();
-                
-                if (response.success) {
-                    wishlistItems = response.data.items;
-                    renderWishlist();
-                } else {
-                    container.innerHTML = `
-                        <div class="empty-wishlist">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <h2>Error al cargar wishlist</h2>
-                            <p>${response.message}</p>
+                const items = Array.isArray(activeList.items) ? activeList.items : [];
+
+                if (elements.activeListName) {
+                    elements.activeListName.textContent = activeList.name;
+                }
+                if (elements.activeListCount) {
+                    elements.activeListCount.textContent = `${items.length} ${items.length === 1 ? 'producto' : 'productos'}`;
+                }
+
+                const filteredItems = applyFilter(items, state.filter);
+
+                if (manager.isLoading && !items.length) {
+                    renderLoading();
+                    return;
+                }
+
+                if (!filteredItems.length) {
+                    elements.container.innerHTML = `
+                        <div class="wishlist-empty-state">
+                            <i class="far fa-star"></i>
+                            <h2>No encontramos productos con ese filtro</h2>
+                            <p>Intenta cambiar el filtro o explora nuevos productos.</p>
+                            <button class="btn btn-outline btn-sm" onclick="window.location.href='products.html'">
+                                <i class="fas fa-search"></i> Buscar productos
+                            </button>
                         </div>
                     `;
+                    return;
                 }
-            } catch (error) {
-                container.innerHTML = `
-                    <div class="empty-wishlist">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <h2>Error al cargar wishlist</h2>
-                        <p>${error.message}</p>
+
+                elements.container.innerHTML = `
+                    <div class="wishlist-grid">
+                        ${filteredItems.map(item => renderWishlistCard(item, manager.selectedItems?.has(item.product_id))).join('')}
                     </div>
                 `;
             }
-        }
 
-        // Renderizar wishlist
-        function renderWishlist() {
-            const container = document.getElementById('wishlistContainer');
-            
-            // Filtrar items
-            let filteredItems = wishlistItems;
-            if (currentFilter === 'on-sale') {
-                filteredItems = wishlistItems.filter(item => item.discount_price);
-            } else if (currentFilter === 'available') {
-                filteredItems = wishlistItems.filter(item => item.stock_quantity > 0);
-            }
+            function renderWishlistCard(item, isSelected) {
+                const hasDiscount = Boolean(item.discount_price);
+                const isAvailable = Number(item.stock_quantity || 0) > 0;
+                const availabilityLabel = isAvailable ? '<span class="wishlist-badge success">Disponible</span>' : '<span class="wishlist-badge warning">Agotado</span>';
+                const priceContent = hasDiscount
+                    ? `
+                        <span class="wishlist-price-old">S/ ${Number(item.price).toFixed(2)}</span>
+                        <span class="wishlist-price-new">S/ ${Number(item.discount_price).toFixed(2)}</span>
+                    `
+                    : `<span class="wishlist-price-new">S/ ${Number(item.price).toFixed(2)}</span>`;
 
-            // Actualizar estadísticas
-            document.getElementById('wishlistCount').textContent = wishlistItems.length;
-            document.getElementById('onSaleCount').textContent = 
-                wishlistItems.filter(item => item.discount_price).length;
-
-            if (filteredItems.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-wishlist">
-                        <i class="far fa-heart"></i>
-                        <h2>Tu wishlist está vacía</h2>
-                        <p>Agrega productos a tu wishlist para verlos aquí</p>
-                        <button class="btn btn-primary" onclick="window.location.href='products.html'">
-                            <i class="fas fa-shopping-bag"></i> Explorar Productos
-                        </button>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = `
-                <div class="wishlist-grid">
-                    ${filteredItems.map(item => `
-                        <div class="wishlist-item">
-                            <div class="wishlist-item-header">
-                                <img src="${item.image_url}" alt="${item.name}">
-                                <button class="wishlist-item-remove" onclick="removeFromWishlist('${item.id}')">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                                ${item.discount_price ? '<div class="wishlist-item-badge">Oferta</div>' : ''}
+                return `
+                    <article class="wishlist-item" data-product-id="${item.product_id}">
+                        <div class="wishlist-item-select">
+                            <input type="checkbox"
+                                class="wishlist-item-checkbox"
+                                data-product-id="${item.product_id}"
+                                ${isSelected ? 'checked' : ''}>
+                        </div>
+                        <div class="wishlist-item-media">
+                            <img src="${item.image_url || 'https://via.placeholder.com/480x480?text=FutureLabs'}" alt="${escapeHTML(item.product_name || 'Producto FutureLabs')}">
+                            ${hasDiscount ? '<span class="wishlist-item-badge">Oferta</span>' : ''}
+                        </div>
+                        <div class="wishlist-item-body">
+                            <div class="wishlist-item-meta">
+                                <span class="wishlist-item-brand">${escapeHTML(item.brand || 'FutureLabs')}</span>
+                                ${availabilityLabel}
                             </div>
-                            <div class="wishlist-item-content">
-                                <div class="wishlist-item-brand">${item.brand}</div>
-                                <div class="wishlist-item-name" onclick="window.location.href='product-detail.html?id=${item.id}'">
-                                    ${item.name}
-                                </div>
-                                <div class="wishlist-item-rating">
-                                    ${generateStars(item.rating)}
-                                    <span style="color: #999; font-size: 14px;">(${item.review_count})</span>
-                                </div>
-                                <div class="wishlist-item-price">
-                                    ${item.discount_price ? `
-                                        <span class="wishlist-item-price-old">S/ ${parseFloat(item.price).toFixed(2)}</span>
-                                        <span class="wishlist-item-price-new">S/ ${parseFloat(item.discount_price).toFixed(2)}</span>
-                                    ` : `
-                                        <span class="wishlist-item-price-new">S/ ${parseFloat(item.price).toFixed(2)}</span>
-                                    `}
-                                </div>
-                                <div class="wishlist-item-actions">
-                                    <button class="btn btn-primary" onclick="addToCart('${item.id}')">
-                                        <i class="fas fa-shopping-cart"></i> Agregar
-                                    </button>
-                                    <button class="btn btn-secondary" onclick="buyNow('${item.id}')">
-                                        Comprar
-                                    </button>
-                                </div>
+                            <button class="wishlist-item-title" type="button" data-product-link="${item.product_id}">
+                                ${escapeHTML(item.product_name || 'Producto FutureLabs')}
+                            </button>
+                            <div class="wishlist-item-rating">
+                                ${generateStars(item.rating || 0)}
+                                <span class="wishlist-item-reviews">${item.review_count || 0} reseñas</span>
+                            </div>
+                            <div class="wishlist-item-price">
+                                ${priceContent}
                             </div>
                         </div>
-                    `).join('')}
-                </div>
-            `;
-        }
+                        <div class="wishlist-item-footer">
+                            <button class="btn btn-primary btn-sm" data-product-action="cart" data-product-id="${item.product_id}">
+                                <i class="fas fa-shopping-cart"></i>
+                                Carrito
+                            </button>
+                            <button class="btn btn-outline btn-sm" data-product-action="remove" data-product-id="${item.product_id}">
+                                <i class="fas fa-trash"></i>
+                                Eliminar
+                            </button>
+                        </div>
+                    </article>
+                `;
+            }
 
-        // Generar estrellas
-        function generateStars(rating) {
-            const fullStars = Math.floor(rating);
-            const hasHalfStar = rating % 1 >= 0.5;
-            const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-            
-            return `
-                ${'<i class="fas fa-star" style="color: #ffc107;"></i>'.repeat(fullStars)}
-                ${hasHalfStar ? '<i class="fas fa-star-half-alt" style="color: #ffc107;"></i>' : ''}
-                ${'<i class="far fa-star" style="color: #ddd;"></i>'.repeat(emptyStars)}
-            `;
-        }
+            function renderLoading() {
+                if (!elements.container) return;
+                elements.container.innerHTML = `
+                    <div class="wishlist-empty-state loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Cargando wishlist...</p>
+                    </div>
+                `;
+            }
 
-        // Eliminar de wishlist
-        async function removeFromWishlist(productId) {
-            try {
-                const response = await window.api.removeFromWishlist(productId);
-                
-                if (response.success) {
-                    wishlistItems = wishlistItems.filter(item => item.product_id !== productId);
-                    renderWishlist();
-                    window.notifications.success('Producto eliminado de tu wishlist');
-                } else {
-                    window.notifications.error('Error al eliminar de wishlist');
+            function renderAuthRequired() {
+                if (!elements.container) return;
+
+                elements.container.innerHTML = `
+                    <div class="wishlist-empty-state">
+                        <i class="fas fa-lock"></i>
+                        <h2>Inicia sesión para ver tu wishlist</h2>
+                        <p>Necesitas estar autenticado para administrar tus listas de productos favoritos.</p>
+                        <div class="wishlist-empty-actions">
+                            <button class="btn btn-primary btn-sm" onclick="window.modalManager?.showLogin?.()">
+                                <i class="fas fa-sign-in-alt"></i> Iniciar sesión
+                            </button>
+                            <button class="btn btn-outline btn-sm" onclick="window.location.href='index.html'">
+                                <i class="fas fa-home"></i> Volver al inicio
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function updateMoveTargetOptions(lists, activeListId) {
+                if (!elements.moveTargetSelect) return;
+
+                const otherLists = lists.filter(list => list.id !== activeListId);
+                elements.moveTargetSelect.innerHTML = '<option value="">Mover a...</option>';
+
+                otherLists.forEach((list) => {
+                    const option = document.createElement('option');
+                    option.value = list.id;
+                    option.textContent = list.name;
+                    elements.moveTargetSelect.appendChild(option);
+                });
+
+                elements.moveTargetSelect.disabled = otherLists.length === 0;
+                if (elements.moveTargetSelect.disabled) {
+                    elements.moveTargetSelect.value = '';
                 }
-            } catch (error) {
-                window.notifications.error('Error al eliminar de wishlist');
             }
-        }
 
-        // Agregar al carrito
-        async function addToCart(productId) {
-            try {
-                await window.cartManager.add(productId, 1);
-                window.notifications.success('Producto agregado al carrito');
-            } catch (error) {
-                window.notifications.error('Error al agregar producto');
+            function updateShareButton() {
+                if (!elements.shareListBtn) return;
+                const hasList = !!window.wishlistManager?.getActiveList?.();
+                elements.shareListBtn.disabled = !hasList;
             }
-        }
 
-        // Comprar ahora
-        async function buyNow(productId) {
-            try {
-                await window.cartManager.add(productId, 1);
-                window.location.href = 'checkout.html';
-            } catch (error) {
-                window.notifications.error('Error al procesar compra');
+            function handleFilterChange(event) {
+                const button = event.currentTarget;
+                state.filter = button.dataset.filter;
+
+                elements.filterButtons.forEach((btn) => btn.classList.remove('active'));
+                button.classList.add('active');
+
+                renderItems();
             }
-        }
 
-        // Filtros
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                currentFilter = this.dataset.filter;
-                renderWishlist();
-            });
-        });
+            function handleListClick(event) {
+                const actionBtn = event.target.closest('[data-action]');
+                const listItem = event.target.closest('.wishlist-list-item');
 
-        // Actualizar contador de carrito
-        document.addEventListener('cartUpdated', (e) => {
-            const cartCount = document.querySelector('.cart-count');
-            if (cartCount) {
-                cartCount.textContent = e.detail.count;
+                if (!listItem) return;
+
+                const listId = listItem.dataset.listId;
+                const action = actionBtn?.dataset.action || 'activate';
+
+                if (actionBtn) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+
+                switch (action) {
+                    case 'activate':
+                        window.wishlistManager?.setActiveList?.(listId);
+                        break;
+                    case 'rename':
+                        openListModal('rename', listId);
+                        break;
+                    case 'delete':
+                        confirmDeleteList(listId);
+                        break;
+                    case 'set-default':
+                        window.wishlistManager?.setDefaultList?.(listId);
+                        break;
+                    default:
+                        break;
+                }
             }
-        });
 
-        // Inicializar header dinámico con barra de búsqueda (fallback)
-        document.addEventListener('DOMContentLoaded', function() {
-            const headerContainer = document.getElementById('mainHeader');
-            if (headerContainer && window.Components) {
-                headerContainer.innerHTML = window.Components.getHeader(true, true);
-                window.Components.initHeader();
-                window.Components.initSearch();
-                window.Components.initCartCounter();
+            function handleContainerClick(event) {
+                const productLink = event.target.closest('[data-product-link]');
+                if (productLink) {
+                    const productId = productLink.dataset.productLink;
+                    window.location.href = `product-detail.html?id=${productId}`;
+                    return;
+                }
+
+                const actionBtn = event.target.closest('[data-product-action]');
+                if (!actionBtn) return;
+
+                const productId = actionBtn.dataset.productId;
+                const action = actionBtn.dataset.productAction;
+                const listId = window.wishlistManager?.activeListId || null;
+
+                switch (action) {
+                    case 'cart':
+                        window.wishlistManager?.moveToCart?.(productId, { listId });
+                        break;
+                    case 'remove':
+                        window.wishlistManager?.remove?.(productId, { listId });
+                        break;
+                    default:
+                        break;
+                }
             }
-        });
 
-        // Cargar wishlist al iniciar
-        loadWishlist();
+            function handleContainerChange(event) {
+                if (!event.target.matches('.wishlist-item-checkbox')) return;
+
+                const productId = event.target.dataset.productId;
+                if (event.target.checked) {
+                    window.wishlistManager?.selectItem?.(productId);
+                } else {
+                    window.wishlistManager?.deselectItem?.(productId);
+                }
+            }
+
+            function handleSelectAll() {
+                const manager = window.wishlistManager;
+                const activeList = manager?.getActiveList?.();
+                if (!manager || !activeList) return;
+
+                const listSize = activeList.items?.length || 0;
+                const selectedSize = manager.selectedItems?.size || 0;
+
+                if (selectedSize && selectedSize >= listSize) {
+                    manager.clearSelection();
+                } else {
+                    manager.selectAllCurrentList();
+                }
+            }
+
+            async function handleMoveSelected() {
+                if (state.processingBulk) return;
+
+                const manager = window.wishlistManager;
+                const activeListId = manager?.activeListId;
+                const targetListId = elements.moveTargetSelect?.value;
+
+                if (!targetListId || !manager || !activeListId) {
+                    window.notifications?.warning?.('Selecciona la lista destino para mover los productos.');
+                    return;
+                }
+
+                const selected = Array.from(manager.selectedItems || []);
+                if (!selected.length) return;
+
+                setBulkProcessing(true);
+
+                try {
+                    for (const productId of selected) {
+                        await manager.moveProductToList(productId, targetListId, activeListId);
+                    }
+                    manager.clearSelection();
+                    window.notifications?.success?.('Productos movidos a la nueva lista');
+                } catch (error) {
+                    console.error('Error moving selected items:', error);
+                    window.notifications?.error?.(error.message || 'No se pudieron mover los productos seleccionados');
+                } finally {
+                    setBulkProcessing(false);
+                }
+            }
+
+            async function handleCartSelected() {
+                if (state.processingBulk) return;
+
+                const manager = window.wishlistManager;
+                const activeListId = manager?.activeListId;
+                const selected = Array.from(manager?.selectedItems || []);
+
+                if (!selected.length || !manager || !activeListId) return;
+
+                setBulkProcessing(true);
+
+                try {
+                    for (const productId of selected) {
+                        await manager.moveToCart(productId, { listId: activeListId });
+                    }
+                    manager.clearSelection();
+                    window.notifications?.success?.('Productos enviados al carrito');
+                } catch (error) {
+                    console.error('Error sending selected to cart:', error);
+                    window.notifications?.error?.(error.message || 'No se pudieron mover los productos al carrito');
+                } finally {
+                    setBulkProcessing(false);
+                }
+            }
+
+            async function handleDeleteSelected() {
+                if (state.processingBulk) return;
+
+                const manager = window.wishlistManager;
+                const activeListId = manager?.activeListId;
+                const selected = Array.from(manager?.selectedItems || []);
+
+                if (!selected.length || !manager || !activeListId) return;
+
+                const confirmDelete = window.confirm(`¿Eliminar ${selected.length} ${selected.length === 1 ? 'producto' : 'productos'} de la lista?`);
+                if (!confirmDelete) return;
+
+                setBulkProcessing(true);
+
+                try {
+                    for (const productId of selected) {
+                        await manager.remove(productId, { listId: activeListId });
+                    }
+                    manager.clearSelection();
+                    window.notifications?.success?.('Productos eliminados de la lista');
+                } catch (error) {
+                    console.error('Error deleting selected items:', error);
+                    window.notifications?.error?.(error.message || 'No se pudieron eliminar los productos seleccionados');
+                } finally {
+                    setBulkProcessing(false);
+                }
+            }
+
+            function updateBulkActions() {
+                const manager = window.wishlistManager;
+                const selected = manager?.selectedItems?.size || 0;
+                const otherListsAvailable = elements.moveTargetSelect && !elements.moveTargetSelect.disabled;
+
+                if (elements.moveSelectedBtn) {
+                    elements.moveSelectedBtn.disabled = !selected || !otherListsAvailable || state.processingBulk;
+                }
+                if (elements.cartSelectedBtn) {
+                    elements.cartSelectedBtn.disabled = !selected || state.processingBulk;
+                }
+                if (elements.deleteSelectedBtn) {
+                    elements.deleteSelectedBtn.disabled = !selected || state.processingBulk;
+                }
+                if (elements.selectAllBtn) {
+                    const activeList = manager?.getActiveList?.();
+                    const listSize = activeList?.items?.length || 0;
+                    elements.selectAllBtn.textContent = selected && selected >= listSize ? 'Deseleccionar todo' : 'Seleccionar todo';
+                }
+            }
+
+            function setBulkProcessing(isProcessing) {
+                state.processingBulk = isProcessing;
+                updateBulkActions();
+
+                if (isProcessing) {
+                    elements.moveSelectedBtn?.classList.add('is-loading');
+                    elements.cartSelectedBtn?.classList.add('is-loading');
+                    elements.deleteSelectedBtn?.classList.add('is-loading');
+                } else {
+                    elements.moveSelectedBtn?.classList.remove('is-loading');
+                    elements.cartSelectedBtn?.classList.remove('is-loading');
+                    elements.deleteSelectedBtn?.classList.remove('is-loading');
+                }
+            }
+
+            function openListModal(mode, listId = null) {
+                modalState.mode = mode;
+                modalState.listId = listId;
+
+                const list = listId ? window.wishlistManager?.getListById?.(listId) : null;
+
+                if (mode === 'create') {
+                    elements.listModalTitle.innerHTML = '<i class="fas fa-list-ul"></i> Nueva lista';
+                    elements.listSubmitButton.textContent = 'Crear lista';
+                    elements.listNameInput.value = '';
+                    elements.listDescriptionInput.value = '';
+                } else if (list) {
+                    elements.listModalTitle.innerHTML = '<i class="fas fa-pen"></i> Renombrar lista';
+                    elements.listSubmitButton.textContent = 'Guardar cambios';
+                    elements.listNameInput.value = list.name || '';
+                    elements.listDescriptionInput.value = list.description || '';
+                }
+
+            elements.listModal?.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                elements.listNameInput?.focus();
+            }
+
+            function closeListModal() {
+                elements.listModal?.classList.remove('active');
+                document.body.style.overflow = '';
+                elements.listForm?.reset();
+                modalState.mode = 'create';
+                modalState.listId = null;
+            }
+
+            async function handleListFormSubmit(event) {
+                event.preventDefault();
+
+                const name = elements.listNameInput?.value.trim();
+                const description = elements.listDescriptionInput?.value.trim();
+
+                if (!name) {
+                    window.notifications?.warning?.('El nombre de la lista es obligatorio');
+                    elements.listNameInput?.focus();
+                    return;
+                }
+
+                elements.listSubmitButton.disabled = true;
+                elements.listSubmitButton.classList.add('is-loading');
+
+                try {
+                    if (modalState.mode === 'create') {
+                        await window.wishlistManager?.createList?.(name, description);
+                    } else if (modalState.listId) {
+                        await window.wishlistManager?.renameList?.(modalState.listId, { name, description });
+                    }
+                    closeListModal();
+                } catch (error) {
+                    console.error('Error saving list:', error);
+                } finally {
+                    elements.listSubmitButton.disabled = false;
+                    elements.listSubmitButton.classList.remove('is-loading');
+                }
+            }
+
+            function confirmDeleteList(listId) {
+                const list = window.wishlistManager?.getListById?.(listId);
+                if (!list) return;
+
+                const confirmDelete = window.confirm(`¿Eliminar la lista "${list.name}"? Los productos se moverán a tu lista principal.`);
+                if (!confirmDelete) return;
+
+                window.wishlistManager?.deleteList?.(listId);
+            }
+
+            function handleClearActiveList() {
+                const manager = window.wishlistManager;
+                const activeList = manager?.getActiveList?.();
+
+                if (!activeList || !activeList.items?.length) {
+                    window.notifications?.info?.('No hay productos que eliminar en esta lista.');
+                    return;
+                }
+
+                const confirmClear = window.confirm(`¿Vaciar "${activeList.name}"? Los ${activeList.items.length} productos se eliminarán de esta lista.`);
+                if (!confirmClear) return;
+
+                manager?.clear?.(activeList.id);
+            }
+
+            async function shareActiveList() {
+                const manager = window.wishlistManager;
+                const list = manager?.getActiveList?.();
+                if (!list) return;
+
+                const shareUrl = `${window.location.origin}${window.location.pathname}?list=${list.id}`;
+                const message = `Lista "${list.name}" en FutureLabs (${list.items?.length || 0} productos)\n${shareUrl}`;
+
+                try {
+                    if (navigator.share) {
+                        await navigator.share({
+                            title: `Wishlist FutureLabs - ${list.name}`,
+                            text: `Mira mi lista "${list.name}" en FutureLabs`,
+                            url: shareUrl
+                        });
+                    } else if (navigator.clipboard) {
+                        await navigator.clipboard.writeText(message);
+                        window.notifications?.success?.('Enlace de la lista copiado al portapapeles');
+                    } else {
+                        window.notifications?.info?.('Copia manualmente este enlace:\n' + shareUrl);
+                    }
+                } catch (error) {
+                    console.error('Error sharing list:', error);
+                }
+            }
+
+            function applyFilter(items, filter) {
+                switch (filter) {
+                    case 'on-sale':
+                        return items.filter(item => item.discount_price);
+                    case 'available':
+                        return items.filter(item => Number(item.stock_quantity || 0) > 0);
+                    default:
+                        return items;
+                }
+            }
+
+            function generateStars(rating) {
+                const fullStars = Math.floor(rating);
+                const hasHalfStar = rating % 1 >= 0.5;
+                const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
+                return `
+                    ${'<i class="fas fa-star"></i>'.repeat(fullStars)}
+                    ${hasHalfStar ? '<i class="fas fa-star-half-alt"></i>' : ''}
+                    ${'<i class="far fa-star"></i>'.repeat(emptyStars)}
+                `;
+            }
+
+            function escapeHTML(value = '') {
+                return value.replace(/[&<>"'`]/g, (match) => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;',
+                    '`': '&#96;'
+                }[match]));
+            }
+        })();
     </script>
 </body>
 </html>

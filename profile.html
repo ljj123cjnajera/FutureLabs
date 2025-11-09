@@ -761,10 +761,11 @@
                 // Cargar wishlist
                 const wishlistResponse = await window.api.getWishlist();
                 if (wishlistResponse.success) {
-                    const items = wishlistResponse.data.items || [];
+                    const lists = wishlistResponse.data.lists || [];
+                    const wishlistTotal = lists.reduce((sum, list) => sum + (list.items?.length || 0), 0);
                     const wishlistCountEl = document.getElementById('wishlistCount');
                     if (wishlistCountEl) {
-                        animateCounter(wishlistCountEl, items.length);
+                        animateCounter(wishlistCountEl, wishlistTotal);
                     }
                 }
             } catch (error) {
