@@ -9,6 +9,7 @@ class Cart {
         'cart.quantity',
         'cart.created_at',
         'products.id as product_id',
+        'products.category_id as category_id',
         'products.name',
         'products.slug',
         'products.price',

@@ -16,6 +16,8 @@ let shippingData = {};
 let paymentData = {};
 let orderNumber = null;
 
+window.addEventListener('couponUpdated', handleCouponUpdate);
+
 // Inicializar checkout
 document.addEventListener('DOMContentLoaded', async () => {
     // Esperar a que el authManager se inicialice
@@ -78,6 +80,19 @@ async function loadCheckout() {
         }
 
         cartData = cartResponse.data;
+        const baseSubtotal = Number(cartData.subtotal ?? cartData.total ?? 0);
+        cartData.subtotal = baseSubtotal;
+        cartData.shipping = Number(cartData.shipping ?? 0);
+        const couponItems = cartData.items.map(item => ({
+            product_id: item.product_id,
+            category_id: item.category_id,
+            brand: item.brand
+        }));
+
+        if (window.couponsManager) {
+            window.couponsManager.setCartContext(couponItems, baseSubtotal);
+            window.couponsManager.context = 'checkout';
+        }
         
         // Cargar puntos de fidelidad disponibles
         try {
@@ -595,6 +610,15 @@ function validatePaymentForm() {
 
 // Renderizar resumen del pedido
 function renderOrderSummary() {
+    if (!cartData) return;
+
+    const subtotal = Number(cartData.subtotal ?? cartData.total ?? 0);
+    const shippingAmount = Number(cartData.shipping ?? 30.0);
+    const couponDiscount = Number(discount || 0);
+    const pointsDiscount = Number(loyaltyPointsDiscount || 0);
+    const totalBeforePoints = Math.max(subtotal + shippingAmount - couponDiscount, 0);
+    const totalDue = Math.max(totalBeforePoints - pointsDiscount, 0);
+
     const summaryHTML = `
         <div class="order-summary">
             <h3>Resumen del Pedido</h3>
@@ -609,6 +633,7 @@ function renderOrderSummary() {
                     </div>
                 `).join('')}
             </div>
+            <div id="checkoutCouponSection"></div>
             ${availableLoyaltyPoints > 0 ? `
             <div class="loyalty-section" style="padding: 15px; background: #f8f9fa; border-radius: 8px; margin: 20px 0;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
@@ -631,10 +656,10 @@ function renderOrderSummary() {
                     </div>
                     `}
                 </div>
-                ${loyaltyPointsDiscount > 0 ? `
+                ${pointsDiscount > 0 ? `
                 <div class="summary-row" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #ddd;">
                     <span>Descuento por Puntos</span>
-                    <span style="color: #10b981;">-S/ ${loyaltyPointsDiscount.toFixed(2)}</span>
+                    <span style="color: #10b981;">-S/ ${pointsDiscount.toFixed(2)}</span>
                 </div>
                 ` : ''}
             </div>
@@ -642,33 +667,64 @@ function renderOrderSummary() {
             <div class="summary-totals">
                 <div class="summary-row">
                     <span>Subtotal</span>
-                    <span>S/ ${parseFloat(cartData.subtotal).toFixed(2)}</span>
+                    <span>S/ ${subtotal.toFixed(2)}</span>
                 </div>
                 <div class="summary-row">
                     <span>Envío</span>
-                    <span>S/ ${(cartData.shipping || 30.00).toFixed(2)}</span>
+                    <span>S/ ${shippingAmount.toFixed(2)}</span>
                 </div>
-                ${discount > 0 ? `
+                ${couponDiscount > 0 ? `
                 <div class="summary-row">
                     <span>Descuento Cupón</span>
-                    <span>-S/ ${parseFloat(discount).toFixed(2)}</span>
+                    <span>-S/ ${couponDiscount.toFixed(2)}</span>
                 </div>
                 ` : ''}
-                ${loyaltyPointsDiscount > 0 ? `
+                ${pointsDiscount > 0 ? `
                 <div class="summary-row">
                     <span>Descuento Puntos</span>
-                    <span style="color: #10b981;">-S/ ${loyaltyPointsDiscount.toFixed(2)}</span>
+                    <span style="color: #10b981;">-S/ ${pointsDiscount.toFixed(2)}</span>
                 </div>
                 ` : ''}
                 <div class="summary-row total">
                     <span>Total</span>
-                    <span>S/ ${(parseFloat(cartData.total) - loyaltyPointsDiscount).toFixed(2)}</span>
+                    <span>S/ ${totalDue.toFixed(2)}</span>
                 </div>
             </div>
         </div>
     `;
-    
-    document.getElementById('orderSummary').innerHTML = summaryHTML;
+
+    const summaryContainer = document.getElementById('orderSummary');
+    if (!summaryContainer) return;
+    summaryContainer.innerHTML = summaryHTML;
+    mountCheckoutCoupons();
+}
+
+function mountCheckoutCoupons() {
+    if (!window.couponsManager) return;
+    window.couponsManager.context = 'checkout';
+    window.couponsManager.containerId = 'checkoutCouponSection';
+    window.couponsManager.renderCouponForm('checkoutCouponSection');
+
+    if (!window.couponsManager.availableCouponsLoaded && !window.couponsManager.availableCouponsLoading) {
+        window.couponsManager.loadAvailableCoupons();
+    } else {
+        window.couponsManager.renderAvailableCouponsList();
+    }
+}
+
+function handleCouponUpdate(event) {
+    if (!cartData) return;
+    if (!document.getElementById('orderSummary')) return;
+
+    const detail = event.detail || {};
+    discount = Number(detail.discount || 0);
+    appliedCoupon = detail.applied && detail.coupon ? detail.coupon.code : null;
+    cartData.coupon = detail.coupon || null;
+    cartData.totalWithDiscount = detail.totalWithDiscount
+        ? Number(detail.totalWithDiscount)
+        : Math.max((cartData.subtotal ?? cartData.total ?? 0) - discount, 0);
+
+    renderOrderSummary();
 }
 
 // Procesar pedido
@@ -720,7 +776,9 @@ async function processOrder() {
         }
 
         // Crear pedido
-        const finalTotal = parseFloat(cartData.total) - discount - loyaltyPointsDiscount;
+        const subtotal = Number(cartData.subtotal ?? cartData.total ?? 0);
+        const shippingAmount = Number(cartData.shipping ?? 30.0);
+        const finalTotal = Math.max(subtotal + shippingAmount - discount - loyaltyPointsDiscount, 0);
         const orderData = {
             // Datos de envío (formato plano para el backend)
             shipping_address: shippingData.address,
@@ -764,42 +822,6 @@ async function processOrder() {
     }
 }
 
-// Aplicar cupón
-async function applyCoupon() {
-    const couponInput = document.getElementById('couponCode');
-    const couponCode = couponInput.value.trim();
-    
-    if (!couponCode) {
-        window.notifications.warning('Ingresa un código de cupón');
-        return;
-    }
-    
-    try {
-        const items = cartData.items.map(item => ({
-          product_id: item.product_id,
-          category_id: item.category_id,
-          brand: item.brand
-        }));
-        
-        const response = await window.api.validateCoupon(couponCode, cartData.total, items);
-        
-        if (response.success) {
-            appliedCoupon = couponCode;
-            discount = response.data.discount;
-            cartData.total = cartData.subtotal + (cartData.shipping || 30.00) - discount;
-            
-            window.notifications.success('Cupón aplicado exitosamente');
-            renderOrderSummary();
-        } else {
-            throw new Error(response.message || 'Cupón inválido');
-        }
-    } catch (error) {
-        console.error('Error al aplicar cupón:', error);
-        window.notifications.error(error.message || 'Error al aplicar cupón');
-    }
-}
-
-
 // Seleccionar método de pago
 function selectPaymentMethod(method) {
     selectedPaymentMethod = method;
@@ -824,7 +846,9 @@ async function useLoyaltyPoints() {
     }
 
     // Calcular el máximo de puntos que se pueden usar (no más del total)
-    const maxDiscount = parseFloat(cartData.total) - discount;
+    const subtotal = Number(cartData.subtotal ?? cartData.total ?? 0);
+    const shippingAmount = Number(cartData.shipping ?? 30.0);
+    const maxDiscount = Math.max(subtotal + shippingAmount - discount, 0);
     const maxPointsDiscount = Math.min(availableLoyaltyPoints / 10, maxDiscount);
     const pointsToUse = Math.floor(maxPointsDiscount * 10);
 

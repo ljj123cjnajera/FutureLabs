@@ -125,6 +125,20 @@ class Coupon {
       .orderBy('created_at', 'desc');
   }
 
+  static async findActiveForUser() {
+    const now = new Date();
+
+    return await knex('coupons')
+      .where('is_active', true)
+      .andWhere('valid_from', '<=', now)
+      .andWhere('valid_until', '>=', now)
+      .andWhere(function() {
+        this.whereNull('max_uses')
+          .orWhere('used_count', '<', knex.ref('max_uses'));
+      })
+      .orderBy('valid_until', 'asc');
+  }
+
   static async findById(id) {
     const [coupon] = await knex('coupons')
       .where('id', id);

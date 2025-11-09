@@ -510,6 +510,10 @@ class FutureLabsAPI {
     });
   }
 
+  async getAvailableCoupons() {
+    return this.request('/coupons/available');
+  }
+
   async getCoupons() {
     return this.request('/coupons');
   }

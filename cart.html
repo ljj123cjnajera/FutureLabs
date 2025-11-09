@@ -27,8 +27,6 @@
     <link rel="stylesheet" href="css/responsive.css?v=2.0">
     <link rel="stylesheet" href="css/notifications.css?v=2.0">
     <link rel="stylesheet" href="css/coupons.css?v=2.0">
-    <link rel="stylesheet" href="css/home-link-fix.css?v=2.0">
-    <link rel="stylesheet" href="force-reload.css?v=2.0">
     <link rel="stylesheet" href="css/breadcrumbs.css?v=1.0">
 </head>
 <body>
@@ -67,213 +65,311 @@
     <script src="js/cart.js"></script>
     <script src="js/coupons.js"></script>
     <script src="js/components.js"></script>
-    <script src="js/fix-home-link.js"></script>
     <script src="js/breadcrumbs.js"></script>
     
     <script>
-        // Inicializar header dinámico (sin barra de búsqueda)
-        document.addEventListener('DOMContentLoaded', function() {
-            const headerContainer = document.getElementById('mainHeader');
-            if (headerContainer && window.Components) {
-                headerContainer.innerHTML = window.Components.getHeader(false, false); // false = sin barra de búsqueda, false = sin navegación
-                window.Components.initHeader();
-            }
-            
-            // Esperar a que el authManager se inicialice
-            
-            // Esperar a que la inicialización se complete
-            const checkAuth = setInterval(() => {
-                if (window.authManager && !window.authManager.isInitializing) {
-                    clearInterval(checkAuth);
-                    console.log('✅ AuthManager inicializado completamente');
-                    loadCart();
+        (function() {
+            const FREE_SHIPPING_THRESHOLD = 200;
+            let cartItems = [];
+            let cartTotal = 0;
+            let couponListenerRegistered = false;
+
+            document.addEventListener('DOMContentLoaded', async () => {
+                initHeader();
+                await waitForAuth();
+                loadCart();
+            });
+
+            function initHeader() {
+                const headerContainer = document.getElementById('mainHeader');
+                if (headerContainer && window.Components) {
+                    headerContainer.innerHTML = window.Components.getHeader(false, false);
+                    window.Components.initHeader();
                 }
-            }, 100);
-        });
-        
-        // Cargar carrito
-        async function loadCart() {
-            const container = document.getElementById('cartContainer');
-            
-            try {
-                // Verificar si el usuario está autenticado
-                console.log('🔍 Verificando autenticación en cart.html...');
-                console.log('🔍 authManager existe:', typeof window.authManager);
-                console.log('🔍 isAuthenticated:', window.authManager ? window.authManager.isAuthenticated() : 'authManager no existe');
-                
-                if (!window.authManager || !window.authManager.isAuthenticated()) {
-                    console.log('❌ Usuario no autenticado, mostrando mensaje de login');
+            }
+
+            function waitForAuth() {
+                return new Promise((resolve) => {
+                    const interval = setInterval(() => {
+                        if (window.authManager && !window.authManager.isInitializing) {
+                            clearInterval(interval);
+                            resolve();
+                        }
+                    }, 100);
+
+                    setTimeout(() => {
+                        clearInterval(interval);
+                        resolve();
+                    }, 5000);
+                });
+            }
+
+            async function loadCart() {
+                const container = document.getElementById('cartContainer');
+                if (!container) return;
+
                 container.innerHTML = `
-                    <div class="empty-cart">
-                        <i class="fas fa-shopping-cart"></i>
-                            <h2>Inicia sesión para ver tu carrito</h2>
-                            <p>Necesitas estar autenticado para ver tu carrito de compras</p>
-                            <button class="btn-shop" onclick="window.location.href='index.html'">Ir a Inicio</button>
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Cargando carrito...</p>
                     </div>
                 `;
-                return;
-            }
-            
-                console.log('✅ Usuario autenticado, cargando carrito...');
 
-                const response = await window.api.getCart();
-                
-                if (response.success && response.data.items.length > 0) {
-                    const items = response.data.items;
-                    const total = response.data.total;
-                    
-                    // Calcular envío gratis (umbral: S/ 200)
-                    const FREE_SHIPPING_THRESHOLD = 200;
-                    const remaining = Math.max(0, FREE_SHIPPING_THRESHOLD - total);
-                    const progress = Math.min(100, (total / FREE_SHIPPING_THRESHOLD) * 100);
-                    const hasFreeShipping = total >= FREE_SHIPPING_THRESHOLD;
-                    
-                    function renderShippingProgressBar(total, remaining, progress, hasFreeShipping) {
-                        if (hasFreeShipping) {
-                            return `
-                                <div class="shipping-progress-bar shipping-achieved">
-                                    <div class="shipping-progress-header">
-                                        <i class="fas fa-check-circle"></i>
-                                        <span>¡Envío gratis activado!</span>
-                                    </div>
-                                    <div class="shipping-progress-full">
-                                        <div class="shipping-progress-fill" style="width: 100%"></div>
-                                    </div>
-                                </div>
-                            `;
-                        }
-                        return `
-                            <div class="shipping-progress-bar">
-                                <div class="shipping-progress-header">
-                                    <i class="fas fa-truck"></i>
-                                    <span>Te faltan S/ ${remaining.toFixed(2)} para envío gratis</span>
-                                </div>
-                                <div class="shipping-progress-full">
-                                    <div class="shipping-progress-fill" style="width: ${progress}%"></div>
-                                </div>
-                                <div class="shipping-progress-text">
-                                    <span>S/ ${total.toFixed(2)}</span>
-                                    <span>S/ ${FREE_SHIPPING_THRESHOLD.toFixed(2)}</span>
-                                </div>
-                            </div>
-                        `;
+                try {
+                    if (!window.authManager?.isAuthenticated()) {
+                        container.innerHTML = renderAuthRequiredState();
+                        mountCoupons([], 0);
+                        updateSummaryTotals();
+                        return;
                     }
-            
-            container.innerHTML = `
-                <div class="cart-container">
-                    <div class="cart-items">
-                                <h2 style="margin-bottom: 20px;">Productos (${items.length})</h2>
-                                ${items.map(item => `
-                            <div class="cart-item">
-                                <div class="cart-item-image">
-                                            <img src="${item.image_url || 'assets/images/products/placeholder.jpg'}" alt="${item.name}">
-                                </div>
-                                <div class="cart-item-info">
-                                            <h3>${item.name}</h3>
-                                    <p class="cart-item-brand">${item.brand}</p>
-                                            <p class="cart-item-price">S/ ${item.price}</p>
-                                            <div class="cart-item-actions">
-                                    <div class="quantity-controls">
-                                                    <button class="quantity-btn" onclick="updateQuantity('${item.product_id}', ${item.quantity - 1})">-</button>
-                                                    <input type="text" class="quantity-input" value="${item.quantity}" readonly>
-                                                    <button class="quantity-btn" onclick="updateQuantity('${item.product_id}', ${item.quantity + 1})">+</button>
-                                    </div>
-                                                <button class="remove-btn" onclick="removeItem('${item.product_id}')">
-                                                    <i class="fas fa-trash"></i> Eliminar
-                        </button>
-                    </div>
-                                </div>
+
+                    const response = await window.api.getCart();
+                    if (!response?.success) {
+                        throw new Error(response?.message || 'No se pudo cargar el carrito');
+                    }
+
+                    cartItems = response.data?.items || [];
+                    cartTotal = Number(response.data?.total || 0);
+
+                    if (cartItems.length === 0) {
+                        container.innerHTML = renderEmptyCartState();
+                        mountCoupons([], cartTotal);
+                        updateSummaryTotals();
+                        return;
+                    }
+
+                    container.innerHTML = renderCartMarkup(cartItems, cartTotal);
+                    mountCoupons(cartItems, cartTotal);
+                    registerCouponListener();
+                    updateSummaryTotals();
+                } catch (error) {
+                    console.error('Error al cargar el carrito:', error);
+                    container.innerHTML = renderErrorState(error);
+                }
+            }
+
+            function renderCartMarkup(items, total) {
+                const remaining = Math.max(0, FREE_SHIPPING_THRESHOLD - total);
+                const progress = Math.min(100, (total / FREE_SHIPPING_THRESHOLD) * 100);
+                const hasFreeShipping = total >= FREE_SHIPPING_THRESHOLD;
+
+                return `
+                    <div class="cart-container">
+                        <div class="cart-items">
+                            <h2 style="margin-bottom: 20px;">Productos (${items.length})</h2>
+                            ${items.map(renderCartItem).join('')}
+                        </div>
+                        <div class="cart-summary">
+                            <h2 style="margin-bottom: 20px;">Resumen</h2>
+                            ${renderShippingProgressBar(total, remaining, progress, hasFreeShipping)}
+                            <div id="couponSection"></div>
+                            <div class="summary-row">
+                                <span>Subtotal</span>
+                                <span>S/ ${total.toFixed(2)}</span>
                             </div>
-                        `).join('')}
+                            <div class="summary-row">
+                                <span>Envío</span>
+                                <span>Gratis</span>
+                            </div>
+                            <div id="discountRow" class="summary-discount" style="display: none;">
+                                <span class="discount-label">
+                                    <i class="fas fa-tag"></i> Descuento
+                                </span>
+                                <span class="discount-amount" id="discountAmount">-S/ 0.00</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Total</span>
+                                <span id="finalTotal">S/ ${total.toFixed(2)}</span>
+                            </div>
+                            <button class="checkout-btn" type="button" onclick="checkout()">
+                                <i class="fas fa-lock"></i> Proceder al Pago
+                            </button>
+                        </div>
                     </div>
-                    
-                            <div class="cart-summary">
-                                <h2 style="margin-bottom: 20px;">Resumen</h2>
-                                
-                                <!-- Progress Bar Envío Gratis -->
-                                ${renderShippingProgressBar(total, remaining, progress, hasFreeShipping)}
-                                
-                                <!-- Sección de Cupón -->
-                                <div id="couponSection"></div>
-                                
-                                <div class="summary-row">
-                                    <span>Subtotal</span>
-                                    <span>S/ ${total.toFixed(2)}</span>
+                `;
+            }
+
+            function renderCartItem(item) {
+                const price = Number(item.price || item.discount_price || 0);
+                return `
+                    <div class="cart-item">
+                        <div class="cart-item-image">
+                            <img src="${item.image_url || 'assets/images/products/placeholder.jpg'}" alt="${item.name}">
+                        </div>
+                        <div class="cart-item-info">
+                            <h3>${item.name}</h3>
+                            ${item.brand ? `<p class="cart-item-brand">${item.brand}</p>` : ''}
+                            <p class="cart-item-price">S/ ${price.toFixed(2)}</p>
+                            <div class="cart-item-actions">
+                                <div class="quantity-controls">
+                                    <button class="quantity-btn" type="button" onclick="updateQuantity('${item.product_id}', ${item.quantity - 1})">-</button>
+                                    <input type="text" class="quantity-input" value="${item.quantity}" readonly>
+                                    <button class="quantity-btn" type="button" onclick="updateQuantity('${item.product_id}', ${item.quantity + 1})">+</button>
                                 </div>
-                                <div class="summary-row">
-                                    <span>Envío</span>
-                                    <span>Gratis</span>
-                                </div>
-                                <div id="discountRow" class="summary-discount" style="display: none;">
-                                    <span class="discount-label">
-                                        <i class="fas fa-tag"></i> Descuento
-                                    </span>
-                                    <span class="discount-amount" id="discountAmount">-S/ 0.00</span>
-                                </div>
-                                <div class="summary-row">
-                                    <span>Total</span>
-                                    <span id="finalTotal">S/ ${total.toFixed(2)}</span>
-                                </div>
-                                <button class="checkout-btn" onclick="checkout()">
-                                    <i class="fas fa-lock"></i> Proceder al Pago
+                                <button class="remove-btn" type="button" onclick="removeItem('${item.product_id}')">
+                                    <i class="fas fa-trash"></i> Eliminar
                                 </button>
                             </div>
                         </div>
-                    `;
-                } else {
-                    container.innerHTML = `
-                        <div class="empty-cart">
-                            <i class="fas fa-shopping-cart"></i>
-                            <h2>Tu carrito está vacío</h2>
-                            <p>Agrega productos para comenzar a comprar</p>
-                            <button class="btn-shop" onclick="window.location.href='products.html'">Ver Productos</button>
+                    </div>
+                `;
+            }
+
+            function renderShippingProgressBar(total, remaining, progress, hasFreeShipping) {
+                if (hasFreeShipping) {
+                    return `
+                        <div class="shipping-progress-bar shipping-achieved">
+                            <div class="shipping-progress-header">
+                                <i class="fas fa-check-circle"></i>
+                                <span>¡Envío gratis activado!</span>
+                            </div>
+                            <div class="shipping-progress-full">
+                                <div class="shipping-progress-fill" style="width: 100%"></div>
+                            </div>
                         </div>
                     `;
                 }
-            } catch (error) {
-                container.innerHTML = `
+
+                return `
+                    <div class="shipping-progress-bar">
+                        <div class="shipping-progress-header">
+                            <i class="fas fa-truck"></i>
+                            <span>Te faltan S/ ${remaining.toFixed(2)} para envío gratis</span>
+                        </div>
+                        <div class="shipping-progress-full">
+                            <div class="shipping-progress-fill" style="width: ${progress}%"></div>
+                        </div>
+                        <div class="shipping-progress-text">
+                            <span>S/ ${total.toFixed(2)}</span>
+                            <span>S/ ${FREE_SHIPPING_THRESHOLD.toFixed(2)}</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function renderAuthRequiredState() {
+                return `
+                    <div class="empty-cart">
+                        <i class="fas fa-shopping-cart"></i>
+                        <h2>Inicia sesión para ver tu carrito</h2>
+                        <p>Necesitas estar autenticado para ver tu carrito de compras</p>
+                        <button class="btn-shop" type="button" onclick="window.location.href='index.html'">Ir a Inicio</button>
+                    </div>
+                `;
+            }
+
+            function renderEmptyCartState() {
+                return `
+                    <div class="empty-cart">
+                        <i class="fas fa-shopping-cart"></i>
+                        <h2>Tu carrito está vacío</h2>
+                        <p>Agrega productos para comenzar a comprar</p>
+                        <button class="btn-shop" type="button" onclick="window.location.href='products.html'">Ver Productos</button>
+                    </div>
+                `;
+            }
+
+            function renderErrorState(error) {
+                const message = error?.message || 'Ocurrió un error inesperado';
+                return `
                     <div class="empty-cart">
                         <i class="fas fa-exclamation-triangle"></i>
                         <h2>Error al cargar el carrito</h2>
-                        <p>${error.message}</p>
-                        <button class="btn-shop" onclick="window.location.href='index.html'">Ir a Inicio</button>
-                </div>
-            `;
-        }
-        }
-        
-        // Actualizar cantidad
-        async function updateQuantity(productId, quantity) {
-            if (quantity < 1) {
-                await removeItem(productId);
-                return;
+                        <p>${message}</p>
+                        <button class="btn-shop" type="button" onclick="window.location.href='index.html'">Ir a Inicio</button>
+                    </div>
+                `;
             }
-            
-            await window.cartManager.update(productId, quantity);
-            await loadCart();
-        }
-        
-        // Eliminar item
-        async function removeItem(productId) {
-            await window.cartManager.remove(productId);
-            await loadCart();
-        }
 
-        // Checkout
-        function checkout() {
-            window.notifications.info('Redirigiendo al checkout...');
-            setTimeout(() => {
-                window.location.href = 'checkout.html';
-            }, 1000);
-        }
+            function mountCoupons(items, total) {
+                const couponItems = items.map((item) => ({
+                    product_id: item.product_id,
+                    category_id: item.category_id,
+                    brand: item.brand
+                }));
 
-        // Actualizar contador de carrito
-        document.addEventListener('cartUpdated', (e) => {
-            const cartCount = document.querySelector('.cart-count');
-            if (cartCount) {
-                cartCount.textContent = e.detail.count;
+                window.couponsManager.setCartContext(couponItems, total);
+                window.couponsManager.init({
+                    context: 'cart',
+                    containerId: 'couponSection'
+                });
             }
-        });
+
+            function registerCouponListener() {
+                if (couponListenerRegistered) return;
+                couponListenerRegistered = true;
+                window.addEventListener('couponUpdated', handleCouponUpdated);
+            }
+
+            function handleCouponUpdated(event) {
+                const detail = event.detail || {};
+                const discount = Number(detail.discount || 0);
+                const totalWithDiscount = Number(
+                    detail.totalWithDiscount || window.couponsManager.calculateNewTotal(cartTotal)
+                );
+
+                const discountRow = document.getElementById('discountRow');
+                const discountAmountEl = document.getElementById('discountAmount');
+                const finalTotalEl = document.getElementById('finalTotal');
+
+                if (discountRow && discountAmountEl) {
+                    if (discount > 0) {
+                        discountRow.style.display = 'flex';
+                        discountAmountEl.textContent = `-S/ ${discount.toFixed(2)}`;
+                    } else {
+                        discountRow.style.display = 'none';
+                    }
+                }
+
+                if (finalTotalEl) {
+                    finalTotalEl.textContent = `S/ ${totalWithDiscount.toFixed(2)}`;
+                }
+            }
+
+            function updateSummaryTotals() {
+                handleCouponUpdated({
+                    detail: {
+                        discount: window.couponsManager.getDiscount(),
+                        coupon: window.couponsManager.getAppliedCoupon(),
+                        total: cartTotal,
+                        totalWithDiscount: window.couponsManager.calculateNewTotal(cartTotal)
+                    }
+                });
+            }
+
+            async function updateQuantity(productId, quantity) {
+                if (quantity < 1) {
+                    await removeItem(productId);
+                    return;
+                }
+
+                await window.cartManager.update(productId, quantity);
+                await loadCart();
+            }
+
+            async function removeItem(productId) {
+                await window.cartManager.remove(productId);
+                await loadCart();
+            }
+
+            function checkout() {
+                window.notifications?.info?.('Redirigiendo al checkout...');
+                setTimeout(() => {
+                    window.location.href = 'checkout.html';
+                }, 600);
+            }
+
+            document.addEventListener('cartUpdated', (event) => {
+                const cartCount = document.querySelector('.cart-count');
+                if (cartCount) {
+                    cartCount.textContent = event.detail.count;
+                }
+            });
+
+            window.updateQuantity = updateQuantity;
+            window.removeItem = removeItem;
+            window.checkout = checkout;
+        })();
     </script>
 </body>
 </html>

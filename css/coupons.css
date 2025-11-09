@@ -1,5 +1,122 @@
 /* 🎟️ Sistema de Cupones - FutureLabs */
 
+.coupon-widget {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+    box-shadow: var(--shadow-sm, 0 12px 30px rgba(15, 23, 42, 0.06));
+}
+
+.coupon-widget > section + section {
+    margin-top: var(--spacing-lg);
+}
+
+.coupon-message {
+    margin-top: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    min-height: 18px;
+}
+
+.coupon-message.is-success {
+    color: var(--success);
+}
+
+.coupon-message.is-error {
+    color: var(--error);
+}
+
+.coupon-message.is-warning {
+    color: var(--warning);
+}
+
+.coupon-message.is-info {
+    color: var(--primary);
+}
+
+.coupon-applied {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.coupon-suggestions {
+    border-top: 1px dashed var(--gray-200);
+    padding-top: var(--spacing-lg);
+}
+
+.coupon-suggestions-header h4 {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-xs);
+}
+
+.coupon-suggestions-header p {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin: 0 0 var(--spacing-md) 0;
+}
+
+.empty-state {
+    text-align: center;
+    padding: var(--spacing-lg);
+    border: 1px dashed var(--gray-200);
+    border-radius: var(--border-radius-lg);
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+}
+
+.empty-state i {
+    display: block;
+    font-size: 24px;
+    margin-bottom: var(--spacing-sm);
+    color: var(--primary);
+}
+
+.coupons-list.skeleton {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.skeleton-card {
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-lg);
+    background: linear-gradient(
+        90deg,
+        rgba(226, 232, 240, 0.6) 0%,
+        rgba(241, 245, 249, 0.9) 50%,
+        rgba(226, 232, 240, 0.6) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.skeleton-line {
+    height: 14px;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 999px;
+    margin-bottom: var(--spacing-sm);
+}
+
+.skeleton-line.short {
+    width: 60%;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
 /* Formulario de Cupón */
 .coupon-form {
     background: var(--gray-50);
@@ -225,6 +342,11 @@
 
 .coupon-card.active .coupon-card-apply {
     color: var(--success);
+}
+
+.coupon-card-apply[disabled] {
+    opacity: 0.6;
+    cursor: default;
 }
 
 /* Descuento en Resumen */

@@ -34,6 +34,56 @@ router.post('/validate', async (req, res) => {
   }
 });
 
+// Obtener cupones disponibles para usuarios
+router.get('/available', async (_req, res) => {
+  try {
+    const coupons = await Coupon.findActiveForUser();
+
+    const formatted = coupons.map((coupon) => {
+      const remainingUses = coupon.max_uses
+        ? Math.max(coupon.max_uses - (coupon.used_count || 0), 0)
+        : null;
+
+      const expiresInDays = coupon.valid_until
+        ? Math.ceil(
+            (new Date(coupon.valid_until).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+          )
+        : null;
+
+      return {
+        id: coupon.id,
+        code: coupon.code,
+        type: coupon.type,
+        value: Number(coupon.value),
+        description: coupon.description,
+        min_purchase: coupon.min_purchase ? Number(coupon.min_purchase) : 0,
+        min_order_amount: coupon.min_order_amount ? Number(coupon.min_order_amount) : null,
+        max_uses: coupon.max_uses,
+        used_count: coupon.used_count,
+        remaining_uses: remainingUses,
+        valid_from: coupon.valid_from,
+        valid_until: coupon.valid_until,
+        expires_in_days: expiresInDays,
+        restricted_to_categories: coupon.restricted_to_categories,
+        restricted_to_brands: coupon.restricted_to_brands
+      };
+    });
+
+    res.json({
+      success: true,
+      data: {
+        coupons: formatted
+      }
+    });
+  } catch (error) {
+    console.error('Error obteniendo cupones disponibles:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener cupones disponibles'
+    });
+  }
+});
+
 // Obtener todos los cupones (admin)
 router.get('/', requireAdmin, async (req, res) => {
   try {
