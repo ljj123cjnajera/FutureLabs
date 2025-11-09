@@ -288,7 +288,9 @@
                 const container = document.getElementById('ordersContainer');
                 if (!container) return;
 
-                container.innerHTML = renderLoadingState();
+                window.loadingState.renderLoading(container, 'Cargando pedidos...', {
+                    className: 'loading-state',
+                });
 
                 try {
                     if (!window.authManager || !window.authManager.isAuthenticated()) {
@@ -311,7 +313,10 @@
                     container.innerHTML = orders.map(renderOrderCard).join('');
                 } catch (error) {
                     console.error('Error al cargar pedidos', error);
-                    container.innerHTML = renderErrorState(error);
+                    window.loadingState.renderError(container, error?.message || 'Error al cargar tus pedidos', {
+                        className: 'loading-state loading-state-error',
+                        spinner: false,
+                    });
                 }
             }
 
@@ -375,15 +380,6 @@
                         </div>
                     </div>
                 `).join('');
-            }
-
-            function renderLoadingState() {
-                return `
-                    <div style="text-align: center; padding: 80px;">
-                        <div class="loading-spinner large"></div>
-                        <p style="margin-top: 18px;">Cargando pedidos...</p>
-                    </div>
-                `;
             }
 
             function renderAuthRequiredState() {

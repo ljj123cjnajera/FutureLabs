@@ -83,6 +83,47 @@
     set: setProgress
   };
 })();
+window.loadingState = (() => {
+  const defaultMessages = {
+    loading: 'Cargando...',
+    empty: 'Sin resultados disponibles',
+    error: 'Ocurrió un error al cargar la información'
+  };
+
+  function createContainer(message, options = {}) {
+    const wrapper = document.createElement('div');
+    wrapper.className = options.className || 'loading-state';
+    if (options.variant) {
+      wrapper.classList.add(`loading-state-${options.variant}`);
+    }
+    wrapper.innerHTML = `
+      <div class="loading-state-content">
+        ${options.spinner !== false ? '<div class="loading-spinner"></div>' : ''}
+        <p>${message}</p>
+      </div>
+    `;
+    return wrapper;
+  }
+
+  function render(target, message, options = {}) {
+    const container = typeof target === 'string' ? document.querySelector(target) : target;
+    if (!container) return;
+    container.innerHTML = '';
+    container.appendChild(createContainer(message, options));
+  }
+
+  return {
+    renderLoading(target, message = defaultMessages.loading, options = {}) {
+      render(target, message, { ...options, variant: 'loading' });
+    },
+    renderEmpty(target, message = defaultMessages.empty, options = {}) {
+      render(target, message, { ...options, variant: 'empty', spinner: false });
+    },
+    renderError(target, message = defaultMessages.error, options = {}) {
+      render(target, message, { ...options, variant: 'error', spinner: false });
+    }
+  };
+})();
 class FutureLabsAPI {
   constructor() {
     this.baseURL = 'https://futurelabs-production.up.railway.app/api';

@@ -110,16 +110,11 @@
                 const container = document.getElementById('cartContainer');
                 if (!container) return;
 
-                container.innerHTML = `
-                    <div class="loading">
-                        <div class="loading-spinner"></div>
-                        <p>Cargando carrito...</p>
-                    </div>
-                `;
+                window.loadingState.renderLoading(container, 'Cargando carrito...');
 
                 try {
                     if (!window.authManager?.isAuthenticated()) {
-                        container.innerHTML = renderAuthRequiredState();
+                    container.innerHTML = renderAuthRequiredState();
                         mountCoupons([], 0);
                         updateSummaryTotals();
                         return;

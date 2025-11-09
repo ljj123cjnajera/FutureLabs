@@ -386,6 +386,43 @@
     border: 1px solid var(--border);
 }
 
+.loading-state {
+    padding: var(--spacing-3xl);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-md);
+}
+
+.loading-state.loading-state-empty,
+.loading-state.loading-state-error {
+    background: var(--gray-50);
+}
+
+.loading-state-content {
+    display: grid;
+    justify-items: center;
+    gap: var(--spacing-md);
+}
+
+.loading-state-content p {
+    margin: 0;
+    font-size: var(--font-size-lg);
+    color: var(--text-secondary);
+}
+
+.loading-state-error .loading-state-content p {
+    color: var(--error);
+}
+
+.loading-state-empty .loading-state-content p {
+    color: var(--gray-600);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .skeleton-grid {

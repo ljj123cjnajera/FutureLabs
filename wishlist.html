@@ -496,32 +496,29 @@
 
             function renderLoading() {
                 if (!elements.container) return;
-                elements.container.innerHTML = `
-                    <div class="wishlist-empty-state loading">
-                        <div class="loading-spinner"></div>
-                        <p>Cargando wishlist...</p>
-                    </div>
-                `;
+                window.loadingState.renderLoading(elements.container, 'Cargando wishlist...', {
+                    className: 'wishlist-empty-state loading'
+                });
             }
 
             function renderAuthRequired() {
                 if (!elements.container) return;
 
-                elements.container.innerHTML = `
-                    <div class="wishlist-empty-state">
-                        <i class="fas fa-lock"></i>
-                        <h2>Inicia sesión para ver tu wishlist</h2>
-                        <p>Necesitas estar autenticado para administrar tus listas de productos favoritos.</p>
-                        <div class="wishlist-empty-actions">
-                            <button class="btn btn-primary btn-sm" onclick="window.modalManager?.showLogin?.()">
-                                <i class="fas fa-sign-in-alt"></i> Iniciar sesión
-                            </button>
-                            <button class="btn btn-outline btn-sm" onclick="window.location.href='index.html'">
-                                <i class="fas fa-home"></i> Volver al inicio
-                            </button>
+                    elements.container.innerHTML = `
+                        <div class="wishlist-empty-state">
+                            <i class="fas fa-lock"></i>
+                            <h2>Inicia sesión para ver tu wishlist</h2>
+                            <p>Necesitas estar autenticado para administrar tus listas de productos favoritos.</p>
+                            <div class="wishlist-empty-actions">
+                                <button class="btn btn-primary btn-sm" onclick="window.modalManager?.showLogin?.()">
+                                    <i class="fas fa-sign-in-alt"></i> Iniciar sesión
+                                </button>
+                                <button class="btn btn-outline btn-sm" onclick="window.location.href='index.html'">
+                                    <i class="fas fa-home"></i> Volver al inicio
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                `;
+                    `;
             }
 
             function updateMoveTargetOptions(lists, activeListId) {

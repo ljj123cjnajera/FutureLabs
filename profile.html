@@ -244,12 +244,7 @@
                                 <i class="fas fa-plus"></i> Nueva Dirección
                             </button>
                         </div>
-                        <div id="addressesList" class="address-list">
-                            <div class="loading">
-                                <div class="loading-spinner"></div>
-                                <p>Cargando direcciones...</p>
-                            </div>
-                        </div>
+                        <div id="addressesList" class="address-list"></div>
                     </div>
                 </div>
 
@@ -297,12 +292,7 @@
                         <div class="profile-content-section-header">
                             <h2><i class="fas fa-star"></i> Historial de Puntos</h2>
                         </div>
-                        <div id="loyaltyTransactions" class="loyalty-transactions">
-                            <div class="loading">
-                                <div class="loading-spinner"></div>
-                                <p>Cargando transacciones...</p>
-                            </div>
-                        </div>
+                        <div id="loyaltyTransactions" class="loyalty-transactions"></div>
                     </div>
                 </div>
             </div>
@@ -776,7 +766,10 @@
         // Cargar direcciones
         async function loadAddresses() {
             const container = document.getElementById('addressesList');
-            
+            if (!container) return;
+
+            window.loadingState.renderLoading(container, 'Cargando direcciones...');
+
             try {
                 const response = await window.api.getAddresses();
                 
@@ -822,22 +815,16 @@
                         </div>
                     `).join('');
                 } else {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <h3>Error al cargar direcciones</h3>
-                            <p>${response.message || 'Error desconocido'}</p>
-                        </div>
-                    `;
+                    window.loadingState.renderError(container, response.message || 'Error al cargar direcciones', {
+                        className: 'loading-state loading-state-error',
+                        spinner: false
+                    });
                 }
             } catch (error) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <h3>Error al cargar direcciones</h3>
-                        <p>${error.message}</p>
-                    </div>
-                `;
+                window.loadingState.renderError(container, error.message || 'Error al cargar direcciones', {
+                    className: 'loading-state loading-state-error',
+                    spinner: false
+                });
             }
         }
 
@@ -856,7 +843,10 @@
         // Cargar transacciones de lealtad
         async function loadLoyaltyTransactions() {
             const container = document.getElementById('loyaltyTransactions');
-            
+            if (!container) return;
+
+            window.loadingState.renderLoading(container, 'Cargando transacciones de puntos...');
+
             try {
                 const response = await window.api.getLoyaltyTransactions();
                 
@@ -887,15 +877,17 @@
                             </div>
                         </div>
                     `).join('');
+                } else {
+                    window.loadingState.renderError(container, response.message || 'Error al cargar transacciones', {
+                        className: 'loading-state loading-state-error',
+                        spinner: false
+                    });
                 }
             } catch (error) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <h3>Error al cargar transacciones</h3>
-                        <p>${error.message}</p>
-                    </div>
-                `;
+                window.loadingState.renderError(container, error.message || 'Error al cargar transacciones', {
+                    className: 'loading-state loading-state-error',
+                    spinner: false
+                });
             }
         }
 

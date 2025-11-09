@@ -39,9 +39,11 @@
     <!-- Blog Container -->
     <div class="blog-container">
         <div id="blogContent">
-            <div class="loading">
-                <div class="loading-spinner large"></div>
-                <p>Cargando artículos...</p>
+            <div class="loading-state">
+                <div class="loading-state-content">
+                    <div class="loading-spinner large"></div>
+                    <p>Cargando artículos...</p>
+                </div>
             </div>
         </div>
     </div>
@@ -62,6 +64,11 @@
 
         async function loadBlogPosts(page = 1) {
             try {
+                const contentContainer = document.getElementById('blogContent');
+                window.loadingState.renderLoading(contentContainer, 'Cargando artículos...', {
+                    className: 'loading-state'
+                });
+
                 const response = await window.api.getBlogPosts(page, 12);
                 
                 if (response.success) {
