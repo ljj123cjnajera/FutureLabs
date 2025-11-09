@@ -25,6 +25,7 @@
     <link rel="stylesheet" href="css/notifications.css">
     <link rel="stylesheet" href="css/reviews.css">
     <link rel="stylesheet" href="css/product-gallery.css?v=1.0">
+    <link rel="stylesheet" href="css/recently-viewed.css?v=1.0">
     <link rel="stylesheet" href="css/comparator.css?v=1.0">
     <link rel="stylesheet" href="css/breadcrumbs.css?v=1.0">
     <!-- Estilos inline removidos - migrados a product-detail-page.css -->
@@ -47,6 +48,19 @@
     </div>
 </div>
 
+<!-- Recently Viewed Section -->
+<section id="recentlyViewedSection" class="recently-viewed-section" data-recently-viewed-section style="display:none;">
+    <div class="container">
+        <div class="section-header">
+            <h2><i class="fas fa-eye"></i> Productos que viste recientemente</h2>
+            <button type="button" class="recently-viewed-clear" id="clearRecentlyViewedBtn">
+                <i class="fas fa-times"></i> Limpiar historial
+            </button>
+        </div>
+        <div id="recentlyViewedGrid" class="recently-viewed-grid" data-section="#recentlyViewedSection"></div>
+    </div>
+</section>
+
 <!-- Reviews Section -->
 <div class="container">
     <div id="reviewsContainer"></div>
@@ -62,6 +76,7 @@
     <script src="js/modals.js"></script>
     <script src="js/cart.js"></script>
     <script src="js/comparator.js"></script>
+    <script src="js/recently-viewed.js"></script>
     <script src="js/reviews.js"></script>
     <script src="js/related-products.js"></script>
     <script src="js/components.js"></script>
@@ -133,6 +148,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             }
             
             console.log('Product image URL:', imageUrl);
+            product.image_url = imageUrl;
             
             // Generar múltiples imágenes para la galería
             let galleryImages = [];
@@ -214,9 +230,20 @@ document.addEventListener('DOMContentLoaded', async function() {
               window.productComparator.updateCompareButtons();
             }
             
-            // Renderizar galería de imágenes
             if (window.productGallery && galleryImages) {
               window.productGallery.render(galleryImages, product);
+            }
+
+            if (window.recentlyViewed) {
+              window.recentlyViewed.add({
+                id: product.id,
+                name: product.name,
+                brand: product.brand,
+                price: product.price,
+                discount_price: product.discount_price,
+                image_url: product.image_url
+              });
+              window.recentlyViewed.render('recentlyViewedGrid', { limit: 6, hideWhenEmpty: true });
             }
             
             // Cargar reseñas
@@ -277,6 +304,17 @@ async function buyNow() {
         window.location.href = 'checkout.html';
     }, 1000);
 }
+
+    const clearRecentlyViewedBtn = document.getElementById('clearRecentlyViewedBtn');
+    if (clearRecentlyViewedBtn) {
+        clearRecentlyViewedBtn.addEventListener('click', () => {
+            window.recentlyViewed?.clearAndRender('recentlyViewedGrid', { hideWhenEmpty: true });
+        });
+    }
+
+    if (window.recentlyViewed) {
+        window.recentlyViewed.render('recentlyViewedGrid', { limit: 6, hideWhenEmpty: true });
+    }
 
     // Actualizar contador de carrito
     document.addEventListener('cartUpdated', (e) => {

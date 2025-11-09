@@ -26,6 +26,7 @@
     <link rel="stylesheet" href="css/quick-view.css?v=1.0">
     <link rel="stylesheet" href="css/comparator.css?v=1.0">
     <link rel="stylesheet" href="css/breadcrumbs.css?v=1.0">
+    <link rel="stylesheet" href="css/recently-viewed.css?v=1.0">
     <!-- Estilos inline removidos - migrados a products-page.css -->
 </head>
 <body>
@@ -111,6 +112,18 @@
         </div>
     </div>
 
+    <section id="recentlyViewedProductsSection" class="recently-viewed-section" data-recently-viewed-section style="display:none;">
+        <div class="container">
+            <div class="section-header">
+                <h2><i class="fas fa-history"></i> Tu historial de productos</h2>
+                <button type="button" class="recently-viewed-clear" id="clearRecentlyViewedProductsBtn">
+                    <i class="fas fa-times"></i> Limpiar historial
+                </button>
+            </div>
+            <div id="recentlyViewedGridProducts" class="recently-viewed-grid" data-section="#recentlyViewedProductsSection"></div>
+        </div>
+    </section>
+
     <!-- Scripts -->
     <!-- Scripts del Sistema Integrado -->
     <script src="js/api.js"></script>
@@ -121,6 +134,7 @@
     <script src="js/comparator.js"></script>
     <script src="js/modals.js"></script>
     <script src="js/cart.js"></script>
+    <script src="js/recently-viewed.js"></script>
     <script src="js/quick-view.js"></script>
     <script src="js/breadcrumbs.js"></script>
     
@@ -182,6 +196,16 @@
             const productsPerPage = 12;
             let currentFilters = {};
             let currentSort = 'name-asc';
+            const recentlyViewedOptions = { limit: 6, hideWhenEmpty: true };
+
+            const clearRecentlyViewedBtn = document.getElementById('clearRecentlyViewedProductsBtn');
+            if (clearRecentlyViewedBtn) {
+                clearRecentlyViewedBtn.addEventListener('click', () => {
+                    window.recentlyViewed?.clearAndRender('recentlyViewedGridProducts', recentlyViewedOptions);
+                });
+            }
+
+            window.recentlyViewed?.render('recentlyViewedGridProducts', recentlyViewedOptions);
 
             // Obtener parámetros de URL
             const urlParams = new URLSearchParams(window.location.search);
@@ -377,6 +401,8 @@
             if (window.productComparator) {
                 window.productComparator.updateCompareButtons();
             }
+
+            window.recentlyViewed?.render('recentlyViewedGridProducts', recentlyViewedOptions);
         }
 
         // Renderizar paginación
@@ -448,7 +474,6 @@
                 }
             });
 
-            // Cargar productos al iniciar
             loadProducts();
         });
     </script>
