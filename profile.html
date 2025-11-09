@@ -36,22 +36,34 @@
     <!-- Header Dinámico -->
     <header id="mainHeader"></header>
 
-    <!-- Profile Page -->
     <div class="profile-page">
-        <!-- Profile Header -->
-        <div class="profile-header">
+        <!-- Profile Hero -->
+        <section class="profile-hero">
             <div class="container">
-                <div class="profile-header-content">
-                    <div class="profile-avatar" id="profileAvatar">
-                        <i class="fas fa-user"></i>
+                <div class="profile-hero-card">
+                    <div class="profile-hero-meta">
+                        <div class="profile-avatar" id="profileAvatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="profile-info">
+                            <h1 id="profileName">Cargando...</h1>
+                            <p id="profileEmail">Cargando email...</p>
+                        </div>
                     </div>
-                    <div class="profile-info">
-                        <h1 id="profileName">Cargando...</h1>
-                        <p id="profileEmail">Cargando email...</p>
+                    <div class="profile-hero-actions">
+                        <button type="button" class="btn btn-primary btn-sm" onclick="scrollToSection('orders')">
+                            <i class="fas fa-shopping-bag"></i> Ver pedidos
+                        </button>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="scrollToSection('wishlist')">
+                            <i class="fas fa-heart"></i> Wishlist
+                        </button>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="scrollToSection('security')">
+                            <i class="fas fa-lock"></i> Seguridad
+                        </button>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
 
         <div class="container">
             <!-- Profile Tabs -->
@@ -81,7 +93,7 @@
             <!-- Profile Content Sections -->
             <div class="profile-content-wrapper">
                 <!-- Overview Tab -->
-                <div class="profile-section active" id="overview">
+                <div class="profile-section active" id="overview" data-profile-section="overview">
                     <!-- Loyalty Points Overview -->
                     <div class="loyalty-overview-grid">
                         <div class="loyalty-points-card">
@@ -203,7 +215,7 @@
                 </div>
 
                 <!-- Personal Data Tab -->
-                <div class="profile-section" id="personal">
+                <div class="profile-section" id="personal" data-profile-section="personal">
                     <div class="profile-content-section">
                         <div class="profile-content-section-header">
                             <h2><i class="fas fa-user"></i> Información Personal</h2>
@@ -236,7 +248,7 @@
                 </div>
 
                 <!-- Addresses Tab -->
-                <div class="profile-section" id="addresses">
+                <div class="profile-section" id="addresses" data-profile-section="addresses">
                     <div class="profile-content-section">
                         <div class="profile-content-section-header">
                             <h2><i class="fas fa-map-marker-alt"></i> Mis Direcciones</h2>
@@ -249,7 +261,7 @@
                 </div>
 
                 <!-- Security Tab -->
-                <div class="profile-section" id="security">
+                <div class="profile-section" id="security" data-profile-section="security">
                     <div class="profile-content-section">
                         <div class="profile-content-section-header">
                             <h2><i class="fas fa-lock"></i> Seguridad</h2>
@@ -287,7 +299,7 @@
                 </div>
 
                 <!-- Points Tab -->
-                <div class="profile-section" id="points">
+                <div class="profile-section" id="points" data-profile-section="points">
                     <div class="profile-content-section">
                         <div class="profile-content-section-header">
                             <h2><i class="fas fa-star"></i> Historial de Puntos</h2>
@@ -1082,6 +1094,13 @@
                 }
             });
         }
+
+        window.scrollToSection = function(sectionId) {
+            const target = document.querySelector(`[data-profile-section='${sectionId}']`) || document.getElementById(sectionId);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        };
     </script>
 </body>
 </html>
