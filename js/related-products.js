@@ -66,7 +66,16 @@ class RelatedProducts {
                     ${Math.round((1 - product.discount_price / product.price) * 100)}% OFF
                   </span>
                 ` : ''}
-                <button class="wishlist-btn" onclick="toggleWishlist('${product.id}')">
+                <button
+                  class="wishlist-btn"
+                  type="button"
+                  data-wishlist-toggle
+                  data-product-id="${product.id}"
+                  data-label-inactive="Agregar a favoritos"
+                  data-label-active="En tu wishlist"
+                  data-icon-inactive="far fa-heart"
+                  data-icon-active="fas fa-heart"
+                >
                   <i class="far fa-heart"></i>
                 </button>
               </div>
@@ -105,6 +114,8 @@ class RelatedProducts {
     if (window.productComparator) {
       window.productComparator.updateCompareButtons();
     }
+
+    window.wishlistManager?.syncToggleButtons?.(container);
   }
 
   generateStars(rating) {
@@ -132,16 +143,4 @@ async function addToCart(productId) {
     window.notifications.show('Error al agregar al carrito', 'error');
   }
 }
-
-async function toggleWishlist(productId) {
-  try {
-    const response = await window.api.addToWishlist(productId);
-    if (response.success) {
-      window.notifications.success('Producto agregado a wishlist');
-    }
-  } catch (error) {
-    window.notifications.error('Error al agregar a wishlist');
-  }
-}
-
 

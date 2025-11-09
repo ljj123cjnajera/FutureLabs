@@ -151,7 +151,16 @@ class QuickView {
             <button class="btn btn-outline btn-lg" onclick="quickView.buyNow('${product.id}')">
               <i class="fas fa-bolt"></i> Comprar Ahora
             </button>
-            <button class="btn btn-ghost btn-lg" onclick="quickView.toggleWishlist('${product.id}')">
+            <button
+              class="btn btn-ghost btn-lg"
+              type="button"
+              data-wishlist-toggle
+              data-product-id="${product.id}"
+              data-label-inactive="Agregar a favoritos"
+              data-label-active="En tu wishlist"
+              data-icon-inactive="far fa-heart"
+              data-icon-active="fas fa-heart"
+            >
               <i class="far fa-heart"></i>
             </button>
             <button class="btn btn-ghost btn-lg" onclick="quickView.addToCompare('${product.id}')">
@@ -168,7 +177,11 @@ class QuickView {
       </div>
     `;
 
-    document.getElementById('quickViewBody').innerHTML = html;
+    const quickViewBody = document.getElementById('quickViewBody');
+    if (quickViewBody) {
+      quickViewBody.innerHTML = html;
+      window.wishlistManager?.syncToggleButtons?.(quickViewBody);
+    }
   }
 
   generateStars(rating) {
@@ -228,14 +241,6 @@ class QuickView {
   buyNow(productId) {
     this.close();
     window.location.href = `product-detail.html?id=${productId}`;
-  }
-
-  toggleWishlist(productId) {
-    if (window.wishlistManager) {
-      window.wishlistManager.toggle(productId);
-    } else {
-      console.warn('Wishlist manager no disponible');
-    }
   }
 
   addToCompare(productId) {

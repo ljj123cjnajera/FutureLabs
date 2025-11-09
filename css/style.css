@@ -1,3 +1,22 @@
+/* Wishlist toggle buttons */
+[data-wishlist-toggle] {
+  position: relative;
+  cursor: pointer;
+}
+
+[data-wishlist-toggle] i {
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+[data-wishlist-toggle].is-loading {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+[data-wishlist-toggle].is-active i,
+[data-wishlist-toggle]:hover i {
+  color: #e74c3c;
+}
 /* ============================================
    FUTURELABS - ESTILOS PRINCIPALES
    Sistema de Diseño Unificado y Profesional

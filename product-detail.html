@@ -213,7 +213,16 @@ document.addEventListener('DOMContentLoaded', async function() {
                             <button class="btn btn-primary btn-lg" onclick="addToCart()" ${product.stock_quantity === 0 ? 'disabled' : ''}>
                                 <i class="fas fa-shopping-cart"></i> Agregar al Carrito
                             </button>
-                            <button class="btn btn-ghost btn-lg" onclick="addToFavorites()">
+                            <button
+                                class="btn btn-ghost btn-lg"
+                                type="button"
+                                data-wishlist-toggle
+                                data-product-id="${product.id}"
+                                data-label-inactive="Agregar a favoritos"
+                                data-label-active="En tu wishlist"
+                                data-icon-inactive="far fa-heart"
+                                data-icon-active="fas fa-heart"
+                            >
                                 <i class="far fa-heart"></i>
                             </button>
                             <button class="btn btn-outline btn-lg btn-compare" data-product-id="${product.id}" data-label-inactive="Comparar" data-label-active="Comparando" title="Comparar producto">
@@ -234,6 +243,10 @@ document.addEventListener('DOMContentLoaded', async function() {
             
             if (window.productGallery && galleryImages) {
               window.productGallery.render(galleryImages, product);
+            }
+
+            if (window.wishlistManager) {
+              window.wishlistManager.syncToggleButtons(container);
             }
 
             if (window.recentlyViewed) {
@@ -282,11 +295,6 @@ async function addToCart() {
     }
     
     await window.cartManager.add(productId, 1);
-}
-
-// Agregar a favoritos
-function addToFavorites() {
-    window.notifications.info('Funcionalidad de favoritos próximamente');
 }
 
 // Comprar ahora

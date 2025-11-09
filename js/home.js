@@ -82,6 +82,7 @@ class HomeManager {
     if (!container) return;
 
     container.innerHTML = this.featuredProducts.map(product => this.createProductCard(product)).join('');
+    window.wishlistManager?.syncToggleButtons?.(container);
     
     // Ocultar skeleton loader
     if (window.skeletonLoader) {
@@ -115,6 +116,7 @@ class HomeManager {
 
     if (container) {
       container.innerHTML = this.onSaleProducts.map(product => this.createProductCard(product)).join('');
+      window.wishlistManager?.syncToggleButtons?.(container);
       
       // Ocultar skeleton loader
       if (window.skeletonLoader) {
@@ -154,7 +156,16 @@ class HomeManager {
                alt="${product.name}" 
                onerror="this.src='assets/images/products/placeholder.jpg'">
           ${discount > 0 ? `<span class="discount-badge">-${discount}%</span>` : ''}
-          <button class="favorite-btn" onclick="event.stopPropagation(); homeManager.toggleFavorite('${product.id}')">
+          <button
+            class="favorite-btn"
+            type="button"
+            data-wishlist-toggle
+            data-product-id="${product.id}"
+            data-label-inactive="Agregar a favoritos"
+            data-label-active="En tu wishlist"
+            data-icon-inactive="far fa-heart"
+            data-icon-active="fas fa-heart"
+          >
             <i class="far fa-heart"></i>
           </button>
         </div>
@@ -233,36 +244,6 @@ class HomeManager {
       window.location.href = 'checkout.html';
     } catch (error) {
       window.notifications.show('Error al procesar compra', 'error');
-    }
-  }
-
-  async toggleFavorite(productId) {
-    try {
-      // Verificar si está autenticado
-      if (!window.authManager || !window.authManager.isAuthenticated()) {
-        window.notifications.show('Inicia sesión para agregar a favoritos', 'warning');
-        window.modalManager.showLogin();
-        return;
-      }
-
-      // Verificar si está en wishlist
-      const checkResponse = await window.api.checkWishlist(productId);
-      
-      if (checkResponse.success && checkResponse.data.inWishlist) {
-        // Remover de wishlist
-        const response = await window.api.removeFromWishlist(productId);
-        if (response.success) {
-          window.notifications.show('Eliminado de favoritos', 'success');
-        }
-      } else {
-        // Agregar a wishlist
-        const response = await window.api.addToWishlist(productId);
-        if (response.success) {
-          window.notifications.show('Agregado a favoritos', 'success');
-        }
-      }
-    } catch (error) {
-      window.notifications.show('Error al gestionar favoritos', 'error');
     }
   }
 

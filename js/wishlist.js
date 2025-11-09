@@ -7,9 +7,12 @@ class WishlistManager {
         this.stats = { total_items: 0, total_lists: 0 };
         this.isLoading = false;
         this.selectedItems = new Set();
+        this.handleBoundToggleClick = this.handleBoundToggleClick.bind(this);
     }
 
     async init() {
+        this.syncToggleButtons();
+
         if (!window.authManager?.isAuthenticated()) {
             console.log('⏳ Usuario no autenticado, wishlist no disponible');
             return;
@@ -35,6 +38,7 @@ class WishlistManager {
                 }
 
                 this.updateWishlistCount();
+                this.syncToggleButtons();
                 this.emitUpdate();
             }
         } catch (error) {
@@ -45,6 +49,8 @@ class WishlistManager {
     }
 
     emitUpdate() {
+        this.syncToggleButtons();
+
         window.dispatchEvent(new CustomEvent('wishlistUpdated', {
             detail: {
                 count: this.stats.total_items,
@@ -97,6 +103,7 @@ class WishlistManager {
     async add(productId, { listId = null } = {}) {
         if (!window.authManager?.isAuthenticated()) {
             window.notifications?.warning?.('Inicia sesión para guardar productos en tu wishlist');
+            window.modalManager?.showLogin?.();
             return false;
         }
 
@@ -306,6 +313,97 @@ class WishlistManager {
             }
         }));
     }
+
+    syncToggleButtons(context = document) {
+        if (!context || typeof context.querySelectorAll !== 'function') {
+            if (context instanceof Element && context.matches?.('[data-wishlist-toggle]')) {
+                this.updateToggleButtons([context]);
+            }
+            return;
+        }
+
+        const buttons = Array.from(context.querySelectorAll('[data-wishlist-toggle]'));
+        if (buttons.length === 0) return;
+
+        this.updateToggleButtons(buttons);
+    }
+
+    updateToggleButtons(buttons) {
+        buttons.forEach((button) => {
+            if (!(button instanceof Element)) return;
+
+            this.bindToggleButton(button);
+
+            const productId = button.dataset.productId;
+            const listId = button.dataset.listId || null;
+            const isActive = !!(productId && this.isInWishlist(productId, listId));
+            const activeLabel = button.dataset.labelActive || 'En tu wishlist';
+            const inactiveLabel = button.dataset.labelInactive || 'Agregar a favoritos';
+            const activeIcon = button.dataset.iconActive || 'fas fa-heart';
+            const inactiveIcon = button.dataset.iconInactive || 'far fa-heart';
+
+            button.classList.toggle('is-active', isActive);
+            button.classList.toggle('is-loading', button.dataset.wishlistLoading === 'true');
+            button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+            button.setAttribute('aria-label', isActive ? activeLabel : inactiveLabel);
+            button.title = isActive ? activeLabel : inactiveLabel;
+
+            const icon = button.querySelector('i');
+            if (icon) {
+                icon.className = isActive ? activeIcon : inactiveIcon;
+            }
+
+            const labelNode = button.querySelector('[data-wishlist-label]');
+            if (labelNode) {
+                labelNode.textContent = isActive ? activeLabel : inactiveLabel;
+            }
+        });
+    }
+
+    bindToggleButton(button) {
+        if (button.dataset.wishlistToggleBound === 'true') return;
+
+        button.type = button.type || 'button';
+        button.dataset.wishlistToggleBound = 'true';
+
+        button.addEventListener('click', this.handleBoundToggleClick);
+    }
+
+    async handleBoundToggleClick(event) {
+        const button = event.currentTarget;
+
+        if (!(button instanceof Element) || !button.matches('[data-wishlist-toggle]')) {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (button.dataset.wishlistLoading === 'true') {
+            return;
+        }
+
+        const productId = button.dataset.productId;
+        const listId = button.dataset.listId || null;
+
+        if (!productId) {
+            console.warn('⚠️ Botón de wishlist sin data-product-id');
+            return;
+        }
+
+        button.dataset.wishlistLoading = 'true';
+        button.classList.add('is-loading');
+
+        try {
+            const success = await this.toggle(productId, { listId });
+            if (!success) {
+                this.updateToggleButtons([button]);
+            }
+        } finally {
+            button.dataset.wishlistLoading = 'false';
+            button.classList.remove('is-loading');
+        }
+    }
 }
 
 window.wishlistManager = new WishlistManager();
@@ -320,4 +418,12 @@ if (window.authManager) {
 
 if (window.authManager && window.authManager.isAuthenticated()) {
     window.wishlistManager.init();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    window.wishlistManager.syncToggleButtons();
+});
+
+if (document.readyState !== 'loading') {
+    window.wishlistManager.syncToggleButtons();
 }
