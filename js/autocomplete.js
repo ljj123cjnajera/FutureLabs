@@ -32,7 +32,13 @@ class SearchAutocomplete {
     // Event listeners
     this.searchInput.addEventListener('input', (e) => this.handleInput(e));
     this.searchInput.addEventListener('keydown', (e) => this.handleKeydown(e));
-    this.searchInput.addEventListener('focus', () => this.showSuggestions());
+    this.searchInput.addEventListener('focus', () => {
+      if (this.searchInput && this.searchInput.value.trim().length === 0) {
+        this.renderHistoryAndTrending();
+      } else {
+        this.showSuggestions();
+      }
+    });
     this.searchInput.addEventListener('blur', () => {
       // Delay para permitir clicks en sugerencias
       setTimeout(() => this.hideSuggestions(), 200);
@@ -43,11 +49,19 @@ class SearchAutocomplete {
     const searchBar = this.searchInput.closest('.search-bar');
     if (!searchBar) return;
     
-    this.suggestionsContainer = document.createElement('div');
-    this.suggestionsContainer.className = 'search-suggestions';
-    this.suggestionsContainer.style.display = 'none';
+    const existingContainer = searchBar.querySelector('.search-suggestions');
+    if (existingContainer) {
+      this.suggestionsContainer = existingContainer;
+      this.suggestionsContainer.style.display = 'none';
+      this.suggestionsContainer.innerHTML = '';
+      return;
+    }
     
-    searchBar.appendChild(this.suggestionsContainer);
+    const container = document.createElement('div');
+    container.className = 'search-suggestions';
+    container.style.display = 'none';
+    searchBar.appendChild(container);
+    this.suggestionsContainer = container;
   }
 
   async handleInput(e) {
@@ -86,9 +100,13 @@ class SearchAutocomplete {
       if (response.success) {
         this.currentSuggestions = response.data.suggestions;
         this.renderSuggestions();
+      } else {
+        this.currentSuggestions = [];
+        this.hideSuggestions();
       }
     } catch (error) {
       console.error('Error fetching suggestions:', error);
+      this.currentSuggestions = [];
       this.hideSuggestions();
     } finally {
       this.isLoading = false;
@@ -127,7 +145,7 @@ class SearchAutocomplete {
       html += '<div class="suggestions-title"><i class="fas fa-box"></i> Productos</div>';
       products.forEach((product, index) => {
         html += `
-          <div class="suggestion-item" data-type="product" data-id="${product.id}" data-slug="${product.slug}">
+          <div class="suggestion-item" data-type="product" data-id="${product.id}" data-slug="${product.slug}" data-name="${this.escapeAttribute(product.name)}">
             <img src="${product.image_url || 'https://via.placeholder.com/50'}" alt="${product.name}">
             <div class="suggestion-info">
               <div class="suggestion-name">${this.highlightMatch(product.name)}</div>
@@ -152,7 +170,7 @@ class SearchAutocomplete {
       html += '<div class="suggestions-title"><i class="fas fa-tags"></i> Categorías</div>';
       categories.forEach((category) => {
         html += `
-          <div class="suggestion-item" data-type="category" data-slug="${category.slug}">
+          <div class="suggestion-item" data-type="category" data-slug="${category.slug}" data-name="${this.escapeAttribute(category.name)}">
             <i class="fas fa-folder"></i>
             <div class="suggestion-info">
               <div class="suggestion-name">${this.highlightMatch(category.name)}</div>
@@ -187,13 +205,31 @@ class SearchAutocomplete {
     const query = this.searchInput.value.toLowerCase();
     const index = text.toLowerCase().indexOf(query);
     
-    if (index === -1) return text;
+    if (index === -1) {
+      return this.escapeHTML(text);
+    }
     
     const before = text.substring(0, index);
     const match = text.substring(index, index + query.length);
     const after = text.substring(index + query.length);
     
-    return `${before}<strong>${match}</strong>${after}`;
+    return `${this.escapeHTML(before)}<strong>${this.escapeHTML(match)}</strong>${this.escapeHTML(after)}`;
+  }
+
+  escapeAttribute(value) {
+    if (value === undefined || value === null) return '';
+    return String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  escapeHTML(value) {
+    if (value === undefined || value === null) return '';
+    return String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
   }
 
 
@@ -221,6 +257,8 @@ class SearchAutocomplete {
         e.preventDefault();
         if (this.selectedIndex >= 0 && items[this.selectedIndex]) {
           this.selectSuggestion(items[this.selectedIndex]);
+        } else if (this.searchInput && this.searchInput.value.trim()) {
+          this.executeSearch(this.searchInput.value.trim());
         }
         break;
         
@@ -261,13 +299,19 @@ class SearchAutocomplete {
   }
 
   saveSearchHistory(query) {
-    // No guardar si ya existe
-    if (this.searchHistory.includes(query)) {
-      return;
+    if (!query) return;
+    const normalizedQuery = query.trim();
+    if (!normalizedQuery) return;
+    
+    const existingIndex = this.searchHistory.findIndex(
+      (item) => item.toLowerCase() === normalizedQuery.toLowerCase()
+    );
+    
+    if (existingIndex !== -1) {
+      this.searchHistory.splice(existingIndex, 1);
     }
     
-    // Agregar al inicio
-    this.searchHistory.unshift(query);
+    this.searchHistory.unshift(normalizedQuery);
     
     // Limitar a 10 búsquedas
     if (this.searchHistory.length > 10) {
@@ -276,6 +320,15 @@ class SearchAutocomplete {
     
     // Guardar en localStorage
     localStorage.setItem('searchHistory', JSON.stringify(this.searchHistory));
+  }
+
+  executeSearch(query) {
+    const normalizedQuery = query?.trim();
+    if (!normalizedQuery) return;
+    
+    this.saveSearchHistory(normalizedQuery);
+    this.hideSuggestions();
+    window.location.href = `products.html?search=${encodeURIComponent(normalizedQuery)}`;
   }
 
   clearSearchHistory() {
@@ -296,13 +349,15 @@ class SearchAutocomplete {
       html += '<div class="suggestions-title"><i class="fas fa-clock"></i> Búsquedas Recientes</div>';
       
       this.searchHistory.slice(0, 5).forEach((query) => {
+        const safeAttr = this.escapeAttribute(query);
+        const safeLabel = this.escapeHTML(query);
         html += `
-          <div class="suggestion-item" data-type="history" data-query="${query}">
+          <div class="suggestion-item" data-type="history" data-query="${safeAttr}">
             <i class="fas fa-history"></i>
             <div class="suggestion-info">
-              <div class="suggestion-name">${query}</div>
+              <div class="suggestion-name">${safeLabel}</div>
             </div>
-            <button class="suggestion-delete" data-query="${query}">
+            <button class="suggestion-delete" data-query="${safeAttr}">
               <i class="fas fa-times"></i>
             </button>
           </div>
@@ -319,11 +374,13 @@ class SearchAutocomplete {
     
     const popularSearches = ['laptop gaming', 'smartphone', 'auriculares', 'smartwatch', 'tablet'];
     popularSearches.forEach((query) => {
+      const safeAttr = this.escapeAttribute(query);
+      const safeLabel = this.escapeHTML(query);
       html += `
-        <div class="suggestion-item" data-type="popular" data-query="${query}">
+        <div class="suggestion-item" data-type="popular" data-query="${safeAttr}">
           <i class="fas fa-fire"></i>
           <div class="suggestion-info">
-            <div class="suggestion-name">${query}</div>
+            <div class="suggestion-name">${safeLabel}</div>
           </div>
         </div>
       `;
@@ -356,7 +413,9 @@ class SearchAutocomplete {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         const query = btn.dataset.query;
-        this.searchHistory = this.searchHistory.filter(q => q !== query);
+        this.searchHistory = this.searchHistory.filter(
+          (q) => q.toLowerCase() !== query.toLowerCase()
+        );
         localStorage.setItem('searchHistory', JSON.stringify(this.searchHistory));
         this.renderHistoryAndTrending();
       });
@@ -369,18 +428,28 @@ class SearchAutocomplete {
     
     if (type === 'product') {
       const productId = item.dataset.id;
+      if (item.dataset.name) {
+        this.saveSearchHistory(item.dataset.name);
+      } else if (this.searchInput && this.searchInput.value.trim()) {
+        this.saveSearchHistory(this.searchInput.value.trim());
+      }
+      this.hideSuggestions();
       window.location.href = `product-detail.html?id=${productId}`;
     } else if (type === 'category') {
       const slug = item.dataset.slug;
+      if (item.dataset.name) {
+        this.saveSearchHistory(item.dataset.name);
+      } else if (this.searchInput && this.searchInput.value.trim()) {
+        this.saveSearchHistory(this.searchInput.value.trim());
+      }
+      this.hideSuggestions();
       window.location.href = `products.html?category=${slug}`;
     } else if (type === 'history' || type === 'popular') {
       const query = item.dataset.query;
-      this.searchInput.value = query;
-      // Guardar en historial si es una búsqueda popular
-      if (type === 'popular') {
-        this.saveSearchHistory(query);
+      if (this.searchInput) {
+        this.searchInput.value = query;
       }
-      window.location.href = `products.html?search=${encodeURIComponent(query)}`;
+      this.executeSearch(query);
     }
   }
 }

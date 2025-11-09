@@ -314,87 +314,40 @@ class Components {
   }
 
   static initSearch() {
-    const searchInput = document.getElementById('searchInput');
-    if (!searchInput) return;
-    
-    let debounceTimer;
-    
-    // Búsqueda con Enter
-    searchInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        this.hideSuggestions();
-        performSearch();
-      }
-    });
-    
-    // Autocomplete en tiempo real
-    searchInput.addEventListener('input', (e) => {
-      const query = e.target.value.trim();
-      
-      // Limpiar timer anterior
-      clearTimeout(debounceTimer);
-      
-      // Si está vacío, ocultar sugerencias
-      if (query.length < 2) {
-        this.hideSuggestions();
-        return;
-      }
-      
-      // Debounce: esperar 300ms antes de buscar
-      debounceTimer = setTimeout(async () => {
-        await this.showSuggestions(query);
-      }, 300);
-    });
-    
-    // Ocultar sugerencias al hacer click fuera
-    document.addEventListener('click', (e) => {
-      if (!e.target.closest('.search-bar')) {
-        this.hideSuggestions();
-      }
-    });
+    this.ensureAutocompleteAssets();
   }
-  
-  static async showSuggestions(query) {
-    try {
-      const response = await window.api.getSearchSuggestions(query);
-      
-      if (response.success && response.data.suggestions.length > 0) {
-        const suggestionsContainer = document.getElementById('searchSuggestions');
-        if (suggestionsContainer) {
-          suggestionsContainer.innerHTML = response.data.suggestions.map(item => {
-            if (item.type === 'product') {
-              return `
-                <div class="suggestion-item" onclick="this.parentElement.style.display='none'; performSearchWithQuery('${item.name.replace(/'/g, "\\'")}')">
-                  <i class="fas fa-box"></i>
-                  <span>${item.name}</span>
-                  <small>S/ ${parseFloat(item.discount_price || item.price).toFixed(2)}</small>
-                </div>
-              `;
-            } else if (item.type === 'category') {
-              return `
-                <div class="suggestion-item" onclick="this.parentElement.style.display='none'; window.location.href='products.html?category=${item.slug}'">
-                  <i class="fas fa-tag"></i>
-                  <span>${item.name}</span>
-                  <small>Categoría</small>
-                </div>
-              `;
-            }
-          }).join('');
-          suggestionsContainer.style.display = 'block';
-        }
-      } else {
-        this.hideSuggestions();
-      }
-    } catch (error) {
-      console.error('Error loading search suggestions:', error);
-      this.hideSuggestions();
+
+  static ensureAutocompleteAssets() {
+    if (typeof document === 'undefined') return;
+
+    if (!document.querySelector('link[data-autocomplete-style]')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'css/autocomplete.css?v=1.0';
+      link.setAttribute('data-autocomplete-style', 'true');
+      document.head.appendChild(link);
     }
-  }
-  
-  static hideSuggestions() {
-    const suggestionsContainer = document.getElementById('searchSuggestions');
-    if (suggestionsContainer) {
-      suggestionsContainer.style.display = 'none';
+
+    const initialize = () => {
+      if (window.searchAutocomplete && typeof window.searchAutocomplete.init === 'function') {
+        window.searchAutocomplete.init();
+      } else if (typeof window.initializeAutocomplete === 'function') {
+        window.initializeAutocomplete();
+      }
+    };
+
+    if (window.searchAutocomplete || typeof window.initializeAutocomplete === 'function') {
+      initialize();
+      return;
+    }
+
+    if (!document.querySelector('script[data-autocomplete-script]')) {
+      const script = document.createElement('script');
+      script.src = 'js/autocomplete.js';
+      script.defer = true;
+      script.setAttribute('data-autocomplete-script', 'true');
+      script.onload = () => initialize();
+      document.body.appendChild(script);
     }
   }
   
@@ -412,14 +365,41 @@ class Components {
 // Función de búsqueda global
 function performSearch() {
   const searchInput = document.getElementById('searchInput');
-  if (searchInput && searchInput.value.trim()) {
-    window.location.href = `products.html?search=${encodeURIComponent(searchInput.value)}`;
+  if (!searchInput) return;
+
+  const query = searchInput.value.trim();
+  if (!query) return;
+
+  if (window.searchAutocomplete && typeof window.searchAutocomplete.executeSearch === 'function') {
+    window.searchAutocomplete.executeSearch(query);
+  } else if (typeof window.initializeAutocomplete === 'function') {
+    window.initializeAutocomplete();
+    if (window.searchAutocomplete && typeof window.searchAutocomplete.executeSearch === 'function') {
+      window.searchAutocomplete.executeSearch(query);
+    } else {
+      window.location.href = `products.html?search=${encodeURIComponent(query)}`;
+    }
+  } else {
+    window.location.href = `products.html?search=${encodeURIComponent(query)}`;
   }
 }
 
 // Función de búsqueda con query específica
 function performSearchWithQuery(query) {
-  window.location.href = `products.html?search=${encodeURIComponent(query)}`;
+  if (!query) return;
+
+  if (window.searchAutocomplete && typeof window.searchAutocomplete.executeSearch === 'function') {
+    window.searchAutocomplete.executeSearch(query);
+  } else if (typeof window.initializeAutocomplete === 'function') {
+    window.initializeAutocomplete();
+    if (window.searchAutocomplete && typeof window.searchAutocomplete.executeSearch === 'function') {
+      window.searchAutocomplete.executeSearch(query);
+    } else {
+      window.location.href = `products.html?search=${encodeURIComponent(query)}`;
+    }
+  } else {
+    window.location.href = `products.html?search=${encodeURIComponent(query)}`;
+  }
 }
 
 // Hacer disponible globalmente
