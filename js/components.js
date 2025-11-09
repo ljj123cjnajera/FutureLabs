@@ -128,6 +128,7 @@ class Components {
 
   static initHeader() {
     console.log('🔵 [COMPONENTS] initHeader() ejecutado');
+    this.ensureWishlistAssets();
     
     // FORZAR VISIBILIDAD DE TODOS LOS BOTONES DEL HEADER
     function forceAllHeaderButtons() {
@@ -315,6 +316,33 @@ class Components {
 
   static initSearch() {
     this.ensureAutocompleteAssets();
+  }
+
+  static ensureWishlistAssets() {
+    if (typeof document === 'undefined') return;
+
+    const syncIfReady = () => {
+      if (window.wishlistManager && typeof window.wishlistManager.syncToggleButtons === 'function') {
+        window.wishlistManager.syncToggleButtons(document);
+      }
+    };
+
+    if (window.wishlistManager) {
+      syncIfReady();
+      return;
+    }
+
+    if (document.querySelector('script[data-wishlist-script]')) {
+      document.querySelector('script[data-wishlist-script]').addEventListener('load', () => syncIfReady(), { once: true });
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = 'js/wishlist.js';
+    script.defer = true;
+    script.setAttribute('data-wishlist-script', 'true');
+    script.onload = () => syncIfReady();
+    document.body.appendChild(script);
   }
 
   static ensureAutocompleteAssets() {
