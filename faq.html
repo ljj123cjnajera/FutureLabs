@@ -230,28 +230,21 @@
 
     
     <script>
-        // Inicializar componentes
         document.addEventListener('DOMContentLoaded', function() {
-            // Inicializar header dinámico (sin barra de búsqueda)
             const headerContainer = document.getElementById('mainHeader');
-            if (headerContainer && window.Components) {
-                headerContainer.innerHTML = window.Components.getHeader(false, false);
-                window.Components.initHeader();
-            }
+            const footerContainer = document.getElementById('mainFooter');
 
-            // Renderizar header y footer
+            if (headerContainer && window.Components) {
+                headerContainer.innerHTML = window.Components.getHeader(true, true);
+                window.Components.initHeader();
+                window.Components.initSearch();
+                window.Components.initCartCounter();
             }
 
             if (footerContainer && window.Components) {
                 footerContainer.innerHTML = window.Components.getFooter();
             }
 
-            // Inicializar contador de carrito
-            if (window.Components) {
-                window.Components.initCartCounter();
-            }
-
-            // Toggle FAQ items
             document.querySelectorAll('.faq-question').forEach(question => {
                 question.addEventListener('click', function() {
                     const item = this.parentElement;

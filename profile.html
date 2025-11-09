@@ -340,9 +340,11 @@
             
             if (headerContainer && window.Components) {
                 console.log('🔵 [PROFILE] Renderizando header...');
-                headerContainer.innerHTML = window.Components.getHeader(false, false);
+                headerContainer.innerHTML = window.Components.getHeader(true, true);
                 console.log('🔵 [PROFILE] Header renderizado, llamando initHeader()...');
                 window.Components.initHeader();
+                window.Components.initSearch();
+                window.Components.initCartCounter();
                 console.log('🔵 [PROFILE] initHeader() ejecutado');
             }
             

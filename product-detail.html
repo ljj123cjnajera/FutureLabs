@@ -89,8 +89,10 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Inicializar header
     const headerContainer = document.getElementById('mainHeader');
     if (headerContainer && window.Components) {
-        headerContainer.innerHTML = window.Components.getHeader(false, false);
+        headerContainer.innerHTML = window.Components.getHeader(true, true);
         window.Components.initHeader();
+        window.Components.initSearch();
+        window.Components.initCartCounter();
     }
     
     // Obtener ID del producto de la URL

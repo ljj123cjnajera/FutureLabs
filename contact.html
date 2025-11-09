@@ -148,17 +148,16 @@
     <script src="js/modals.js"></script>
     <script src="js/cart.js"></script>
     <script src="js/components.js"></script>
-
-    <script src="js/components.js"></script>
     
     <script>
         // Inicializar componentes
         document.addEventListener('DOMContentLoaded', function() {
-            // Inicializar header dinámico (sin barra de búsqueda)
             const headerContainer = document.getElementById('mainHeader');
             if (headerContainer && window.Components) {
-                headerContainer.innerHTML = window.Components.getHeader(false, false);
+                headerContainer.innerHTML = window.Components.getHeader(true, true);
                 window.Components.initHeader();
+                window.Components.initSearch();
+                window.Components.initCartCounter();
             }
 
             // Renderizar footer
@@ -166,11 +165,6 @@
 
             if (footerContainer && window.Components) {
                 footerContainer.innerHTML = window.Components.getFooter();
-            }
-
-            // Inicializar contador de carrito
-            if (window.Components) {
-                window.Components.initCartCounter();
             }
 
             // Manejar envío del formulario

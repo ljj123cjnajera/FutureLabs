@@ -104,15 +104,16 @@
     <script src="js/stripe-checkout.js"></script>
     <script src="js/checkout.js"></script>
     <script src="js/components.js"></script>
-    <script src="js/fix-home-link.js"></script>
     
     <script>
-        // Inicializar header dinámico (sin barra de búsqueda)
+        // Inicializar header dinámico con barra de búsqueda
         document.addEventListener('DOMContentLoaded', function() {
             const headerContainer = document.getElementById('mainHeader');
             if (headerContainer && window.Components) {
-                headerContainer.innerHTML = window.Components.getHeader(false, false); // false = sin barra de búsqueda, false = sin navegación
+                headerContainer.innerHTML = window.Components.getHeader(true, true);
                 window.Components.initHeader();
+                window.Components.initSearch();
+                window.Components.initCartCounter();
             }
         });
     </script>

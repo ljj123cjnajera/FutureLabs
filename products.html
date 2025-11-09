@@ -175,15 +175,17 @@
         }
         // =============================================================
         
-        // Inicializar header dinámico (sin barra de búsqueda)
+        // Inicializar header dinámico con barra de búsqueda
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🔧 Inicializando header en products.html...');
             const headerContainer = document.getElementById('mainHeader');
             console.log('📦 Header container:', headerContainer);
             console.log('🧩 Components:', window.Components);
             if (headerContainer && window.Components) {
-                headerContainer.innerHTML = window.Components.getHeader(false, false); // false = sin barra de búsqueda, false = sin navegación
+                headerContainer.innerHTML = window.Components.getHeader(true, true);
                 window.Components.initHeader();
+                window.Components.initSearch();
+                window.Components.initCartCounter();
                 console.log('✅ Header renderizado correctamente');
             } else {
                 console.error('❌ Error: No se pudo renderizar el header');

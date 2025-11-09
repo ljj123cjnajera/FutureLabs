@@ -68,6 +68,8 @@
             if (headerContainer && window.Components) {
                 headerContainer.innerHTML = window.Components.getHeader(true, true);
                 window.Components.initHeader();
+                window.Components.initSearch();
+                window.Components.initCartCounter();
             }
 
             const footerContainer = document.getElementById('mainFooter');

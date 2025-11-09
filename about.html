@@ -143,8 +143,10 @@
             // Inicializar header dinámico (sin barra de búsqueda)
             const headerContainer = document.getElementById('mainHeader');
             if (headerContainer && window.Components) {
-                headerContainer.innerHTML = window.Components.getHeader(false, false);
+                headerContainer.innerHTML = window.Components.getHeader(true, true);
                 window.Components.initHeader();
+                window.Components.initSearch();
+                window.Components.initCartCounter();
             }
 
             // Renderizar footer
@@ -154,10 +156,6 @@
                 footerContainer.innerHTML = window.Components.getFooter();
             }
 
-            // Inicializar contador de carrito
-            if (window.Components) {
-                window.Components.initCartCounter();
-            }
         });
     </script>
 </body>
