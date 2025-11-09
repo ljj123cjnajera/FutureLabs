@@ -218,398 +218,75 @@
 /* Wishlist Page */
 .wishlist-page {
     background: var(--bg-secondary);
-    min-height: calc(100vh - 200px);
-    padding-top: 20px;
-    padding-bottom: var(--spacing-xl);
-}
-
-.wishlist-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: var(--spacing-xl);
-    margin-bottom: var(--spacing-2xl);
-}
-
-.wishlist-empty {
-    text-align: center;
-    padding: var(--spacing-2xl);
-    background: var(--white);
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow);
-}
-
-/* Orders Page */
-.orders-page {
-    background: var(--bg-secondary);
-    min-height: calc(100vh - 200px);
-    padding-top: var(--spacing-3xl);
-    padding-bottom: var(--spacing-3xl);
-}
-
-.orders-list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-xl);
-}
-
-.order-card {
-    background: var(--white);
-    border-radius: var(--radius-xl);
-    padding: var(--spacing-xl);
-    box-shadow: var(--shadow);
-    border: 1px solid var(--border);
-    transition: var(--transition);
-}
-
-.order-card:hover {
-    box-shadow: var(--shadow-lg);
-    transform: translateY(-2px);
-}
-
-.order-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: var(--spacing-lg);
-    padding-bottom: var(--spacing-lg);
-    border-bottom: 2px solid var(--border);
-    flex-wrap: wrap;
-    gap: var(--spacing-md);
-}
-
-.order-info {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-xs);
-}
-
-.order-number {
-    font-size: 1.125rem;
-    font-weight: 700;
-    color: var(--gray-900);
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-}
-
-.order-date {
-    font-size: 0.875rem;
-    color: var(--gray-500);
-}
-
-.order-status {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-}
-
-.order-items-preview {
-    display: flex;
-    gap: var(--spacing-md);
-    margin-bottom: var(--spacing-lg);
-    flex-wrap: wrap;
-}
-
-.order-item-preview {
-    display: flex;
-    gap: var(--spacing-sm);
-    align-items: center;
-    padding: var(--spacing-sm);
-    background: var(--gray-50);
-    border-radius: var(--radius-md);
-}
-
-.order-item-preview-image {
-    width: 50px;
-    height: 50px;
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    background: var(--gray-200);
-}
-
-.order-item-preview-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.order-item-preview-info {
-    font-size: 0.875rem;
-}
-
-.order-item-preview-name {
-    font-weight: 600;
-    color: var(--gray-900);
-}
-
-.order-item-preview-quantity {
-    color: var(--gray-500);
-}
-
-.order-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: var(--spacing-lg);
-    border-top: 1px solid var(--border);
-    flex-wrap: wrap;
-    gap: var(--spacing-md);
-}
-
-.order-total {
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: var(--primary);
-}
-
-.order-actions {
-    display: flex;
-    gap: var(--spacing-sm);
-    flex-wrap: wrap;
-}
-
-/* Loyalty Points */
-.loyalty-overview-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr);
-    gap: var(--spacing-xl);
-    margin-bottom: var(--spacing-xl);
-    align-items: stretch;
-}
-
-.loyalty-points-card {
-    background: var(--loyalty-gradient, linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%));
-    color: var(--loyalty-text-color, var(--white));
-    border-radius: var(--radius-xl);
-    padding: var(--spacing-xl);
-    box-shadow: var(--shadow-lg);
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-lg);
-}
-
-.loyalty-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: var(--spacing-md);
-}
-
-.loyalty-tier-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    padding: 6px 16px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.18);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-size: 0.75rem;
-}
-
-.loyalty-tier-chip i {
-    font-size: 1rem;
-}
-
-.btn-light {
-    background: rgba(255, 255, 255, 0.18);
-    color: var(--white);
-    border: 1px solid rgba(255, 255, 255, 0.32);
-    backdrop-filter: blur(6px);
-}
-
-.btn-light:hover {
-    background: rgba(255, 255, 255, 0.3);
-    color: var(--white);
-}
-
-.loyalty-card-body {
-    display: grid;
-    gap: var(--spacing-lg);
-}
-
-.loyalty-points-group {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-xs);
-}
-
-.loyalty-points-label {
-    font-size: 0.95rem;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    opacity: 0.8;
-}
-
-.loyalty-points-value {
-    font-size: clamp(2.5rem, 4vw, 3.5rem);
-    font-weight: 800;
-    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
-}
-
-.loyalty-points-meta {
-    display: grid;
-    gap: var(--spacing-sm);
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-}
-
-.loyalty-meta-label {
-    display: block;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    opacity: 0.75;
-}
-
-.loyalty-meta-value {
-    font-size: 1.1rem;
-    font-weight: 600;
-}
-
-.loyalty-progress {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-sm);
-}
-
-.loyalty-progress-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.9rem;
-    opacity: 0.9;
-}
-
-.loyalty-progress-bar {
-    width: 100%;
-    height: 10px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 999px;
-    overflow: hidden;
-}
-
-.loyalty-progress-fill {
-    height: 100%;
-    width: 0%;
-    background: var(--white);
-    border-radius: 999px;
-    transition: width 0.6s ease-out;
-    box-shadow: 0 2px 8px rgba(255, 255, 255, 0.4);
-}
-
-.loyalty-benefits h3 {
-    font-size: 1.1rem;
-    margin-bottom: var(--spacing-sm);
-}
-
-.loyalty-benefits ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    gap: var(--spacing-xs);
-}
-
-.loyalty-benefits li {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    font-size: 0.95rem;
-}
-
-.loyalty-benefits li i {
-    color: var(--success-light);
-}
-
-.loyalty-actions-card {
-    background: var(--white);
-    border-radius: var(--radius-xl);
-    border: 1px solid var(--border);
-    padding: var(--spacing-xl);
-    box-shadow: var(--shadow-sm);
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-md);
-}
-
-.loyalty-actions-card h3 {
-    font-size: 1.35rem;
-    font-weight: 700;
-    color: var(--gray-900);
-}
-
-.loyalty-next-tier {
-    font-size: 0.95rem;
-    color: var(--gray-600);
-    line-height: 1.6;
-}
-
-.loyalty-actions-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    gap: var(--spacing-sm);
-}
-
-.loyalty-actions-list li {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    font-weight: 500;
-    color: var(--gray-700);
-}
-
-.loyalty-actions-list li i {
-    color: var(--primary);
-}
-
-.loyalty-actions-card .btn {
-    align-self: flex-start;
-}
-
-@media (max-width: 1024px) {
-    .loyalty-overview-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 768px) {
-    .loyalty-points-card,
-    .loyalty-actions-card {
-        padding: var(--spacing-lg);
-    }
-
-    .loyalty-card-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-}
-
-/* Wishlist Page */
-.wishlist-page {
-    background: var(--gray-25, #f8f9fb);
     min-height: 100vh;
-    padding: 100px 0 80px;
+    padding: var(--spacing-3xl) 0;
 }
 
 .wishlist-hero {
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-    color: var(--white);
-    padding: 72px 0;
-    margin-bottom: var(--spacing-xl);
-    box-shadow: var(--shadow-lg);
+    margin-bottom: clamp(var(--spacing-2xl), 6vw, var(--spacing-4xl));
 }
 
-.wishlist-hero h1 {
-    font-size: clamp(2.25rem, 3vw, 3rem);
-    margin-bottom: var(--spacing-2xs);
+.wishlist-hero-card {
+    background: linear-gradient(135deg, rgba(244, 114, 182, 0.14) 0%, rgba(236, 72, 153, 0.14) 50%, rgba(99, 102, 241, 0.14) 100%);
+    border: 1px solid rgba(236, 72, 153, 0.25);
+    border-radius: var(--radius-2xl);
+    padding: clamp(var(--spacing-xl), 6vw, var(--spacing-3xl));
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
 }
 
-.wishlist-hero p {
-    font-size: 1.05rem;
-    opacity: 0.85;
+.wishlist-hero-card::after {
+    content: '';
+    position: absolute;
+    top: -200px;
+    right: -160px;
+    width: 360px;
+    height: 360px;
+    background: radial-gradient(circle, rgba(236, 72, 153, 0.18) 0%, transparent 65%);
+}
+
+.wishlist-hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    background: rgba(236, 72, 153, 0.15);
+    color: #ec4899;
+    font-weight: 600;
+    font-size: 0.875rem;
+    margin-bottom: var(--spacing-md);
+}
+
+.wishlist-hero-title {
+    font-size: clamp(2rem, 3.6vw, 2.8rem);
+    font-weight: 800;
+    color: var(--gray-900);
+    margin: 0 0 var(--spacing-md);
+}
+
+.wishlist-hero-description {
+    color: var(--gray-600);
+    font-size: clamp(1rem, 1.4vw, 1.125rem);
+    line-height: 1.7;
+    max-width: 640px;
+    margin: 0;
+}
+
+.wishlist-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+}
+
+.wishlist-hero-actions .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
 }
 
 .wishlist-layout {
@@ -621,14 +298,15 @@
 
 .wishlist-sidebar {
     background: var(--white);
-    border-radius: var(--radius-xl);
-    padding: var(--spacing-xl);
+    border-radius: var(--radius-2xl);
+    padding: clamp(var(--spacing-lg), 4vw, var(--spacing-2xl));
     box-shadow: var(--shadow-md);
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-lg);
+    gap: clamp(var(--spacing-md), 3vw, var(--spacing-xl));
     position: sticky;
     top: 120px;
+    border: 1px solid rgba(226, 232, 240, 0.9);
 }
 
 .wishlist-lists-header h2 {
@@ -787,8 +465,12 @@
     justify-content: space-between;
     align-items: center;
     gap: var(--spacing-lg);
-    border-bottom: 1px solid var(--border);
-    padding-bottom: var(--spacing-md);
+    flex-wrap: wrap;
+    background: var(--white);
+    border-radius: var(--radius-2xl);
+    padding: clamp(var(--spacing-md), 3vw, var(--spacing-xl));
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(226, 232, 240, 0.9);
 }
 
 .wishlist-toolbar-info h2 {
@@ -1095,6 +777,20 @@
 }
 
 @media (max-width: 1024px) {
+    .loyalty-overview-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .loyalty-points-card,
+    .loyalty-actions-card {
+        padding: var(--spacing-lg);
+    }
+
+    .loyalty-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
     .wishlist-layout {
         grid-template-columns: 1fr;
     }

@@ -33,9 +33,18 @@
     <main class="wishlist-page">
         <section class="wishlist-hero">
             <div class="container">
-                <div>
-                    <h1>Mi Wishlist</h1>
-                    <p>Organiza tus productos favoritos en listas personalizadas</p>
+                <div class="wishlist-hero-card">
+                    <span class="wishlist-hero-eyebrow"><i class="fas fa-heart"></i> Favoritos personales</span>
+                    <h1 class="wishlist-hero-title">Mi wishlist</h1>
+                    <p class="wishlist-hero-description">Organiza tus productos favoritos en listas personalizadas, compártelas y revisa qué artículos están en oferta.</p>
+                    <div class="wishlist-hero-actions">
+                        <button type="button" class="btn btn-primary btn-sm" onclick="window.location.href='products.html'">
+                            <i class="fas fa-plus"></i> Agregar productos
+                        </button>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="window.location.href='orders.html'">
+                            <i class="fas fa-box-open"></i> Ver pedidos
+                        </button>
+                    </div>
                 </div>
             </div>
         </section>
