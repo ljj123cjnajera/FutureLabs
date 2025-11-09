@@ -427,7 +427,7 @@
 
 #### 4.1 Estados de Carga
 - [x] Skeleton loaders
-- [ ] Spinners consistentes
+- [x] Spinners consistentes
 - [ ] Progress bars
 - [ ] Loading states en todos los componentes
 
