@@ -29,7 +29,7 @@ class QuickView {
           <div class="quick-view-body" id="quickViewBody">
             <!-- Contenido se carga dinámicamente -->
             <div class="quick-view-loading">
-              <i class="fas fa-spinner fa-spin"></i>
+          <div class="loading-spinner"></div>
               <p>Cargando producto...</p>
             </div>
           </div>

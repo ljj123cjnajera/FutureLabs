@@ -126,7 +126,7 @@ class OrderTracking {
     const timestamp = this.getTimestamp(order, stepId);
     if (!timestamp) {
       if (state === 'is-active') {
-        return `<span class="tracking-step-time"><i class="fas fa-spinner fa-spin"></i> En progreso</span>`;
+        return `<span class="tracking-step-time loading-inline"><span class="loading-spinner small"></span> En progreso</span>`;
       }
       return '';
     }
