@@ -119,7 +119,10 @@ class FutureLabsAPI {
 
       if (!response.ok) {
         console.error('❌ Response not ok:', data.message);
-        throw new Error(data.message || 'Error en la petición');
+        const error = new Error(data.message || 'Error en la petición');
+        error.status = response.status;
+        error.data = data;
+        throw error;
       }
 
       return data;

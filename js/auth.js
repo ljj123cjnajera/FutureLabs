@@ -47,19 +47,23 @@ class AuthManager {
           document.dispatchEvent(new Event('authStateChanged'));
           console.log('🎉 Evento authStateChanged disparado');
         } else {
-          // Token inválido, eliminar
-          console.log('❌ Token inválido, eliminando...');
+          // No se obtuvo usuario pero no hubo error explícito
+          console.warn('⚠️ No se pudo obtener el usuario actual, manteniendo el token para reintentar.');
           this.currentUser = null;
-          window.api.setToken(null);
-          localStorage.removeItem('auth_token');
-          // Disparar evento de cambio de estado
           document.dispatchEvent(new Event('authStateChanged'));
         }
       } catch (error) {
         console.error('❌ Error al cargar usuario:', error);
         this.currentUser = null;
-        window.api.setToken(null);
-        localStorage.removeItem('auth_token');
+        
+        if (error.status === 401 || error.status === 403) {
+          console.log('❌ Token inválido/expirado, limpiando credenciales');
+          window.api.setToken(null);
+          localStorage.removeItem('auth_token');
+        } else {
+          console.warn('⚠️ Manteniendo token para reintentar más tarde');
+        }
+        
         // Disparar evento de cambio de estado
         document.dispatchEvent(new Event('authStateChanged'));
       }
@@ -239,7 +243,7 @@ class AuthManager {
       return null;
     } catch (error) {
       console.error('❌ Error en getCurrentUser:', error);
-      return null;
+      throw error;
     }
   }
 
