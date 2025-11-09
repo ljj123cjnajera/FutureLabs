@@ -565,8 +565,29 @@ a.home-link::before,
 
 @media (max-width: 768px) {
     .top-bar {
-        grid-template-columns: auto 1fr auto;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
         gap: var(--spacing-sm);
+    }
+    
+    .top-bar > * {
+        width: 100%;
+    }
+    
+    .top-bar .logo {
+        justify-content: center;
+    }
+    
+    .user-actions {
+        justify-content: space-between;
+        order: 2;
+    }
+    
+    .user-actions a,
+    .user-actions button {
+        flex: 1;
+        justify-content: center;
     }
     
     .logo {
