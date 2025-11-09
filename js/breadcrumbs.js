@@ -59,6 +59,8 @@ class Breadcrumbs {
       this.items.push({ name: 'Sobre Nosotros', url: null });
     } else if (page === 'faq.html') {
       this.items.push({ name: 'Preguntas Frecuentes', url: null });
+    } else if (page === 'compare.html') {
+      this.items.push({ name: 'Comparador', url: null });
     }
 
     return this.items;

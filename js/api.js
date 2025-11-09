@@ -115,6 +115,10 @@ class FutureLabsAPI {
     return this.request(`/products?${params.toString()}`);
   }
 
+  async getProductById(id) {
+    return this.getProduct(id);
+  }
+
   async getProduct(id) {
     return this.request(`/products/${id}`);
   }

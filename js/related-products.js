@@ -91,7 +91,7 @@ class RelatedProducts {
                   <button class="btn-add-cart" onclick="addToCart('${product.id}')">
                     <i class="fas fa-shopping-cart"></i> Agregar
                   </button>
-                  <button class="btn-compare" data-product-id="${product.id}">
+                  <button class="btn-compare" data-product-id="${product.id}" data-compare-variant="icon" title="Comparar producto">
                     <i class="fas fa-balance-scale"></i>
                   </button>
                 </div>
@@ -101,6 +101,10 @@ class RelatedProducts {
         </div>
       </div>
     `;
+
+    if (window.productComparator) {
+      window.productComparator.updateCompareButtons();
+    }
   }
 
   generateStars(rating) {

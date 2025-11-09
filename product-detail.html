@@ -24,8 +24,8 @@
     <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="css/notifications.css">
     <link rel="stylesheet" href="css/reviews.css">
-    <link rel="stylesheet" href="css/home-link-fix.css?v=2.0">
     <link rel="stylesheet" href="css/product-gallery.css?v=1.0">
+    <link rel="stylesheet" href="css/comparator.css?v=1.0">
     <link rel="stylesheet" href="css/breadcrumbs.css?v=1.0">
     <!-- Estilos inline removidos - migrados a product-detail-page.css -->
 </head>
@@ -61,10 +61,10 @@
     <script src="js/skeleton.js"></script>
     <script src="js/modals.js"></script>
     <script src="js/cart.js"></script>
+    <script src="js/comparator.js"></script>
     <script src="js/reviews.js"></script>
     <script src="js/related-products.js"></script>
     <script src="js/components.js"></script>
-    <script src="js/fix-home-link.js"></script>
     <script src="js/product-gallery.js"></script>
     <script src="js/breadcrumbs.js"></script>
     
@@ -198,6 +198,9 @@ document.addEventListener('DOMContentLoaded', async function() {
                             <button class="btn btn-ghost btn-lg" onclick="addToFavorites()">
                                 <i class="far fa-heart"></i>
                             </button>
+                            <button class="btn btn-outline btn-lg btn-compare" data-product-id="${product.id}" data-label-inactive="Comparar" data-label-active="Comparando" title="Comparar producto">
+                                <i class="fas fa-balance-scale"></i> Comparar
+                            </button>
                         </div>
                         
                         <button class="btn btn-secondary btn-lg btn-full" onclick="buyNow()" ${product.stock_quantity === 0 ? 'disabled' : ''}>
@@ -206,6 +209,10 @@ document.addEventListener('DOMContentLoaded', async function() {
                     </div>
                 </div>
             `;
+
+            if (window.productComparator) {
+              window.productComparator.updateCompareButtons();
+            }
             
             // Renderizar galería de imágenes
             if (window.productGallery && galleryImages) {

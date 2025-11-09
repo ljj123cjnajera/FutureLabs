@@ -23,8 +23,8 @@
     <link rel="stylesheet" href="css/micro-interactions.css">
     <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="css/notifications.css">
-    <link rel="stylesheet" href="css/home-link-fix.css?v=2.0">
     <link rel="stylesheet" href="css/quick-view.css?v=1.0">
+    <link rel="stylesheet" href="css/comparator.css?v=1.0">
     <link rel="stylesheet" href="css/breadcrumbs.css?v=1.0">
     <!-- Estilos inline removidos - migrados a products-page.css -->
 </head>
@@ -118,7 +118,7 @@
     <script src="js/notifications.js"></script>
     <script src="js/skeleton.js"></script>
     <script src="js/components.js"></script>
-    <script src="js/fix-home-link.js"></script>
+    <script src="js/comparator.js"></script>
     <script src="js/modals.js"></script>
     <script src="js/cart.js"></script>
     <script src="js/quick-view.js"></script>
@@ -357,8 +357,8 @@
                                         <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); addToCart('${product.id}')">
                                             <i class="fas fa-shopping-cart"></i> Agregar
                                         </button>
-                                        <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();">
-                                            <i class="far fa-heart"></i>
+                                        <button class="btn btn-outline btn-sm btn-compare" data-product-id="${product.id}" data-label-inactive="Comparar" data-label-active="Comparando" onclick="event.stopPropagation();" title="Comparar producto">
+                                            <i class="fas fa-balance-scale"></i> Comparar
                                         </button>
                                     </div>
                                 </div>
@@ -372,6 +372,11 @@
 
             // Renderizar paginación
             renderPagination();
+
+            // Actualizar estado de botones del comparador
+            if (window.productComparator) {
+                window.productComparator.updateCompareButtons();
+            }
         }
 
         // Renderizar paginación

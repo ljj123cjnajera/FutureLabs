@@ -17,6 +17,8 @@
     <link rel="stylesheet" href="css/micro-interactions.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/notifications.css">
+    <link rel="stylesheet" href="css/comparator.css?v=1.0">
+    <link rel="stylesheet" href="css/breadcrumbs.css?v=1.0">
     <link rel="stylesheet" href="css/blog-compare.css">
     <link rel="stylesheet" href="css/animations.css">
     <link rel="stylesheet" href="css/animations-enhanced.css">
@@ -28,6 +30,8 @@
 
     <!-- Header Dinámico -->
     <header id="mainHeader"></header>
+
+    <nav id="breadcrumbs"></nav>
 
     <!-- Compare Page -->
     <section class="compare-page">
@@ -50,10 +54,36 @@
     <footer id="mainFooter"></footer>
 
     <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
     <script src="js/notifications.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/modals.js"></script>
+    <script src="js/cart.js"></script>
     <script src="js/comparator.js"></script>
+    <script src="js/breadcrumbs.js"></script>
     
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const headerContainer = document.getElementById('mainHeader');
+            if (headerContainer && window.Components) {
+                headerContainer.innerHTML = window.Components.getHeader(true, true);
+                window.Components.initHeader();
+            }
+
+            const footerContainer = document.getElementById('mainFooter');
+            if (footerContainer && window.Components) {
+                footerContainer.innerHTML = window.Components.getFooter();
+            }
+
+            loadComparison();
+        });
+
+        document.addEventListener('productComparator:updated', () => {
+            if (window.location.pathname.includes('compare.html')) {
+                loadComparison();
+            }
+        });
+
         async function loadComparison() {
             const products = window.productComparator.getProducts();
             const container = document.getElementById('compareContent');
@@ -216,11 +246,8 @@
         
         function removeFromComparison(productId) {
             window.productComparator.removeProduct(productId);
-            loadComparison();
         }
         
-        // Cargar comparación al iniciar
-        loadComparison();
     </script>
 </body>
 </html>
