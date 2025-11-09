@@ -428,8 +428,8 @@
 #### 4.1 Estados de Carga
 - [x] Skeleton loaders
 - [x] Spinners consistentes
-- [ ] Progress bars
-- [ ] Loading states en todos los componentes
+- [x] Progress bars
+- [x] Loading states en todos los componentes
 
 #### 4.2 Feedback Visual
 - [ ] Toast notifications mejoradas
