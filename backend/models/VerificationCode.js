@@ -43,6 +43,16 @@ class VerificationCode {
       .first();
   }
 
+  // Buscar código válido por usuario y código
+  static async findValidCode(userId, code, type = 'email') {
+    return await db('verification_codes')
+      .where({ user_id: userId, code, type })
+      .where('expires_at', '>', new Date())
+      .where('is_verified', false)
+      .orderBy('created_at', 'desc')
+      .first();
+  }
+
   // Marcar código como usado
   static async markAsUsed(codeId) {
     return await db('verification_codes')
