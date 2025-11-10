@@ -129,6 +129,7 @@ class Components {
   static initHeader() {
     console.log('🔵 [COMPONENTS] initHeader() ejecutado');
     this.ensureWishlistAssets();
+    this.ensureVerificationAssets();
     
     // FORZAR VISIBILIDAD DE TODOS LOS BOTONES DEL HEADER
     function forceAllHeaderButtons() {
@@ -342,6 +343,29 @@ class Components {
     script.defer = true;
     script.setAttribute('data-wishlist-script', 'true');
     script.onload = () => syncIfReady();
+    document.body.appendChild(script);
+  }
+
+  static ensureVerificationAssets() {
+    if (typeof document === 'undefined') return;
+
+    if (window.verificationManager) {
+      return;
+    }
+
+    if (document.querySelector('script[data-verification-script]')) {
+      document
+        .querySelector('script[data-verification-script]')
+        .addEventListener('load', () => {
+          console.log('🔵 [COMPONENTS] verification assets loaded (existing)');
+        }, { once: true });
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = 'js/verification.js';
+    script.defer = true;
+    script.setAttribute('data-verification-script', 'true');
     document.body.appendChild(script);
   }
 
