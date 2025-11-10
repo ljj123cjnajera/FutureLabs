@@ -62,7 +62,7 @@ class EmailService {
       `;
 
       await this.resend.emails.send({
-        from: 'FutureLabs <onboarding@resend.dev>', // Puedes cambiar esto después
+        from: 'FutureLabs <no-reply@futurelabs.website>',
         to: email,
         subject: 'Verifica tu cuenta - FutureLabs',
         html: html
@@ -130,7 +130,7 @@ class EmailService {
       `;
 
       await this.resend.emails.send({
-        from: 'FutureLabs <onboarding@resend.dev>',
+        from: 'FutureLabs <no-reply@futurelabs.website>',
         to: email,
         subject: 'Recupera tu contraseña - FutureLabs',
         html: html
@@ -227,7 +227,7 @@ class EmailService {
       `;
 
       await this.resend.emails.send({
-        from: 'FutureLabs <onboarding@resend.dev>',
+        from: 'FutureLabs <no-reply@futurelabs.website>',
         to: email,
         subject: `Confirmación de Pedido #${orderData.order_number} - FutureLabs`,
         html: html
@@ -294,7 +294,7 @@ class EmailService {
       `;
 
       await this.resend.emails.send({
-        from: 'FutureLabs <onboarding@resend.dev>',
+        from: 'FutureLabs <no-reply@futurelabs.website>',
         to: email,
         subject: '¡Bienvenido a FutureLabs!',
         html: html
