@@ -9,6 +9,9 @@ class SearchAutocomplete {
     this.searchHistory = this.loadSearchHistory();
     this.isLoading = false;
     this.initialized = false;
+    this.optionCounter = 0;
+    this.suggestionIdPrefix = 'search-suggestion';
+    this.containerId = 'searchSuggestions';
   }
 
   init() {
@@ -26,6 +29,13 @@ class SearchAutocomplete {
     this.initialized = true;
     console.log('✅ SearchAutocomplete inicializado correctamente');
     
+    this.searchInput.setAttribute('autocomplete', 'off');
+    this.searchInput.setAttribute('role', 'combobox');
+    this.searchInput.setAttribute('aria-autocomplete', 'list');
+    this.searchInput.setAttribute('aria-haspopup', 'listbox');
+    this.searchInput.setAttribute('aria-expanded', 'false');
+    this.searchInput.setAttribute('aria-controls', this.containerId);
+
     // Crear contenedor de sugerencias
     this.createSuggestionsContainer();
     
@@ -54,6 +64,7 @@ class SearchAutocomplete {
       this.suggestionsContainer = existingContainer;
       this.suggestionsContainer.style.display = 'none';
       this.suggestionsContainer.innerHTML = '';
+      this.configureSuggestionsContainer();
       return;
     }
     
@@ -62,6 +73,25 @@ class SearchAutocomplete {
     container.style.display = 'none';
     searchBar.appendChild(container);
     this.suggestionsContainer = container;
+    this.configureSuggestionsContainer();
+  }
+ 
+   configureSuggestionsContainer() {
+     if (!this.suggestionsContainer) return;
+     this.suggestionsContainer.id = this.containerId;
+     this.suggestionsContainer.setAttribute('role', 'listbox');
+     this.suggestionsContainer.setAttribute('aria-label', 'Sugerencias de búsqueda');
+     this.suggestionsContainer.setAttribute('aria-live', 'polite');
+     this.suggestionsContainer.setAttribute('aria-busy', 'false');
+   }
+
+  resetOptionCounter() {
+    this.optionCounter = 0;
+  }
+
+  createOptionId(type = 'option') {
+    this.optionCounter += 1;
+    return `${this.suggestionIdPrefix}-${type}-${this.optionCounter}`;
   }
 
   async handleInput(e) {
@@ -80,6 +110,9 @@ class SearchAutocomplete {
     
     // Hide suggestions if query is too short
     if (query.length < 2) {
+      if (this.suggestionsContainer) {
+        this.suggestionsContainer.setAttribute('aria-busy', 'false');
+      }
       this.hideSuggestions();
       return;
     }
@@ -110,12 +143,16 @@ class SearchAutocomplete {
       this.hideSuggestions();
     } finally {
       this.isLoading = false;
+      if (this.suggestionsContainer) {
+        this.suggestionsContainer.setAttribute('aria-busy', 'false');
+      }
     }
   }
 
   showLoadingState() {
     if (!this.suggestionsContainer) return;
     
+    this.suggestionsContainer.setAttribute('aria-busy', 'true');
     this.suggestionsContainer.innerHTML = `
       <div class="suggestions-loading">
         <div class="loading-spinner"></div>
@@ -123,12 +160,18 @@ class SearchAutocomplete {
       </div>
     `;
     this.showSuggestions();
+    if (this.searchInput) {
+      this.searchInput.setAttribute('aria-expanded', 'true');
+    }
   }
 
   renderSuggestions() {
     if (!this.suggestionsContainer) return;
     
+    this.resetOptionCounter();
+    
     if (this.currentSuggestions.length === 0) {
+      this.suggestionsContainer.setAttribute('aria-busy', 'false');
       this.hideSuggestions();
       return;
     }
@@ -141,11 +184,12 @@ class SearchAutocomplete {
     
     // Products
     if (products.length > 0) {
-      html += '<div class="suggestions-section">';
-      html += '<div class="suggestions-title"><i class="fas fa-box"></i> Productos</div>';
-      products.forEach((product, index) => {
+      html += '<div class="suggestions-section" role="presentation">';
+      html += '<div class="suggestions-title" aria-hidden="true"><i class="fas fa-box" aria-hidden="true"></i> Productos</div>';
+      products.forEach((product) => {
+        const optionId = this.createOptionId('product');
         html += `
-          <div class="suggestion-item" data-type="product" data-id="${product.id}" data-slug="${product.slug}" data-name="${this.escapeAttribute(product.name)}">
+          <div class="suggestion-item" id="${optionId}" role="option" aria-selected="false" tabindex="-1" data-type="product" data-id="${product.id}" data-slug="${this.escapeAttribute(product.slug || '')}" data-name="${this.escapeAttribute(product.name)}">
             <img src="${product.image_url || 'https://via.placeholder.com/50'}" alt="${product.name}">
             <div class="suggestion-info">
               <div class="suggestion-name">${this.highlightMatch(product.name)}</div>
@@ -166,12 +210,13 @@ class SearchAutocomplete {
     
     // Categories
     if (categories.length > 0) {
-      html += '<div class="suggestions-section">';
-      html += '<div class="suggestions-title"><i class="fas fa-tags"></i> Categorías</div>';
+      html += '<div class="suggestions-section" role="presentation">';
+      html += '<div class="suggestions-title" aria-hidden="true"><i class="fas fa-tags" aria-hidden="true"></i> Categorías</div>';
       categories.forEach((category) => {
+        const optionId = this.createOptionId('category');
         html += `
-          <div class="suggestion-item" data-type="category" data-slug="${category.slug}" data-name="${this.escapeAttribute(category.name)}">
-            <i class="fas fa-folder"></i>
+          <div class="suggestion-item" id="${optionId}" role="option" aria-selected="false" tabindex="-1" data-type="category" data-slug="${this.escapeAttribute(category.slug || '')}" data-name="${this.escapeAttribute(category.name)}">
+            <i class="fas fa-folder" aria-hidden="true"></i>
             <div class="suggestion-info">
               <div class="suggestion-name">${this.highlightMatch(category.name)}</div>
             </div>
@@ -183,18 +228,20 @@ class SearchAutocomplete {
     
     // View all results
     html += `
-      <div class="suggestions-footer">
+      <div class="suggestions-footer" role="presentation">
         <a href="products.html?search=${encodeURIComponent(this.searchInput.value)}">
-          <i class="fas fa-search"></i> Ver todos los resultados
+          <i class="fas fa-search" aria-hidden="true"></i> Ver todos los resultados
         </a>
       </div>
     `;
     
     this.suggestionsContainer.innerHTML = html;
+    this.suggestionsContainer.setAttribute('aria-busy', 'false');
     this.showSuggestions();
+    this.selectedIndex = -1;
     
     // Add click handlers
-    this.suggestionsContainer.querySelectorAll('.suggestion-item').forEach(item => {
+    this.suggestionsContainer.querySelectorAll('.suggestion-item[role="option"]').forEach(item => {
       item.addEventListener('click', () => {
         this.selectSuggestion(item);
       });
@@ -238,7 +285,7 @@ class SearchAutocomplete {
       return;
     }
     
-    const items = this.suggestionsContainer.querySelectorAll('.suggestion-item');
+    const items = this.suggestionsContainer.querySelectorAll('.suggestion-item[role="option"]');
     
     switch(e.key) {
       case 'ArrowDown':
@@ -269,28 +316,47 @@ class SearchAutocomplete {
   }
 
   updateSelection(items) {
+    let activeId = null;
     items.forEach((item, index) => {
       if (index === this.selectedIndex) {
         item.classList.add('selected');
+        item.setAttribute('aria-selected', 'true');
         item.scrollIntoView({ block: 'nearest' });
+        activeId = item.id || null;
       } else {
         item.classList.remove('selected');
+        item.setAttribute('aria-selected', 'false');
       }
     });
+    if (this.searchInput) {
+      if (activeId) {
+        this.searchInput.setAttribute('aria-activedescendant', activeId);
+      } else {
+        this.searchInput.removeAttribute('aria-activedescendant');
+      }
+    }
   }
 
   showSuggestions() {
-    if (this.suggestionsContainer) {
-      this.suggestionsContainer.style.display = 'block';
-    }
-  }
-
-  hideSuggestions() {
-    if (this.suggestionsContainer) {
-      this.suggestionsContainer.style.display = 'none';
-    }
-    this.selectedIndex = -1;
-  }
+     if (this.suggestionsContainer) {
+       this.suggestionsContainer.style.display = 'block';
+       if (this.searchInput) {
+         this.searchInput.setAttribute('aria-expanded', 'true');
+       }
+     }
+   }
+ 
+   hideSuggestions() {
+     if (this.suggestionsContainer) {
+       this.suggestionsContainer.style.display = 'none';
+       this.suggestionsContainer.setAttribute('aria-busy', 'false');
+     }
+     this.selectedIndex = -1;
+     if (this.searchInput) {
+       this.searchInput.setAttribute('aria-expanded', 'false');
+       this.searchInput.removeAttribute('aria-activedescendant');
+     }
+   }
 
   // Historial de búsquedas
   loadSearchHistory() {
@@ -341,58 +407,73 @@ class SearchAutocomplete {
   async renderHistoryAndTrending() {
     if (!this.suggestionsContainer) return;
     
+    this.resetOptionCounter();
+
     let html = '';
     
     // Historial de búsquedas
     if (this.searchHistory.length > 0) {
-      html += '<div class="suggestions-section">';
-      html += '<div class="suggestions-title"><i class="fas fa-clock"></i> Búsquedas Recientes</div>';
+      html += '<div class="suggestions-section" role="presentation">';
+      html += '<div class="suggestions-title" aria-hidden="true"><i class="fas fa-clock" aria-hidden="true"></i> Búsquedas Recientes</div>';
       
       this.searchHistory.slice(0, 5).forEach((query) => {
         const safeAttr = this.escapeAttribute(query);
         const safeLabel = this.escapeHTML(query);
+        const optionId = this.createOptionId('history');
         html += `
-          <div class="suggestion-item" data-type="history" data-query="${safeAttr}">
-            <i class="fas fa-history"></i>
+          <div class="suggestion-item" id="${optionId}" role="option" aria-selected="false" tabindex="-1" data-type="history" data-query="${safeAttr}">
+            <i class="fas fa-history" aria-hidden="true"></i>
             <div class="suggestion-info">
               <div class="suggestion-name">${safeLabel}</div>
             </div>
-            <button class="suggestion-delete" data-query="${safeAttr}">
-              <i class="fas fa-times"></i>
+            <button class="suggestion-delete" data-query="${safeAttr}" aria-label="Eliminar de historial" type="button">
+              <i class="fas fa-times" aria-hidden="true"></i>
             </button>
           </div>
         `;
       });
       
-      html += '<div class="suggestions-clear"><button id="clearHistory">Limpiar historial</button></div>';
+      html += '<div class="suggestions-clear" role="presentation"><button id="clearHistory" type="button">Limpiar historial</button></div>';
       html += '</div>';
     }
     
     // Búsquedas populares
-    html += '<div class="suggestions-section">';
-    html += '<div class="suggestions-title"><i class="fas fa-fire"></i> Búsquedas Populares</div>';
-    
     const popularSearches = ['laptop gaming', 'smartphone', 'auriculares', 'smartwatch', 'tablet'];
-    popularSearches.forEach((query) => {
-      const safeAttr = this.escapeAttribute(query);
-      const safeLabel = this.escapeHTML(query);
-      html += `
-        <div class="suggestion-item" data-type="popular" data-query="${safeAttr}">
-          <i class="fas fa-fire"></i>
-          <div class="suggestion-info">
-            <div class="suggestion-name">${safeLabel}</div>
+    if (popularSearches.length > 0) {
+      html += '<div class="suggestions-section" role="presentation">';
+      html += '<div class="suggestions-title" aria-hidden="true"><i class="fas fa-fire" aria-hidden="true"></i> Búsquedas Populares</div>';
+      
+      popularSearches.forEach((query) => {
+        const optionId = this.createOptionId('popular');
+        const safeAttr = this.escapeAttribute(query);
+        const safeLabel = this.escapeHTML(query);
+        html += `
+          <div class="suggestion-item" id="${optionId}" role="option" aria-selected="false" tabindex="-1" data-type="popular" data-query="${safeAttr}">
+            <i class="fas fa-fire" aria-hidden="true"></i>
+            <div class="suggestion-info">
+              <div class="suggestion-name">${safeLabel}</div>
+            </div>
           </div>
-        </div>
-      `;
-    });
+        `;
+      });
+      
+      html += '</div>';
+    }
     
-    html += '</div>';
+    if (!html.trim()) {
+      this.suggestionsContainer.innerHTML = '';
+      this.suggestionsContainer.setAttribute('aria-busy', 'false');
+      this.hideSuggestions();
+      return;
+    }
     
     this.suggestionsContainer.innerHTML = html;
+    this.suggestionsContainer.setAttribute('aria-busy', 'false');
     this.showSuggestions();
+    this.selectedIndex = -1;
     
     // Add click handlers
-    this.suggestionsContainer.querySelectorAll('.suggestion-item').forEach(item => {
+    this.suggestionsContainer.querySelectorAll('.suggestion-item[role="option"]').forEach(item => {
       item.addEventListener('click', (e) => {
         if (!e.target.closest('.suggestion-delete')) {
           this.selectSuggestion(item);

@@ -198,6 +198,8 @@ class ProductComparator {
       comparator = document.createElement('div');
       comparator.id = 'floating-comparator';
       comparator.className = 'floating-comparator';
+      comparator.setAttribute('role', 'region');
+      comparator.setAttribute('aria-label', 'Comparador de productos seleccionados');
       document.body.appendChild(comparator);
     }
 
@@ -209,9 +211,9 @@ class ProductComparator {
 
       comparator.innerHTML = `
         <div class="comparator-header">
-          <h4><i class="fas fa-balance-scale"></i> Comparador (${this.products.length}/${this.maxProducts})</h4>
-          <button class="clear-comparator" title="Vaciar">
-            <i class="fas fa-trash"></i>
+          <h4><i class="fas fa-balance-scale" aria-hidden="true"></i> Comparador (${this.products.length}/${this.maxProducts})</h4>
+          <button class="clear-comparator" type="button" title="Vaciar" aria-label="Vaciar comparador">
+            <i class="fas fa-trash" aria-hidden="true"></i>
           </button>
         </div>
         <div class="comparator-products">
@@ -219,14 +221,14 @@ class ProductComparator {
             <div class="comparator-product">
               <img src="${product.image_url || 'https://via.placeholder.com/100'}" alt="${product.name}">
               <span class="product-name">${product.name.substring(0, 20)}...</span>
-              <button class="remove-from-comparator" data-product-id="${product.id}" title="Eliminar">
-                <i class="fas fa-times"></i>
+              <button class="remove-from-comparator" type="button" data-product-id="${product.id}" title="Eliminar" aria-label="Eliminar ${product.name} del comparador">
+                <i class="fas fa-times" aria-hidden="true"></i>
               </button>
             </div>
           `).join('')}
         </div>
-        <button class="compare-now">
-          <i class="fas fa-balance-scale"></i> Comparar Ahora
+        <button class="compare-now" type="button">
+          <i class="fas fa-balance-scale" aria-hidden="true"></i> Comparar Ahora
         </button>
       `;
     }

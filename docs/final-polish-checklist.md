@@ -15,7 +15,7 @@
 - [x] Estados `focus-visible` heredados + verificación CTA en páginas informativas.
 - [ ] Revisión de contraste en botones secundarios / outline en cards interactivas.
 - [~] Declarar `aria-live` / `aria-expanded` en componentes dinámicos (autocomplete, FAQ, comparator) donde aplique.
-  - Funnel: `cartContainer`, `ordersContainer` y `checkoutContent` ahora anuncian cambios; pendiente revisar autocomplete/comparator.
+  - Funnel: `cartContainer`, `ordersContainer` y `checkoutContent` ahora anuncian cambios; autocomplete usa combobox accesible con `aria-live` y el comparador tiene tabla descriptiva; sigue pendiente revisar detalles del comparator flotante y CTA de blog.
 
 ## 3. Documentación & Comunicación
 - [x] Checklist creado.

@@ -59,22 +59,22 @@
                     <p>Destaca diferencias clave o comparte tu selección con un clic.</p>
                 </div>
                 <div class="compare-actions" id="compareActions" hidden>
-                    <button class="btn btn-outline btn-sm" id="toggleDifferences">
-                        <i class="fas fa-adjust"></i> Mostrar solo diferencias
+                    <button class="btn btn-outline btn-sm" id="toggleDifferences" aria-pressed="false">
+                        <i class="fas fa-adjust" aria-hidden="true"></i> Mostrar solo diferencias
                     </button>
                     <button class="btn btn-outline btn-sm" id="copyShareLink">
-                        <i class="fas fa-link"></i> Compartir
+                        <i class="fas fa-link" aria-hidden="true"></i> Compartir
                     </button>
                     <button class="btn btn-outline btn-sm" id="exportComparison">
-                        <i class="fas fa-file-download"></i> Exportar CSV
+                        <i class="fas fa-file-download" aria-hidden="true"></i> Exportar CSV
                     </button>
                     <button class="btn btn-ghost btn-sm" id="clearComparison">
-                        <i class="fas fa-trash"></i> Vaciar
+                        <i class="fas fa-trash" aria-hidden="true"></i> Vaciar
                     </button>
                 </div>
             </div>
 
-            <div id="compareContent">
+            <div id="compareContent" role="status" aria-live="polite" aria-busy="true" tabindex="-1">
                 <div class="loading-state">
                     <div class="loading-state-content">
                         <div class="loading-spinner large"></div>
@@ -163,9 +163,10 @@
                     toggleDifferencesBtn.addEventListener('click', () => {
                         state.highlightDifferences = !state.highlightDifferences;
                         toggleDifferencesBtn.classList.toggle('is-active', state.highlightDifferences);
+                        toggleDifferencesBtn.setAttribute('aria-pressed', state.highlightDifferences ? 'true' : 'false');
                         toggleDifferencesBtn.innerHTML = state.highlightDifferences
-                            ? '<i class="fas fa-adjust"></i> Mostrar todas'
-                            : '<i class="fas fa-adjust"></i> Mostrar solo diferencias';
+                            ? '<i class="fas fa-adjust" aria-hidden="true"></i> Mostrar todas'
+                            : '<i class="fas fa-adjust" aria-hidden="true"></i> Mostrar solo diferencias';
                         renderComparison();
                     });
                 }
@@ -223,6 +224,7 @@
             }
 
             function renderLoading() {
+                compareContent.setAttribute('aria-busy', 'true');
                 compareContent.innerHTML = `
                     <div class="loading">
                         <div class="loading-spinner large"></div>
@@ -247,6 +249,8 @@
                         </div>
                     </div>
                 `;
+                compareContent.setAttribute('aria-busy', 'false');
+                compareContent.focus();
                 if (actionsBar) actionsBar.hidden = true;
             }
 
@@ -261,6 +265,8 @@
                         </a>
                     </div>
                 `;
+                compareContent.setAttribute('aria-busy', 'false');
+                compareContent.focus();
                 if (actionsBar) actionsBar.hidden = true;
             }
 
@@ -273,6 +279,7 @@
                 if (actionsBar) {
                     actionsBar.hidden = false;
                     toggleDifferencesBtn?.classList.toggle('is-active', state.highlightDifferences);
+                    toggleDifferencesBtn?.setAttribute('aria-pressed', state.highlightDifferences ? 'true' : 'false');
                 }
 
                 const filteredSections = state.sections.map(section => ({
@@ -280,14 +287,16 @@
                     rows: section.rows.filter(row => !state.highlightDifferences || row.isDifferent)
                 })).filter(section => section.rows.length > 0);
 
+                compareContent.setAttribute('aria-busy', 'true');
                 compareContent.innerHTML = `
                     <div class="compare-table">
                         <table>
+                            <caption class="sr-only visually-hidden">Comparación de productos seleccionados</caption>
                             <thead>
                                 <tr>
-                                    <th class="product-column">Producto</th>
+                                    <th class="product-column" scope="col">Producto</th>
                                     ${state.products.map(product => `
-                                        <th>
+                                        <th scope="col">
                                             <div class="product-card">
                                                 <img src="${product.image_url || 'https://via.placeholder.com/200'}"
                                                      alt="${escapeHTML(product.name)}"
@@ -301,13 +310,13 @@
                                                 </div>
                                                 <div class="product-actions d-flex flex-col gap-sm">
                                                     <button class="btn btn-primary btn-sm" data-action="compare-add-cart" data-product-id="${product.id}">
-                                                        <i class="fas fa-shopping-cart"></i> Agregar al Carrito
+                                                        <i class="fas fa-shopping-cart" aria-hidden="true"></i> Agregar al Carrito
                                                     </button>
                                                     <button class="btn btn-outline btn-sm" data-action="compare-add-wishlist" data-product-id="${product.id}">
-                                                        <i class="fas fa-heart"></i> Agregar a Wishlist
+                                                        <i class="fas fa-heart" aria-hidden="true"></i> Agregar a Wishlist
                                                     </button>
                                                     <button class="btn btn-error btn-sm" data-action="compare-remove" data-product-id="${product.id}">
-                                                        <i class="fas fa-times"></i> Eliminar
+                                                        <i class="fas fa-times" aria-hidden="true"></i> Eliminar
                                                     </button>
                                                 </div>
                                             </div>
@@ -317,12 +326,12 @@
                             </thead>
                             <tbody>
                                 ${filteredSections.map(section => `
-                                    <tr class="section-row">
-                                        <td colspan="${state.products.length + 1}">${escapeHTML(section.title)}</td>
+                                    <tr class="section-row" role="presentation">
+                                        <th scope="colgroup" colspan="${state.products.length + 1}" class="section-header">${escapeHTML(section.title)}</th>
                                     </tr>
                                     ${section.rows.map(row => `
                                         <tr class="${row.isDifferent ? 'is-different' : 'is-equal'}">
-                                            <td class="spec-label">${escapeHTML(row.label)}</td>
+                                            <th scope="row" class="spec-label">${escapeHTML(row.label)}</th>
                                             ${row.displayValues.map((value, index) => `
                                                 <td class="spec-value ${row.isDifferent ? 'spec-value-different' : ''}">
                                                     ${value}
@@ -335,7 +344,8 @@
                         </table>
                     </div>
                 `;
-
+                compareContent.setAttribute('aria-busy', 'false');
+ 
                 compareContent.querySelectorAll('[data-action="compare-add-cart"]').forEach(button => {
                     button.addEventListener('click', () => addToCart(button.dataset.productId));
                 });
@@ -347,6 +357,7 @@
                 compareContent.querySelectorAll('[data-action="compare-remove"]').forEach(button => {
                     button.addEventListener('click', () => removeFromComparison(button.dataset.productId));
                 });
+                compareContent.focus();
             }
 
             function renderPrice(product) {
