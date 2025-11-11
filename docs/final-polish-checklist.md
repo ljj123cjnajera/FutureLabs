@@ -8,13 +8,14 @@
 - [~] Funnel (`cart`, `checkout`, `orders`)
   - `cart`: aria-live agregado al contenedor dinámico y anuncio explícito del progreso de envío gratis; hover visual desactivado en pantallas táctiles.
   - `checkout`: indicador de pasos convertido en lista accesible con `aria-current`, botones hero responsivos en mobile y contenedor dinámico con `role="status"`.
+  - `orders`: timeline convertido en `<ol>` accesible, progreso con `role="progressbar"` y contenedor dinámico con `aria-live`.
 - [ ] Cuenta (`profile`, `wishlist`, `blog`, `compare`)
 
 ## 2. Accesibilidad Básica
 - [x] Estados `focus-visible` heredados + verificación CTA en páginas informativas.
 - [ ] Revisión de contraste en botones secundarios / outline en cards interactivas.
 - [~] Declarar `aria-live` / `aria-expanded` en componentes dinámicos (autocomplete, FAQ, comparator) donde aplique.
-  - Funnel: `cartContainer` y `checkoutContent` ahora anuncian cambios; pendiente revisar autocomplete/comparator.
+  - Funnel: `cartContainer`, `ordersContainer` y `checkoutContent` ahora anuncian cambios; pendiente revisar autocomplete/comparator.
 
 ## 3. Documentación & Comunicación
 - [x] Checklist creado.

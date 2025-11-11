@@ -56,18 +56,19 @@ class OrderTracking {
       .map((step, index) => {
         const state = this.getStepState(index, currentIndex, step.id, order.status, isCancelled);
         const timestampHtml = this.renderTimestamp(order, step.id, state);
+        const isCurrent = state === 'is-active';
 
         return `
-          <div class="tracking-step ${state}" data-step="${step.id}">
+          <li class="tracking-step ${state}" data-step="${step.id}" role="listitem" ${isCurrent ? 'aria-current="step"' : ''}>
             <div class="tracking-step-icon">
-              <i class="${step.icon}"></i>
+              <i class="${step.icon}" aria-hidden="true"></i>
             </div>
             <div class="tracking-step-content">
               <h4>${step.label}</h4>
               <p>${step.description}</p>
               ${timestampHtml}
             </div>
-          </div>
+          </li>
         `;
       })
       .join('');
@@ -79,16 +80,16 @@ class OrderTracking {
       <div class="order-tracking ${isCancelled ? 'is-cancelled' : ''}">
         <div class="tracking-header">
           <span class="tracking-status-pill">
-            <i class="fas fa-circle"></i> ${statusLabel}
+            <i class="fas fa-circle" aria-hidden="true"></i> ${statusLabel}
           </span>
           ${trackingMeta}
         </div>
-        <div class="tracking-progress">
+        <div class="tracking-progress" role="progressbar" aria-label="Progreso del pedido" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(progress)}">
           <div class="tracking-progress-fill" style="width: ${progress}%"></div>
         </div>
-        <div class="tracking-steps">
+        <ol class="tracking-steps" role="list">
           ${stepsHtml}
-        </div>
+        </ol>
         ${trackingNotes}
       </div>
     `;
@@ -132,7 +133,7 @@ class OrderTracking {
     }
 
     const formatted = this.formatDate(timestamp);
-    return `<span class="tracking-step-time"><i class="fas fa-clock"></i> ${formatted}</span>`;
+    return `<span class="tracking-step-time"><i class="fas fa-clock" aria-hidden="true"></i> ${formatted}</span>`;
   }
 
   getTimestamp(order, stepId) {
@@ -174,7 +175,7 @@ class OrderTracking {
     if (order.tracking_number) {
       pieces.push(`
         <span>
-          <i class="fas fa-hashtag"></i>
+          <i class="fas fa-hashtag" aria-hidden="true"></i>
           Tracking: ${order.tracking_number}
         </span>
       `);
@@ -183,7 +184,7 @@ class OrderTracking {
     if (order.shipping_company) {
       pieces.push(`
         <span>
-          <i class="fas fa-shipping-fast"></i>
+          <i class="fas fa-shipping-fast" aria-hidden="true"></i>
           ${order.shipping_company}
         </span>
       `);
@@ -194,7 +195,7 @@ class OrderTracking {
       if (formatted) {
         pieces.push(`
           <span>
-            <i class="fas fa-history"></i>
+            <i class="fas fa-history" aria-hidden="true"></i>
             Actualizado: ${formatted}
           </span>
         `);

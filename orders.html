@@ -55,7 +55,7 @@
         </section>
 
         <div class="container">
-            <div id="ordersContainer">
+            <div id="ordersContainer" role="status" aria-live="polite">
                 <div class="loading-state">
                     <div class="loading-state-content">
                         <div class="loading-spinner large"></div>
@@ -118,10 +118,12 @@
                 window.loadingState.renderLoading(container, 'Cargando pedidos...', {
                     className: 'loading-state',
                 });
+                container.setAttribute('aria-busy', 'true');
 
                 try {
                     if (!window.authManager || !window.authManager.isAuthenticated()) {
                         container.innerHTML = renderAuthRequiredState();
+                        container.removeAttribute('aria-busy');
                         return;
                     }
 
@@ -134,16 +136,23 @@
                     const orders = response?.data?.orders || [];
                     if (orders.length === 0) {
                         container.innerHTML = renderEmptyState();
+                        container.removeAttribute('aria-busy');
                         return;
                     }
 
-                    container.innerHTML = orders.map(renderOrderCard).join('');
+                    container.innerHTML = `
+                        <div class="orders-list" role="list" aria-label="Listado de pedidos">
+                            ${orders.map(renderOrderCard).join('')}
+                        </div>
+                    `;
+                    container.removeAttribute('aria-busy');
                 } catch (error) {
                     console.error('Error al cargar pedidos', error);
                     window.loadingState.renderError(container, error?.message || 'Error al cargar tus pedidos', {
                         className: 'loading-state loading-state-error',
                         spinner: false,
                     });
+                    container.removeAttribute('aria-busy');
                 }
             }
 
@@ -153,12 +162,13 @@
                 const orderDate = formatDate(order.created_at);
                 const total = formatCurrency(order.total_amount);
                 const trackingTimeline = window.orderTracking ? window.orderTracking.render(order) : '';
+                const headingId = `order-${order.id}-title`;
 
                 return `
-                    <div class="order-card">
+                    <article class="order-card" role="listitem" aria-labelledby="${headingId}">
                         <div class="order-header">
                             <div>
-                                <div class="order-number">Pedido ${order.order_number}</div>
+                                <div class="order-number" id="${headingId}">Pedido ${order.order_number}</div>
                                 <div class="order-date">${orderDate}</div>
                             </div>
                             <div class="order-status ${statusClass}">
@@ -166,7 +176,7 @@
                             </div>
                         </div>
 
-                        <div class="order-items">
+                        <div class="order-items" role="list">
                             ${renderOrderItems(order.items)}
                         </div>
 
@@ -180,14 +190,14 @@
                         </div>
 
                         ${trackingTimeline}
-                    </div>
+                    </article>
                 `;
             }
 
             function renderOrderItems(items = []) {
                 if (!items.length) {
                     return `
-                        <div class="order-item">
+                        <div class="order-item" role="listitem">
                             <div class="order-item-info">
                                 <div class="order-item-name">Sin productos registrados</div>
                             </div>
@@ -196,7 +206,7 @@
                 }
 
                 return items.map(item => `
-                    <div class="order-item">
+                    <div class="order-item" role="listitem">
                         <div class="order-item-image">
                             <img src="${item.image_url || 'assets/images/products/placeholder.jpg'}" alt="${item.product_name}">
                         </div>
