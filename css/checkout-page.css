@@ -436,6 +436,16 @@
         padding: var(--spacing-lg);
     }
     
+    .checkout-hero-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .checkout-hero-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
     .address-card-header {
         flex-direction: column;
         gap: var(--spacing-sm);

@@ -57,7 +57,7 @@
         </section>
 
         <div class="container">
-            <div id="cartContainer" class="cart-loader">
+            <div id="cartContainer" class="cart-loader" role="status" aria-live="polite">
                 <div class="loading-state">
                     <div class="loading-state-content">
                         <div class="loading-spinner large"></div>
@@ -259,7 +259,7 @@
             function renderShippingProgressBar(total, remaining, progress, hasFreeShipping) {
                 if (hasFreeShipping) {
                     return `
-                        <div class="shipping-progress-bar shipping-achieved">
+                        <div class="shipping-progress-bar shipping-achieved" role="status" aria-live="polite">
                             <div class="shipping-progress-header">
                                 <i class="fas fa-check-circle"></i>
                                 <span>¡Envío gratis activado!</span>
@@ -272,13 +272,13 @@
                 }
 
                 return `
-                    <div class="shipping-progress-bar">
+                        <div class="shipping-progress-bar">
                         <div class="shipping-progress-header">
                             <i class="fas fa-truck"></i>
                             <span>Te faltan S/ ${remaining.toFixed(2)} para envío gratis</span>
                         </div>
                         <div class="shipping-progress-full">
-                            <div class="shipping-progress-fill" style="width: ${progress}%" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(progress)}"></div>
+                            <div class="shipping-progress-fill" style="width: ${progress}%" role="progressbar" aria-label="Progreso hacia envío gratis" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(progress)}"></div>
                         </div>
                         <div class="shipping-progress-text">
                             <span>S/ ${total.toFixed(2)}</span>

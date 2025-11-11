@@ -197,11 +197,13 @@ function updateProgressIndicator() {
     steps.forEach((step, index) => {
         const stepNumber = index + 1;
         step.classList.remove('active', 'completed');
+        step.removeAttribute('aria-current');
         
         if (stepNumber < currentStep) {
             step.classList.add('completed');
         } else if (stepNumber === currentStep) {
             step.classList.add('active');
+            step.setAttribute('aria-current', 'step');
         }
     });
 }

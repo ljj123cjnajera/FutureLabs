@@ -130,12 +130,14 @@
     border-bottom: none;
 }
 
-.cart-item:hover {
-    background: var(--gray-50);
-    margin: 0 calc(-1 * var(--spacing-lg));
-    padding-left: calc(var(--spacing-lg));
-    padding-right: calc(var(--spacing-lg));
-    border-radius: var(--radius-xl);
+@media (hover: hover) and (pointer: fine) {
+    .cart-item:hover {
+        background: var(--gray-50);
+        margin: 0 calc(-1 * var(--spacing-lg));
+        padding-left: calc(var(--spacing-lg));
+        padding-right: calc(var(--spacing-lg));
+        border-radius: var(--radius-xl);
+    }
 }
 
 .cart-item-image {
