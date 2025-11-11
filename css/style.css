@@ -557,6 +557,7 @@ button {
     cursor: pointer;
     transition: var(--transition);
     border: 2px solid transparent;
+    padding: 0;
 }
 
 .slider-dot:hover {
@@ -587,13 +588,22 @@ button {
     transition: var(--transition);
     z-index: 10;
     font-size: 1.25rem;
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    padding: 0;
+}
+
+.slider-arrow {
+    border: none;
+}
+
+.slider-arrow:focus-visible,
+.slider-dot:focus-visible {
+    outline: 3px solid rgba(102, 126, 234, 0.85);
+    outline-offset: 2px;
 }
 
 .slider-arrow:hover {
     background-color: rgba(255, 255, 255, 0.3);
     transform: translateY(-50%) scale(1.1);
-    border-color: rgba(255, 255, 255, 0.4);
 }
 
 .slider-arrow.prev {

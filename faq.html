@@ -30,188 +30,279 @@
     <header id="mainHeader"></header>
 
     <!-- FAQ Page -->
-    <div class="faq-page">
-        <div class="faq-header">
+    <main class="faq-page info-page">
+        <section class="hero-section faq-hero">
+            <div class="container hero-content">
+                <span class="hero-eyebrow">Centro de ayuda</span>
+                <h1>Preguntas frecuentes</h1>
+                <p>
+                    Resolvemos las dudas más comunes sobre compras, envíos, cambios y soporte técnico.
+                    Actualizamos este centro de ayuda cada semana para que siempre tengas información confiable.
+                </p>
+
+                <div class="faq-hero-meta">
+                    <div class="meta-card">
+                        <span class="meta-label">Actualizado</span>
+                        <span class="meta-value">11 Nov 2025</span>
+                    </div>
+                    <div class="meta-card">
+                        <span class="meta-label">Cobertura</span>
+                        <span class="meta-value">+35 temas</span>
+                    </div>
+                    <div class="meta-card">
+                        <span class="meta-label">Satisfacción</span>
+                        <span class="meta-value">98%</span>
+                    </div>
+                </div>
+
+                <div class="faq-search-card">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Busca por palabras clave: envíos, devoluciones, pagos..." id="faqSearch" aria-label="Buscar en preguntas frecuentes">
+                    <button type="button" class="btn btn-secondary" data-faq-clear>
+                        <i class="fas fa-times"></i>
+                        Limpiar
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section faq-section">
             <div class="container">
-                <h1>Preguntas Frecuentes</h1>
-                <p>Encuentra respuestas a tus dudas</p>
+                <div class="faq-highlights">
+                    <article class="info-card">
+                        <div class="info-card-icon">
+                            <i class="fas fa-truck-fast"></i>
+                        </div>
+                        <h3>Logística eficiente</h3>
+                        <p>Envíos express en Lima, seguimiento en tiempo real y centros de recojo autorizados.</p>
+                    </article>
+                    <article class="info-card">
+                        <div class="info-card-icon">
+                            <i class="fas fa-arrows-rotate"></i>
+                        </div>
+                        <h3>Devoluciones sin fricción</h3>
+                        <p>Procesos claros, recolección a domicilio y notificaciones en cada etapa.</p>
+                    </article>
+                    <article class="info-card">
+                        <div class="info-card-icon">
+                            <i class="fas fa-shield"></i>
+                        </div>
+                        <h3>Seguro y transparente</h3>
+                        <p>Pagos protegidos con cifrado, validaciones antifraude y verificación de identidad.</p>
+                    </article>
+                </div>
+
+                <div class="faq-container">
+                    <div class="faq-layout">
+                        <div class="faq-categories">
+                            <!-- Compras -->
+                            <div class="faq-category" data-category="compras">
+                                <h2><i class="fas fa-shopping-cart"></i> Compras</h2>
+                                
+                                <div class="faq-item">
+                                    <div class="faq-question">
+                                        <h3>¿Cómo puedo realizar una compra?</h3>
+                                        <i class="fas fa-chevron-down"></i>
+                                    </div>
+                                    <div class="faq-answer">
+                                        <div class="faq-answer-content">
+                                            <p>Es muy sencillo. Solo necesitas:</p>
+                                            <ol>
+                                                <li>Buscar el producto que deseas</li>
+                                                <li>Agregarlo a tu carrito</li>
+                                                <li>Ir al checkout y completar tus datos</li>
+                                                <li>Seleccionar tu método de pago</li>
+                                                <li>Confirmar tu pedido</li>
+                                            </ol>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="faq-item">
+                                    <div class="faq-question">
+                                        <h3>¿Qué métodos de pago aceptan?</h3>
+                                        <i class="fas fa-chevron-down"></i>
+                                    </div>
+                                    <div class="faq-answer">
+                                        <div class="faq-answer-content">
+                                            <p>Aceptamos múltiples métodos de pago:</p>
+                                            <ul>
+                                                <li>Tarjetas de crédito/débito (Visa, MasterCard, Amex)</li>
+                                                <li>PayPal</li>
+                                                <li>Yape</li>
+                                                <li>Plin</li>
+                                                <li>PagoEfectivo</li>
+                                                <li>Efectivo contra entrega</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="faq-item">
+                                    <div class="faq-question">
+                                        <h3>¿Cuánto tiempo tarda el envío?</h3>
+                                        <i class="fas fa-chevron-down"></i>
+                                    </div>
+                                    <div class="faq-answer">
+                                        <div class="faq-answer-content">
+                                            <p>El tiempo de envío depende de tu ubicación:</p>
+                                            <ul>
+                                                <li><strong>Lima Metropolitana:</strong> 1-2 días hábiles</li>
+                                                <li><strong>Provincias:</strong> 3-5 días hábiles</li>
+                                                <li><strong>Regiones:</strong> 5-7 días hábiles</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="faq-item">
+                                    <div class="faq-question">
+                                        <h3>¿Ofrecen envío gratis?</h3>
+                                        <i class="fas fa-chevron-down"></i>
+                                    </div>
+                                    <div class="faq-answer">
+                                        <div class="faq-answer-content">
+                                            <p>Sí, ofrecemos envío gratis en compras mayores a S/ 200 en Lima Metropolitana.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Devoluciones -->
+                            <div class="faq-category" data-category="devoluciones">
+                                <h2><i class="fas fa-undo"></i> Devoluciones y Garantías</h2>
+                                
+                                <div class="faq-item">
+                                    <div class="faq-question">
+                                        <h3>¿Puedo devolver un producto?</h3>
+                                        <i class="fas fa-chevron-down"></i>
+                                    </div>
+                                    <div class="faq-answer">
+                                        <div class="faq-answer-content">
+                                            <p>Sí, puedes devolver productos en un plazo de 15 días desde la compra, siempre que:</p>
+                                            <ul>
+                                                <li>El producto esté en su empaque original</li>
+                                                <li>No haya sido usado</li>
+                                                <li>Incluya todos los accesorios</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="faq-item">
+                                    <div class="faq-question">
+                                        <h3>¿Qué garantía tienen los productos?</h3>
+                                        <i class="fas fa-chevron-down"></i>
+                                    </div>
+                                    <div class="faq-answer">
+                                        <div class="faq-answer-content">
+                                            <p>Todos nuestros productos tienen garantía de fábrica. Además, ofrecemos garantía extendida en productos seleccionados.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Cuenta -->
+                            <div class="faq-category" data-category="cuenta">
+                                <h2><i class="fas fa-user"></i> Mi Cuenta</h2>
+                                
+                                <div class="faq-item">
+                                    <div class="faq-question">
+                                        <h3>¿Cómo creo una cuenta?</h3>
+                                        <i class="fas fa-chevron-down"></i>
+                                    </div>
+                                    <div class="faq-answer">
+                                        <div class="faq-answer-content">
+                                            <p>Puedes crear una cuenta haciendo clic en "Cuenta" en el header y luego en "Regístrate". Solo necesitas tu email y contraseña.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="faq-item">
+                                    <div class="faq-question">
+                                        <h3>¿Cómo recupero mi contraseña?</h3>
+                                        <i class="fas fa-chevron-down"></i>
+                                    </div>
+                                    <div class="faq-answer">
+                                        <div class="faq-answer-content">
+                                            <p>En la página de login, haz clic en "¿Olvidaste tu contraseña?" y sigue las instrucciones que te enviaremos por email.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Productos -->
+                            <div class="faq-category" data-category="productos">
+                                <h2><i class="fas fa-box"></i> Productos</h2>
+                                
+                                <div class="faq-item">
+                                    <div class="faq-question">
+                                        <h3>¿Son productos originales?</h3>
+                                        <i class="fas fa-chevron-down"></i>
+                                    </div>
+                                    <div class="faq-answer">
+                                        <div class="faq-answer-content">
+                                            <p>Sí, todos nuestros productos son 100% originales y cuentan con garantía de fábrica.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="faq-item">
+                                    <div class="faq-question">
+                                        <h3>¿Puedo ver el producto antes de comprarlo?</h3>
+                                        <i class="fas fa-chevron-down"></i>
+                                    </div>
+                                    <div class="faq-answer">
+                                        <div class="faq-answer-content">
+                                            <p>Puedes visitar nuestras tiendas físicas para ver los productos. También ofrecemos fotos de alta calidad y videos en cada producto.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <aside class="faq-sidebar" aria-label="Recursos adicionales">
+                            <div class="faq-summary-card">
+                                <h3>¿No encontraste la respuesta?</h3>
+                                <p>Habla con nuestro equipo o agenda una llamada para casos complejos.</p>
+                                <a href="contact.html" class="btn btn-primary">
+                                    <i class="fas fa-headset"></i>
+                                    Contactar soporte
+                                </a>
+                            </div>
+
+                            <div class="faq-stat-card">
+                                <span class="stat-label">Resultados visibles</span>
+                                <span class="stat-value" data-faq-count>16</span>
+                                <p>Respuestas disponibles para tu búsqueda actual.</p>
+                            </div>
+
+                            <div class="faq-links-card">
+                                <h4>Accesos rápidos</h4>
+                                <ul>
+                                    <li><a href="orders.html"><i class="fas fa-location-dot"></i> Seguimiento de pedidos</a></li>
+                                    <li><a href="returns.html"><i class="fas fa-box-open"></i> Política de devoluciones</a></li>
+                                    <li><a href="warranty.html"><i class="fas fa-badge-check"></i> Garantías y soporte</a></li>
+                                </ul>
+                            </div>
+                        </aside>
+                    </div>
+                </div>
+
+                <div class="faq-empty-state" id="faqEmptyState" hidden>
+                    <div class="empty-state-icon">
+                        <i class="fas fa-face-thinking"></i>
+                    </div>
+                    <h3>No encontramos resultados para tu búsqueda</h3>
+                    <p>Intenta con otra palabra clave o ponte en contacto con nuestro equipo.</p>
+                    <div class="empty-state-actions">
+                        <button type="button" class="btn btn-secondary" data-faq-clear>Limpiar búsqueda</button>
+                        <a href="contact.html" class="btn btn-primary">Escribir al soporte</a>
+                    </div>
+                </div>
             </div>
-        </div>
-
-        <div class="container">
-            <div class="faq-container">
-                <!-- Search Box -->
-                <div class="search-box">
-                    <input type="text" placeholder="Buscar en preguntas frecuentes..." id="faqSearch">
-                </div>
-
-                <!-- Compras -->
-                <div class="faq-category" data-category="compras">
-                    <h2><i class="fas fa-shopping-cart"></i> Compras</h2>
-                    
-                    <div class="faq-item">
-                        <div class="faq-question">
-                            <h3>¿Cómo puedo realizar una compra?</h3>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="faq-answer">
-                            <div class="faq-answer-content">
-                                <p>Es muy sencillo. Solo necesitas:</p>
-                                <ol>
-                                    <li>Buscar el producto que deseas</li>
-                                    <li>Agregarlo a tu carrito</li>
-                                    <li>Ir al checkout y completar tus datos</li>
-                                    <li>Seleccionar tu método de pago</li>
-                                    <li>Confirmar tu pedido</li>
-                                </ol>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="faq-item">
-                        <div class="faq-question">
-                            <h3>¿Qué métodos de pago aceptan?</h3>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="faq-answer">
-                            <div class="faq-answer-content">
-                                <p>Aceptamos múltiples métodos de pago:</p>
-                                <ul>
-                                    <li>Tarjetas de crédito/débito (Visa, MasterCard, Amex)</li>
-                                    <li>PayPal</li>
-                                    <li>Yape</li>
-                                    <li>Plin</li>
-                                    <li>PagoEfectivo</li>
-                                    <li>Efectivo contra entrega</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="faq-item">
-                        <div class="faq-question">
-                            <h3>¿Cuánto tiempo tarda el envío?</h3>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="faq-answer">
-                            <div class="faq-answer-content">
-                                <p>El tiempo de envío depende de tu ubicación:</p>
-                                <ul>
-                                    <li><strong>Lima Metropolitana:</strong> 1-2 días hábiles</li>
-                                    <li><strong>Provincias:</strong> 3-5 días hábiles</li>
-                                    <li><strong>Regiones:</strong> 5-7 días hábiles</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="faq-item">
-                        <div class="faq-question">
-                            <h3>¿Ofrecen envío gratis?</h3>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="faq-answer">
-                            <div class="faq-answer-content">
-                                <p>Sí, ofrecemos envío gratis en compras mayores a S/ 200 en Lima Metropolitana.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Devoluciones -->
-                <div class="faq-category" data-category="devoluciones">
-                    <h2><i class="fas fa-undo"></i> Devoluciones y Garantías</h2>
-                    
-                    <div class="faq-item">
-                        <div class="faq-question">
-                            <h3>¿Puedo devolver un producto?</h3>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="faq-answer">
-                            <div class="faq-answer-content">
-                                <p>Sí, puedes devolver productos en un plazo de 15 días desde la compra, siempre que:</p>
-                                <ul>
-                                    <li>El producto esté en su empaque original</li>
-                                    <li>No haya sido usado</li>
-                                    <li>Incluya todos los accesorios</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="faq-item">
-                        <div class="faq-question">
-                            <h3>¿Qué garantía tienen los productos?</h3>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="faq-answer">
-                            <div class="faq-answer-content">
-                                <p>Todos nuestros productos tienen garantía de fábrica. Además, ofrecemos garantía extendida en productos seleccionados.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Cuenta -->
-                <div class="faq-category" data-category="cuenta">
-                    <h2><i class="fas fa-user"></i> Mi Cuenta</h2>
-                    
-                    <div class="faq-item">
-                        <div class="faq-question">
-                            <h3>¿Cómo creo una cuenta?</h3>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="faq-answer">
-                            <div class="faq-answer-content">
-                                <p>Puedes crear una cuenta haciendo clic en "Cuenta" en el header y luego en "Regístrate". Solo necesitas tu email y contraseña.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="faq-item">
-                        <div class="faq-question">
-                            <h3>¿Cómo recupero mi contraseña?</h3>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="faq-answer">
-                            <div class="faq-answer-content">
-                                <p>En la página de login, haz clic en "¿Olvidaste tu contraseña?" y sigue las instrucciones que te enviaremos por email.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Productos -->
-                <div class="faq-category" data-category="productos">
-                    <h2><i class="fas fa-box"></i> Productos</h2>
-                    
-                    <div class="faq-item">
-                        <div class="faq-question">
-                            <h3>¿Son productos originales?</h3>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="faq-answer">
-                            <div class="faq-answer-content">
-                                <p>Sí, todos nuestros productos son 100% originales y cuentan con garantía de fábrica.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="faq-item">
-                        <div class="faq-question">
-                            <h3>¿Puedo ver el producto antes de comprarlo?</h3>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="faq-answer">
-                            <div class="faq-answer-content">
-                                <p>Puedes visitar nuestras tiendas físicas para ver los productos. También ofrecemos fotos de alta calidad y videos en cada producto.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+        </section>
+    </main>
 
     <!-- Footer -->
     <footer id="mainFooter"></footer>
@@ -259,25 +350,53 @@
                     }
                 });
             });
-
-            // Búsqueda en FAQ
+            
             const faqSearch = document.getElementById('faqSearch');
+            const faqItems = Array.from(document.querySelectorAll('.faq-item'));
+            const faqEmptyState = document.getElementById('faqEmptyState');
+            const faqClearButtons = document.querySelectorAll('[data-faq-clear]');
+            const faqCount = document.querySelector('[data-faq-count]');
+
+            const applyFaqFilter = () => {
+                const searchTerm = faqSearch?.value.trim().toLowerCase() ?? '';
+                let matches = 0;
+
+                faqItems.forEach(item => {
+                    const question = item.querySelector('.faq-question h3')?.textContent.toLowerCase() ?? '';
+                    const answer = item.querySelector('.faq-answer-content')?.textContent.toLowerCase() ?? '';
+                    const shouldShow = !searchTerm || question.includes(searchTerm) || answer.includes(searchTerm);
+
+                    item.style.display = shouldShow ? '' : 'none';
+                    if (shouldShow) {
+                        matches += 1;
+                    }
+                });
+
+                if (faqCount) {
+                    faqCount.textContent = matches.toString();
+                }
+
+                if (faqEmptyState) {
+                    faqEmptyState.hidden = matches > 0;
+                }
+            };
+
             if (faqSearch) {
-                faqSearch.addEventListener('input', function(e) {
-                    const searchTerm = e.target.value.toLowerCase();
-                    
-                    document.querySelectorAll('.faq-item').forEach(item => {
-                        const question = item.querySelector('.faq-question h3').textContent.toLowerCase();
-                        const answer = item.querySelector('.faq-answer-content').textContent.toLowerCase();
-                        
-                        if (question.includes(searchTerm) || answer.includes(searchTerm)) {
-                            item.style.display = 'block';
-                        } else {
-                            item.style.display = 'none';
-                        }
+                faqSearch.addEventListener('input', applyFaqFilter);
+            }
+
+            if (faqClearButtons.length) {
+                faqClearButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        if (!faqSearch) return;
+                        faqSearch.value = '';
+                        faqSearch.focus();
+                        applyFaqFilter();
                     });
                 });
             }
+
+            applyFaqFilter();
         });
     </script>
 </body>

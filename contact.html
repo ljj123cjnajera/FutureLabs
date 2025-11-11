@@ -28,111 +28,250 @@
     <!-- Header Dinámico -->
     <header id="mainHeader"></header>
 
-    <!-- Contact Page -->
-    <div class="contact-page">
-        <div class="contact-header">
+    <main class="contact-page info-page">
+        <section class="hero-section contact-hero">
+            <div class="container hero-content">
+                <span class="hero-eyebrow">Soporte FutureLabs</span>
+                <h1>Conversemos sobre tu experiencia</h1>
+                <p>
+                    Nuestro equipo está listo para ayudarte con pedidos, garantías, devoluciones o cualquier consulta de productos.
+                    Resolvemos casos prioritarios en minutos y hacemos seguimiento hasta cerrar cada solicitud.
+                </p>
+
+                <div class="hero-actions">
+                    <a href="#contactForm" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i>
+                        Enviar mensaje
+                    </a>
+                    <a href="faq.html" class="btn btn-secondary">
+                        <i class="fas fa-question-circle"></i>
+                        Revisar preguntas frecuentes
+                    </a>
+                </div>
+
+                <div class="contact-hero-metrics" role="list">
+                    <div class="metric-card" role="listitem">
+                        <span class="metric-label">Disponibilidad</span>
+                        <span class="metric-value">24/7</span>
+                        <small>Chat prioritario</small>
+                    </div>
+                    <div class="metric-card" role="listitem" data-response-time>
+                        <span class="metric-label">Tiempo de respuesta</span>
+                        <span class="metric-value">~2 min</span>
+                        <small>Casos urgentes</small>
+                    </div>
+                    <div class="metric-card" role="listitem">
+                        <span class="metric-label">Satisfacción</span>
+                        <span class="metric-value">4.9/5</span>
+                        <small>Más de 3,500 clientes</small>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section contact-content">
             <div class="container">
-                <h1>Contáctanos</h1>
-                <p>Estamos aquí para ayudarte</p>
-            </div>
-        </div>
+                <div class="contact-layout">
+                    <section class="contact-info-panel">
+                        <div class="contact-info-header">
+                            <span class="pill success">Resolvemos en 24h</span>
+                            <h2>Elige el canal que prefieras</h2>
+                            <p>Combinamos soporte humano con automatizaciones para mantenerte al tanto de cada actualización.</p>
+                        </div>
 
-        <div class="container">
-            <div class="contact-container">
-                <!-- Contact Info -->
-                <div class="contact-info">
-                    <h2>Información de Contacto</h2>
-                    
-                    <div class="contact-item">
-                        <div class="contact-item-icon">
+                        <div class="contact-info-grid">
+                            <article class="contact-info-card">
+                                <div class="contact-info-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div>
+                                    <h3>Visítanos</h3>
+                                    <p>Av. Javier Prado 1234<br>San Isidro, Lima, Perú</p>
+                                    <span class="contact-info-meta">Centro de experiencia FutureLabs</span>
+                                </div>
+                            </article>
+
+                            <article class="contact-info-card">
+                                <div class="contact-info-icon">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                <div>
+                                    <h3>Llámanos</h3>
+                                    <p>+51 987 654 321</p>
+                                    <span class="contact-info-meta">Lun a Sáb · 09:00 - 20:00</span>
+                                </div>
+                            </article>
+
+                            <article class="contact-info-card">
+                                <div class="contact-info-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div>
+                                    <h3>Escríbenos</h3>
+                                    <p>soporte@futurelabs.com</p>
+                                    <span class="contact-info-meta">Tiempo medio de respuesta: 4h</span>
+                                </div>
+                            </article>
+
+                            <article class="contact-info-card">
+                                <div class="contact-info-icon">
+                                    <i class="fas fa-headset"></i>
+                                </div>
+                                <div>
+                                    <h3>Chat con especialistas</h3>
+                                    <p>Soporte premium para pedidos corporativos</p>
+                                    <span class="contact-info-meta">Disponible para cuentas empresariales</span>
+                                </div>
+                            </article>
+                        </div>
+
+                        <div class="contact-support-banner">
+                            <div class="contact-support-content">
+                                <h3>¿Necesitas ayuda con un pedido reciente?</h3>
+                                <p>Rastrea el estado en <a href="orders.html">Mis pedidos</a> o comparte el número de orden para priorizar tu caso.</p>
+                            </div>
+                            <div class="contact-support-actions">
+                                <a class="btn btn-outline" href="orders.html">
+                                    <i class="fas fa-location-arrow"></i>
+                                    Ver seguimiento
+                                </a>
+                            </div>
+                        </div>
+                    </section>
+
+                    <aside class="contact-form-panel" aria-labelledby="contactFormTitle">
+                        <div class="contact-form-card">
+                            <h2 id="contactFormTitle">Envíanos un mensaje</h2>
+                            <p class="contact-form-subtitle">Cuéntanos qué necesitas y un especialista te contactará con la mejor solución.</p>
+
+                            <form id="contactForm" novalidate>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="contactName">Nombre completo</label>
+                                        <input id="contactName" type="text" name="name" autocomplete="name" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="contactEmail">Email</label>
+                                        <input id="contactEmail" type="email" name="email" autocomplete="email" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="contactPhone">Teléfono</label>
+                                        <input id="contactPhone" type="tel" name="phone" autocomplete="tel">
+                                    </div>
+
+                                    <div class="form-group">
+                                       <label for="contactTopic">Motivo</label>
+                                       <select id="contactTopic" name="topic" required>
+                                           <option value="">Selecciona una opción</option>
+                                           <option value="orders">Estado de pedido</option>
+                                           <option value="returns">Devoluciones / cambios</option>
+                                           <option value="warranty">Soporte técnico / garantía</option>
+                                           <option value="payments">Pagos y facturación</option>
+                                           <option value="other">Otro</option>
+                                       </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="contactSubject">Asunto</label>
+                                    <input id="contactSubject" type="text" name="subject" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="contactMessage">Mensaje</label>
+                                    <textarea id="contactMessage" name="message" rows="5" required></textarea>
+                                </div>
+
+                                <div class="contact-form-footer">
+                                    <label class="checkbox">
+                                        <input type="checkbox" name="newsletter">
+                                        <span>Deseo recibir actualizaciones y promociones exclusivas.</span>
+                                    </label>
+
+                                    <p class="contact-form-privacy">
+                                        Gestionamos tus datos con altos estándares de seguridad. Conoce más en <a href="privacy.html">Privacidad</a>.
+                                    </p>
+                                </div>
+
+                                <div id="contactFormStatus" class="form-status" role="status" aria-live="polite"></div>
+
+                                <button type="submit" class="btn btn-primary contact-submit-btn">
+                                    <i class="fas fa-paper-plane"></i>
+                                    Enviar mensaje
+                                </button>
+                            </form>
+                        </div>
+                    </aside>
+                </div>
+
+                <div class="contact-support-grid" aria-label="Canales destacados">
+                    <article class="contact-support-card">
+                        <div class="support-icon">
+                            <i class="fas fa-whatsapp"></i>
+                        </div>
+                        <div>
+                            <h3>WhatsApp empresarial</h3>
+                            <p>Coordinación inmediata y envío de evidencias para incidentes o cambios.</p>
+                            <a href="#" class="support-link">Próximamente</a>
+                        </div>
+                    </article>
+
+                    <article class="contact-support-card">
+                        <div class="support-icon">
+                            <i class="fas fa-shield-check"></i>
+                        </div>
+                        <div>
+                            <h3>Soporte inteligente</h3>
+                            <p>Automatiza devoluciones, valida garantías y agenda recolecciones sin fricción.</p>
+                            <a href="returns.html" class="support-link">Ver política de devoluciones</a>
+                        </div>
+                    </article>
+
+                    <article class="contact-support-card">
+                        <div class="support-icon">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <div>
+                            <h3>Atención corporativa</h3>
+                            <p>Planes personalizados, SLA garantizado y seguimiento dedicado para empresas.</p>
+                            <a href="mailto:empresas@futurelabs.com" class="support-link">empresas@futurelabs.com</a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="contact-map-section">
+            <div class="container">
+                <div class="contact-map-card">
+                    <div class="map-content">
+                        <h2>Visita nuestro Experience Center</h2>
+                        <p>Estamos modernizando nuestro showroom con laboratorios y zones demo. Agenda una visita y prueba los equipos antes de comprarlos.</p>
+
+                        <ul class="map-list">
+                            <li><i class="fas fa-store"></i> Demo de productos core y accesorios</li>
+                            <li><i class="fas fa-vr-cardboard"></i> Zona inmersiva de realidad virtual</li>
+                            <li><i class="fas fa-tools"></i> Laboratorio express para diagnósticos</li>
+                        </ul>
+
+                        <a class="btn btn-secondary" href="https://maps.google.com/?q=FutureLabs+Peru" target="_blank" rel="noopener">
                             <i class="fas fa-map-marker-alt"></i>
-                        </div>
-                        <div class="contact-item-content">
-                            <h3>Dirección</h3>
-                            <p>Av. Javier Prado 1234<br>San Isidro, Lima, Perú</p>
-                        </div>
+                            Cómo llegar
+                        </a>
                     </div>
-                    
-                    <div class="contact-item">
-                        <div class="contact-item-icon">
-                            <i class="fas fa-phone"></i>
-                        </div>
-                        <div class="contact-item-content">
-                            <h3>Teléfono</h3>
-                            <p>+51 987 654 321<br>Lun - Sáb: 9:00 AM - 8:00 PM</p>
-                        </div>
-                    </div>
-                    
-                    <div class="contact-item">
-                        <div class="contact-item-icon">
-                            <i class="fas fa-envelope"></i>
-                        </div>
-                        <div class="contact-item-content">
-                            <h3>Email</h3>
-                            <p>info@futurelabs.com<br>soporte@futurelabs.com</p>
-                        </div>
-                    </div>
-                    
-                    <div class="contact-item">
-                        <div class="contact-item-icon">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <div class="contact-item-content">
-                            <h3>Horario de Atención</h3>
-                            <p>Lunes - Viernes: 9:00 AM - 8:00 PM<br>Sábado: 10:00 AM - 6:00 PM</p>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Contact Form -->
-                <div class="contact-form">
-                    <h2>Envíanos un Mensaje</h2>
-                    
-                    <form id="contactForm">
-                        <div class="form-group">
-                            <label>Nombre Completo</label>
-                            <input type="text" name="name" required>
+                    <div class="map-placeholder" aria-hidden="true">
+                        <div class="map-placeholder-content">
+                            <i class="fas fa-map-marked-alt"></i>
+                            <p>Mapa interactivo en desarrollo</p>
                         </div>
-                        
-                        <div class="form-group">
-                            <label>Email</label>
-                            <input type="email" name="email" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Teléfono</label>
-                            <input type="tel" name="phone">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Asunto</label>
-                            <input type="text" name="subject" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Mensaje</label>
-                            <textarea name="message" required></textarea>
-                        </div>
-                        
-                        <button type="submit" class="btn-submit">
-                            <i class="fas fa-paper-plane"></i> Enviar Mensaje
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Map Section -->
-            <div class="map-section">
-                <h2>Nuestra Ubicación</h2>
-                <div class="map-placeholder">
-                    <div style="text-align: center;">
-                        <i class="fas fa-map-marked-alt" style="font-size: 48px; color: #ddd; margin-bottom: 10px;"></i>
-                        <p>Mapa interactivo próximamente</p>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+        </section>
+    </main>
 
     <!-- Footer -->
     <footer id="mainFooter"></footer>
@@ -170,19 +309,48 @@
             // Manejar envío del formulario
             const contactForm = document.getElementById('contactForm');
             if (contactForm) {
+                const submitButton = contactForm.querySelector('button[type="submit"]');
+                const statusMessage = document.getElementById('contactFormStatus');
+                const responseMetric = document.querySelector('[data-response-time] .metric-value');
+
                 contactForm.addEventListener('submit', function(e) {
                     e.preventDefault();
-                    
+
                     const formData = new FormData(this);
                     const data = Object.fromEntries(formData);
-                    
-                    // Simular envío
-                    console.log('Formulario enviado:', data);
-                    
-                    window.notifications.success('Mensaje enviado correctamente. Te contactaremos pronto.');
-                    
-                    // Limpiar formulario
-                    this.reset();
+
+                    if (submitButton) {
+                        submitButton.classList.add('loading');
+                        submitButton.disabled = true;
+                    }
+
+                    window.Components?.pageProgress?.start?.();
+
+                    window.setTimeout(() => {
+                        console.log('Formulario de contacto enviado:', data);
+
+                        if (typeof window.notifications?.success === 'function') {
+                            window.notifications.success('Tu mensaje fue enviado. Te contactaremos muy pronto.');
+                        }
+
+                        if (statusMessage) {
+                            statusMessage.textContent = 'Mensaje enviado correctamente. Revisa tu bandeja para el seguimiento.';
+                            statusMessage.classList.add('is-success');
+                        }
+
+                        if (responseMetric) {
+                            responseMetric.textContent = '~90 min';
+                        }
+
+                        contactForm.reset();
+
+                        if (submitButton) {
+                            submitButton.classList.remove('loading');
+                            submitButton.disabled = false;
+                        }
+
+                        window.Components?.pageProgress?.finish?.();
+                    }, 900);
                 });
             }
         });

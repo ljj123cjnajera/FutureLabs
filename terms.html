@@ -13,132 +13,267 @@
     <link rel="stylesheet" href="css/modals-improved.css">
     <link rel="stylesheet" href="css/pages-common.css">
     <link rel="stylesheet" href="css/informational-pages-improved.css">
-    <!-- Estilos inline removidos - migrados a CSS externo -->
     <link rel="stylesheet" href="css/loading-states-improved.css">
     <link rel="stylesheet" href="css/micro-interactions.css">
+    <link rel="stylesheet" href="css/notifications.css">
+    <link rel="stylesheet" href="css/informational-pages.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/animations-enhanced.css">
+    <link rel="stylesheet" href="css/components-enhanced.css">
+    <link rel="stylesheet" href="css/typography.css">
     <link rel="stylesheet" href="css/responsive.css">
 </head>
 <body>
-
-    <!-- Header Dinámico -->
     <header id="mainHeader"></header>
 
-    <!-- Legal Page -->
-    <section class="legal-page">
-        <div class="legal-container">
-            <div class="legal-header">
-                <h1><i class="fas fa-file-contract"></i> Términos y Condiciones</h1>
-                <p>Última actualización: 16 de Octubre, 2025</p>
+    <main class="legal-page info-page">
+        <section class="hero-section legal-hero">
+            <div class="container hero-content">
+                <span class="hero-eyebrow">Documentación legal</span>
+                <h1>Términos y Condiciones</h1>
+                <p>Este documento establece las reglas del servicio, políticas de uso y responsabilidades compartidas entre FutureLabs y nuestros clientes.</p>
+
+                <div class="legal-hero-meta">
+                    <div class="meta-card">
+                        <span class="meta-label">Última actualización</span>
+                        <span class="meta-value" id="legalUpdatedLabel">16 Oct 2025</span>
+                    </div>
+                    <div class="meta-card">
+                        <span class="meta-label">Aplicable a</span>
+                        <span class="meta-value">Perú · Ecommerce B2C</span>
+                    </div>
+                    <div class="meta-card">
+                        <span class="meta-label">Versionado</span>
+                        <span class="meta-value">v2.1</span>
+                    </div>
+                </div>
+
+                <div class="hero-actions">
+                    <a href="returns.html" class="btn btn-secondary">
+                        <i class="fas fa-box-open"></i>
+                        Devoluciones
+                    </a>
+                    <a href="warranty.html" class="btn btn-outline">
+                        <i class="fas fa-shield"></i>
+                        Garantías
+                    </a>
+                </div>
             </div>
+        </section>
 
-            <div class="legal-content">
-                <h2>1. Aceptación de los Términos</h2>
-                <p>Al acceder y utilizar el sitio web de FutureLabs, usted acepta cumplir con estos términos y condiciones. Si no está de acuerdo con alguna parte de estos términos, no debe utilizar nuestros servicios.</p>
+        <section class="content-section legal-section">
+            <div class="container">
+                <div class="legal-layout">
+                    <article class="legal-content" id="legalContent">
+                        <header class="legal-intro">
+                            <p>Al navegar o realizar operaciones en FutureLabs, confirmas que leíste y aceptaste las condiciones descritas a continuación. Te recomendamos revisar periódicamente este documento, ya que puede actualizarse para reflejar mejoras en nuestros procesos o cambios normativos.</p>
+                        </header>
 
-                <h2>2. Descripción del Servicio</h2>
-                <p>FutureLabs es una plataforma de comercio electrónico que ofrece productos tecnológicos. Nos reservamos el derecho de modificar, suspender o descontinuar cualquier aspecto del servicio en cualquier momento.</p>
+                        <h2 id="aceptacion">1. Aceptación de los Términos</h2>
+                        <p>Al acceder y utilizar el sitio web de FutureLabs, usted acepta cumplir con estos términos y condiciones. Si no está de acuerdo con alguna parte de estos términos, no debe utilizar nuestros servicios.</p>
 
-                <h2>3. Cuentas de Usuario</h2>
-                <h3>3.1 Registro</h3>
-                <p>Para realizar compras, debe crear una cuenta proporcionando información precisa y completa. Usted es responsable de mantener la confidencialidad de su contraseña.</p>
+                        <h2 id="servicio">2. Descripción del Servicio</h2>
+                        <p>FutureLabs es una plataforma de comercio electrónico que ofrece productos tecnológicos. Nos reservamos el derecho de modificar, suspender o descontinuar cualquier aspecto del servicio en cualquier momento.</p>
 
-                <h3>3.2 Responsabilidades</h3>
-                <ul>
-                    <li>Mantener la seguridad de su cuenta</li>
-                    <li>Notificarnos inmediatamente de cualquier uso no autorizado</li>
-                    <li>Ser responsable de todas las actividades bajo su cuenta</li>
-                </ul>
+                        <h2 id="cuentas">3. Cuentas de Usuario</h2>
+                        <h3 id="registro">3.1 Registro</h3>
+                        <p>Para realizar compras, debe crear una cuenta proporcionando información precisa y completa. Usted es responsable de mantener la confidencialidad de su contraseña.</p>
 
-                <h2>4. Productos y Precios</h2>
-                <h3>4.1 Disponibilidad</h3>
-                <p>Todos los productos están sujetos a disponibilidad. Nos reservamos el derecho de descontinuar cualquier producto sin previo aviso.</p>
+                        <h3 id="responsabilidades">3.2 Responsabilidades</h3>
+                        <ul>
+                            <li>Mantener la seguridad de su cuenta</li>
+                            <li>Notificarnos inmediatamente de cualquier uso no autorizado</li>
+                            <li>Ser responsable de todas las actividades bajo su cuenta</li>
+                        </ul>
 
-                <h3>4.2 Precios</h3>
-                <p>Los precios están en soles peruanos (PEN) e incluyen impuestos aplicables. Los precios pueden cambiar sin previo aviso, pero no afectarán pedidos ya confirmados.</p>
+                        <h2 id="productos">4. Productos y Precios</h2>
+                        <h3 id="disponibilidad">4.1 Disponibilidad</h3>
+                        <p>Todos los productos están sujetos a disponibilidad. Nos reservamos el derecho de descontinuar cualquier producto sin previo aviso.</p>
 
-                <h3>4.3 Errores de Precio</h3>
-                <p>Nos reservamos el derecho de corregir errores de precios, incluso después de confirmar su pedido.</p>
+                        <h3 id="precios">4.2 Precios</h3>
+                        <p>Los precios están en soles peruanos (PEN) e incluyen impuestos aplicables. Los precios pueden cambiar sin previo aviso, pero no afectarán pedidos ya confirmados.</p>
 
-                <h2>5. Pedidos y Pagos</h2>
-                <h3>5.1 Proceso de Pedido</h3>
-                <p>Al realizar un pedido, usted hace una oferta para comprar productos. La aceptación de su pedido se confirmará por correo electrónico.</p>
+                        <h3 id="errores-precio">4.3 Errores de Precio</h3>
+                        <p>Nos reservamos el derecho de corregir errores de precios, incluso después de confirmar su pedido.</p>
 
-                <h3>5.2 Métodos de Pago</h3>
-                <p>Aceptamos los siguientes métodos de pago:</p>
-                <ul>
-                    <li>Tarjetas de crédito/débito (Visa, Mastercard, Amex)</li>
-                    <li>PayPal</li>
-                    <li>Yape / Plin</li>
-                    <li>Pago contra entrega</li>
-                </ul>
+                        <h2 id="pedidos">5. Pedidos y Pagos</h2>
+                        <h3 id="proceso-pedido">5.1 Proceso de Pedido</h3>
+                        <p>Al realizar un pedido, usted hace una oferta para comprar productos. La aceptación de su pedido se confirmará por correo electrónico.</p>
 
-                <h3>5.3 Verificación</h3>
-                <p>Podemos solicitar información adicional para verificar su identidad antes de procesar su pedido.</p>
+                        <h3 id="metodos-pago">5.2 Métodos de Pago</h3>
+                        <p>Aceptamos los siguientes métodos de pago:</p>
+                        <ul>
+                            <li>Tarjetas de crédito/débito (Visa, Mastercard, Amex)</li>
+                            <li>PayPal</li>
+                            <li>Yape / Plin</li>
+                            <li>Pago contra entrega</li>
+                        </ul>
 
-                <h2>6. Envío y Entrega</h2>
-                <h3>6.1 Tiempos de Entrega</h3>
-                <p>Los tiempos de entrega son estimados y pueden variar según la ubicación y disponibilidad del producto.</p>
+                        <h3 id="verificacion">5.3 Verificación</h3>
+                        <p>Podemos solicitar información adicional para verificar su identidad antes de procesar su pedido.</p>
 
-                <h3>6.2 Costos de Envío</h3>
-                <p>Los costos de envío se calculan según el peso, dimensiones y destino del pedido.</p>
+                        <h2 id="envio">6. Envío y Entrega</h2>
+                        <h3 id="tiempos-envio">6.1 Tiempos de Entrega</h3>
+                        <p>Los tiempos de entrega son estimados y pueden variar según la ubicación y disponibilidad del producto.</p>
 
-                <h3>6.3 Daños en el Transporte</h3>
-                <p>Debe inspeccionar los productos al recibirlos y notificarnos de cualquier daño dentro de 48 horas.</p>
+                        <h3 id="costos-envio">6.2 Costos de Envío</h3>
+                        <p>Los costos de envío se calculan según el peso, dimensiones y destino del pedido.</p>
 
-                <h2>7. Devoluciones y Reembolsos</h2>
-                <h3>7.1 Política de Devolución</h3>
-                <p>Puede devolver productos no deseados dentro de 30 días de la recepción, siempre que estén sin usar y en su embalaje original.</p>
+                        <h3 id="danos-envio">6.3 Daños en el Transporte</h3>
+                        <p>Debe inspeccionar los productos al recibirlos y notificarnos de cualquier daño dentro de 48 horas.</p>
 
-                <h3>7.2 Proceso de Devolución</h3>
-                <ol>
-                    <li>Contactar a nuestro servicio al cliente</li>
-                    <li>Obtener autorización de devolución</li>
-                    <li>Empaquetar el producto de forma segura</li>
-                    <li>Enviar el producto a nuestra dirección</li>
-                </ol>
+                        <h2 id="devoluciones">7. Devoluciones y Reembolsos</h2>
+                        <h3 id="politica-devolucion">7.1 Política de Devolución</h3>
+                        <p>Puede devolver productos no deseados dentro de 30 días de la recepción, siempre que estén sin usar y en su embalaje original.</p>
 
-                <h3>7.3 Reembolsos</h3>
-                <p>Los reembolsos se procesarán dentro de 10 días hábiles después de recibir el producto devuelto.</p>
+                        <h3 id="proceso-devolucion">7.2 Proceso de Devolución</h3>
+                        <ol>
+                            <li>Contactar a nuestro servicio al cliente</li>
+                            <li>Obtener autorización de devolución</li>
+                            <li>Empaquetar el producto de forma segura</li>
+                            <li>Enviar el producto a nuestra dirección</li>
+                        </ol>
 
-                <h2>8. Garantía</h2>
-                <p>Todos los productos vienen con garantía del fabricante. FutureLabs actúa como intermediario y no ofrece garantías adicionales.</p>
+                        <h3 id="reembolsos">7.3 Reembolsos</h3>
+                        <p>Los reembolsos se procesarán dentro de 10 días hábiles después de recibir el producto devuelto.</p>
 
-                <h2>9. Propiedad Intelectual</h2>
-                <p>Todo el contenido del sitio web, incluyendo textos, gráficos, logotipos, imágenes y software, es propiedad de FutureLabs o sus proveedores de contenido y está protegido por leyes de derechos de autor.</p>
+                        <h2 id="garantia">8. Garantía</h2>
+                        <p>Todos los productos vienen con garantía del fabricante. FutureLabs actúa como intermediario y no ofrece garantías adicionales.</p>
 
-                <h2>10. Limitación de Responsabilidad</h2>
-                <p>FutureLabs no será responsable de ningún daño indirecto, incidental, especial o consecuente que resulte del uso o la imposibilidad de usar nuestros servicios.</p>
+                        <h2 id="propiedad-intelectual">9. Propiedad Intelectual</h2>
+                        <p>Todo el contenido del sitio web, incluyendo textos, gráficos, logotipos, imágenes y software, es propiedad de FutureLabs o sus proveedores de contenido y está protegido por leyes de derechos de autor.</p>
 
-                <h2>11. Indemnización</h2>
-                <p>Usted acepta indemnizar y eximir de responsabilidad a FutureLabs de cualquier reclamo, pérdida, responsabilidad y gasto que surja de su uso del servicio.</p>
+                        <h2 id="responsabilidad">10. Limitación de Responsabilidad</h2>
+                        <p>FutureLabs no será responsable de ningún daño indirecto, incidental, especial o consecuente que resulte del uso o la imposibilidad de usar nuestros servicios.</p>
 
-                <h2>12. Modificaciones</h2>
-                <p>Nos reservamos el derecho de modificar estos términos en cualquier momento. Las modificaciones entrarán en vigor al publicarse en el sitio web.</p>
+                        <h2 id="indemnizacion">11. Indemnización</h2>
+                        <p>Usted acepta indemnizar y eximir de responsabilidad a FutureLabs de cualquier reclamo, pérdida, responsabilidad y gasto que surja de su uso del servicio.</p>
 
-                <h2>13. Ley Aplicable</h2>
-                <p>Estos términos se rigen por las leyes de la República del Perú. Cualquier disputa será resuelta por los tribunales competentes de Lima, Perú.</p>
+                        <h2 id="modificaciones">12. Modificaciones</h2>
+                        <p>Nos reservamos el derecho de modificar estos términos en cualquier momento. Las modificaciones entrarán en vigor al publicarse en el sitio web.</p>
 
-                <h2>14. Contacto</h2>
-                <p>Si tiene preguntas sobre estos términos, puede contactarnos en:</p>
-                <ul>
-                    <li><strong>Email:</strong> legal@futurelabs.com</li>
-                    <li><strong>Teléfono:</strong> +51 999 999 999</li>
-                    <li><strong>Dirección:</strong> Av. Principal 123, Lima, Perú</li>
-                </ul>
+                        <h2 id="ley-aplicable">13. Ley Aplicable</h2>
+                        <p>Estos términos se rigen por las leyes de la República del Perú. Cualquier disputa será resuelta por los tribunales competentes de Lima, Perú.</p>
+
+                        <h2 id="contacto">14. Contacto</h2>
+                        <p>Si tiene preguntas sobre estos términos, puede contactarnos en:</p>
+                        <ul>
+                            <li><strong>Email:</strong> legal@futurelabs.com</li>
+                            <li><strong>Teléfono:</strong> +51 999 999 999</li>
+                            <li><strong>Dirección:</strong> Av. Principal 123, Lima, Perú</li>
+                        </ul>
+
+                        <footer class="legal-footer">
+                            <p>© 2025 FutureLabs. Todos los derechos reservados.</p>
+                            <div class="legal-footer-links">
+                                <a href="privacy.html"><i class="fas fa-lock"></i> Aviso de Privacidad</a>
+                                <a href="contact.html"><i class="fas fa-headset"></i> Soporte Legal</a>
+                            </div>
+                        </footer>
+                    </article>
+
+                    <aside class="legal-sidebar">
+                        <nav class="legal-toc" aria-label="Índice del documento">
+                            <span class="toc-title">Contenido</span>
+                            <ul>
+                                <li><a href="#aceptacion" class="is-active">1. Aceptación</a></li>
+                                <li><a href="#servicio">2. Servicio</a></li>
+                                <li><a href="#cuentas">3. Cuentas</a></li>
+                                <li><a href="#pedidos">5. Pedidos y pagos</a></li>
+                                <li><a href="#envio">6. Envíos</a></li>
+                                <li><a href="#devoluciones">7. Devoluciones</a></li>
+                                <li><a href="#garantia">8. Garantías</a></li>
+                                <li><a href="#contacto">14. Contacto</a></li>
+                            </ul>
+                        </nav>
+
+                        <div class="legal-aside-card">
+                            <h3>¿Necesitas asesoría?</h3>
+                            <p>Nuestro equipo legal responde en menos de 24 horas hábiles.</p>
+                            <a href="mailto:legal@futurelabs.com" class="btn btn-secondary">
+                                <i class="fas fa-envelope-open-text"></i>
+                                legal@futurelabs.com
+                            </a>
+                        </div>
+
+                        <div class="legal-aside-card subtle">
+                            <h4>Descargas</h4>
+                            <ul>
+                                <li><a href="#"><i class="fas fa-file-pdf"></i> PDF oficial (próximamente)</a></li>
+                                <li><a href="#"><i class="fas fa-scale-balanced"></i> Código de ética</a></li>
+                                <li><a href="warranty.html"><i class="fas fa-shield-check"></i> Política de garantía</a></li>
+                            </ul>
+                        </div>
+                    </aside>
+                </div>
             </div>
+        </section>
+    </main>
 
-            <div class="legal-footer">
-                <p>© 2025 FutureLabs. Todos los derechos reservados.</p>
-                <a href="index.html" class="back-link">
-                    <i class="fas fa-arrow-left"></i> Volver al Inicio
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
     <footer id="mainFooter"></footer>
 
+    <div id="loginModal" class="modal-overlay"></div>
+    <div id="registerModal" class="modal-overlay"></div>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/modals.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/components.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const headerContainer = document.getElementById('mainHeader');
+            if (headerContainer && window.Components) {
+                headerContainer.innerHTML = window.Components.getHeader(true, true);
+                window.Components.initHeader();
+                window.Components.initSearch();
+                window.Components.initCartCounter();
+            }
+
+            const footerContainer = document.getElementById('mainFooter');
+            if (footerContainer && window.Components) {
+                footerContainer.innerHTML = window.Components.getFooter();
+            }
+
+            const tocLinks = Array.from(document.querySelectorAll('.legal-toc a[href^="#"]'));
+            const sections = tocLinks
+                .map(link => document.querySelector(link.getAttribute('href')))
+                .filter(Boolean);
+
+            tocLinks.forEach(link => {
+                link.addEventListener('click', event => {
+                    const targetId = link.getAttribute('href');
+                    const target = document.querySelector(targetId);
+                    if (!target) return;
+
+                    event.preventDefault();
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                    tocLinks.forEach(item => item.classList.remove('is-active'));
+                    link.classList.add('is-active');
+                });
+            });
+
+            if (sections.length) {
+                const observer = new IntersectionObserver(entries => {
+                    entries.forEach(entry => {
+                        if (!entry.isIntersecting) return;
+                        const activeId = entry.target.getAttribute('id');
+                        tocLinks.forEach(link => {
+                            const href = link.getAttribute('href').replace('#', '');
+                            link.classList.toggle('is-active', href === activeId);
+                        });
+                    });
+                }, {
+                    rootMargin: '-45% 0px -45% 0px'
+                });
+
+                sections.forEach(section => observer.observe(section));
+            }
+        });
+    </script>
 </body>
 </html>
 
