@@ -1175,6 +1175,18 @@
     font-weight: 600;
     color: var(--text-primary);
     transition: background 0.3s ease, color 0.3s ease;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+.faq-question:focus-visible {
+    outline: none;
+    background: rgba(102, 126, 234, 0.1);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
 }
 
 .faq-question:hover {
