@@ -47,8 +47,8 @@ class AdminCRUD {
   }
 
   setupModals() {
-    // Product Modal
-    window.openProductModal = () => {
+    // Product Modal - Exponer métodos en la instancia
+    this.openProductModal = () => {
       this.currentEditId = null;
       document.getElementById('productForm').reset();
       document.getElementById('productModalTitle').textContent = 'Crear Producto';
@@ -65,21 +65,23 @@ class AdminCRUD {
       }
     };
 
-    window.editProduct = async (id) => {
+    this.editProduct = async (id) => {
       this.currentEditId = id;
       await this.loadProductForEdit(id);
       document.getElementById('productModalTitle').textContent = 'Editar Producto';
       document.getElementById('productModal').style.display = 'flex';
     };
 
-    window.deleteProduct = async (id) => {
+    this.deleteProduct = async (id) => {
       if (confirm('¿Estás seguro de eliminar este producto?')) {
         try {
           const response = await window.api.request(`/admin/products/${id}`, { method: 'DELETE' });
           
           if (response.success) {
             window.notifications.success('Producto eliminado exitosamente');
-            adminManager.loadProducts();
+            if (window.adminManager) {
+              window.adminManager.loadProducts();
+            }
           } else {
             window.notifications.error('Error al eliminar producto');
           }
@@ -90,28 +92,30 @@ class AdminCRUD {
     };
 
     // Category Modal
-    window.openCategoryModal = () => {
+    this.openCategoryModal = () => {
       this.currentEditId = null;
       document.getElementById('categoryForm').reset();
       document.getElementById('categoryModalTitle').textContent = 'Crear Categoría';
       document.getElementById('categoryModal').style.display = 'flex';
     };
 
-    window.editCategory = async (id) => {
+    this.editCategory = async (id) => {
       this.currentEditId = id;
       await this.loadCategoryForEdit(id);
       document.getElementById('categoryModalTitle').textContent = 'Editar Categoría';
       document.getElementById('categoryModal').style.display = 'flex';
     };
 
-    window.deleteCategory = async (id) => {
+    this.deleteCategory = async (id) => {
       if (confirm('¿Estás seguro de eliminar esta categoría?')) {
         try {
           const response = await window.api.request(`/admin/categories/${id}`, { method: 'DELETE' });
           
           if (response.success) {
             window.notifications.success('Categoría eliminada exitosamente');
-            adminManager.loadCategories();
+            if (window.adminManager) {
+              window.adminManager.loadCategories();
+            }
           } else {
             window.notifications.error('Error al eliminar categoría');
           }
@@ -122,7 +126,7 @@ class AdminCRUD {
     };
 
     // User Modal
-    window.editUser = async (id) => {
+    this.editUser = async (id) => {
       this.currentEditId = id;
       await this.loadUserForEdit(id);
       document.getElementById('userModalTitle').textContent = 'Editar Usuario';
@@ -130,21 +134,23 @@ class AdminCRUD {
     };
 
     // Review Modal
-    window.editReview = async (id) => {
+    this.editReview = async (id) => {
       this.currentEditId = id;
       await this.loadReviewForEdit(id);
       document.getElementById('reviewModalTitle').textContent = 'Editar Reseña';
       document.getElementById('reviewModal').style.display = 'flex';
     };
 
-    window.deleteReview = async (id) => {
+    this.deleteReview = async (id) => {
       if (confirm('¿Estás seguro de eliminar esta reseña?')) {
         try {
           const response = await window.api.request(`/admin/reviews/${id}`, { method: 'DELETE' });
           
           if (response.success) {
             window.notifications.success('Reseña eliminada exitosamente');
-            adminManager.loadReviews();
+            if (window.adminManager) {
+              window.adminManager.loadReviews();
+            }
           } else {
             window.notifications.error('Error al eliminar reseña');
           }
@@ -155,7 +161,7 @@ class AdminCRUD {
     };
 
     // Order Modal
-    window.viewOrder = async (id) => {
+    this.viewOrder = async (id) => {
       await this.loadOrderDetails(id);
       document.getElementById('orderModal').style.display = 'flex';
     };
@@ -412,7 +418,9 @@ class AdminCRUD {
           slugInput.dataset.manualEdit = '';
         }
         
-        adminManager.loadProducts();
+        if (window.adminManager) {
+          window.adminManager.loadProducts();
+        }
       } else {
         console.error('Error response:', response);
         window.notifications.error(response?.message || response?.error || 'Error al guardar producto');
@@ -465,7 +473,9 @@ class AdminCRUD {
           this.currentEditId ? 'Categoría actualizada exitosamente' : 'Categoría creada exitosamente'
         );
         document.getElementById('categoryModal').style.display = 'none';
-        adminManager.loadCategories();
+        if (window.adminManager) {
+          window.adminManager.loadCategories();
+        }
       } else {
         window.notifications.error(response.message || 'Error al guardar categoría');
       }
@@ -514,7 +524,9 @@ class AdminCRUD {
       if (response.success) {
         window.notifications.success('Usuario actualizado exitosamente');
         document.getElementById('userModal').style.display = 'none';
-        adminManager.loadUsers();
+        if (window.adminManager) {
+          window.adminManager.loadUsers();
+        }
       } else {
         window.notifications.error(response.message || 'Error al actualizar usuario');
       }
@@ -559,7 +571,9 @@ class AdminCRUD {
       if (response.success) {
         window.notifications.success('Reseña actualizada exitosamente');
         document.getElementById('reviewModal').style.display = 'none';
-        adminManager.loadReviews();
+        if (window.adminManager) {
+          window.adminManager.loadReviews();
+        }
       } else {
         window.notifications.error(response.message || 'Error al actualizar reseña');
       }
@@ -675,6 +689,18 @@ class AdminCRUD {
 // Inicializar CRUD
 const adminCRUD = new AdminCRUD();
 window.adminCRUD = adminCRUD;
+
+// Exponer métodos globalmente para compatibilidad con onclick handlers
+window.openProductModal = () => adminCRUD.openProductModal();
+window.editProduct = (id) => adminCRUD.editProduct(id);
+window.deleteProduct = (id) => adminCRUD.deleteProduct(id);
+window.openCategoryModal = () => adminCRUD.openCategoryModal();
+window.editCategory = (id) => adminCRUD.editCategory(id);
+window.deleteCategory = (id) => adminCRUD.deleteCategory(id);
+window.editUser = (id) => adminCRUD.editUser(id);
+window.editReview = (id) => adminCRUD.editReview(id);
+window.deleteReview = (id) => adminCRUD.deleteReview(id);
+window.viewOrder = (id) => adminCRUD.viewOrder(id);
 
 
 

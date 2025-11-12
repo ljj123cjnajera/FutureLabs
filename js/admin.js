@@ -584,61 +584,62 @@ async function viewOrder(orderId) {
 }
 
 function editProduct(productId) {
-  if (window.adminCRUD) {
-    window.editProduct(productId);
+  if (window.adminCRUD && window.adminCRUD.editProduct) {
+    window.adminCRUD.editProduct(productId);
   }
 }
 
 function deleteProduct(productId) {
-  if (window.deleteProduct) {
-    window.deleteProduct(productId);
+  if (window.adminCRUD && window.adminCRUD.deleteProduct) {
+    window.adminCRUD.deleteProduct(productId);
   }
 }
 
 function editCategory(categoryId) {
-  if (window.editCategory) {
-    window.editCategory(categoryId);
+  if (window.adminCRUD && window.adminCRUD.editCategory) {
+    window.adminCRUD.editCategory(categoryId);
   }
 }
 
 function deleteCategory(categoryId) {
-  if (window.deleteCategory) {
-    window.deleteCategory(categoryId);
+  if (window.adminCRUD && window.adminCRUD.deleteCategory) {
+    window.adminCRUD.deleteCategory(categoryId);
   }
 }
 
 function editUser(userId) {
-  if (window.editUser) {
-    window.editUser(userId);
+  if (window.adminCRUD && window.adminCRUD.editUser) {
+    window.adminCRUD.editUser(userId);
   }
 }
 
 function editReview(reviewId) {
-  if (window.editReview) {
-    window.editReview(reviewId);
+  if (window.adminCRUD && window.adminCRUD.editReview) {
+    window.adminCRUD.editReview(reviewId);
   }
 }
 
 function deleteReview(reviewId) {
-  if (window.deleteReview) {
-    window.deleteReview(reviewId);
+  if (window.adminCRUD && window.adminCRUD.deleteReview) {
+    window.adminCRUD.deleteReview(reviewId);
   }
 }
 
 function openProductModal() {
-  if (window.openProductModal) {
-    window.openProductModal();
+  if (window.adminCRUD && window.adminCRUD.openProductModal) {
+    window.adminCRUD.openProductModal();
   }
 }
 
 function openCategoryModal() {
-  if (window.openCategoryModal) {
-    window.openCategoryModal();
+  if (window.adminCRUD && window.adminCRUD.openCategoryModal) {
+    window.adminCRUD.openCategoryModal();
   }
 }
 
 // Inicializar
 const adminManager = new AdminManager();
+window.adminManager = adminManager; // Exponer globalmente para adminCRUD
 
 // ===== FUNCIONES DE REPORTES =====
 async function exportSalesReport() {
