@@ -255,6 +255,12 @@
     flex-wrap: wrap;
 }
 
+.blog-card:focus-within {
+    outline: none;
+    border-color: rgba(59, 130, 246, 0.4);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+}
+
 .blog-card-views {
     color: var(--text-secondary);
     font-size: 0.9rem;
@@ -275,6 +281,13 @@
 .btn-read-more:hover {
     color: var(--primary-dark);
     gap: var(--spacing-sm);
+}
+
+.btn-read-more:focus-visible {
+    outline: none;
+    color: var(--primary-dark);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.25);
+    border-radius: var(--radius-full);
 }
 
 .blog-card-category {

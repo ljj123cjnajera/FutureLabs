@@ -319,6 +319,19 @@ input, textarea, select {
     box-shadow: var(--shadow-sm);
 }
 
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible,
+.btn-success:focus-visible,
+.btn-warning:focus-visible,
+.btn-error:focus-visible,
+.btn-danger:focus-visible,
+.btn-outline:focus-visible,
+.btn-ghost:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.25);
+    border-color: var(--primary);
+}
+
 /* Tamaños */
 .btn-sm {
     padding: var(--spacing-xs) var(--spacing-md);
