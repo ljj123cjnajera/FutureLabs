@@ -101,7 +101,7 @@ class AdminCRUD {
   closeModal(modal) {
     if (!modal) return;
     console.log('🔻 closeModal llamado para', modal.id, new Error().stack);
-    modal.style.display = 'none';
+    this.hideModal(modal);
     // Limpiar errores de validación al cerrar
     modal.querySelectorAll('.error-message').forEach(err => err.remove());
     modal.querySelectorAll('input, select, textarea').forEach(input => {
@@ -109,6 +109,29 @@ class AdminCRUD {
     });
     // Remover cualquier overlay de loading que quede
     modal.querySelectorAll('[id$="ModalLoading"]').forEach(overlay => overlay.remove());
+  }
+
+  showModal(modal) {
+    if (!modal) return;
+    modal.style.display = 'flex';
+    modal.classList.add('active');
+  }
+
+  hideModal(modal) {
+    if (!modal) return;
+    modal.classList.remove('active');
+    setTimeout(() => {
+      if (!modal.classList.contains('active')) {
+        modal.style.display = 'none';
+      }
+    }, 200);
+  }
+
+  closeModalById(id) {
+    const modal = document.getElementById(id);
+    if (modal) {
+      this.closeModal(modal);
+    }
   }
 
   setupSlugGeneration() {
@@ -147,7 +170,7 @@ class AdminCRUD {
       this.currentEditId = null;
       document.getElementById('productForm').reset();
       document.getElementById('productModalTitle').textContent = 'Crear Producto';
-      document.getElementById('productModal').style.display = 'flex';
+        this.showModal(modal);
       // Resetear preview de imagen
       document.getElementById('imagePreviewContainer').style.display = 'none';
       document.getElementById('previewImage').src = '';
@@ -225,7 +248,7 @@ class AdminCRUD {
         }
         
         // Abrir modal ANTES de agregar el overlay
-        modal.style.display = 'flex';
+        this.showModal(modal);
         
         // Pequeño delay para asegurar que el modal esté completamente renderizado
         await new Promise(resolve => setTimeout(resolve, 200));
@@ -244,7 +267,7 @@ class AdminCRUD {
         const keepModalOpen = () => {
           if (modal.style.display !== 'flex') {
             console.warn('⚠️ Modal se cerró, reabriendo...');
-            modal.style.display = 'flex';
+            this.showModal(modal);
           }
         };
         
@@ -256,7 +279,7 @@ class AdminCRUD {
           // Verificar nuevamente que el modal sigue abierto
           if (modal.style.display !== 'flex') {
             console.warn('⚠️ Modal se cerró durante la carga, reabriendo...');
-            modal.style.display = 'flex';
+            this.showModal(modal);
           }
           console.log('✅ Producto cargado en modal');
           
@@ -336,7 +359,7 @@ class AdminCRUD {
         input.style.borderColor = '';
       });
       
-      modal.style.display = 'flex';
+      this.showModal(modal);
     };
 
     this.editCategory = async (id) => {
@@ -377,7 +400,7 @@ class AdminCRUD {
           modalContent.style.position = 'relative';
         }
         
-        modal.style.display = 'flex';
+        this.showModal(modal);
         await new Promise(resolve => setTimeout(resolve, 150));
         modalContent.appendChild(loadingOverlay);
         
@@ -400,7 +423,7 @@ class AdminCRUD {
         console.error('Error loading category for edit:', error);
         const overlay = document.getElementById('categoryModalLoading');
         if (overlay) overlay.remove();
-        modal.style.display = 'none';
+        this.hideModal(modal);
         window.notifications?.error('Error al cargar categoría: ' + (error.message || 'Error desconocido'));
       } finally {
         this.isLoading = false;
@@ -465,7 +488,7 @@ class AdminCRUD {
           modalContent.style.position = 'relative';
         }
         
-        modal.style.display = 'flex';
+        this.showModal(modal);
         await new Promise(resolve => setTimeout(resolve, 150));
         modalContent.appendChild(loadingOverlay);
         
@@ -488,7 +511,7 @@ class AdminCRUD {
         console.error('Error loading user for edit:', error);
         const overlay = document.getElementById('userModalLoading');
         if (overlay) overlay.remove();
-        modal.style.display = 'none';
+        this.hideModal(modal);
         window.notifications?.error('Error al cargar usuario: ' + (error.message || 'Error desconocido'));
       } finally {
         this.isLoading = false;
@@ -534,7 +557,7 @@ class AdminCRUD {
           modalContent.style.position = 'relative';
         }
         
-        modal.style.display = 'flex';
+        this.showModal(modal);
         await new Promise(resolve => setTimeout(resolve, 150));
         modalContent.appendChild(loadingOverlay);
         
@@ -557,7 +580,7 @@ class AdminCRUD {
         console.error('Error loading review for edit:', error);
         const overlay = document.getElementById('reviewModalLoading');
         if (overlay) overlay.remove();
-        modal.style.display = 'none';
+        this.hideModal(modal);
         window.notifications?.error('Error al cargar reseña: ' + (error.message || 'Error desconocido'));
       } finally {
         this.isLoading = false;
@@ -586,7 +609,7 @@ class AdminCRUD {
     // Order Modal
     this.viewOrder = async (id) => {
       await this.loadOrderDetails(id);
-      document.getElementById('orderModal').style.display = 'flex';
+      this.showModal(document.getElementById('orderModal'));
     };
 
     // Close modals - Usar delegación de eventos para evitar múltiples listeners
