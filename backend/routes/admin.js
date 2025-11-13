@@ -95,7 +95,12 @@ router.get('/dashboard/stats', async (req, res) => {
 // ===== PRODUCTOS =====
 router.get('/products/:id', async (req, res) => {
   try {
-    const product = await Product.getById(req.params.id);
+    // Para admin, obtener producto sin filtrar por is_active
+    const product = await knex('products')
+      .select('products.*', 'categories.name as category_name', 'categories.slug as category_slug')
+      .leftJoin('categories', 'products.category_id', 'categories.id')
+      .where('products.id', req.params.id)
+      .first();
     
     if (!product) {
       return res.status(404).json({
