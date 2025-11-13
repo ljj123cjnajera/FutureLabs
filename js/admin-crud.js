@@ -30,14 +30,60 @@ class AdminCRUD {
   }
   
   setupModalBackdrop() {
-    // Cerrar modal al hacer click en el backdrop (fuera del contenido)
-    document.querySelectorAll('.modal').forEach(modal => {
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-          modal.style.display = 'none';
+    // Prevenir múltiples listeners
+    if (this.modalBackdropSetup) return;
+    
+    // Usar delegación de eventos en el body para evitar múltiples listeners
+    document.body.addEventListener('click', (e) => {
+      // Manejar cierre con botón modal-close
+      if (e.target.classList.contains('modal-close') || e.target.closest('.modal-close')) {
+        const modal = e.target.closest('.modal') || e.target.closest('.modal-close')?.closest('.modal');
+        if (modal) {
+          e.preventDefault();
+          e.stopPropagation();
+          this.closeModal(modal);
+          return;
         }
-      });
+      }
+      
+      // Solo cerrar si se hace click directamente en el backdrop del modal (no en su contenido)
+      const modal = e.target.closest('.modal');
+      if (modal && e.target === modal) {
+        // Asegurar que NO se está haciendo click dentro del modal-content
+        const modalContent = modal.querySelector('.modal-content');
+        if (modalContent && !modalContent.contains(e.target)) {
+          // Verificar que no se esté haciendo click en el overlay de loading
+          const loadingOverlay = modal.querySelector('[id$="ModalLoading"]');
+          if (!loadingOverlay || !loadingOverlay.contains(e.target)) {
+            this.closeModal(modal);
+          }
+        }
+      }
     });
+    
+    // Prevenir que ESC cierre el modal durante carga
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !this.isLoading) {
+        const openModal = document.querySelector('.modal[style*="flex"]');
+        if (openModal) {
+          this.closeModal(openModal);
+        }
+      }
+    });
+    
+    this.modalBackdropSetup = true;
+  }
+  
+  closeModal(modal) {
+    if (!modal) return;
+    modal.style.display = 'none';
+    // Limpiar errores de validación al cerrar
+    modal.querySelectorAll('.error-message').forEach(err => err.remove());
+    modal.querySelectorAll('input, select, textarea').forEach(input => {
+      input.style.borderColor = '';
+    });
+    // Remover cualquier overlay de loading que quede
+    modal.querySelectorAll('[id$="ModalLoading"]').forEach(overlay => overlay.remove());
   }
 
   setupSlugGeneration() {
@@ -109,14 +155,28 @@ class AdminCRUD {
         
         // Mostrar loading overlay sin reemplazar el contenido completo
         const modalContent = modal.querySelector('.modal-content');
+        if (!modalContent) {
+          throw new Error('Contenido del modal no encontrado');
+        }
+        
         const loadingOverlay = document.createElement('div');
         loadingOverlay.id = 'productModalLoading';
-        loadingOverlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000;';
+        loadingOverlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; pointer-events: none;';
         loadingOverlay.innerHTML = '<div style="text-align: center;"><div class="loading-spinner"></div><p style="margin-top: 16px;">Cargando producto...</p></div>';
-        modalContent.style.position = 'relative';
+        
+        // Asegurar que modal-content tenga position relative
+        const currentPosition = window.getComputedStyle(modalContent).position;
+        if (currentPosition === 'static') {
+          modalContent.style.position = 'relative';
+        }
+        
         modalContent.appendChild(loadingOverlay);
         
+        // Abrir modal ANTES de cargar datos para que sea visible
         modal.style.display = 'flex';
+        
+        // Pequeño delay para asegurar que el modal esté visible
+        await new Promise(resolve => setTimeout(resolve, 50));
         
         await this.loadProductForEdit(id);
         
@@ -155,10 +215,31 @@ class AdminCRUD {
 
     // Category Modal
     this.openCategoryModal = () => {
+      if (this.isLoading) {
+        window.notifications?.warning('Por favor espera, hay una operación en curso...');
+        return;
+      }
+      
+      const modal = document.getElementById('categoryModal');
+      if (!modal) {
+        console.error('Modal de categoría no encontrado');
+        return;
+      }
+      
       this.currentEditId = null;
-      document.getElementById('categoryForm').reset();
-      document.getElementById('categoryModalTitle').textContent = 'Crear Categoría';
-      document.getElementById('categoryModal').style.display = 'flex';
+      const form = document.getElementById('categoryForm');
+      if (form) form.reset();
+      
+      const title = document.getElementById('categoryModalTitle');
+      if (title) title.textContent = 'Crear Categoría';
+      
+      // Limpiar errores previos
+      modal.querySelectorAll('.error-message').forEach(err => err.remove());
+      modal.querySelectorAll('input, select, textarea').forEach(input => {
+        input.style.borderColor = '';
+      });
+      
+      modal.style.display = 'flex';
     };
 
     this.editCategory = async (id) => {
@@ -181,14 +262,23 @@ class AdminCRUD {
         
         // Mostrar loading overlay sin reemplazar el contenido completo
         const modalContent = modal.querySelector('.modal-content');
+        if (!modalContent) {
+          throw new Error('Contenido del modal no encontrado');
+        }
+        
         const loadingOverlay = document.createElement('div');
         loadingOverlay.id = 'categoryModalLoading';
-        loadingOverlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000;';
+        loadingOverlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; pointer-events: none;';
         loadingOverlay.innerHTML = '<div style="text-align: center;"><div class="loading-spinner"></div><p style="margin-top: 16px;">Cargando categoría...</p></div>';
-        modalContent.style.position = 'relative';
-        modalContent.appendChild(loadingOverlay);
         
+        const currentPosition = window.getComputedStyle(modalContent).position;
+        if (currentPosition === 'static') {
+          modalContent.style.position = 'relative';
+        }
+        
+        modalContent.appendChild(loadingOverlay);
         modal.style.display = 'flex';
+        await new Promise(resolve => setTimeout(resolve, 50));
         
         await this.loadCategoryForEdit(id);
         
@@ -246,14 +336,23 @@ class AdminCRUD {
         
         // Mostrar loading overlay sin reemplazar el contenido completo
         const modalContent = modal.querySelector('.modal-content');
+        if (!modalContent) {
+          throw new Error('Contenido del modal no encontrado');
+        }
+        
         const loadingOverlay = document.createElement('div');
         loadingOverlay.id = 'userModalLoading';
-        loadingOverlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000;';
+        loadingOverlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; pointer-events: none;';
         loadingOverlay.innerHTML = '<div style="text-align: center;"><div class="loading-spinner"></div><p style="margin-top: 16px;">Cargando usuario...</p></div>';
-        modalContent.style.position = 'relative';
-        modalContent.appendChild(loadingOverlay);
         
+        const currentPosition = window.getComputedStyle(modalContent).position;
+        if (currentPosition === 'static') {
+          modalContent.style.position = 'relative';
+        }
+        
+        modalContent.appendChild(loadingOverlay);
         modal.style.display = 'flex';
+        await new Promise(resolve => setTimeout(resolve, 50));
         
         await this.loadUserForEdit(id);
         
@@ -292,14 +391,23 @@ class AdminCRUD {
         
         // Mostrar loading overlay sin reemplazar el contenido completo
         const modalContent = modal.querySelector('.modal-content');
+        if (!modalContent) {
+          throw new Error('Contenido del modal no encontrado');
+        }
+        
         const loadingOverlay = document.createElement('div');
         loadingOverlay.id = 'reviewModalLoading';
-        loadingOverlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000;';
+        loadingOverlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; pointer-events: none;';
         loadingOverlay.innerHTML = '<div style="text-align: center;"><div class="loading-spinner"></div><p style="margin-top: 16px;">Cargando reseña...</p></div>';
-        modalContent.style.position = 'relative';
-        modalContent.appendChild(loadingOverlay);
         
+        const currentPosition = window.getComputedStyle(modalContent).position;
+        if (currentPosition === 'static') {
+          modalContent.style.position = 'relative';
+        }
+        
+        modalContent.appendChild(loadingOverlay);
         modal.style.display = 'flex';
+        await new Promise(resolve => setTimeout(resolve, 50));
         
         await this.loadReviewForEdit(id);
         
@@ -343,19 +451,8 @@ class AdminCRUD {
     };
 
     // Close modals - Usar delegación de eventos para evitar múltiples listeners
-    document.body.addEventListener('click', (e) => {
-      if (e.target.classList.contains('modal-close') || e.target.closest('.modal-close')) {
-        const modal = e.target.closest('.modal') || e.target.closest('.modal-close')?.closest('.modal');
-        if (modal) {
-          modal.style.display = 'none';
-          // Limpiar errores de validación al cerrar
-          modal.querySelectorAll('.error-message').forEach(err => err.remove());
-          modal.querySelectorAll('input, select, textarea').forEach(input => {
-            input.style.borderColor = '';
-          });
-        }
-      }
-    });
+    // Este listener se configura una sola vez usando la bandera modalBackdropSetup
+    // El cierre de modales se maneja en setupModalBackdrop() para evitar duplicados
   }
 
   setupForms() {
