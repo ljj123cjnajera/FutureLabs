@@ -132,7 +132,14 @@ class FutureLabsAPI {
 
   // Helper para hacer requests
   async request(endpoint, options = {}) {
+    const method = options.method ? options.method.toUpperCase() : 'GET';
     let effectiveEndpoint = endpoint;
+
+    // Añadir parámetro anti-cache para peticiones GET (Safari)
+    if (method === 'GET') {
+      const separator = endpoint.includes('?') ? '&' : '?';
+      effectiveEndpoint = `${endpoint}${separator}_=${Date.now()}`;
+    }
     let cacheBustingTried = false;
 
     const performRequest = async (retrying = false) => {
