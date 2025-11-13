@@ -93,7 +93,7 @@ class AdminHomeContent {
       this.loadHeroSlideForEdit(id);
     }
     
-    modal.style.display = 'flex';
+    this.showModal(modal);
   }
 
   async loadHeroSlideForEdit(id) {
@@ -157,7 +157,7 @@ class AdminHomeContent {
 
       if (response.success) {
         window.notifications?.success(response.message || 'Slide guardado exitosamente');
-        document.getElementById('heroSlideModal').style.display = 'none';
+        this.hideModal(document.getElementById('heroSlideModal'));
         this.loadHeroSlides();
       }
     } catch (error) {
@@ -248,7 +248,7 @@ class AdminHomeContent {
       this.loadBannerForEdit(id);
     }
     
-    modal.style.display = 'flex';
+    this.showModal(modal);
   }
 
   async loadBannerForEdit(id) {
@@ -318,7 +318,7 @@ class AdminHomeContent {
 
       if (response.success) {
         window.notifications?.success(response.message || 'Banner guardado exitosamente');
-        document.getElementById('bannerModal').style.display = 'none';
+        this.hideModal(document.getElementById('bannerModal'));
         this.loadBanners();
       }
     } catch (error) {
@@ -409,7 +409,7 @@ class AdminHomeContent {
       this.loadBenefitForEdit(id);
     }
     
-    modal.style.display = 'flex';
+    this.showModal(modal);
   }
 
   async loadBenefitForEdit(id) {
@@ -471,7 +471,7 @@ class AdminHomeContent {
 
       if (response.success) {
         window.notifications?.success(response.message || 'Beneficio guardado exitosamente');
-        document.getElementById('benefitModal').style.display = 'none';
+        this.hideModal(document.getElementById('benefitModal'));
         this.loadBenefits();
       }
     } catch (error) {
@@ -576,7 +576,7 @@ class AdminHomeContent {
       this.loadHomeSectionForEdit(id);
     }
     
-    modal.style.display = 'flex';
+    this.showModal(modal);
   }
 
   async loadHomeSectionForEdit(id) {
@@ -617,7 +617,7 @@ class AdminHomeContent {
 
       if (response.success) {
         window.notifications?.success(response.message || 'Sección guardada exitosamente');
-        document.getElementById('homeSectionModal').style.display = 'none';
+        this.hideModal(document.getElementById('homeSectionModal'));
         this.loadHomeSections();
       }
     } catch (error) {
@@ -642,6 +642,29 @@ class AdminHomeContent {
   editHomeSection(id) {
     this.openHomeSectionModal(id);
   }
+
+  showModal(modal) {
+    if (!modal) return;
+    modal.style.display = 'flex';
+    modal.classList.add('active');
+  }
+
+  hideModal(modal) {
+    if (!modal) return;
+    modal.classList.remove('active');
+    setTimeout(() => {
+      if (!modal.classList.contains('active')) {
+        modal.style.display = 'none';
+      }
+    }, 200);
+  }
+
+  closeModalById(id) {
+    const modal = document.getElementById(id);
+    if (modal) {
+      this.hideModal(modal);
+    }
+  }
 }
 
 // Funciones globales para los modales
@@ -649,6 +672,10 @@ window.openHeroSlideModal = (id) => adminHomeContent.openHeroSlideModal(id);
 window.openBannerModal = (id) => adminHomeContent.openBannerModal(id);
 window.openBenefitModal = (id) => adminHomeContent.openBenefitModal(id);
 window.openHomeSectionModal = (id) => adminHomeContent.openHomeSectionModal(id);
+window.closeHeroSlideModal = () => adminHomeContent.closeModalById('heroSlideModal');
+window.closeBannerModal = () => adminHomeContent.closeModalById('bannerModal');
+window.closeBenefitModal = () => adminHomeContent.closeModalById('benefitModal');
+window.closeHomeSectionModal = () => adminHomeContent.closeModalById('homeSectionModal');
 
 // Funciones de preview de imágenes
 function previewHeroSlideImage(input) {
