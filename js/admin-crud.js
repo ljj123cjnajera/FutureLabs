@@ -36,7 +36,10 @@ class AdminCRUD {
     // Usar delegación de eventos en el body para evitar múltiples listeners
     document.body.addEventListener('click', (e) => {
       // No hacer nada si hay una operación en curso
-      if (this.isLoading) return;
+      if (this.isLoading) {
+        e.stopPropagation();
+        return;
+      }
       
       // Manejar cierre con botón modal-close
       const closeBtn = e.target.closest('.modal-close');
@@ -67,7 +70,7 @@ class AdminCRUD {
           }
         }
       }
-    }, true); // Usar capture phase para capturar antes que otros listeners
+    });
     
     // Prevenir que ESC cierre el modal durante carga
     document.addEventListener('keydown', (e) => {
@@ -171,8 +174,13 @@ class AdminCRUD {
         
         const loadingOverlay = document.createElement('div');
         loadingOverlay.id = 'productModalLoading';
-        loadingOverlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; pointer-events: none;';
+        loadingOverlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; pointer-events: auto;';
         loadingOverlay.innerHTML = '<div style="text-align: center;"><div class="loading-spinner"></div><p style="margin-top: 16px;">Cargando producto...</p></div>';
+        
+        // Prevenir que clicks en el overlay cierren el modal
+        loadingOverlay.addEventListener('click', (e) => {
+          e.stopPropagation();
+        });
         
         // Asegurar que modal-content tenga position relative
         const currentPosition = window.getComputedStyle(modalContent).position;
@@ -180,13 +188,14 @@ class AdminCRUD {
           modalContent.style.position = 'relative';
         }
         
-        modalContent.appendChild(loadingOverlay);
-        
-        // Abrir modal ANTES de cargar datos para que sea visible
+        // Abrir modal ANTES de agregar el overlay
         modal.style.display = 'flex';
         
-        // Pequeño delay para asegurar que el modal esté visible
-        await new Promise(resolve => setTimeout(resolve, 50));
+        // Pequeño delay para asegurar que el modal esté completamente renderizado
+        await new Promise(resolve => setTimeout(resolve, 150));
+        
+        // Agregar overlay después de que el modal esté visible
+        modalContent.appendChild(loadingOverlay);
         
         await this.loadProductForEdit(id);
         
@@ -278,17 +287,21 @@ class AdminCRUD {
         
         const loadingOverlay = document.createElement('div');
         loadingOverlay.id = 'categoryModalLoading';
-        loadingOverlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; pointer-events: none;';
+        loadingOverlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; pointer-events: auto;';
         loadingOverlay.innerHTML = '<div style="text-align: center;"><div class="loading-spinner"></div><p style="margin-top: 16px;">Cargando categoría...</p></div>';
+        
+        loadingOverlay.addEventListener('click', (e) => {
+          e.stopPropagation();
+        });
         
         const currentPosition = window.getComputedStyle(modalContent).position;
         if (currentPosition === 'static') {
           modalContent.style.position = 'relative';
         }
         
-        modalContent.appendChild(loadingOverlay);
         modal.style.display = 'flex';
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 150));
+        modalContent.appendChild(loadingOverlay);
         
         if (modal.style.display !== 'flex') {
           console.warn('Modal se cerró antes de cargar datos');
@@ -362,17 +375,21 @@ class AdminCRUD {
         
         const loadingOverlay = document.createElement('div');
         loadingOverlay.id = 'userModalLoading';
-        loadingOverlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; pointer-events: none;';
+        loadingOverlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; pointer-events: auto;';
         loadingOverlay.innerHTML = '<div style="text-align: center;"><div class="loading-spinner"></div><p style="margin-top: 16px;">Cargando usuario...</p></div>';
+        
+        loadingOverlay.addEventListener('click', (e) => {
+          e.stopPropagation();
+        });
         
         const currentPosition = window.getComputedStyle(modalContent).position;
         if (currentPosition === 'static') {
           modalContent.style.position = 'relative';
         }
         
-        modalContent.appendChild(loadingOverlay);
         modal.style.display = 'flex';
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 150));
+        modalContent.appendChild(loadingOverlay);
         
         if (modal.style.display !== 'flex') {
           console.warn('Modal se cerró antes de cargar datos');
@@ -427,17 +444,21 @@ class AdminCRUD {
         
         const loadingOverlay = document.createElement('div');
         loadingOverlay.id = 'reviewModalLoading';
-        loadingOverlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; pointer-events: none;';
+        loadingOverlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; pointer-events: auto;';
         loadingOverlay.innerHTML = '<div style="text-align: center;"><div class="loading-spinner"></div><p style="margin-top: 16px;">Cargando reseña...</p></div>';
+        
+        loadingOverlay.addEventListener('click', (e) => {
+          e.stopPropagation();
+        });
         
         const currentPosition = window.getComputedStyle(modalContent).position;
         if (currentPosition === 'static') {
           modalContent.style.position = 'relative';
         }
         
-        modalContent.appendChild(loadingOverlay);
         modal.style.display = 'flex';
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 150));
+        modalContent.appendChild(loadingOverlay);
         
         if (modal.style.display !== 'flex') {
           console.warn('Modal se cerró antes de cargar datos');
