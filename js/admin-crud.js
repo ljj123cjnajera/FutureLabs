@@ -100,6 +100,7 @@ class AdminCRUD {
   
   closeModal(modal) {
     if (!modal) return;
+    console.log('🔻 closeModal llamado para', modal.id, new Error().stack);
     modal.style.display = 'none';
     // Limpiar errores de validación al cerrar
     modal.querySelectorAll('.error-message').forEach(err => err.remove());
@@ -257,6 +258,7 @@ class AdminCRUD {
             console.warn('⚠️ Modal se cerró durante la carga, reabriendo...');
             modal.style.display = 'flex';
           }
+          console.log('✅ Producto cargado en modal');
           
           // Remover loading overlay
           const overlay = document.getElementById('productModalLoading');
@@ -797,6 +799,12 @@ class AdminCRUD {
     if (isActiveInput) {
       isActiveInput.checked = product.is_active !== false;
     }
+    
+    console.log('✅ Formulario del modal completado', {
+      id: product.id,
+      name: product.name,
+      category: product.category_id
+    });
   }
 
   async saveProduct() {
