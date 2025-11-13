@@ -4,7 +4,6 @@ class AdminCRUD {
     this.currentEditId = null;
     this.isInitialized = false;
     this.isLoading = false; // Prevenir múltiples operaciones simultáneas
-    this.productsCache = [];
     this.init();
   }
 
@@ -251,11 +250,7 @@ class AdminCRUD {
         const modalCheckInterval = setInterval(keepModalOpen, 50);
         
         try {
-          const cachedProduct = Array.isArray(this.productsCache)
-            ? this.productsCache.find(product => product.id === id)
-            : null;
-          
-          await this.loadProductForEdit(id, { product: cachedProduct });
+          await this.loadProductForEdit(id);
           
           // Verificar nuevamente que el modal sigue abierto
           if (modal.style.display !== 'flex') {
@@ -664,13 +659,7 @@ class AdminCRUD {
     try {
       console.log('🔍 Loading product for edit:', id);
       
-      let product = options.product;
-      
-      if (!product) {
-        product = await this.fetchProductForEdit(id);
-      } else {
-        console.log('📦 Using cached product data');
-      }
+      const product = await this.fetchProductForEdit(id);
       
       this.populateProductForm(product);
     } catch (error) {
@@ -692,15 +681,6 @@ class AdminCRUD {
     }
     
     console.log('📦 Product fetched from API:', product);
-    
-    if (Array.isArray(this.productsCache)) {
-      const existingIndex = this.productsCache.findIndex(item => item.id === product.id);
-      if (existingIndex >= 0) {
-        this.productsCache[existingIndex] = { ...this.productsCache[existingIndex], ...product };
-      } else {
-        this.productsCache.push(product);
-      }
-    }
     
     return product;
   }
