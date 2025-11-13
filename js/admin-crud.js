@@ -170,7 +170,12 @@ class AdminCRUD {
       this.currentEditId = null;
       document.getElementById('productForm').reset();
       document.getElementById('productModalTitle').textContent = 'Crear Producto';
-        this.showModal(modal);
+      const modal = document.getElementById('productModal');
+      if (!modal) {
+        console.error('Modal de producto no encontrado');
+        return;
+      }
+      this.showModal(modal);
       // Resetear preview de imagen
       document.getElementById('imagePreviewContainer').style.display = 'none';
       document.getElementById('previewImage').src = '';
