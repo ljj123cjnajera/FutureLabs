@@ -132,47 +132,104 @@ class FutureLabsAPI {
 
   // Helper para hacer requests
   async request(endpoint, options = {}) {
-    const url = `${this.baseURL}${endpoint}`;
-    const config = {
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-      },
-      ...options
-    };
+    let effectiveEndpoint = endpoint;
+    let cacheBustingTried = false;
 
-    // Agregar token si existe
-    if (this.token) {
-      config.headers['Authorization'] = `Bearer ${this.token}`;
-      console.log('🔑 Token enviado en request:', this.token.substring(0, 20) + '...');
-    } else {
-      console.log('⚠️ No hay token en request');
-    }
+    const performRequest = async (retrying = false) => {
+      const url = `${this.baseURL}${effectiveEndpoint}`;
+      const config = {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          Pragma: 'no-cache',
+          'Expires': '0',
+          'If-None-Match': '',
+          'If-Modified-Since': '0',
+          ...options.headers
+        }
+      };
 
-    try {
-      window.pageProgress?.begin?.();
-      console.log('📤 Request a:', url);
-      const response = await fetch(url, config);
-      console.log('📥 Response status:', response.status);
-      
-      const data = await response.json();
-      console.log('📥 Response data:', data);
+      config.cache = 'reload';
 
-      if (!response.ok) {
-        console.error('❌ Response not ok:', data.message);
-        const error = new Error(data.message || 'Error en la petición');
-        error.status = response.status;
-        error.data = data;
-        throw error;
+      // Agregar token si existe
+      if (this.token) {
+        config.headers['Authorization'] = `Bearer ${this.token}`;
+        console.log('🔑 Token enviado en request:', this.token.substring(0, 20) + '...');
+      } else {
+        console.log('⚠️ No hay token en request');
       }
 
-      return data;
-    } catch (error) {
-      console.error('❌ Error en API:', error);
-      throw error;
-    } finally {
-      window.pageProgress?.end?.();
-    }
+      try {
+        window.pageProgress?.begin?.();
+        console.log('📤 Request a:', url, retrying ? '(reintento)' : '');
+        const response = await fetch(url, config);
+        console.log('📥 Response status:', response.status);
+
+        const parseResponse = async (resp) => {
+          let data = {};
+          const contentLength = resp.headers.get('content-length');
+          const hasBody = resp.status !== 204 && resp.status !== 205 && resp.status !== 304 &&
+            (contentLength === null || parseInt(contentLength, 10) > 0);
+
+          if (hasBody) {
+            const text = await resp.text();
+            if (text) {
+              try {
+                data = JSON.parse(text);
+              } catch (parseError) {
+                console.warn('⚠️ No fue posible parsear la respuesta como JSON. Devolviendo texto plano.');
+                data = { raw: text };
+              }
+            }
+          }
+
+          console.log('📥 Response data:', data);
+
+          if (!resp.ok) {
+            console.error('❌ Response not ok:', data?.message);
+            const error = new Error(data?.message || 'Error en la petición');
+            error.status = resp.status;
+            error.data = data;
+            throw error;
+          }
+
+          return data;
+        };
+
+        if (response.status === 304) {
+          console.warn('⚠️ Respuesta 304 Not Modified recibida. Reintentando con parámetro anti-cache.');
+          if (!cacheBustingTried) {
+            cacheBustingTried = true;
+            const separator = effectiveEndpoint.includes('?') ? '&' : '?';
+            effectiveEndpoint = `${endpoint}${separator}_=${Date.now()}`;
+            return performRequest(true);
+          }
+          
+          console.warn('⚠️ Segunda respuesta 304 recibida. Forzando nueva solicitud con credenciales frescas.');
+          cacheBustingTried = true;
+          effectiveEndpoint = `${endpoint}${endpoint.includes('?') ? '&' : '?'}force=${Date.now()}`;
+          config.cache = 'no-store';
+          config.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
+          config.headers['Pragma'] = 'no-cache';
+          config.headers['If-None-Match'] = '';
+          config.headers['If-Modified-Since'] = 'Thu, 01 Jan 1970 00:00:00 GMT';
+          const reloadResponse = await fetch(`${this.baseURL}${effectiveEndpoint}`, config);
+          console.log('📥 Response status después de forzar:', reloadResponse.status);
+          return parseResponse(reloadResponse);
+        }
+
+        return parseResponse(response);
+      } catch (error) {
+        console.error('❌ Error en API:', error);
+        throw error;
+      } finally {
+        window.pageProgress?.end?.();
+      }
+    };
+
+    return performRequest();
   }
 
   // Guardar token
