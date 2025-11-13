@@ -142,16 +142,10 @@ class FutureLabsAPI {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          Pragma: 'no-cache',
-          'Expires': '0',
-          'If-None-Match': '',
-          'If-Modified-Since': '0',
           ...options.headers
-        }
+        },
+        cache: 'no-store'
       };
-
-      config.cache = 'reload';
 
       // Agregar token si existe
       if (this.token) {
@@ -210,12 +204,10 @@ class FutureLabsAPI {
           console.warn('⚠️ Segunda respuesta 304 recibida. Forzando nueva solicitud con credenciales frescas.');
           cacheBustingTried = true;
           effectiveEndpoint = `${endpoint}${endpoint.includes('?') ? '&' : '?'}force=${Date.now()}`;
-          config.cache = 'no-store';
-          config.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
-          config.headers['Pragma'] = 'no-cache';
-          config.headers['If-None-Match'] = '';
-          config.headers['If-Modified-Since'] = 'Thu, 01 Jan 1970 00:00:00 GMT';
-          const reloadResponse = await fetch(`${this.baseURL}${effectiveEndpoint}`, config);
+          const reloadResponse = await fetch(`${this.baseURL}${effectiveEndpoint}`, {
+            ...config,
+            cache: 'reload'
+          });
           console.log('📥 Response status después de forzar:', reloadResponse.status);
           return parseResponse(reloadResponse);
         }
