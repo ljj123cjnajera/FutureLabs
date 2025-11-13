@@ -266,15 +266,24 @@ class AdminManager {
   }
 
   async loadRecentOrders() {
+    const tbody = document.getElementById('recentOrdersTable');
+    if (!tbody) return;
+    
     try {
       const response = await window.api.request('/admin/orders');
       
       if (response.success) {
         const orders = response.data.orders.slice(0, 10);
-        const tbody = document.getElementById('recentOrdersTable');
         
         if (orders.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;">No hay pedidos</td></tr>';
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="6" style="text-align: center; padding: 40px; color: #999;">
+                <i class="fas fa-shopping-bag" style="opacity: 0.5;"></i>
+                <p style="margin-top: 8px; margin-bottom: 0;">No hay pedidos recientes</p>
+              </td>
+            </tr>
+          `;
           return;
         }
         
@@ -300,31 +309,53 @@ class AdminManager {
 
   // Products
   async loadProducts() {
+    const tbody = document.getElementById('productsTable');
+    if (!tbody) return;
+    
+    // Mostrar estado de carga
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;"><div class="loading-spinner"></div><p style="margin-top: 10px; color: #666;">Cargando productos...</p></td></tr>';
+    
     try {
       const response = await window.api.getProducts();
       
       if (response.success) {
         const products = response.data.products;
-        const tbody = document.getElementById('productsTable');
         
         if (products.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;">No hay productos</td></tr>';
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="7" style="text-align: center; padding: 60px 20px;">
+                <div style="color: #999;">
+                  <i class="fas fa-box-open" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+                  <p style="font-size: 16px; margin: 0;">No hay productos registrados</p>
+                  <p style="font-size: 14px; margin-top: 8px; opacity: 0.7;">Haz clic en "Nuevo Producto" para crear uno</p>
+                </div>
+              </td>
+            </tr>
+          `;
           return;
         }
         
+        // Escapar HTML para prevenir XSS
+        const escapeHtml = (text) => {
+          const div = document.createElement('div');
+          div.textContent = text;
+          return div.innerHTML;
+        };
+        
         tbody.innerHTML = products.map(product => `
               <tr>
-                <td>${product.id.substring(0, 8)}...</td>
-                <td>${product.name}</td>
-                <td>${product.category_name || 'Sin categoría'}</td>
-                <td>S/ ${parseFloat(product.price).toFixed(2)}</td>
-                <td>${product.stock_quantity}</td>
+                <td>${escapeHtml(product.id.substring(0, 8))}...</td>
+                <td>${escapeHtml(product.name)}</td>
+                <td>${escapeHtml(product.category_name || 'Sin categoría')}</td>
+                <td>S/ ${parseFloat(product.price || 0).toFixed(2)}</td>
+                <td>${parseInt(product.stock_quantity || 0)}</td>
                 <td><span class="badge badge-${product.is_active ? 'success' : 'danger'}">${product.is_active ? 'Activo' : 'Inactivo'}</span></td>
                 <td>
-                  <button class="btn-action btn-edit" onclick="window.editProduct('${product.id}')">
+                  <button class="btn-action btn-edit" onclick="window.editProduct('${escapeHtml(product.id)}')" aria-label="Editar producto">
                     <i class="fas fa-edit"></i>
                   </button>
-                  <button class="btn-action btn-delete" onclick="window.deleteProduct('${product.id}')">
+                  <button class="btn-action btn-delete" onclick="window.deleteProduct('${escapeHtml(product.id)}')" aria-label="Eliminar producto">
                     <i class="fas fa-trash"></i>
                   </button>
                 </td>
@@ -336,7 +367,22 @@ class AdminManager {
       }
     } catch (error) {
       console.error('Error loading products:', error);
-      window.notifications.error('Error al cargar productos');
+      const errorMsg = error.message || error.status === 401 ? 'Sesión expirada. Por favor, inicia sesión nuevamente.' : 'Error desconocido al cargar productos';
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align: center; padding: 60px 20px;">
+            <div style="color: #ef4444;">
+              <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 16px; opacity: 0.7;"></i>
+              <p style="font-size: 16px; margin: 0; font-weight: 600;">Error al cargar productos</p>
+              <p style="font-size: 14px; margin-top: 8px; opacity: 0.8;">${errorMsg}</p>
+              <button class="btn-primary" onclick="window.adminManager?.loadProducts()" style="margin-top: 16px;">
+                <i class="fas fa-redo"></i> Reintentar
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+      window.notifications?.error('Error al cargar productos: ' + errorMsg);
     }
   }
 
@@ -358,29 +404,40 @@ class AdminManager {
 
   // Categories
   async loadCategories() {
+    const tbody = document.getElementById('categoriesTable');
+    if (!tbody) return;
+    
+    // Mostrar estado de carga
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px;"><div class="loading-spinner"></div> Cargando categorías...</td></tr>';
+    
     try {
       const response = await window.api.getCategories();
       
       if (response.success) {
         const categories = response.data.categories;
-        const tbody = document.getElementById('categoriesTable');
         
         if (categories.length === 0) {
           tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px;">No hay categorías</td></tr>';
           return;
         }
         
-            tbody.innerHTML = categories.map(category => `
+        const escapeHtml = (text) => {
+          const div = document.createElement('div');
+          div.textContent = text;
+          return div.innerHTML;
+        };
+        
+        tbody.innerHTML = categories.map(category => `
               <tr>
-                <td>${category.id.substring(0, 8)}...</td>
-                <td>${category.name}</td>
-                <td>${category.slug}</td>
-                <td>${category.description || '-'}</td>
+                <td>${escapeHtml(category.id.substring(0, 8))}...</td>
+                <td>${escapeHtml(category.name)}</td>
+                <td>${escapeHtml(category.slug)}</td>
+                <td>${escapeHtml(category.description || '-')}</td>
                 <td>
-                  <button class="btn-action btn-edit" onclick="window.editCategory('${category.id}')">
+                  <button class="btn-action btn-edit" onclick="window.editCategory('${escapeHtml(category.id)}')" aria-label="Editar categoría">
                     <i class="fas fa-edit"></i>
                   </button>
-                  <button class="btn-action btn-delete" onclick="window.deleteCategory('${category.id}')">
+                  <button class="btn-action btn-delete" onclick="window.deleteCategory('${escapeHtml(category.id)}')" aria-label="Eliminar categoría">
                     <i class="fas fa-trash"></i>
                   </button>
                 </td>
@@ -389,34 +446,60 @@ class AdminManager {
       }
     } catch (error) {
       console.error('Error loading categories:', error);
-      window.notifications.error('Error al cargar categorías');
+      const errorMsg = error.message || error.status === 401 ? 'Sesión expirada. Por favor, inicia sesión nuevamente.' : 'Error desconocido al cargar categorías';
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" style="text-align: center; padding: 60px 20px;">
+            <div style="color: #ef4444;">
+              <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 16px; opacity: 0.7;"></i>
+              <p style="font-size: 16px; margin: 0; font-weight: 600;">Error al cargar categorías</p>
+              <p style="font-size: 14px; margin-top: 8px; opacity: 0.8;">${errorMsg}</p>
+              <button class="btn-primary" onclick="window.adminManager?.loadCategories()" style="margin-top: 16px;">
+                <i class="fas fa-redo"></i> Reintentar
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+      window.notifications?.error('Error al cargar categorías: ' + errorMsg);
     }
   }
 
   // Orders
   async loadOrders() {
+    const tbody = document.getElementById('ordersTable');
+    if (!tbody) return;
+    
+    // Mostrar estado de carga
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;"><div class="loading-spinner"></div> Cargando pedidos...</td></tr>';
+    
     try {
       const response = await window.api.request('/admin/orders');
       
       if (response.success) {
         const orders = response.data.orders;
-        const tbody = document.getElementById('ordersTable');
         
         if (orders.length === 0) {
           tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;">No hay pedidos</td></tr>';
           return;
         }
         
+        const escapeHtml = (text) => {
+          const div = document.createElement('div');
+          div.textContent = text;
+          return div.innerHTML;
+        };
+        
         tbody.innerHTML = orders.map(order => `
           <tr>
-            <td>#${order.order_number}</td>
-            <td>${order.first_name} ${order.last_name}</td>
-            <td>S/ ${parseFloat(order.total_amount).toFixed(2)}</td>
+            <td>#${escapeHtml(order.order_number || 'N/A')}</td>
+            <td>${escapeHtml((order.first_name || '') + ' ' + (order.last_name || ''))}</td>
+            <td>S/ ${parseFloat(order.total_amount || 0).toFixed(2)}</td>
             <td><span class="badge badge-${this.getStatusBadgeClass(order.status)}">${this.getStatusText(order.status)}</span></td>
             <td><span class="badge badge-${this.getPaymentBadgeClass(order.payment_status)}">${this.getPaymentText(order.payment_status)}</span></td>
             <td>${new Date(order.created_at).toLocaleDateString('es-PE')}</td>
             <td>
-              <button class="btn-action btn-view" onclick="window.viewOrder('${order.id}')">
+              <button class="btn-action btn-view" onclick="window.viewOrder('${escapeHtml(order.id)}')" aria-label="Ver pedido">
                 <i class="fas fa-eye"></i>
               </button>
             </td>
@@ -425,23 +508,50 @@ class AdminManager {
       }
     } catch (error) {
       console.error('Error loading orders:', error);
-      window.notifications.error('Error al cargar pedidos');
+      const errorMsg = error.message || error.status === 401 ? 'Sesión expirada. Por favor, inicia sesión nuevamente.' : 'Error desconocido al cargar pedidos';
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align: center; padding: 60px 20px;">
+            <div style="color: #ef4444;">
+              <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 16px; opacity: 0.7;"></i>
+              <p style="font-size: 16px; margin: 0; font-weight: 600;">Error al cargar pedidos</p>
+              <p style="font-size: 14px; margin-top: 8px; opacity: 0.8;">${errorMsg}</p>
+              <button class="btn-primary" onclick="window.adminManager?.loadOrders()" style="margin-top: 16px;">
+                <i class="fas fa-redo"></i> Reintentar
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+      window.notifications?.error('Error al cargar pedidos: ' + errorMsg);
     }
   }
 
   // Users
   async loadUsers() {
+    const tbody = document.getElementById('usersTable');
+    if (!tbody) return;
+    
+    // Mostrar estado de carga
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;"><div class="loading-spinner"></div> Cargando usuarios...</td></tr>';
+    
     try {
       const response = await window.api.request('/admin/users');
       
       if (response.success) {
         const users = response.data.users;
-        const tbody = document.getElementById('usersTable');
         
         if (users.length === 0) {
           tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;">No hay usuarios</td></tr>';
           return;
         }
+        
+        // Escapar HTML para prevenir XSS
+        const escapeHtml = (text) => {
+          const div = document.createElement('div');
+          div.textContent = text;
+          return div.innerHTML;
+        };
         
             tbody.innerHTML = users.map(user => `
               <tr>
@@ -461,21 +571,50 @@ class AdminManager {
       }
     } catch (error) {
       console.error('Error loading users:', error);
-      window.notifications.error('Error al cargar usuarios');
+      const errorMsg = error.message || error.status === 401 ? 'Sesión expirada. Por favor, inicia sesión nuevamente.' : 'Error desconocido al cargar usuarios';
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align: center; padding: 60px 20px;">
+            <div style="color: #ef4444;">
+              <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 16px; opacity: 0.7;"></i>
+              <p style="font-size: 16px; margin: 0; font-weight: 600;">Error al cargar usuarios</p>
+              <p style="font-size: 14px; margin-top: 8px; opacity: 0.8;">${errorMsg}</p>
+              <button class="btn-primary" onclick="window.adminManager?.loadUsers()" style="margin-top: 16px;">
+                <i class="fas fa-redo"></i> Reintentar
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+      window.notifications?.error('Error al cargar usuarios: ' + errorMsg);
     }
   }
 
   // Reviews
   async loadReviews() {
+    const tbody = document.getElementById('reviewsTable');
+    if (!tbody) return;
+    
+    // Mostrar estado de carga
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;"><div class="loading-spinner"></div><p style="margin-top: 10px; color: #666;">Cargando reseñas...</p></td></tr>';
+    
     try {
       const response = await window.api.request('/admin/reviews');
       
       if (response.success) {
         const reviews = response.data.reviews;
-        const tbody = document.getElementById('reviewsTable');
         
         if (reviews.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;">No hay reseñas</td></tr>';
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="7" style="text-align: center; padding: 60px 20px;">
+                <div style="color: #999;">
+                  <i class="fas fa-star" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+                  <p style="font-size: 16px; margin: 0;">No hay reseñas registradas</p>
+                </div>
+              </td>
+            </tr>
+          `;
           return;
         }
         
@@ -500,7 +639,22 @@ class AdminManager {
       }
     } catch (error) {
       console.error('Error loading reviews:', error);
-      window.notifications.error('Error al cargar reseñas');
+      const errorMsg = error.message || error.status === 401 ? 'Sesión expirada. Por favor, inicia sesión nuevamente.' : 'Error desconocido al cargar reseñas';
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align: center; padding: 60px 20px;">
+            <div style="color: #ef4444;">
+              <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 16px; opacity: 0.7;"></i>
+              <p style="font-size: 16px; margin: 0; font-weight: 600;">Error al cargar reseñas</p>
+              <p style="font-size: 14px; margin-top: 8px; opacity: 0.8;">${errorMsg}</p>
+              <button class="btn-primary" onclick="window.adminManager?.loadReviews()" style="margin-top: 16px;">
+                <i class="fas fa-redo"></i> Reintentar
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+      window.notifications?.error('Error al cargar reseñas: ' + errorMsg);
     }
   }
 
