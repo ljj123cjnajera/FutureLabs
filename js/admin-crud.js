@@ -270,8 +270,19 @@ class AdminCRUD {
       } catch (error) {
         console.error('Error loading product for edit:', error);
         const overlay = document.getElementById('productModalLoading');
-        if (overlay) overlay.remove();
-        modal.style.display = 'none';
+        if (overlay) {
+          overlay.innerHTML = `
+            <div style="text-align:center; max-width: 280px; color:#ef4444;">
+              <i class="fas fa-exclamation-triangle" style="font-size:32px; margin-bottom:12px;"></i>
+              <p style="margin:0; font-weight:600;">No pudimos cargar el producto.</p>
+              <p style="margin-top:8px; font-size:13px; color:#b91c1c;">${error.message || 'Error desconocido'}</p>
+              <button class="btn-primary" style="margin-top:12px;" onclick="window.adminCRUD?.retryLoadProduct('${id}')">
+                <i class="fas fa-redo"></i> Reintentar
+              </button>
+            </div>
+          `;
+        }
+        console.error('Error stack:', error?.stack || error);
         window.notifications?.error('Error al cargar producto: ' + (error.message || 'Error desconocido'));
       } finally {
         this.isLoading = false;
@@ -683,6 +694,31 @@ class AdminCRUD {
     console.log('📦 Product fetched from API:', product);
     
     return product;
+  }
+
+  async retryLoadProduct(id) {
+    const modal = document.getElementById('productModal');
+    if (!modal) return;
+    const overlay = document.getElementById('productModalLoading');
+    if (overlay) {
+      overlay.innerHTML = '<div style="text-align:center;"><div class="loading-spinner"></div><p style="margin-top:16px;">Reintentando...</p></div>';
+    }
+    try {
+      await this.loadProductForEdit(id);
+      const retryOverlay = document.getElementById('productModalLoading');
+      if (retryOverlay) retryOverlay.remove();
+    } catch (error) {
+      console.error('❌ Falló el reintento de carga de producto:', error);
+      if (overlay) {
+        overlay.innerHTML = `
+          <div style="text-align:center; max-width: 280px; color:#ef4444;">
+            <i class="fas fa-exclamation-triangle" style="font-size:32px; margin-bottom:12px;"></i>
+            <p style="margin:0; font-weight:600;">No fue posible cargar el producto.</p>
+            <p style="margin-top:8px; font-size:13px; color:#b91c1c;">${error.message || 'Error desconocido'}</p>
+          </div>
+        `;
+      }
+    }
   }
 
   populateProductForm(product) {
