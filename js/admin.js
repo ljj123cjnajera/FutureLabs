@@ -320,6 +320,9 @@ class AdminManager {
       
       if (response.success) {
         const products = response.data.products;
+        if (Array.isArray(products)) {
+          window.adminCRUD.productsCache = products;
+        }
         
         if (products.length === 0) {
           tbody.innerHTML = `

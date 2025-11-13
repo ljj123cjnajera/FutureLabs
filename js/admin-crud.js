@@ -4,6 +4,7 @@ class AdminCRUD {
     this.currentEditId = null;
     this.isInitialized = false;
     this.isLoading = false; // Prevenir múltiples operaciones simultáneas
+    this.productsCache = [];
     this.init();
   }
 
@@ -38,6 +39,17 @@ class AdminCRUD {
       // No hacer nada si hay una operación en curso
       if (this.isLoading) {
         e.stopPropagation();
+        e.preventDefault();
+        return false;
+      }
+      
+      // Ignorar clicks en botones de acción (editar, eliminar, etc.)
+      if (e.target.closest('.btn-action') || e.target.closest('.btn-edit') || e.target.closest('.btn-delete')) {
+        return;
+      }
+      
+      // Ignorar clicks dentro de cualquier tabla
+      if (e.target.closest('table') || e.target.closest('tbody') || e.target.closest('tr') || e.target.closest('td')) {
         return;
       }
       
@@ -49,19 +61,19 @@ class AdminCRUD {
           e.preventDefault();
           e.stopPropagation();
           this.closeModal(modal);
-          return;
+          return false;
         }
       }
       
       // Solo cerrar si se hace click directamente en el backdrop del modal (no en su contenido)
       const modal = e.target.closest('.modal');
-      if (modal) {
+      if (modal && modal.style.display === 'flex') {
         // Verificar que el click fue directamente en el backdrop (no en ningún hijo)
         // e.target debe ser el modal mismo, no un elemento dentro
         if (e.target === modal) {
           const modalContent = modal.querySelector('.modal-content');
           // Solo cerrar si NO hay contenido o si el click fue fuera del contenido
-          if (!modalContent || !modalContent.contains(e.target)) {
+          if (modalContent && !modalContent.contains(e.target)) {
             // Verificar que no se esté haciendo click en el overlay de loading
             const loadingOverlay = modal.querySelector('[id$="ModalLoading"]');
             if (!loadingOverlay) {
@@ -70,7 +82,7 @@ class AdminCRUD {
           }
         }
       }
-    });
+    }, true); // Usar capture phase para capturar antes que otros listeners
     
     // Prevenir que ESC cierre el modal durante carga
     document.addEventListener('keydown', (e) => {
@@ -239,7 +251,11 @@ class AdminCRUD {
         const modalCheckInterval = setInterval(keepModalOpen, 50);
         
         try {
-          await this.loadProductForEdit(id);
+          const cachedProduct = Array.isArray(this.productsCache)
+            ? this.productsCache.find(product => product.id === id)
+            : null;
+          
+          await this.loadProductForEdit(id, { product: cachedProduct });
           
           // Verificar nuevamente que el modal sigue abierto
           if (modal.style.display !== 'flex') {
@@ -644,99 +660,126 @@ class AdminCRUD {
   }
 
   // ===== PRODUCTS =====
-  async loadProductForEdit(id) {
+  async loadProductForEdit(id, options = {}) {
     try {
       console.log('🔍 Loading product for edit:', id);
       
-      // Usar el endpoint correcto para admin
-      const response = await window.api.request(`/admin/products/${id}`);
+      let product = options.product;
       
-      console.log('📦 Product response:', response);
-      
-      if (!response) {
-        throw new Error('No se recibió respuesta del servidor');
-      }
-      
-      if (!response.success) {
-        throw new Error(response?.message || response?.error || 'Error al obtener producto');
-      }
-      
-      // Manejar diferentes formatos de respuesta
-      const product = response.data?.product || response.data || response.product;
       if (!product) {
-        console.error('❌ Product data structure:', response);
-        throw new Error('Producto no encontrado en la respuesta');
+        product = await this.fetchProductForEdit(id);
+      } else {
+        console.log('📦 Using cached product data');
       }
       
-      console.log('✅ Product loaded:', product);
-      
-      // Verificar que los elementos existan antes de asignar valores
-      const nameInput = document.getElementById('productName');
-      const slugInput = document.getElementById('productSlug');
-      const descInput = document.getElementById('productDescription');
-      const priceInput = document.getElementById('productPrice');
-      const discountPriceInput = document.getElementById('productDiscountPrice');
-      const stockInput = document.getElementById('productStock');
-      const categoryInput = document.getElementById('productCategory');
-      const brandInput = document.getElementById('productBrand');
-      const skuInput = document.getElementById('productSKU');
-      const imageInput = document.getElementById('productImage');
-      const previewImage = document.getElementById('previewImage');
-      const imageContainer = document.getElementById('imagePreviewContainer');
-      const imageFileName = document.getElementById('imageFileName');
-      const weightInput = document.getElementById('productWeight');
-      const dimensionsInput = document.getElementById('productDimensions');
-      const isActiveInput = document.getElementById('productIsActive');
-      
-      if (!nameInput || !slugInput || !priceInput || !stockInput || !categoryInput) {
-        throw new Error('Algunos campos del formulario no se encontraron');
-      }
-      
-      nameInput.value = product.name || '';
-      slugInput.value = product.slug || '';
-      slugInput.dataset.manualEdit = 'true';
-      
-      if (descInput) descInput.value = product.description || '';
-      priceInput.value = product.price || '';
-      if (discountPriceInput) discountPriceInput.value = product.discount_price || '';
-      stockInput.value = product.stock_quantity || 0;
-      categoryInput.value = product.category_id || '';
-      if (brandInput) brandInput.value = product.brand || '';
-      if (skuInput) skuInput.value = product.sku || '';
-      
-      // Mostrar imagen existente si hay
-      if (product.image_url && imageInput && previewImage && imageContainer && imageFileName) {
-        imageInput.value = product.image_url;
-        previewImage.src = product.image_url;
-        imageContainer.style.display = 'block';
-        imageFileName.textContent = 'Imagen actual';
-      }
-      
-      // Cargar weight y dimensions desde specifications si existen
-      if (weightInput || dimensionsInput) {
-        let weight = '';
-        let dimensions = '';
-        if (product.specifications) {
-          try {
-            const specs = typeof product.specifications === 'string' 
-              ? JSON.parse(product.specifications) 
-              : product.specifications;
-            weight = specs.weight || '';
-            dimensions = specs.dimensions || '';
-          } catch (e) {
-            console.log('Error parsing specifications:', e);
-          }
-        }
-        if (weightInput) weightInput.value = weight;
-        if (dimensionsInput) dimensionsInput.value = dimensions;
-      }
-      
-      if (isActiveInput) {
-        isActiveInput.checked = product.is_active !== false;
-      }
+      this.populateProductForm(product);
     } catch (error) {
       console.error('Error loading product for edit:', error);
       throw error; // Re-lanzar para que el caller maneje el error
+    }
+  }
+
+  async fetchProductForEdit(id) {
+    const response = await window.api.request(`/admin/products/${id}`);
+    
+    if (!response || !response.success) {
+      throw new Error(response?.message || response?.error || 'Error al obtener producto');
+    }
+    
+    const product = response.data?.product || response.data || response.product;
+    if (!product) {
+      throw new Error('Producto no encontrado en la respuesta');
+    }
+    
+    console.log('📦 Product fetched from API:', product);
+    
+    if (Array.isArray(this.productsCache)) {
+      const existingIndex = this.productsCache.findIndex(item => item.id === product.id);
+      if (existingIndex >= 0) {
+        this.productsCache[existingIndex] = { ...this.productsCache[existingIndex], ...product };
+      } else {
+        this.productsCache.push(product);
+      }
+    }
+    
+    return product;
+  }
+
+  populateProductForm(product) {
+    if (!product) {
+      throw new Error('Datos de producto no disponibles');
+    }
+    
+    // Verificar que los elementos existan antes de asignar valores
+    const nameInput = document.getElementById('productName');
+    const slugInput = document.getElementById('productSlug');
+    const descInput = document.getElementById('productDescription');
+    const priceInput = document.getElementById('productPrice');
+    const discountPriceInput = document.getElementById('productDiscountPrice');
+    const stockInput = document.getElementById('productStock');
+    const categoryInput = document.getElementById('productCategory');
+    const brandInput = document.getElementById('productBrand');
+    const skuInput = document.getElementById('productSKU');
+    const imageInput = document.getElementById('productImage');
+    const previewImage = document.getElementById('previewImage');
+    const imageContainer = document.getElementById('imagePreviewContainer');
+    const imageFileName = document.getElementById('imageFileName');
+    const weightInput = document.getElementById('productWeight');
+    const dimensionsInput = document.getElementById('productDimensions');
+    const isActiveInput = document.getElementById('productIsActive');
+    
+    if (!nameInput || !slugInput || !priceInput || !stockInput || !categoryInput) {
+      throw new Error('Algunos campos del formulario no se encontraron');
+    }
+    
+    nameInput.value = product.name || '';
+    slugInput.value = product.slug || '';
+    slugInput.dataset.manualEdit = 'true';
+    
+    if (descInput) descInput.value = product.description || '';
+    priceInput.value = product.price || '';
+    if (discountPriceInput) discountPriceInput.value = product.discount_price || '';
+    stockInput.value = product.stock_quantity || 0;
+    categoryInput.value = product.category_id || '';
+    if (brandInput) brandInput.value = product.brand || '';
+    if (skuInput) skuInput.value = product.sku || '';
+    
+    // Mostrar imagen existente si hay
+    if (imageContainer && previewImage && imageFileName) {
+      if (product.image_url) {
+        if (imageInput) imageInput.value = product.image_url;
+        previewImage.src = product.image_url;
+        imageContainer.style.display = 'block';
+        imageFileName.textContent = 'Imagen actual';
+      } else {
+        if (imageInput) imageInput.value = '';
+        previewImage.src = '';
+        imageContainer.style.display = 'none';
+        imageFileName.textContent = '';
+      }
+    }
+    
+    // Cargar weight y dimensions desde specifications si existen
+    if (weightInput || dimensionsInput) {
+      let weight = '';
+      let dimensions = '';
+      if (product.specifications) {
+        try {
+          const specs = typeof product.specifications === 'string' 
+            ? JSON.parse(product.specifications) 
+            : product.specifications;
+          weight = specs.weight || '';
+          dimensions = specs.dimensions || '';
+        } catch (e) {
+          console.log('Error parsing specifications:', e);
+        }
+      }
+      if (weightInput) weightInput.value = weight;
+      if (dimensionsInput) dimensionsInput.value = dimensions;
+    }
+    
+    if (isActiveInput) {
+      isActiveInput.checked = product.is_active !== false;
     }
   }
 
