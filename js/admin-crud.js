@@ -630,16 +630,23 @@ class AdminCRUD {
   // ===== PRODUCTS =====
   async loadProductForEdit(id) {
     try {
-      const response = await window.api.request(`/products/${id}`);
+      console.log('🔍 Loading product for edit:', id);
+      
+      // Usar el endpoint correcto para admin
+      const response = await window.api.request(`/admin/products/${id}`);
+      
+      console.log('📦 Product response:', response);
       
       if (!response || !response.success) {
         throw new Error(response?.message || response?.error || 'Error al obtener producto');
       }
       
-      const product = response.data?.product;
+      const product = response.data?.product || response.data;
       if (!product) {
         throw new Error('Producto no encontrado');
       }
+      
+      console.log('✅ Product loaded:', product);
       
       // Verificar que los elementos existan antes de asignar valores
       const nameInput = document.getElementById('productName');
