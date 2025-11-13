@@ -2,10 +2,18 @@
 class AdminCRUD {
   constructor() {
     this.currentEditId = null;
+    this.isInitialized = false;
+    this.isLoading = false; // Prevenir múltiples operaciones simultáneas
     this.init();
   }
 
   init() {
+    // Prevenir múltiples inicializaciones
+    if (this.isInitialized) {
+      console.warn('AdminCRUD ya está inicializado');
+      return;
+    }
+    
     // Setup modales
     this.setupModals();
     
@@ -14,6 +22,22 @@ class AdminCRUD {
     
     // Generación automática de slug
     this.setupSlugGeneration();
+    
+    // Setup cierre de modales al hacer click fuera
+    this.setupModalBackdrop();
+    
+    this.isInitialized = true;
+  }
+  
+  setupModalBackdrop() {
+    // Cerrar modal al hacer click en el backdrop (fuera del contenido)
+    document.querySelectorAll('.modal').forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.style.display = 'none';
+        }
+      });
+    });
   }
 
   setupSlugGeneration() {
@@ -66,10 +90,48 @@ class AdminCRUD {
     };
 
     this.editProduct = async (id) => {
-      this.currentEditId = id;
-      await this.loadProductForEdit(id);
-      document.getElementById('productModalTitle').textContent = 'Editar Producto';
-      document.getElementById('productModal').style.display = 'flex';
+      if (this.isLoading) {
+        window.notifications?.warning('Por favor espera, hay una operación en curso...');
+        return;
+      }
+      
+      this.isLoading = true;
+      const modal = document.getElementById('productModal');
+      if (!modal) {
+        console.error('Modal de producto no encontrado');
+        this.isLoading = false;
+        return;
+      }
+      
+      try {
+        this.currentEditId = id;
+        document.getElementById('productModalTitle').textContent = 'Editar Producto';
+        
+        // Mostrar loading overlay sin reemplazar el contenido completo
+        const modalContent = modal.querySelector('.modal-content');
+        const loadingOverlay = document.createElement('div');
+        loadingOverlay.id = 'productModalLoading';
+        loadingOverlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000;';
+        loadingOverlay.innerHTML = '<div style="text-align: center;"><div class="loading-spinner"></div><p style="margin-top: 16px;">Cargando producto...</p></div>';
+        modalContent.style.position = 'relative';
+        modalContent.appendChild(loadingOverlay);
+        
+        modal.style.display = 'flex';
+        
+        await this.loadProductForEdit(id);
+        
+        // Remover loading overlay
+        const overlay = document.getElementById('productModalLoading');
+        if (overlay) overlay.remove();
+      } catch (error) {
+        console.error('Error loading product for edit:', error);
+        const overlay = document.getElementById('productModalLoading');
+        if (overlay) overlay.remove();
+        modal.style.display = 'none';
+        window.notifications?.error('Error al cargar producto: ' + (error.message || 'Error desconocido'));
+      } finally {
+        this.isLoading = false;
+      }
     };
 
     this.deleteProduct = async (id) => {
@@ -100,10 +162,48 @@ class AdminCRUD {
     };
 
     this.editCategory = async (id) => {
-      this.currentEditId = id;
-      await this.loadCategoryForEdit(id);
-      document.getElementById('categoryModalTitle').textContent = 'Editar Categoría';
-      document.getElementById('categoryModal').style.display = 'flex';
+      if (this.isLoading) {
+        window.notifications?.warning('Por favor espera, hay una operación en curso...');
+        return;
+      }
+      
+      this.isLoading = true;
+      const modal = document.getElementById('categoryModal');
+      if (!modal) {
+        console.error('Modal de categoría no encontrado');
+        this.isLoading = false;
+        return;
+      }
+      
+      try {
+        this.currentEditId = id;
+        document.getElementById('categoryModalTitle').textContent = 'Editar Categoría';
+        
+        // Mostrar loading overlay sin reemplazar el contenido completo
+        const modalContent = modal.querySelector('.modal-content');
+        const loadingOverlay = document.createElement('div');
+        loadingOverlay.id = 'categoryModalLoading';
+        loadingOverlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000;';
+        loadingOverlay.innerHTML = '<div style="text-align: center;"><div class="loading-spinner"></div><p style="margin-top: 16px;">Cargando categoría...</p></div>';
+        modalContent.style.position = 'relative';
+        modalContent.appendChild(loadingOverlay);
+        
+        modal.style.display = 'flex';
+        
+        await this.loadCategoryForEdit(id);
+        
+        // Remover loading overlay
+        const overlay = document.getElementById('categoryModalLoading');
+        if (overlay) overlay.remove();
+      } catch (error) {
+        console.error('Error loading category for edit:', error);
+        const overlay = document.getElementById('categoryModalLoading');
+        if (overlay) overlay.remove();
+        modal.style.display = 'none';
+        window.notifications?.error('Error al cargar categoría: ' + (error.message || 'Error desconocido'));
+      } finally {
+        this.isLoading = false;
+      }
     };
 
     this.deleteCategory = async (id) => {
@@ -127,18 +227,94 @@ class AdminCRUD {
 
     // User Modal
     this.editUser = async (id) => {
-      this.currentEditId = id;
-      await this.loadUserForEdit(id);
-      document.getElementById('userModalTitle').textContent = 'Editar Usuario';
-      document.getElementById('userModal').style.display = 'flex';
+      if (this.isLoading) {
+        window.notifications?.warning('Por favor espera, hay una operación en curso...');
+        return;
+      }
+      
+      this.isLoading = true;
+      const modal = document.getElementById('userModal');
+      if (!modal) {
+        console.error('Modal de usuario no encontrado');
+        this.isLoading = false;
+        return;
+      }
+      
+      try {
+        this.currentEditId = id;
+        document.getElementById('userModalTitle').textContent = 'Editar Usuario';
+        
+        // Mostrar loading overlay sin reemplazar el contenido completo
+        const modalContent = modal.querySelector('.modal-content');
+        const loadingOverlay = document.createElement('div');
+        loadingOverlay.id = 'userModalLoading';
+        loadingOverlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000;';
+        loadingOverlay.innerHTML = '<div style="text-align: center;"><div class="loading-spinner"></div><p style="margin-top: 16px;">Cargando usuario...</p></div>';
+        modalContent.style.position = 'relative';
+        modalContent.appendChild(loadingOverlay);
+        
+        modal.style.display = 'flex';
+        
+        await this.loadUserForEdit(id);
+        
+        // Remover loading overlay
+        const overlay = document.getElementById('userModalLoading');
+        if (overlay) overlay.remove();
+      } catch (error) {
+        console.error('Error loading user for edit:', error);
+        const overlay = document.getElementById('userModalLoading');
+        if (overlay) overlay.remove();
+        modal.style.display = 'none';
+        window.notifications?.error('Error al cargar usuario: ' + (error.message || 'Error desconocido'));
+      } finally {
+        this.isLoading = false;
+      }
     };
 
     // Review Modal
     this.editReview = async (id) => {
-      this.currentEditId = id;
-      await this.loadReviewForEdit(id);
-      document.getElementById('reviewModalTitle').textContent = 'Editar Reseña';
-      document.getElementById('reviewModal').style.display = 'flex';
+      if (this.isLoading) {
+        window.notifications?.warning('Por favor espera, hay una operación en curso...');
+        return;
+      }
+      
+      this.isLoading = true;
+      const modal = document.getElementById('reviewModal');
+      if (!modal) {
+        console.error('Modal de reseña no encontrado');
+        this.isLoading = false;
+        return;
+      }
+      
+      try {
+        this.currentEditId = id;
+        document.getElementById('reviewModalTitle').textContent = 'Editar Reseña';
+        
+        // Mostrar loading overlay sin reemplazar el contenido completo
+        const modalContent = modal.querySelector('.modal-content');
+        const loadingOverlay = document.createElement('div');
+        loadingOverlay.id = 'reviewModalLoading';
+        loadingOverlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000;';
+        loadingOverlay.innerHTML = '<div style="text-align: center;"><div class="loading-spinner"></div><p style="margin-top: 16px;">Cargando reseña...</p></div>';
+        modalContent.style.position = 'relative';
+        modalContent.appendChild(loadingOverlay);
+        
+        modal.style.display = 'flex';
+        
+        await this.loadReviewForEdit(id);
+        
+        // Remover loading overlay
+        const overlay = document.getElementById('reviewModalLoading');
+        if (overlay) overlay.remove();
+      } catch (error) {
+        console.error('Error loading review for edit:', error);
+        const overlay = document.getElementById('reviewModalLoading');
+        if (overlay) overlay.remove();
+        modal.style.display = 'none';
+        window.notifications?.error('Error al cargar reseña: ' + (error.message || 'Error desconocido'));
+      } finally {
+        this.isLoading = false;
+      }
     };
 
     this.deleteReview = async (id) => {
@@ -166,20 +342,37 @@ class AdminCRUD {
       document.getElementById('orderModal').style.display = 'flex';
     };
 
-    // Close modals
-    document.querySelectorAll('.modal-close').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.target.closest('.modal').style.display = 'none';
-      });
+    // Close modals - Usar delegación de eventos para evitar múltiples listeners
+    document.body.addEventListener('click', (e) => {
+      if (e.target.classList.contains('modal-close') || e.target.closest('.modal-close')) {
+        const modal = e.target.closest('.modal') || e.target.closest('.modal-close')?.closest('.modal');
+        if (modal) {
+          modal.style.display = 'none';
+          // Limpiar errores de validación al cerrar
+          modal.querySelectorAll('.error-message').forEach(err => err.remove());
+          modal.querySelectorAll('input, select, textarea').forEach(input => {
+            input.style.borderColor = '';
+          });
+        }
+      }
     });
   }
 
   setupForms() {
+    // Usar una bandera para evitar múltiples listeners
+    if (this.formsSetup) return;
+    
     // Product Form
-    document.getElementById('productForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      await this.saveProduct();
-    });
+    const productForm = document.getElementById('productForm');
+    if (productForm && !productForm.dataset.listenerAdded) {
+      productForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (this.isLoading) return;
+        await this.saveProduct();
+      }, { once: false });
+      productForm.dataset.listenerAdded = 'true';
+    }
 
     // Preview de imagen en modal de productos
     const imageFileInput = document.getElementById('productImageFile');
@@ -200,22 +393,42 @@ class AdminCRUD {
     }
 
     // Category Form
-    document.getElementById('categoryForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      await this.saveCategory();
-    });
+    const categoryForm = document.getElementById('categoryForm');
+    if (categoryForm && !categoryForm.dataset.listenerAdded) {
+      categoryForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (this.isLoading) return;
+        await this.saveCategory();
+      }, { once: false });
+      categoryForm.dataset.listenerAdded = 'true';
+    }
 
     // User Form
-    document.getElementById('userForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      await this.saveUser();
-    });
+    const userForm = document.getElementById('userForm');
+    if (userForm && !userForm.dataset.listenerAdded) {
+      userForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (this.isLoading) return;
+        await this.saveUser();
+      }, { once: false });
+      userForm.dataset.listenerAdded = 'true';
+    }
 
     // Review Form
-    document.getElementById('reviewForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      await this.saveReview();
-    });
+    const reviewForm = document.getElementById('reviewForm');
+    if (reviewForm && !reviewForm.dataset.listenerAdded) {
+      reviewForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (this.isLoading) return;
+        await this.saveReview();
+      }, { once: false });
+      reviewForm.dataset.listenerAdded = 'true';
+    }
+    
+    this.formsSetup = true;
   }
 
   // ===== PRODUCTS =====
@@ -223,32 +436,59 @@ class AdminCRUD {
     try {
       const response = await window.api.request(`/products/${id}`);
       
-      if (response.success) {
-        const product = response.data.product;
-        document.getElementById('productName').value = product.name;
-        document.getElementById('productSlug').value = product.slug;
-        // Marcar slug como editado manualmente al cargar para edición
-        const slugInput = document.getElementById('productSlug');
-        if (slugInput) {
-          slugInput.dataset.manualEdit = 'true';
-        }
-        document.getElementById('productDescription').value = product.description || '';
-        document.getElementById('productPrice').value = product.price;
-        document.getElementById('productDiscountPrice').value = product.discount_price || '';
-        document.getElementById('productStock').value = product.stock_quantity;
-        document.getElementById('productCategory').value = product.category_id;
-        document.getElementById('productBrand').value = product.brand || '';
-        document.getElementById('productSKU').value = product.sku || '';
-        
-        // Mostrar imagen existente si hay
-        if (product.image_url) {
-          document.getElementById('productImage').value = product.image_url;
-          document.getElementById('previewImage').src = product.image_url;
-          document.getElementById('imagePreviewContainer').style.display = 'block';
-          document.getElementById('imageFileName').textContent = 'Imagen actual';
-        }
-        
-        // Cargar weight y dimensions desde specifications si existen
+      if (!response || !response.success) {
+        throw new Error(response?.message || response?.error || 'Error al obtener producto');
+      }
+      
+      const product = response.data?.product;
+      if (!product) {
+        throw new Error('Producto no encontrado');
+      }
+      
+      // Verificar que los elementos existan antes de asignar valores
+      const nameInput = document.getElementById('productName');
+      const slugInput = document.getElementById('productSlug');
+      const descInput = document.getElementById('productDescription');
+      const priceInput = document.getElementById('productPrice');
+      const discountPriceInput = document.getElementById('productDiscountPrice');
+      const stockInput = document.getElementById('productStock');
+      const categoryInput = document.getElementById('productCategory');
+      const brandInput = document.getElementById('productBrand');
+      const skuInput = document.getElementById('productSKU');
+      const imageInput = document.getElementById('productImage');
+      const previewImage = document.getElementById('previewImage');
+      const imageContainer = document.getElementById('imagePreviewContainer');
+      const imageFileName = document.getElementById('imageFileName');
+      const weightInput = document.getElementById('productWeight');
+      const dimensionsInput = document.getElementById('productDimensions');
+      const isActiveInput = document.getElementById('productIsActive');
+      
+      if (!nameInput || !slugInput || !priceInput || !stockInput || !categoryInput) {
+        throw new Error('Algunos campos del formulario no se encontraron');
+      }
+      
+      nameInput.value = product.name || '';
+      slugInput.value = product.slug || '';
+      slugInput.dataset.manualEdit = 'true';
+      
+      if (descInput) descInput.value = product.description || '';
+      priceInput.value = product.price || '';
+      if (discountPriceInput) discountPriceInput.value = product.discount_price || '';
+      stockInput.value = product.stock_quantity || 0;
+      categoryInput.value = product.category_id || '';
+      if (brandInput) brandInput.value = product.brand || '';
+      if (skuInput) skuInput.value = product.sku || '';
+      
+      // Mostrar imagen existente si hay
+      if (product.image_url && imageInput && previewImage && imageContainer && imageFileName) {
+        imageInput.value = product.image_url;
+        previewImage.src = product.image_url;
+        imageContainer.style.display = 'block';
+        imageFileName.textContent = 'Imagen actual';
+      }
+      
+      // Cargar weight y dimensions desde specifications si existen
+      if (weightInput || dimensionsInput) {
         let weight = '';
         let dimensions = '';
         if (product.specifications) {
@@ -262,16 +502,27 @@ class AdminCRUD {
             console.log('Error parsing specifications:', e);
           }
         }
-        document.getElementById('productWeight').value = weight;
-        document.getElementById('productDimensions').value = dimensions;
-        document.getElementById('productIsActive').checked = product.is_active !== false;
+        if (weightInput) weightInput.value = weight;
+        if (dimensionsInput) dimensionsInput.value = dimensions;
+      }
+      
+      if (isActiveInput) {
+        isActiveInput.checked = product.is_active !== false;
       }
     } catch (error) {
-      window.notifications.error('Error al cargar producto');
+      console.error('Error loading product for edit:', error);
+      throw error; // Re-lanzar para que el caller maneje el error
     }
   }
 
   async saveProduct() {
+    if (this.isLoading) {
+      window.notifications?.warning('Por favor espera, hay una operación en curso...');
+      return;
+    }
+    
+    this.isLoading = true;
+    
     // Obtener elementos del formulario
     const nameInput = document.getElementById('productName');
     const slugInput = document.getElementById('productSlug');
@@ -500,6 +751,13 @@ class AdminCRUD {
   }
 
   async saveCategory() {
+    if (this.isLoading) {
+      window.notifications?.warning('Por favor espera, hay una operación en curso...');
+      return;
+    }
+    
+    this.isLoading = true;
+    
     // Obtener elementos del formulario
     const nameInput = document.getElementById('categoryName');
     const slugInput = document.getElementById('categorySlug');
@@ -544,6 +802,7 @@ class AdminCRUD {
     
     if (hasErrors) {
       window.notifications?.error('Por favor, corrige los errores en el formulario');
+      this.isLoading = false;
       return;
     }
 
@@ -594,6 +853,7 @@ class AdminCRUD {
         submitBtn.disabled = false;
         submitBtn.textContent = originalBtnText || 'Guardar';
       }
+      this.isLoading = false;
     }
   }
 
