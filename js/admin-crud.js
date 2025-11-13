@@ -154,6 +154,13 @@ class AdminCRUD {
         return;
       }
       
+      // Validar que el ID existe
+      if (!id) {
+        console.error('ID de producto no proporcionado');
+        window.notifications?.error('Error: ID de producto no válido');
+        return;
+      }
+      
       this.isLoading = true;
       const modal = document.getElementById('productModal');
       if (!modal) {
@@ -164,12 +171,28 @@ class AdminCRUD {
       
       try {
         this.currentEditId = id;
-        document.getElementById('productModalTitle').textContent = 'Editar Producto';
+        const modalTitle = document.getElementById('productModalTitle');
+        if (modalTitle) {
+          modalTitle.textContent = 'Editar Producto';
+        }
+        
+        // Cerrar cualquier modal abierto previamente
+        document.querySelectorAll('.modal').forEach(m => {
+          if (m !== modal && m.style.display === 'flex') {
+            m.style.display = 'none';
+          }
+        });
         
         // Mostrar loading overlay sin reemplazar el contenido completo
         const modalContent = modal.querySelector('.modal-content');
         if (!modalContent) {
           throw new Error('Contenido del modal no encontrado');
+        }
+        
+        // Remover cualquier overlay previo
+        const existingOverlay = document.getElementById('productModalLoading');
+        if (existingOverlay) {
+          existingOverlay.remove();
         }
         
         const loadingOverlay = document.createElement('div');
@@ -180,6 +203,7 @@ class AdminCRUD {
         // Prevenir que clicks en el overlay cierren el modal
         loadingOverlay.addEventListener('click', (e) => {
           e.stopPropagation();
+          e.preventDefault();
         });
         
         // Asegurar que modal-content tenga position relative
@@ -192,12 +216,26 @@ class AdminCRUD {
         modal.style.display = 'flex';
         
         // Pequeño delay para asegurar que el modal esté completamente renderizado
-        await new Promise(resolve => setTimeout(resolve, 150));
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
+        // Verificar que el modal sigue abierto
+        if (modal.style.display !== 'flex') {
+          console.warn('Modal se cerró antes de agregar overlay');
+          this.isLoading = false;
+          return;
+        }
         
         // Agregar overlay después de que el modal esté visible
         modalContent.appendChild(loadingOverlay);
         
         await this.loadProductForEdit(id);
+        
+        // Verificar nuevamente que el modal sigue abierto
+        if (modal.style.display !== 'flex') {
+          console.warn('Modal se cerró durante la carga');
+          this.isLoading = false;
+          return;
+        }
         
         // Remover loading overlay
         const overlay = document.getElementById('productModalLoading');

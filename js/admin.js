@@ -352,7 +352,7 @@ class AdminManager {
                 <td>${parseInt(product.stock_quantity || 0)}</td>
                 <td><span class="badge badge-${product.is_active ? 'success' : 'danger'}">${product.is_active ? 'Activo' : 'Inactivo'}</span></td>
                 <td>
-                  <button class="btn-action btn-edit" onclick="window.editProduct('${escapeHtml(product.id)}')" aria-label="Editar producto">
+                  <button class="btn-action btn-edit" onclick="window.editProduct('${escapeHtml(product.id)}', event)" aria-label="Editar producto">
                     <i class="fas fa-edit"></i>
                   </button>
                   <button class="btn-action btn-delete" onclick="window.deleteProduct('${escapeHtml(product.id)}')" aria-label="Eliminar producto">
@@ -747,9 +747,21 @@ async function viewOrder(orderId) {
   }
 }
 
-function editProduct(productId) {
+function editProduct(productId, event) {
+  // Prevenir propagación del evento para evitar que se cierre el modal
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  
   if (window.adminCRUD && window.adminCRUD.editProduct) {
-    window.adminCRUD.editProduct(productId);
+    // Usar setTimeout para asegurar que el evento se complete antes de abrir el modal
+    setTimeout(() => {
+      window.adminCRUD.editProduct(productId);
+    }, 10);
+  } else {
+    console.error('adminCRUD no está disponible');
+    window.notifications?.error('Error: El sistema de administración no está inicializado');
   }
 }
 
