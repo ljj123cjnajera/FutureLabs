@@ -35,9 +35,13 @@ class AdminCRUD {
     
     // Usar delegación de eventos en el body para evitar múltiples listeners
     document.body.addEventListener('click', (e) => {
+      // No hacer nada si hay una operación en curso
+      if (this.isLoading) return;
+      
       // Manejar cierre con botón modal-close
-      if (e.target.classList.contains('modal-close') || e.target.closest('.modal-close')) {
-        const modal = e.target.closest('.modal') || e.target.closest('.modal-close')?.closest('.modal');
+      const closeBtn = e.target.closest('.modal-close');
+      if (closeBtn) {
+        const modal = closeBtn.closest('.modal');
         if (modal) {
           e.preventDefault();
           e.stopPropagation();
@@ -48,24 +52,30 @@ class AdminCRUD {
       
       // Solo cerrar si se hace click directamente en el backdrop del modal (no en su contenido)
       const modal = e.target.closest('.modal');
-      if (modal && e.target === modal) {
-        // Asegurar que NO se está haciendo click dentro del modal-content
-        const modalContent = modal.querySelector('.modal-content');
-        if (modalContent && !modalContent.contains(e.target)) {
-          // Verificar que no se esté haciendo click en el overlay de loading
-          const loadingOverlay = modal.querySelector('[id$="ModalLoading"]');
-          if (!loadingOverlay || !loadingOverlay.contains(e.target)) {
-            this.closeModal(modal);
+      if (modal) {
+        // Verificar que el click fue directamente en el backdrop (no en ningún hijo)
+        // e.target debe ser el modal mismo, no un elemento dentro
+        if (e.target === modal) {
+          const modalContent = modal.querySelector('.modal-content');
+          // Solo cerrar si NO hay contenido o si el click fue fuera del contenido
+          if (!modalContent || !modalContent.contains(e.target)) {
+            // Verificar que no se esté haciendo click en el overlay de loading
+            const loadingOverlay = modal.querySelector('[id$="ModalLoading"]');
+            if (!loadingOverlay) {
+              this.closeModal(modal);
+            }
           }
         }
       }
-    });
+    }, true); // Usar capture phase para capturar antes que otros listeners
     
     // Prevenir que ESC cierre el modal durante carga
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && !this.isLoading) {
         const openModal = document.querySelector('.modal[style*="flex"]');
         if (openModal) {
+          e.preventDefault();
+          e.stopPropagation();
           this.closeModal(openModal);
         }
       }
@@ -278,9 +288,19 @@ class AdminCRUD {
         
         modalContent.appendChild(loadingOverlay);
         modal.style.display = 'flex';
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        if (modal.style.display !== 'flex') {
+          console.warn('Modal se cerró antes de cargar datos');
+          return;
+        }
         
         await this.loadCategoryForEdit(id);
+        
+        if (modal.style.display !== 'flex') {
+          console.warn('Modal se cerró durante la carga de datos');
+          return;
+        }
         
         // Remover loading overlay
         const overlay = document.getElementById('categoryModalLoading');
@@ -352,9 +372,19 @@ class AdminCRUD {
         
         modalContent.appendChild(loadingOverlay);
         modal.style.display = 'flex';
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        if (modal.style.display !== 'flex') {
+          console.warn('Modal se cerró antes de cargar datos');
+          return;
+        }
         
         await this.loadUserForEdit(id);
+        
+        if (modal.style.display !== 'flex') {
+          console.warn('Modal se cerró durante la carga de datos');
+          return;
+        }
         
         // Remover loading overlay
         const overlay = document.getElementById('userModalLoading');
@@ -407,9 +437,19 @@ class AdminCRUD {
         
         modalContent.appendChild(loadingOverlay);
         modal.style.display = 'flex';
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        if (modal.style.display !== 'flex') {
+          console.warn('Modal se cerró antes de cargar datos');
+          return;
+        }
         
         await this.loadReviewForEdit(id);
+        
+        if (modal.style.display !== 'flex') {
+          console.warn('Modal se cerró durante la carga de datos');
+          return;
+        }
         
         // Remover loading overlay
         const overlay = document.getElementById('reviewModalLoading');
