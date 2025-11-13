@@ -93,6 +93,30 @@ router.get('/dashboard/stats', async (req, res) => {
 });
 
 // ===== PRODUCTOS =====
+router.get('/products/:id', async (req, res) => {
+  try {
+    const product = await Product.getById(req.params.id);
+    
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: 'Producto no encontrado'
+      });
+    }
+    
+    res.json({
+      success: true,
+      data: { product }
+    });
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener producto'
+    });
+  }
+});
+
 router.post('/products', async (req, res) => {
   try {
     console.log('Creating product with data:', req.body);
