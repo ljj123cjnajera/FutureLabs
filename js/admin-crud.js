@@ -653,13 +653,19 @@ class AdminCRUD {
       
       console.log('📦 Product response:', response);
       
-      if (!response || !response.success) {
+      if (!response) {
+        throw new Error('No se recibió respuesta del servidor');
+      }
+      
+      if (!response.success) {
         throw new Error(response?.message || response?.error || 'Error al obtener producto');
       }
       
-      const product = response.data?.product || response.data;
+      // Manejar diferentes formatos de respuesta
+      const product = response.data?.product || response.data || response.product;
       if (!product) {
-        throw new Error('Producto no encontrado');
+        console.error('❌ Product data structure:', response);
+        throw new Error('Producto no encontrado en la respuesta');
       }
       
       console.log('✅ Product loaded:', product);
