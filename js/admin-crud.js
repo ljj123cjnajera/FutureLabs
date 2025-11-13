@@ -228,18 +228,34 @@ class AdminCRUD {
         // Agregar overlay después de que el modal esté visible
         modalContent.appendChild(loadingOverlay);
         
-        await this.loadProductForEdit(id);
+        // Forzar que el modal permanezca visible durante la carga
+        const keepModalOpen = () => {
+          if (modal.style.display !== 'flex') {
+            console.warn('⚠️ Modal se cerró, reabriendo...');
+            modal.style.display = 'flex';
+          }
+        };
         
-        // Verificar nuevamente que el modal sigue abierto
-        if (modal.style.display !== 'flex') {
-          console.warn('Modal se cerró durante la carga');
-          this.isLoading = false;
-          return;
+        const modalCheckInterval = setInterval(keepModalOpen, 50);
+        
+        try {
+          await this.loadProductForEdit(id);
+          
+          // Verificar nuevamente que el modal sigue abierto
+          if (modal.style.display !== 'flex') {
+            console.warn('⚠️ Modal se cerró durante la carga, reabriendo...');
+            modal.style.display = 'flex';
+          }
+          
+          // Remover loading overlay
+          const overlay = document.getElementById('productModalLoading');
+          if (overlay) overlay.remove();
+          
+          clearInterval(modalCheckInterval);
+        } catch (loadError) {
+          clearInterval(modalCheckInterval);
+          throw loadError;
         }
-        
-        // Remover loading overlay
-        const overlay = document.getElementById('productModalLoading');
-        if (overlay) overlay.remove();
       } catch (error) {
         console.error('Error loading product for edit:', error);
         const overlay = document.getElementById('productModalLoading');
