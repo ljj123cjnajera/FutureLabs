@@ -684,6 +684,17 @@ tbody tr:last-child td {
     background: var(--admin-white);
 }
 
+.has-error input,
+.has-error select,
+.has-error textarea {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.12);
+}
+
+.has-error .error-message {
+    color: #ef4444;
+}
+
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {

@@ -816,7 +816,7 @@
                     <textarea id="productDescription" rows="4"></textarea>
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="document.getElementById('productModal').style.display='none'">Cancelar</button>
+                    <button type="button" class="btn-secondary" onclick="window.adminCRUD?.closeModalById('productModal')">Cancelar</button>
                     <button type="submit" class="btn-primary">Guardar</button>
                 </div>
             </form>
@@ -846,7 +846,7 @@
                     <textarea id="categoryDescription" rows="4"></textarea>
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="document.getElementById('categoryModal').style.display='none'">Cancelar</button>
+                    <button type="button" class="btn-secondary" onclick="window.adminCRUD?.closeModalById('categoryModal')">Cancelar</button>
                     <button type="submit" class="btn-primary">Guardar</button>
                 </div>
             </form>
@@ -890,7 +890,7 @@
                     </div>
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="document.getElementById('userModal').style.display='none'">Cancelar</button>
+                    <button type="button" class="btn-secondary" onclick="window.adminCRUD?.closeModalById('userModal')">Cancelar</button>
                     <button type="submit" class="btn-primary">Guardar</button>
                 </div>
             </form>
@@ -926,7 +926,7 @@
                     <input type="checkbox" id="reviewIsApproved">
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="document.getElementById('reviewModal').style.display='none'">Cancelar</button>
+                    <button type="button" class="btn-secondary" onclick="window.adminCRUD?.closeModalById('reviewModal')">Cancelar</button>
                     <button type="submit" class="btn-primary">Guardar</button>
                 </div>
             </form>

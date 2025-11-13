@@ -88,6 +88,8 @@ class AdminHomeContent {
     
     title.textContent = id ? 'Editar Hero Slide' : 'Crear Hero Slide';
     document.getElementById('heroSlideForm').reset();
+    document.getElementById('heroSlidePreviewContainer').style.display = 'none';
+    document.getElementById('heroSlideImageFile').value = '';
     
     if (id) {
       this.loadHeroSlideForEdit(id);
@@ -114,6 +116,8 @@ class AdminHomeContent {
         if (slide.image_url) {
           document.getElementById('heroSlidePreview').src = slide.image_url;
           document.getElementById('heroSlidePreviewContainer').style.display = 'block';
+        } else {
+          document.getElementById('heroSlidePreviewContainer').style.display = 'none';
         }
       }
     } catch (error) {
@@ -122,6 +126,9 @@ class AdminHomeContent {
   }
 
   async saveHeroSlide() {
+    const form = document.getElementById('heroSlideForm');
+    this.clearFormErrors(form);
+
     const formData = {
       title: document.getElementById('heroSlideTitle').value.trim(),
       description: document.getElementById('heroSlideDescription').value.trim() || null,
@@ -129,11 +136,21 @@ class AdminHomeContent {
       button_link: document.getElementById('heroSlideButtonLink').value.trim() || null,
       image_url: document.getElementById('heroSlideImageUrl').value.trim() || null,
       background_color: document.getElementById('heroSlideBackgroundColor').value,
-      order_index: parseInt(document.getElementById('heroSlideOrder').value) || 0,
+      order_index: parseInt(document.getElementById('heroSlideOrder').value, 10) || 0,
       is_active: document.getElementById('heroSlideIsActive').checked
     };
 
-    // Subir imagen si hay archivo
+    let hasErrors = false;
+    if (!formData.title) {
+      this.showFieldError('heroSlideTitle', 'El título es obligatorio');
+      hasErrors = true;
+    }
+
+    if (formData.button_link && !this.isValidUrl(formData.button_link)) {
+      this.showFieldError('heroSlideButtonLink', 'Ingresa un enlace válido (https://...)');
+      hasErrors = true;
+    }
+
     const imageFile = document.getElementById('heroSlideImageFile').files[0];
     if (imageFile) {
       try {
@@ -142,18 +159,24 @@ class AdminHomeContent {
           formData.image_url = uploadResponse.data.url;
         }
       } catch (error) {
+        this.showFieldError('heroSlideImageFile', 'No se pudo subir la imagen. Inténtalo de nuevo.');
         window.notifications?.error('Error al subir imagen');
         return;
       }
+    } else if (!formData.image_url && !this.currentEditId) {
+      this.showFieldError('heroSlideImageUrl', 'Adjunta una imagen o ingresa una URL.');
+      hasErrors = true;
+    }
+
+    if (hasErrors) {
+      window.notifications?.error('Corrige los errores y vuelve a intentarlo.');
+      return;
     }
 
     try {
-      let response;
-      if (this.currentEditId) {
-        response = await window.api.updateHeroSlide(this.currentEditId, formData);
-      } else {
-        response = await window.api.createHeroSlide(formData);
-      }
+      const response = this.currentEditId
+        ? await window.api.updateHeroSlide(this.currentEditId, formData)
+        : await window.api.createHeroSlide(formData);
 
       if (response.success) {
         window.notifications?.success(response.message || 'Slide guardado exitosamente');
@@ -161,6 +184,7 @@ class AdminHomeContent {
         this.loadHeroSlides();
       }
     } catch (error) {
+      console.error('Error saving hero slide:', error);
       window.notifications?.error('Error al guardar slide');
     }
   }
@@ -242,7 +266,11 @@ class AdminHomeContent {
     const title = document.getElementById('bannerModalTitle');
     
     title.textContent = id ? 'Editar Banner' : 'Crear Banner';
-    document.getElementById('bannerForm').reset();
+    const form = document.getElementById('bannerForm');
+    form.reset();
+    this.clearFormErrors(form);
+    document.getElementById('bannerPreviewContainer').style.display = 'none';
+    document.getElementById('bannerImageFile').value = '';
     
     if (id) {
       this.loadBannerForEdit(id);
@@ -272,6 +300,8 @@ class AdminHomeContent {
         if (banner.image_url) {
           document.getElementById('bannerPreview').src = banner.image_url;
           document.getElementById('bannerPreviewContainer').style.display = 'block';
+        } else {
+          document.getElementById('bannerPreviewContainer').style.display = 'none';
         }
       }
     } catch (error) {
@@ -280,6 +310,9 @@ class AdminHomeContent {
   }
 
   async saveBanner() {
+    const form = document.getElementById('bannerForm');
+    this.clearFormErrors(form);
+
     const formData = {
       title: document.getElementById('bannerTitle').value.trim(),
       description: document.getElementById('bannerDescription').value.trim() || null,
@@ -294,6 +327,29 @@ class AdminHomeContent {
       is_active: document.getElementById('bannerIsActive').checked
     };
 
+    let hasErrors = false;
+    if (!formData.title) {
+      this.showFieldError('bannerTitle', 'El título es obligatorio');
+      hasErrors = true;
+    }
+
+    if (!formData.banner_type) {
+      this.showFieldError('bannerType', 'Selecciona un tipo de banner');
+      hasErrors = true;
+    }
+
+    if (formData.button_link && !this.isValidUrl(formData.button_link)) {
+      this.showFieldError('bannerButtonLink', 'Ingresa un enlace válido (https://...)');
+      hasErrors = true;
+    }
+
+    const startDate = formData.start_date ? new Date(formData.start_date) : null;
+    const endDate = formData.end_date ? new Date(formData.end_date) : null;
+    if (startDate && endDate && startDate > endDate) {
+      this.showFieldError('bannerEndDate', 'La fecha final debe ser posterior a la inicial');
+      hasErrors = true;
+    }
+
     // Subir imagen si hay archivo
     const imageFile = document.getElementById('bannerImageFile').files[0];
     if (imageFile) {
@@ -303,9 +359,20 @@ class AdminHomeContent {
           formData.image_url = uploadResponse.data.url;
         }
       } catch (error) {
+        this.showFieldError('bannerImageFile', 'Error al subir la imagen');
         window.notifications?.error('Error al subir imagen');
         return;
       }
+    }
+
+    if (!formData.image_url && !imageFile && !this.currentEditId) {
+      this.showFieldError('bannerImageUrl', 'Debes proporcionar una imagen o URL.');
+      hasErrors = true;
+    }
+
+    if (hasErrors) {
+      window.notifications?.error('Corrige los errores y vuelve a intentarlo.');
+      return;
     }
 
     try {
@@ -322,6 +389,7 @@ class AdminHomeContent {
         this.loadBanners();
       }
     } catch (error) {
+      console.error('Error saving banner:', error);
       window.notifications?.error('Error al guardar banner');
     }
   }
@@ -403,7 +471,11 @@ class AdminHomeContent {
     const title = document.getElementById('benefitModalTitle');
     
     title.textContent = id ? 'Editar Beneficio' : 'Crear Beneficio';
-    document.getElementById('benefitForm').reset();
+    const form = document.getElementById('benefitForm');
+    form.reset();
+    this.clearFormErrors(form);
+    document.getElementById('benefitPreviewContainer').style.display = 'none';
+    document.getElementById('benefitImageFile').value = '';
     
     if (id) {
       this.loadBenefitForEdit(id);
@@ -429,6 +501,8 @@ class AdminHomeContent {
         if (benefit.image_url) {
           document.getElementById('benefitPreview').src = benefit.image_url;
           document.getElementById('benefitPreviewContainer').style.display = 'block';
+        } else {
+          document.getElementById('benefitPreviewContainer').style.display = 'none';
         }
       }
     } catch (error) {
@@ -437,6 +511,9 @@ class AdminHomeContent {
   }
 
   async saveBenefit() {
+    const form = document.getElementById('benefitForm');
+    this.clearFormErrors(form);
+
     const formData = {
       title: document.getElementById('benefitTitle').value.trim(),
       description: document.getElementById('benefitDescription').value.trim() || null,
@@ -447,6 +524,12 @@ class AdminHomeContent {
       is_active: document.getElementById('benefitIsActive').checked
     };
 
+    let hasErrors = false;
+    if (!formData.title) {
+      this.showFieldError('benefitTitle', 'El título es obligatorio');
+      hasErrors = true;
+    }
+
     // Subir imagen si hay archivo
     const imageFile = document.getElementById('benefitImageFile').files[0];
     if (imageFile) {
@@ -456,9 +539,20 @@ class AdminHomeContent {
           formData.image_url = uploadResponse.data.url;
         }
       } catch (error) {
+        this.showFieldError('benefitImageFile', 'Error al subir la imagen');
         window.notifications?.error('Error al subir imagen');
         return;
       }
+    }
+
+    if (!formData.icon && !formData.image_url && !imageFile && !this.currentEditId) {
+      this.showFieldError('benefitIcon', 'Añade un ícono (fa-solid fa-truck) o una imagen.');
+      hasErrors = true;
+    }
+
+    if (hasErrors) {
+      window.notifications?.error('Corrige los errores y vuelve a intentarlo.');
+      return;
     }
 
     try {
@@ -475,6 +569,7 @@ class AdminHomeContent {
         this.loadBenefits();
       }
     } catch (error) {
+      console.error('Error saving benefit:', error);
       window.notifications?.error('Error al guardar beneficio');
     }
   }
@@ -569,7 +664,9 @@ class AdminHomeContent {
     const title = document.getElementById('homeSectionModalTitle');
     
     title.textContent = id ? 'Editar Sección del Home' : 'Crear Sección del Home';
-    document.getElementById('homeSectionForm').reset();
+    const form = document.getElementById('homeSectionForm');
+    form.reset();
+    this.clearFormErrors(form);
     this.loadCategoriesForSection();
     
     if (id) {
@@ -663,6 +760,36 @@ class AdminHomeContent {
     const modal = document.getElementById(id);
     if (modal) {
       this.hideModal(modal);
+    }
+  }
+
+  clearFormErrors(form) {
+    if (!form) return;
+    form.querySelectorAll('.error-message').forEach(msg => msg.remove());
+    form.querySelectorAll('.has-error').forEach(el => el.classList.remove('has-error'));
+  }
+
+  showFieldError(fieldId, message) {
+    const field = document.getElementById(fieldId);
+    if (!field) return;
+    const container = field.closest('.form-group') || field.parentElement;
+    if (!container) return;
+    container.classList.add('has-error');
+    const error = document.createElement('p');
+    error.className = 'error-message';
+    error.textContent = message;
+    error.style.color = '#ef4444';
+    error.style.fontSize = '13px';
+    error.style.marginTop = '6px';
+    container.appendChild(error);
+  }
+
+  isValidUrl(value) {
+    try {
+      const url = new URL(value);
+      return url.protocol === 'http:' || url.protocol === 'https:';
+    } catch (error) {
+      return false;
     }
   }
 }
