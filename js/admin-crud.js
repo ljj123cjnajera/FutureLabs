@@ -272,35 +272,72 @@ class AdminCRUD {
   }
 
   async saveProduct() {
+    // Obtener elementos del formulario
+    const nameInput = document.getElementById('productName');
+    const slugInput = document.getElementById('productSlug');
+    const priceInput = document.getElementById('productPrice');
+    const categoryInput = document.getElementById('productCategory');
+    const stockInput = document.getElementById('productStock');
+    
+    // Limpiar errores previos
+    [nameInput, slugInput, priceInput, categoryInput, stockInput].forEach(input => {
+      if (input) {
+        input.style.borderColor = '';
+        const errorMsg = input.parentElement.querySelector('.error-message');
+        if (errorMsg) errorMsg.remove();
+      }
+    });
+    
     // Validaciones
-    const name = document.getElementById('productName').value.trim();
-    const slug = document.getElementById('productSlug').value.trim();
-    const price = document.getElementById('productPrice').value;
-    const category = document.getElementById('productCategory').value;
-    const stock = document.getElementById('productStock').value;
+    const name = nameInput.value.trim();
+    const slug = slugInput.value.trim();
+    const price = priceInput.value;
+    const category = categoryInput.value;
+    const stock = stockInput.value;
+    
+    let hasErrors = false;
+    
+    const showError = (input, message) => {
+      if (!input) return;
+      hasErrors = true;
+      input.style.borderColor = '#ef4444';
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'error-message';
+      errorDiv.style.color = '#ef4444';
+      errorDiv.style.fontSize = '12px';
+      errorDiv.style.marginTop = '4px';
+      errorDiv.textContent = message;
+      input.parentElement.appendChild(errorDiv);
+    };
 
     if (!name || name.length < 3) {
-      window.notifications.error('El nombre debe tener al menos 3 caracteres');
-      return;
+      showError(nameInput, 'El nombre debe tener al menos 3 caracteres');
     }
 
     if (!slug || slug.length < 3) {
-      window.notifications.error('El slug debe tener al menos 3 caracteres');
-      return;
+      showError(slugInput, 'El slug debe tener al menos 3 caracteres');
+    } else if (!/^[a-z0-9-]+$/.test(slug)) {
+      showError(slugInput, 'El slug solo puede contener letras minúsculas, números y guiones');
     }
 
     if (!price || parseFloat(price) <= 0) {
-      window.notifications.error('El precio debe ser mayor a 0');
-      return;
+      showError(priceInput, 'El precio debe ser mayor a 0');
+    } else if (isNaN(parseFloat(price))) {
+      showError(priceInput, 'El precio debe ser un número válido');
     }
 
     if (!category) {
-      window.notifications.error('Debes seleccionar una categoría');
-      return;
+      showError(categoryInput, 'Debes seleccionar una categoría');
     }
 
-    if (!stock || parseInt(stock) < 0) {
-      window.notifications.error('El stock debe ser mayor o igual a 0');
+    if (stock === '' || parseInt(stock) < 0) {
+      showError(stockInput, 'El stock debe ser mayor o igual a 0');
+    } else if (isNaN(parseInt(stock))) {
+      showError(stockInput, 'El stock debe ser un número válido');
+    }
+    
+    if (hasErrors) {
+      window.notifications?.error('Por favor, corrige los errores en el formulario');
       return;
     }
 
@@ -346,10 +383,18 @@ class AdminCRUD {
       });
     }
 
+    // Mostrar loading en el botón de guardar
+    const submitBtn = document.querySelector('#productForm button[type="submit"]');
+    const originalBtnText = submitBtn?.textContent;
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<div class="loading-spinner small"></div> Guardando...';
+    }
+
     try {
       // Si hay una imagen para subir, subirla primero
       if (imageFileInput.files.length > 0) {
-        window.notifications.show('Subiendo imagen...', 'info');
+        window.notifications?.show('Subiendo imagen...', 'info');
         try {
           const uploadResponse = await window.api.uploadImage(imageFileInput.files[0]);
           console.log('Upload response:', uploadResponse);
@@ -428,6 +473,12 @@ class AdminCRUD {
     } catch (error) {
       console.error('Error saving product:', error);
       window.notifications.error('Error al guardar producto: ' + (error.message || 'Error desconocido'));
+    } finally {
+      // Restaurar botón
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalBtnText || 'Guardar';
+      }
     }
   }
 
@@ -449,12 +500,67 @@ class AdminCRUD {
   }
 
   async saveCategory() {
-    const categoryData = {
-      name: document.getElementById('categoryName').value,
-      slug: document.getElementById('categorySlug').value,
-      description: document.getElementById('categoryDescription').value,
-      image_url: document.getElementById('categoryImage').value
+    // Obtener elementos del formulario
+    const nameInput = document.getElementById('categoryName');
+    const slugInput = document.getElementById('categorySlug');
+    
+    // Limpiar errores previos
+    [nameInput, slugInput].forEach(input => {
+      if (input) {
+        input.style.borderColor = '';
+        const errorMsg = input.parentElement.querySelector('.error-message');
+        if (errorMsg) errorMsg.remove();
+      }
+    });
+    
+    // Validaciones
+    const name = nameInput.value.trim();
+    const slug = slugInput.value.trim();
+    
+    let hasErrors = false;
+    
+    const showError = (input, message) => {
+      if (!input) return;
+      hasErrors = true;
+      input.style.borderColor = '#ef4444';
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'error-message';
+      errorDiv.style.color = '#ef4444';
+      errorDiv.style.fontSize = '12px';
+      errorDiv.style.marginTop = '4px';
+      errorDiv.textContent = message;
+      input.parentElement.appendChild(errorDiv);
     };
+
+    if (!name || name.length < 2) {
+      showError(nameInput, 'El nombre debe tener al menos 2 caracteres');
+    }
+
+    if (!slug || slug.length < 2) {
+      showError(slugInput, 'El slug debe tener al menos 2 caracteres');
+    } else if (!/^[a-z0-9-]+$/.test(slug)) {
+      showError(slugInput, 'El slug solo puede contener letras minúsculas, números y guiones');
+    }
+    
+    if (hasErrors) {
+      window.notifications?.error('Por favor, corrige los errores en el formulario');
+      return;
+    }
+
+    const categoryData = {
+      name: name,
+      slug: slug,
+      description: document.getElementById('categoryDescription').value.trim() || null,
+      image_url: document.getElementById('categoryImage').value.trim() || null
+    };
+
+    // Mostrar loading en el botón de guardar
+    const submitBtn = document.querySelector('#categoryForm button[type="submit"]');
+    const originalBtnText = submitBtn?.textContent;
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<div class="loading-spinner small"></div> Guardando...';
+    }
 
     try {
       const url = this.currentEditId 
@@ -477,10 +583,17 @@ class AdminCRUD {
           window.adminManager.loadCategories();
         }
       } else {
-        window.notifications.error(response.message || 'Error al guardar categoría');
+        window.notifications.error(response.message || response.error || 'Error al guardar categoría');
       }
     } catch (error) {
-      window.notifications.error('Error al guardar categoría');
+      console.error('Error saving category:', error);
+      window.notifications.error('Error al guardar categoría: ' + (error.message || 'Error desconocido'));
+    } finally {
+      // Restaurar botón
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalBtnText || 'Guardar';
+      }
     }
   }
 

@@ -408,7 +408,7 @@ class AdminManager {
     if (!tbody) return;
     
     // Mostrar estado de carga
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px;"><div class="loading-spinner"></div> Cargando categorías...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px;"><div class="loading-spinner"></div><p style="margin-top: 10px; color: #666;">Cargando categorías...</p></td></tr>';
     
     try {
       const response = await window.api.getCategories();
@@ -417,7 +417,17 @@ class AdminManager {
         const categories = response.data.categories;
         
         if (categories.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px;">No hay categorías</td></tr>';
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="5" style="text-align: center; padding: 60px 20px;">
+                <div style="color: #999;">
+                  <i class="fas fa-tags" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+                  <p style="font-size: 16px; margin: 0;">No hay categorías registradas</p>
+                  <p style="font-size: 14px; margin-top: 8px; opacity: 0.7;">Haz clic en "Nueva Categoría" para crear una</p>
+                </div>
+              </td>
+            </tr>
+          `;
           return;
         }
         
