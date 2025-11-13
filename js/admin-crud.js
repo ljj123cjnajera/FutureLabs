@@ -730,6 +730,7 @@ class AdminCRUD {
         submitBtn.disabled = false;
         submitBtn.textContent = originalBtnText || 'Guardar';
       }
+      this.isLoading = false;
     }
   }
 
