@@ -738,15 +738,31 @@ class AdminCRUD {
     try {
       const response = await window.api.request(`/categories/${id}`);
       
-      if (response.success) {
-        const category = response.data.category;
-        document.getElementById('categoryName').value = category.name;
-        document.getElementById('categorySlug').value = category.slug;
-        document.getElementById('categoryDescription').value = category.description || '';
-        document.getElementById('categoryImage').value = category.image_url || '';
+      if (!response || !response.success) {
+        throw new Error(response?.message || response?.error || 'Error al obtener categoría');
       }
+      
+      const category = response.data?.category;
+      if (!category) {
+        throw new Error('Categoría no encontrada');
+      }
+      
+      const nameInput = document.getElementById('categoryName');
+      const slugInput = document.getElementById('categorySlug');
+      const descInput = document.getElementById('categoryDescription');
+      const imageInput = document.getElementById('categoryImage');
+      
+      if (!nameInput || !slugInput) {
+        throw new Error('Algunos campos del formulario no se encontraron');
+      }
+      
+      nameInput.value = category.name || '';
+      slugInput.value = category.slug || '';
+      if (descInput) descInput.value = category.description || '';
+      if (imageInput) imageInput.value = category.image_url || '';
     } catch (error) {
-      window.notifications.error('Error al cargar categoría');
+      console.error('Error loading category for edit:', error);
+      throw error; // Re-lanzar para que el caller maneje el error
     }
   }
 
@@ -862,17 +878,35 @@ class AdminCRUD {
     try {
       const response = await window.api.request(`/admin/users/${id}`);
       
-      if (response.success) {
-        const user = response.data.user;
-        document.getElementById('userFirstName').value = user.first_name;
-        document.getElementById('userLastName').value = user.last_name;
-        document.getElementById('userEmail').value = user.email;
-        document.getElementById('userPhone').value = user.phone || '';
-        document.getElementById('userRole').value = user.role;
-        document.getElementById('userEmailVerified').checked = user.email_verified;
+      if (!response || !response.success) {
+        throw new Error(response?.message || response?.error || 'Error al obtener usuario');
       }
+      
+      const user = response.data?.user;
+      if (!user) {
+        throw new Error('Usuario no encontrado');
+      }
+      
+      const firstNameInput = document.getElementById('userFirstName');
+      const lastNameInput = document.getElementById('userLastName');
+      const emailInput = document.getElementById('userEmail');
+      const phoneInput = document.getElementById('userPhone');
+      const roleInput = document.getElementById('userRole');
+      const emailVerifiedInput = document.getElementById('userEmailVerified');
+      
+      if (!firstNameInput || !lastNameInput || !emailInput || !roleInput) {
+        throw new Error('Algunos campos del formulario no se encontraron');
+      }
+      
+      firstNameInput.value = user.first_name || '';
+      lastNameInput.value = user.last_name || '';
+      emailInput.value = user.email || '';
+      if (phoneInput) phoneInput.value = user.phone || '';
+      roleInput.value = user.role || 'client';
+      if (emailVerifiedInput) emailVerifiedInput.checked = user.email_verified || false;
     } catch (error) {
-      window.notifications.error('Error al cargar usuario');
+      console.error('Error loading user for edit:', error);
+      throw error; // Re-lanzar para que el caller maneje el error
     }
   }
 
@@ -913,15 +947,31 @@ class AdminCRUD {
     try {
       const response = await window.api.request(`/admin/reviews/${id}`);
       
-      if (response.success) {
-        const review = response.data.review;
-        document.getElementById('reviewRating').value = review.rating;
-        document.getElementById('reviewTitle').value = review.title || '';
-        document.getElementById('reviewComment').value = review.comment || '';
-        document.getElementById('reviewIsApproved').checked = review.is_approved;
+      if (!response || !response.success) {
+        throw new Error(response?.message || response?.error || 'Error al obtener reseña');
       }
+      
+      const review = response.data?.review;
+      if (!review) {
+        throw new Error('Reseña no encontrada');
+      }
+      
+      const ratingInput = document.getElementById('reviewRating');
+      const titleInput = document.getElementById('reviewTitle');
+      const commentInput = document.getElementById('reviewComment');
+      const isApprovedInput = document.getElementById('reviewIsApproved');
+      
+      if (!ratingInput || !isApprovedInput) {
+        throw new Error('Algunos campos del formulario no se encontraron');
+      }
+      
+      ratingInput.value = review.rating || 5;
+      if (titleInput) titleInput.value = review.title || '';
+      if (commentInput) commentInput.value = review.comment || '';
+      isApprovedInput.checked = review.is_approved || false;
     } catch (error) {
-      window.notifications.error('Error al cargar reseña');
+      console.error('Error loading review for edit:', error);
+      throw error; // Re-lanzar para que el caller maneje el error
     }
   }
 
