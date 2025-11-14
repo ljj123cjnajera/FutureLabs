@@ -42,23 +42,23 @@
             <div class="container">
                 <div class="profile-hero-card">
                     <div class="profile-hero-meta">
-                        <div class="profile-avatar" id="profileAvatar">
-                            <i class="fas fa-user"></i>
+                        <div class="profile-avatar" id="profileAvatar" aria-hidden="true">
+                            <i class="fas fa-user" aria-hidden="true"></i>
                         </div>
                         <div class="profile-info">
-                            <h1 id="profileName">Cargando...</h1>
-                            <p id="profileEmail">Cargando email...</p>
+                            <h1 id="profileName" aria-live="polite">Cargando...</h1>
+                            <p id="profileEmail" aria-live="polite">Cargando email...</p>
                         </div>
                     </div>
-                    <div class="profile-hero-actions">
-                        <button type="button" class="btn btn-primary btn-sm" onclick="scrollToSection('orders')">
-                            <i class="fas fa-shopping-bag"></i> Ver pedidos
+                    <div class="profile-hero-actions" role="group" aria-label="Acciones rápidas del perfil">
+                        <button type="button" class="btn btn-primary btn-sm" onclick="scrollToSection('orders')" aria-label="Ver mis pedidos">
+                            <i class="fas fa-shopping-bag" aria-hidden="true"></i> Ver pedidos
                         </button>
-                        <button type="button" class="btn btn-outline btn-sm" onclick="scrollToSection('wishlist')">
-                            <i class="fas fa-heart"></i> Wishlist
+                        <button type="button" class="btn btn-outline btn-sm" onclick="window.location.href='wishlist.html'" aria-label="Ver mi wishlist">
+                            <i class="fas fa-heart" aria-hidden="true"></i> Wishlist
                         </button>
-                        <button type="button" class="btn btn-outline btn-sm" onclick="scrollToSection('security')">
-                            <i class="fas fa-lock"></i> Seguridad
+                        <button type="button" class="btn btn-outline btn-sm" onclick="scrollToSection('security')" aria-label="Ir a configuración de seguridad">
+                            <i class="fas fa-lock" aria-hidden="true"></i> Seguridad
                         </button>
                     </div>
                 </div>
@@ -67,33 +67,33 @@
 
         <div class="container">
             <!-- Profile Tabs -->
-            <div class="profile-tabs">
-                <button class="profile-tab active" data-tab="overview">
-                    <i class="fas fa-home"></i>
+            <nav class="profile-tabs" role="tablist" aria-label="Secciones del perfil">
+                <button class="profile-tab active" data-tab="overview" role="tab" aria-selected="true" aria-controls="overview" id="tab-overview" tabindex="0">
+                    <i class="fas fa-home" aria-hidden="true"></i>
                     <span>Resumen</span>
                 </button>
-                <button class="profile-tab" data-tab="personal">
-                    <i class="fas fa-user"></i>
+                <button class="profile-tab" data-tab="personal" role="tab" aria-selected="false" aria-controls="personal" id="tab-personal" tabindex="-1">
+                    <i class="fas fa-user" aria-hidden="true"></i>
                     <span>Datos Personales</span>
                 </button>
-                <button class="profile-tab" data-tab="addresses">
-                    <i class="fas fa-map-marker-alt"></i>
+                <button class="profile-tab" data-tab="addresses" role="tab" aria-selected="false" aria-controls="addresses" id="tab-addresses" tabindex="-1">
+                    <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
                     <span>Direcciones</span>
                 </button>
-                <button class="profile-tab" data-tab="security">
-                    <i class="fas fa-lock"></i>
+                <button class="profile-tab" data-tab="security" role="tab" aria-selected="false" aria-controls="security" id="tab-security" tabindex="-1">
+                    <i class="fas fa-lock" aria-hidden="true"></i>
                     <span>Seguridad</span>
                 </button>
-                <button class="profile-tab" data-tab="points">
-                    <i class="fas fa-star"></i>
+                <button class="profile-tab" data-tab="points" role="tab" aria-selected="false" aria-controls="points" id="tab-points" tabindex="-1">
+                    <i class="fas fa-star" aria-hidden="true"></i>
                     <span>Puntos de Lealtad</span>
                 </button>
-            </div>
+            </nav>
 
             <!-- Profile Content Sections -->
             <div class="profile-content-wrapper">
                 <!-- Overview Tab -->
-                <div class="profile-section active" id="overview" data-profile-section="overview">
+                <div class="profile-section active" id="overview" data-profile-section="overview" role="tabpanel" aria-labelledby="tab-overview" aria-live="polite">
                     <!-- Loyalty Points Overview -->
                     <div class="loyalty-overview-grid">
                         <div class="loyalty-points-card">
@@ -215,7 +215,7 @@
                 </div>
 
                 <!-- Personal Data Tab -->
-                <div class="profile-section" id="personal" data-profile-section="personal">
+                <div class="profile-section" id="personal" data-profile-section="personal" role="tabpanel" aria-labelledby="tab-personal" aria-live="polite" hidden>
                     <div class="profile-content-section">
                         <div class="profile-content-section-header">
                             <h2><i class="fas fa-user"></i> Información Personal</h2>
@@ -248,7 +248,7 @@
                 </div>
 
                 <!-- Addresses Tab -->
-                <div class="profile-section" id="addresses" data-profile-section="addresses">
+                <div class="profile-section" id="addresses" data-profile-section="addresses" role="tabpanel" aria-labelledby="tab-addresses" aria-live="polite" hidden>
                     <div class="profile-content-section">
                         <div class="profile-content-section-header">
                             <h2><i class="fas fa-map-marker-alt"></i> Mis Direcciones</h2>
@@ -261,7 +261,7 @@
                 </div>
 
                 <!-- Security Tab -->
-                <div class="profile-section" id="security" data-profile-section="security">
+                <div class="profile-section" id="security" data-profile-section="security" role="tabpanel" aria-labelledby="tab-security" aria-live="polite" hidden>
                     <div class="profile-content-section">
                         <div class="profile-content-section-header">
                             <h2><i class="fas fa-lock"></i> Seguridad</h2>
@@ -299,7 +299,7 @@
                 </div>
 
                 <!-- Points Tab -->
-                <div class="profile-section" id="points" data-profile-section="points">
+                <div class="profile-section" id="points" data-profile-section="points" role="tabpanel" aria-labelledby="tab-points" aria-live="polite" hidden>
                     <div class="profile-content-section">
                         <div class="profile-content-section-header">
                             <h2><i class="fas fa-star"></i> Historial de Puntos</h2>
@@ -672,6 +672,33 @@
                     const tabId = this.dataset.tab;
                     switchTab(tabId);
                 });
+                
+                // Navegación por teclado (Arrow keys)
+                tab.addEventListener('keydown', function(e) {
+                    const tabs = Array.from(document.querySelectorAll('.profile-tab'));
+                    const currentIndex = tabs.indexOf(this);
+                    
+                    let targetIndex = currentIndex;
+                    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        targetIndex = (currentIndex + 1) % tabs.length;
+                    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        targetIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+                    } else if (e.key === 'Home') {
+                        e.preventDefault();
+                        targetIndex = 0;
+                    } else if (e.key === 'End') {
+                        e.preventDefault();
+                        targetIndex = tabs.length - 1;
+                    }
+                    
+                    if (targetIndex !== currentIndex) {
+                        tabs[targetIndex].focus();
+                        const tabId = tabs[targetIndex].getAttribute('data-tab');
+                        switchTab(tabId);
+                    }
+                });
             });
         });
 
@@ -680,14 +707,28 @@
             // Actualizar tabs
             document.querySelectorAll('.profile-tab').forEach(tab => {
                 tab.classList.remove('active');
+                tab.setAttribute('aria-selected', 'false');
+                tab.setAttribute('tabindex', '-1');
             });
-            document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+            
+            const activeTab = document.querySelector(`[data-tab="${tabId}"]`);
+            if (activeTab) {
+                activeTab.classList.add('active');
+                activeTab.setAttribute('aria-selected', 'true');
+                activeTab.setAttribute('tabindex', '0');
+            }
 
             // Actualizar secciones
             document.querySelectorAll('.profile-section').forEach(section => {
                 section.classList.remove('active');
+                section.setAttribute('hidden', '');
             });
-            document.getElementById(tabId).classList.add('active');
+            
+            const activeSection = document.getElementById(tabId);
+            if (activeSection) {
+                activeSection.classList.add('active');
+                activeSection.removeAttribute('hidden');
+            }
 
             // Cargar datos específicos de la sección
             if (tabId === 'addresses') {

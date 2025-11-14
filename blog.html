@@ -48,10 +48,10 @@
         </section>
 
         <div class="container blog-container">
-            <div id="blogContent">
+            <div id="blogContent" role="main" aria-live="polite" aria-busy="true">
                 <div class="loading-state">
                     <div class="loading-state-content">
-                        <div class="loading-spinner large"></div>
+                        <div class="loading-spinner large" aria-hidden="true"></div>
                         <p>Cargando artículos...</p>
                     </div>
                 </div>
@@ -76,6 +76,7 @@
         async function loadBlogPosts(page = 1) {
             try {
                 const contentContainer = document.getElementById('blogContent');
+                contentContainer.setAttribute('aria-busy', 'true');
                 window.loadingState.renderLoading(contentContainer, 'Cargando artículos...', {
                     className: 'loading-state'
                 });
@@ -106,30 +107,31 @@
                 return;
             }
             
+            container.setAttribute('aria-busy', 'false');
             container.innerHTML = `
-                <div class="blog-grid">
-                    ${posts.map(post => `
-                        <div class="blog-card" onclick="viewPost('${post.slug}')">
+                <div class="blog-grid" role="list" aria-label="Lista de artículos del blog">
+                    ${posts.map((post, index) => `
+                        <article class="blog-card" role="listitem" onclick="viewPost('${post.slug}')" onkeypress="if(event.key==='Enter') viewPost('${post.slug}')" tabindex="0" aria-label="Artículo: ${post.title}">
                             <img src="${post.featured_image || 'https://via.placeholder.com/800x400'}" 
                                  alt="${post.title}" 
                                  class="blog-card-image">
                             <div class="blog-card-content">
-                                <div class="blog-card-meta">
-                                    <span><i class="far fa-user"></i> ${post.first_name} ${post.last_name}</span>
-                                    <span><i class="far fa-calendar"></i> ${formatDate(post.published_at)}</span>
+                                <div class="blog-card-meta" aria-label="Información del artículo">
+                                    <span><i class="far fa-user" aria-hidden="true"></i> ${post.first_name} ${post.last_name}</span>
+                                    <span><i class="far fa-calendar" aria-hidden="true"></i> ${formatDate(post.published_at)}</span>
                                 </div>
                                 <h2 class="blog-card-title">${post.title}</h2>
                                 <p class="blog-card-excerpt">${post.excerpt || ''}</p>
                                 <div class="blog-card-footer">
-                                    <span class="blog-card-views">
-                                        <i class="far fa-eye"></i> ${post.views} vistas
+                                    <span class="blog-card-views" aria-label="${post.views} vistas">
+                                        <i class="far fa-eye" aria-hidden="true"></i> ${post.views} vistas
                                     </span>
-                                    <a href="blog-post.html?slug=${post.slug}" class="btn-read-more">
-                                        Leer más <i class="fas fa-arrow-right"></i>
+                                    <a href="blog-post.html?slug=${post.slug}" class="btn-read-more" aria-label="Leer artículo completo: ${post.title}">
+                                        Leer más <i class="fas fa-arrow-right" aria-hidden="true"></i>
                                     </a>
                                 </div>
                             </div>
-                        </div>
+                        </article>
                     `).join('')}
                 </div>
             `;
@@ -140,36 +142,37 @@
             
             if (totalPages <= 1) return;
             
-            let paginationHTML = '<div class="pagination">';
+            let paginationHTML = '<nav class="pagination" role="navigation" aria-label="Paginación de artículos">';
             
             // Botón anterior
             paginationHTML += `
-                <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
-                    <i class="fas fa-chevron-left"></i> Anterior
+                <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} aria-label="Página anterior" ${currentPage === 1 ? 'aria-disabled="true"' : ''}>
+                    <i class="fas fa-chevron-left" aria-hidden="true"></i> Anterior
                 </button>
             `;
             
             // Páginas
             for (let i = 1; i <= totalPages; i++) {
                 if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                    const isActive = i === currentPage;
                     paginationHTML += `
-                        <button onclick="changePage(${i})" class="${i === currentPage ? 'active' : ''}">
+                        <button onclick="changePage(${i})" class="${isActive ? 'active' : ''}" ${isActive ? 'aria-current="page"' : ''} aria-label="Ir a página ${i}">
                             ${i}
                         </button>
                     `;
                 } else if (i === currentPage - 2 || i === currentPage + 2) {
-                    paginationHTML += '<span>...</span>';
+                    paginationHTML += '<span aria-hidden="true">...</span>';
                 }
             }
             
             // Botón siguiente
             paginationHTML += `
-                <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
-                    Siguiente <i class="fas fa-chevron-right"></i>
+                <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} aria-label="Página siguiente" ${currentPage === totalPages ? 'aria-disabled="true"' : ''}>
+                    Siguiente <i class="fas fa-chevron-right" aria-hidden="true"></i>
                 </button>
             `;
             
-            paginationHTML += '</div>';
+            paginationHTML += '</nav>';
             
             container.insertAdjacentHTML('beforeend', paginationHTML);
         }

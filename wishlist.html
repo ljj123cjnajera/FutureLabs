@@ -72,29 +72,30 @@
                 </div>
             </aside>
 
-            <section class="wishlist-content">
-                <div class="wishlist-stats">
-                    <div class="wishlist-stat-card">
-                        <div class="wishlist-stat-icon">
-                            <i class="fas fa-heart"></i>
+            <section class="wishlist-content" aria-labelledby="wishlist-content-title">
+                <h2 id="wishlist-content-title" class="sr-only">Contenido de la wishlist</h2>
+                <div class="wishlist-stats" role="group" aria-label="Estadísticas de la wishlist">
+                    <div class="wishlist-stat-card" role="article" aria-label="Productos guardados">
+                        <div class="wishlist-stat-icon" aria-hidden="true">
+                            <i class="fas fa-heart" aria-hidden="true"></i>
                         </div>
                         <div class="wishlist-stat-info">
                             <span class="wishlist-stat-label">Guardados</span>
-                            <span class="wishlist-stat-value" id="wishlistCount">0</span>
+                            <span class="wishlist-stat-value" id="wishlistCount" aria-live="polite">0</span>
                         </div>
                     </div>
-                    <div class="wishlist-stat-card">
-                        <div class="wishlist-stat-icon">
-                            <i class="fas fa-bolt"></i>
+                    <div class="wishlist-stat-card" role="article" aria-label="Productos en oferta">
+                        <div class="wishlist-stat-icon" aria-hidden="true">
+                            <i class="fas fa-bolt" aria-hidden="true"></i>
                         </div>
                         <div class="wishlist-stat-info">
                             <span class="wishlist-stat-label">En oferta</span>
-                            <span class="wishlist-stat-value" id="onSaleCount">0</span>
+                            <span class="wishlist-stat-value" id="onSaleCount" aria-live="polite">0</span>
                         </div>
                     </div>
-                    <div class="wishlist-stat-card">
-                        <div class="wishlist-stat-icon">
-                            <i class="fas fa-layer-group"></i>
+                    <div class="wishlist-stat-card" role="article" aria-label="Listas activas">
+                        <div class="wishlist-stat-icon" aria-hidden="true">
+                            <i class="fas fa-layer-group" aria-hidden="true"></i>
                         </div>
                         <div class="wishlist-stat-info">
                             <span class="wishlist-stat-label">Listas activas</span>
@@ -121,9 +122,9 @@
                     </div>
                 </div>
 
-                <div class="wishlist-selection-bar" id="wishlistSelectionBar" hidden>
+                <div class="wishlist-selection-bar" id="wishlistSelectionBar" hidden role="toolbar" aria-label="Acciones de selección">
                     <div class="wishlist-selection-summary">
-                        <span id="selectedCountLabel">0 seleccionados</span>
+                        <span id="selectedCountLabel" aria-live="polite">0 seleccionados</span>
                     </div>
                     <div class="wishlist-selection-actions">
                         <select id="moveTargetSelect" class="wishlist-select">
@@ -145,7 +146,7 @@
                     </div>
                 </div>
 
-                <div id="wishlistContainer" class="wishlist-container">
+                <div id="wishlistContainer" class="wishlist-container" role="region" aria-label="Lista de productos en wishlist" aria-live="polite" aria-busy="false">
                     <div class="wishlist-empty-state loading">
                         <div class="loading-spinner"></div>
                         <p>Cargando wishlist...</p>
@@ -443,59 +444,66 @@
                     return;
                 }
 
+                elements.container.setAttribute('aria-busy', 'false');
                 elements.container.innerHTML = `
-                    <div class="wishlist-grid">
-                        ${filteredItems.map(item => renderWishlistCard(item, manager.selectedItems?.has(item.product_id))).join('')}
+                    <div class="wishlist-grid" role="list" aria-label="Productos en la wishlist">
+                        ${filteredItems.map((item, index) => renderWishlistCard(item, manager.selectedItems?.has(item.product_id), index)).join('')}
                     </div>
                 `;
             }
 
-            function renderWishlistCard(item, isSelected) {
+            function renderWishlistCard(item, isSelected, index) {
                 const hasDiscount = Boolean(item.discount_price);
                 const isAvailable = Number(item.stock_quantity || 0) > 0;
-                const availabilityLabel = isAvailable ? '<span class="wishlist-badge success">Disponible</span>' : '<span class="wishlist-badge warning">Agotado</span>';
+                const productName = escapeHTML(item.product_name || 'Producto FutureLabs');
+                const availabilityLabel = isAvailable 
+                    ? '<span class="wishlist-badge success" aria-label="Producto disponible">Disponible</span>' 
+                    : '<span class="wishlist-badge warning" aria-label="Producto agotado">Agotado</span>';
                 const priceContent = hasDiscount
                     ? `
-                        <span class="wishlist-price-old">S/ ${Number(item.price).toFixed(2)}</span>
-                        <span class="wishlist-price-new">S/ ${Number(item.discount_price).toFixed(2)}</span>
+                        <span class="wishlist-price-old" aria-label="Precio original">S/ ${Number(item.price).toFixed(2)}</span>
+                        <span class="wishlist-price-new" aria-label="Precio con descuento">S/ ${Number(item.discount_price).toFixed(2)}</span>
                     `
                     : `<span class="wishlist-price-new">S/ ${Number(item.price).toFixed(2)}</span>`;
 
                 return `
-                    <article class="wishlist-item" data-product-id="${item.product_id}">
+                    <article class="wishlist-item" data-product-id="${item.product_id}" role="listitem" aria-label="Producto: ${productName}">
                         <div class="wishlist-item-select">
+                            <label class="sr-only" for="wishlist-checkbox-${item.product_id}">Seleccionar ${productName}</label>
                             <input type="checkbox"
+                                id="wishlist-checkbox-${item.product_id}"
                                 class="wishlist-item-checkbox"
                                 data-product-id="${item.product_id}"
-                                ${isSelected ? 'checked' : ''}>
+                                ${isSelected ? 'checked' : ''}
+                                aria-label="Seleccionar ${productName}">
                         </div>
                         <div class="wishlist-item-media">
-                            <img src="${item.image_url || 'https://via.placeholder.com/480x480?text=FutureLabs'}" alt="${escapeHTML(item.product_name || 'Producto FutureLabs')}">
-                            ${hasDiscount ? '<span class="wishlist-item-badge">Oferta</span>' : ''}
+                            <img src="${item.image_url || 'https://via.placeholder.com/480x480?text=FutureLabs'}" alt="${productName}">
+                            ${hasDiscount ? '<span class="wishlist-item-badge" aria-label="Producto en oferta">Oferta</span>' : ''}
                         </div>
                         <div class="wishlist-item-body">
                             <div class="wishlist-item-meta">
                                 <span class="wishlist-item-brand">${escapeHTML(item.brand || 'FutureLabs')}</span>
                                 ${availabilityLabel}
                             </div>
-                            <button class="wishlist-item-title" type="button" data-product-link="${item.product_id}">
-                                ${escapeHTML(item.product_name || 'Producto FutureLabs')}
+                            <button class="wishlist-item-title" type="button" data-product-link="${item.product_id}" aria-label="Ver detalles de ${productName}">
+                                ${productName}
                             </button>
-                            <div class="wishlist-item-rating">
-                                ${generateStars(item.rating || 0)}
+                            <div class="wishlist-item-rating" aria-label="Calificación: ${item.rating || 0} de 5 estrellas">
+                                ${generateStars(item.rating || 0).replace(/<i/g, '<i aria-hidden="true"')}
                                 <span class="wishlist-item-reviews">${item.review_count || 0} reseñas</span>
                             </div>
-                            <div class="wishlist-item-price">
+                            <div class="wishlist-item-price" aria-label="Precio del producto">
                                 ${priceContent}
                             </div>
                         </div>
-                        <div class="wishlist-item-footer">
-                            <button class="btn btn-primary btn-sm" data-product-action="cart" data-product-id="${item.product_id}">
-                                <i class="fas fa-shopping-cart"></i>
+                        <div class="wishlist-item-footer" role="group" aria-label="Acciones para ${productName}">
+                            <button class="btn btn-primary btn-sm" data-product-action="cart" data-product-id="${item.product_id}" aria-label="Agregar ${productName} al carrito">
+                                <i class="fas fa-shopping-cart" aria-hidden="true"></i>
                                 Carrito
                             </button>
-                            <button class="btn btn-outline btn-sm" data-product-action="remove" data-product-id="${item.product_id}">
-                                <i class="fas fa-trash"></i>
+                            <button class="btn btn-outline btn-sm" data-product-action="remove" data-product-id="${item.product_id}" aria-label="Eliminar ${productName} de la wishlist">
+                                <i class="fas fa-trash" aria-hidden="true"></i>
                                 Eliminar
                             </button>
                         </div>
@@ -559,8 +567,12 @@
                 const button = event.currentTarget;
                 state.filter = button.dataset.filter;
 
-                elements.filterButtons.forEach((btn) => btn.classList.remove('active'));
+                elements.filterButtons.forEach((btn) => {
+                    btn.classList.remove('active');
+                    btn.setAttribute('aria-pressed', 'false');
+                });
                 button.classList.add('active');
+                button.setAttribute('aria-pressed', 'true');
 
                 renderItems();
             }
