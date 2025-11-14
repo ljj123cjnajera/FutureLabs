@@ -21,6 +21,9 @@ class HomeManager {
         this.loadCategories()
       ]);
       
+      // Cargar megamenú dinámicamente después de cargar categorías
+      this.loadMegaMenu();
+      
       this.setupEventListeners();
       console.log('✅ HomeManager inicializado correctamente');
     } catch (error) {
@@ -97,36 +100,47 @@ class HomeManager {
   async loadFeaturedProducts() {
     try {
       // Mostrar skeleton loader
-      const container = document.getElementById('featuredProducts');
+      const container = document.getElementById('featuredProductsGrid');
       if (container && window.skeletonLoader) {
-        window.skeletonLoader.show('featuredProducts', 'product-grid');
+        window.skeletonLoader.show('featuredProductsGrid', 'product-grid');
       }
       
       const response = await window.api.getFeaturedProducts();
-      if (response.success) {
-        this.featuredProducts = response.data.products;
+      if (response && response.success) {
+        this.featuredProducts = response.data?.products || [];
         this.renderFeaturedProducts();
+        console.log(`✅ Productos destacados cargados: ${this.featuredProducts.length}`);
+      } else {
+        console.warn('⚠️ Respuesta inválida al cargar productos destacados:', response);
+        this.renderFeaturedProducts(); // Renderizar estado vacío
       }
     } catch (error) {
-      console.error('Error loading featured products:', error);
+      console.error('❌ Error cargando productos destacados:', error);
+      this.renderFeaturedProducts(); // Renderizar estado vacío
     }
   }
 
   async loadOnSaleProducts() {
     try {
       // Mostrar skeleton loader
-      const container = document.getElementById('onSaleProducts');
+      const container = document.getElementById('onSaleProductsGrid');
       if (container && window.skeletonLoader) {
-        window.skeletonLoader.show('onSaleProducts', 'product-grid');
+        window.skeletonLoader.show('onSaleProductsGrid', 'product-grid');
       }
       
-      const response = await window.api.getProducts({ on_sale: true });
-      if (response.success) {
-        this.onSaleProducts = response.data.products.slice(0, 8);
+      const response = await window.api.getOnSaleProducts(8);
+      
+      if (response && response.success) {
+        this.onSaleProducts = response.data?.products || [];
         this.renderOnSaleProducts();
+        console.log(`✅ Productos en oferta cargados: ${this.onSaleProducts.length}`);
+      } else {
+        console.warn('⚠️ Respuesta inválida al cargar productos en oferta:', response);
+        this.renderOnSaleProducts(); // Renderizar estado vacío
       }
     } catch (error) {
-      console.error('Error loading on-sale products:', error);
+      console.error('❌ Error cargando productos en oferta:', error);
+      this.renderOnSaleProducts(); // Renderizar estado vacío
     }
   }
 
@@ -139,82 +153,145 @@ class HomeManager {
       }
       
       const response = await window.api.getCategories();
-      if (response.success) {
-        this.categories = response.data.categories;
+      if (response && response.success) {
+        this.categories = response.data?.categories || [];
         this.renderCategories();
         this.renderHomeSections();
+        console.log(`✅ Categorías cargadas: ${this.categories.length}`);
+      } else {
+        console.warn('⚠️ Respuesta inválida al cargar categorías:', response);
+        this.renderCategories(); // Renderizar estado vacío o mantener placeholder
       }
     } catch (error) {
-      console.error('Error loading categories:', error);
+      console.error('❌ Error cargando categorías:', error);
+      // Mantener las categorías placeholder si hay error
+    } finally {
+      // Ocultar skeleton loader
+      if (window.skeletonLoader) {
+        window.skeletonLoader.hide('categories');
+      }
     }
   }
 
   renderFeaturedProducts() {
     const container = document.getElementById('featuredProductsGrid');
-    if (!container) return;
+    if (!container) {
+      console.warn('⚠️ featuredProductsGrid container not found');
+      return;
+    }
+
+    if (!this.featuredProducts || this.featuredProducts.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state" style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #999;">
+          <i class="fas fa-star" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+          <p style="font-size: 16px; margin: 0;">No hay productos destacados en este momento</p>
+          <p style="font-size: 14px; margin-top: 8px; opacity: 0.7;">Explora nuestros productos en la sección de catálogo</p>
+        </div>
+      `;
+      return;
+    }
 
     container.innerHTML = this.featuredProducts.map(product => this.createProductCard(product)).join('');
     window.wishlistManager?.syncToggleButtons?.(container);
     
-    // Ocultar skeleton loader
-    if (window.skeletonLoader) {
-      window.skeletonLoader.hide('featuredProducts');
-    }
+      // Ocultar skeleton loader
+      if (window.skeletonLoader) {
+        window.skeletonLoader.hide('featuredProductsGrid');
+      }
   }
 
   renderOnSaleProducts() {
-    // Crear contenedor si no existe
-    let container = document.getElementById('onSaleProductsGrid');
+    const container = document.getElementById('onSaleProductsGrid');
     if (!container) {
-      const section = document.createElement('section');
-      section.className = 'section';
-      section.innerHTML = `
-        <div class="container">
-          <h2 class="section-title">🔥 Ofertas Especiales</h2>
-          <div id="onSaleProductsGrid" class="products-grid"></div>
-        </div>
-      `;
-      
-      // Insertar después de featured products
-      const featuredSection = document.getElementById('featured-products');
-      if (featuredSection) {
-        featuredSection.insertAdjacentElement('afterend', section);
-        container = document.getElementById('onSaleProductsGrid');
-      } else {
-        console.log('⚠️ Featured section not found, skipping on-sale products');
-        return;
-      }
+      console.warn('⚠️ onSaleProductsGrid container not found');
+      return;
     }
 
-    if (container) {
-      container.innerHTML = this.onSaleProducts.map(product => this.createProductCard(product)).join('');
-      window.wishlistManager?.syncToggleButtons?.(container);
-      
+    if (!this.onSaleProducts || this.onSaleProducts.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state" style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #999;">
+          <i class="fas fa-fire" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+          <p style="font-size: 16px; margin: 0;">No hay ofertas disponibles en este momento</p>
+          <p style="font-size: 14px; margin-top: 8px; opacity: 0.7;">Vuelve pronto para ver nuestras mejores promociones</p>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = this.onSaleProducts.map(product => this.createProductCard(product)).join('');
+    window.wishlistManager?.syncToggleButtons?.(container);
+    
       // Ocultar skeleton loader
       if (window.skeletonLoader) {
-        window.skeletonLoader.hide('onSaleProducts');
+        window.skeletonLoader.hide('onSaleProductsGrid');
       }
-    }
   }
 
   renderCategories() {
-    const container = document.querySelector('.categories-carousel');
-    if (!container) return;
+    const container = document.getElementById('categories');
+    if (!container) {
+      console.warn('⚠️ categories container not found');
+      return;
+    }
 
-    container.innerHTML = this.categories.map(category => `
-      <div class="category-card" onclick="window.location.href='products.html?category=${category.slug}'">
-        <div class="category-icon">
-          <i class="${this.getCategoryIcon(category.slug)}"></i>
+    if (!this.categories || this.categories.length === 0) {
+      // Mantener categorías placeholder si no hay categorías
+      container.innerHTML = `
+        <div class="category-card">
+          <div class="category-icon"><i class="fas fa-gamepad"></i></div>
+          <h3>Mundo Gamer</h3>
+          <p>Equipos y accesorios gaming</p>
         </div>
-        <h3>${category.name}</h3>
-        <p>${category.description}</p>
+        <div class="category-card">
+          <div class="category-icon"><i class="fas fa-laptop"></i></div>
+          <h3>Mundo Productividad</h3>
+          <p>Herramientas para trabajar</p>
+        </div>
+        <div class="category-card">
+          <div class="category-icon"><i class="fas fa-home"></i></div>
+          <h3>Mundo Hogar Inteligente</h3>
+          <p>Automatización y control</p>
+        </div>
+        <div class="category-card">
+          <div class="category-icon"><i class="fas fa-heartbeat"></i></div>
+          <h3>Mundo Bienestar Tech</h3>
+          <p>Tecnología para tu salud</p>
+        </div>
+        <div class="category-card">
+          <div class="category-icon"><i class="fas fa-headphones"></i></div>
+          <h3>Mundo Audio</h3>
+          <p>Sonido de alta calidad</p>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = this.categories.slice(0, 8).map(category => `
+      <div class="category-card" onclick="window.location.href='products.html?category=${category.slug}'" role="button" tabindex="0" aria-label="Ver productos de ${category.name}">
+        <div class="category-icon">
+          <i class="${this.getCategoryIcon(category.slug)}" aria-hidden="true"></i>
+        </div>
+        <h3>${this.escapeHtml(category.name)}</h3>
+        <p>${this.escapeHtml(category.description || 'Explora esta categoría')}</p>
       </div>
     `).join('');
     
-    // Ocultar skeleton loader
-    if (window.skeletonLoader) {
-      window.skeletonLoader.hide('categories');
-    }
+    // Agregar event listeners para teclado (accesibilidad)
+    container.querySelectorAll('.category-card').forEach(card => {
+      card.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          card.click();
+        }
+      });
+    });
+  }
+
+  escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 
   renderHeroSlides() {
@@ -591,13 +668,416 @@ class HomeManager {
       });
     }
 
-    // CTA buttons
-    document.querySelectorAll('.cta-button').forEach(btn => {
-      btn.addEventListener('click', function(e) {
-        e.preventDefault();
-        window.location.href = 'products.html';
+    // CTA buttons genéricos
+    document.querySelectorAll('.cta-button:not([data-action])').forEach(btn => {
+      if (!btn.closest('.sticky-footer') && !btn.closest('.affiliate-banner')) {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          window.location.href = 'products.html';
+        });
+      }
+    });
+
+    // Sticky Footer - Suscripción
+    this.setupSubscriptionBanner();
+
+    // Chat Button
+    this.setupChatButton();
+
+    // Affiliate Banner
+    this.setupAffiliateBanner();
+
+    // Flash Offers - Mejorar diseño
+    this.setupFlashOffers();
+  }
+
+  setupSubscriptionBanner() {
+    const subscribeBtn = document.querySelector('.sticky-footer .cta-button');
+    if (!subscribeBtn) return;
+
+    subscribeBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      
+      // Verificar si el usuario está logueado
+      const user = await window.authManager?.getCurrentUser().catch(() => null);
+      const email = user?.email;
+
+      if (email) {
+        // Usuario logueado, usar su email
+        this.handleSubscription(email);
+      } else {
+        // Usuario no logueado, mostrar modal o prompt
+        this.showSubscriptionModal();
+      }
+    });
+  }
+
+  showSubscriptionModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'flex';
+    modal.innerHTML = `
+      <div class="modal-content" style="max-width: 500px;">
+        <span class="modal-close" onclick="this.closest('.modal').remove()">&times;</span>
+        <h2 style="margin-bottom: 16px;">¡Suscríbete y obtén 10% de descuento!</h2>
+        <p style="margin-bottom: 24px; color: #666;">Recibe ofertas exclusivas, novedades y tu código de descuento por email.</p>
+        <form id="subscriptionForm" onsubmit="event.preventDefault(); window.homeManager.handleSubscriptionForm(event);">
+          <div class="form-group">
+            <input type="email" id="subscriptionEmail" placeholder="tu@email.com" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%;">Suscribirme</button>
+        </form>
+        <p style="margin-top: 16px; font-size: 12px; color: #999; text-align: center;">
+          Al suscribirte, aceptas recibir comunicaciones comerciales de FutureLabs.
+        </p>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    // Cerrar al hacer click fuera
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.remove();
+      }
+    });
+
+    // Focus en el input
+    setTimeout(() => {
+      document.getElementById('subscriptionEmail')?.focus();
+    }, 100);
+  }
+
+  async handleSubscriptionForm(event) {
+    const form = event.target;
+    const emailInput = document.getElementById('subscriptionEmail');
+    const email = emailInput?.value.trim();
+
+    if (!email || !this.isValidEmail(email)) {
+      window.notifications?.error('Por favor, ingresa un email válido');
+      return;
+    }
+
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn?.textContent;
+    
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Suscribiendo...';
+    }
+
+    try {
+      await this.handleSubscription(email);
+      form.closest('.modal')?.remove();
+    } catch (error) {
+      console.error('Error en suscripción:', error);
+      window.notifications?.error('Error al procesar suscripción. Inténtalo de nuevo.');
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+      }
+    }
+  }
+
+  async handleSubscription(email) {
+    try {
+      // TODO: Implementar endpoint de suscripción en backend
+      // Por ahora, solo mostrar notificación
+      window.notifications?.success(`¡Te has suscrito con ${email}! Pronto recibirás tu código de descuento del 10%.`);
+      
+      // Guardar en localStorage para evitar spam
+      const subscriptions = JSON.parse(localStorage.getItem('subscriptions') || '[]');
+      if (!subscriptions.includes(email)) {
+        subscriptions.push(email);
+        localStorage.setItem('subscriptions', JSON.stringify(subscriptions));
+      }
+
+      // Ocultar sticky footer después de suscripción
+      const stickyFooter = document.querySelector('.sticky-footer');
+      if (stickyFooter) {
+        stickyFooter.style.display = 'none';
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  setupChatButton() {
+    const chatBtn = document.querySelector('.chat-button');
+    if (!chatBtn) return;
+
+    chatBtn.addEventListener('click', () => {
+      // Verificar si hay un sistema de chat implementado
+      if (window.chatManager) {
+        window.chatManager.open();
+      } else {
+        // Mostrar modal de contacto
+        this.showContactModal();
+      }
+    });
+  }
+
+  showContactModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'flex';
+    modal.innerHTML = `
+      <div class="modal-content" style="max-width: 600px;">
+        <span class="modal-close" onclick="this.closest('.modal').remove()">&times;</span>
+        <h2 style="margin-bottom: 16px;"><i class="fas fa-comments"></i> ¿Necesitas ayuda?</h2>
+        <p style="margin-bottom: 24px; color: #666;">Estamos aquí para ayudarte. Elige cómo prefieres contactarnos:</p>
+        <div style="display: grid; gap: 16px;">
+          <a href="contact.html" class="btn btn-outline" style="text-align: left; padding: 16px;">
+            <i class="fas fa-envelope"></i> Envíanos un email
+          </a>
+          <a href="faq.html" class="btn btn-outline" style="text-align: left; padding: 16px;">
+            <i class="fas fa-question-circle"></i> Ver preguntas frecuentes
+          </a>
+          <button class="btn btn-outline" onclick="this.closest('.modal').remove(); window.location.href='contact.html';" style="text-align: left; padding: 16px;">
+            <i class="fas fa-phone"></i> Información de contacto
+          </button>
+        </div>
+        <p style="margin-top: 24px; font-size: 12px; color: #999; text-align: center;">
+          El servicio de chat en vivo estará disponible próximamente.
+        </p>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    // Cerrar al hacer click fuera
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.remove();
+      }
+    });
+  }
+
+  setupAffiliateBanner() {
+    const affiliateBtn = document.querySelector('.affiliate-banner .cta-button');
+    if (!affiliateBtn) return;
+
+    affiliateBtn.addEventListener('click', () => {
+      // Redirigir a página de afiliados o mostrar información
+      window.location.href = 'contact.html?subject=affiliate';
+    });
+  }
+
+  async setupFlashOffers() {
+    // Mejorar la sección de flash offers con productos reales
+    const flashSection = document.getElementById('flashOffersMessage');
+    if (!flashSection) return;
+
+    try {
+      // Cargar productos en oferta para mostrar en flash offers
+      const response = await window.api.getOnSaleProducts(4);
+      
+      if (response && response.success && response.data?.products?.length > 0) {
+        const products = response.data.products.slice(0, 4);
+        
+        flashSection.innerHTML = `
+          <div class="flash-offers-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 24px;">
+            ${products.map(product => {
+              const discount = product.discount_price ? 
+                Math.round(((product.price - product.discount_price) / product.price) * 100) : 0;
+              
+              return `
+                <div class="flash-offer-card" onclick="window.location.href='product-detail.html?id=${product.id}'" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 24px; border-radius: 12px; cursor: pointer; transition: transform 0.2s;">
+                  <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                    <span style="background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">-${discount}%</span>
+                    <i class="fas fa-fire" style="font-size: 24px; opacity: 0.8;"></i>
+                  </div>
+                  <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600;">${this.escapeHtml(product.name)}</h3>
+                  <p style="margin: 0 0 16px 0; opacity: 0.9; font-size: 14px;">${this.escapeHtml(product.brand)}</p>
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                      ${product.discount_price ? `
+                        <span style="text-decoration: line-through; opacity: 0.7; font-size: 14px;">S/ ${parseFloat(product.price).toFixed(2)}</span>
+                        <span style="display: block; font-size: 24px; font-weight: 700;">S/ ${parseFloat(product.discount_price).toFixed(2)}</span>
+                      ` : `
+                        <span style="font-size: 24px; font-weight: 700;">S/ ${parseFloat(product.price).toFixed(2)}</span>
+                      `}
+                    </div>
+                    <button class="btn" style="background: white; color: #667eea; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer;" onclick="event.stopPropagation(); window.location.href='product-detail.html?id=${product.id}'">
+                      Ver oferta
+                    </button>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+          <div style="text-align: center; margin-top: 24px;">
+            <a href="products.html?on_sale=true" class="btn btn-primary">Ver todas las ofertas</a>
+          </div>
+        `;
+      } else {
+        // Si no hay ofertas, mostrar mensaje mejorado
+        flashSection.innerHTML = `
+          <div style="text-align: center; padding: 40px 20px;">
+            <i class="fas fa-fire" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5; color: #ff6b6b;"></i>
+            <p style="font-size: 16px; margin: 0; color: #666;">No hay ofertas flash disponibles en este momento</p>
+            <p style="font-size: 14px; margin-top: 8px; color: #999;">Suscríbete para ser el primero en enterarte de nuestras próximas promociones</p>
+            <button class="btn btn-primary" style="margin-top: 16px;" onclick="document.querySelector('.sticky-footer .cta-button')?.click();">
+              Suscribirme
+            </button>
+          </div>
+        `;
+      }
+    } catch (error) {
+      console.error('❌ Error cargando flash offers:', error);
+      flashSection.innerHTML = `
+        <div style="text-align: center; padding: 40px 20px; color: #999;">
+          <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+          <p style="font-size: 16px; margin: 0;">Error al cargar ofertas flash</p>
+          <a href="products.html?on_sale=true" class="btn btn-outline" style="margin-top: 16px;">Ver ofertas disponibles</a>
+        </div>
+      `;
+    }
+  }
+
+  isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  async loadMegaMenu() {
+    try {
+      // Solo cargar si ya tenemos categorías
+      if (!this.categories || this.categories.length === 0) {
+        return;
+      }
+
+      const categoriesColumn = document.querySelector('.categories-column');
+      const contentColumn = document.querySelector('.content-column');
+      
+      if (!categoriesColumn || !contentColumn) {
+        console.warn('⚠️ Mega menu containers not found');
+        return;
+      }
+
+      // Renderizar categorías en la columna izquierda
+      categoriesColumn.innerHTML = this.categories.slice(0, 8).map((category, index) => `
+        <div class="category-item ${index === 0 ? 'active' : ''}" data-category="${category.slug}">
+          <span class="category-text">${this.escapeHtml(category.name)}</span>
+          <i class="fas fa-chevron-right" aria-hidden="true"></i>
+          <div class="active-indicator"></div>
+        </div>
+      `).join('');
+
+      // Renderizar contenido de categorías
+      contentColumn.innerHTML = this.categories.slice(0, 8).map((category, index) => {
+        // Obtener subcategorías si existen (por ahora, usar placeholder)
+        const subcategories = this.getSubcategoriesForCategory(category);
+        
+        return `
+          <div class="category-content ${index === 0 ? 'active' : ''}" data-category="${category.slug}">
+            <div class="content-header">
+              <h2>${this.escapeHtml(category.name)}</h2>
+              <a href="products.html?category=${category.slug}" class="view-all">Ver todo <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+            </div>
+            <div class="subcategories-grid">
+              ${this.renderSubcategoriesGrid(category, subcategories)}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Reinicializar event listeners del megamenú
+      this.setupMegaMenuListeners();
+      
+      console.log('✅ Mega menu cargado dinámicamente');
+    } catch (error) {
+      console.error('❌ Error cargando mega menu:', error);
+    }
+  }
+
+  getSubcategoriesForCategory(category) {
+    // Por ahora, retornar subcategorías genéricas basadas en el slug
+    // TODO: Implementar subcategorías reales desde la BD
+    const subcategoriesMap = {
+      'laptops': [
+        { title: 'Componentes', items: ['Procesadores (CPU)', 'Tarjetas de Video (GPU)', 'Placas Madre', 'Memoria RAM', 'Almacenamiento SSD/HDD'] },
+        { title: 'Periféricos', items: ['Teclados', 'Mouses', 'Monitores', 'Webcams y Micrófonos', 'Audífonos'] },
+        { title: 'Laptops por Tipo', items: ['Laptops para Gaming', 'Laptops Ultraligeras', 'Laptops para Trabajo', 'Laptops Convertibles 2-en-1'] }
+      ],
+      'gaming': [
+        { title: 'Consolas', items: ['PlayStation', 'Xbox', 'Nintendo Switch', 'PC Gaming'] },
+        { title: 'Periféricos Gaming', items: ['Teclados Mecánicos', 'Mouses Gaming', 'Headsets', 'Mousepads'] },
+        { title: 'Componentes', items: ['Tarjetas Gráficas', 'Procesadores Gaming', 'Refrigeración Líquida', 'Gabinetes Gaming'] }
+      ]
+    };
+
+    return subcategoriesMap[category.slug] || [
+      { title: 'Productos', items: ['Ver todos los productos'] }
+    ];
+  }
+
+  renderSubcategoriesGrid(category, subcategories) {
+    if (!subcategories || subcategories.length === 0) {
+      return `
+        <div class="subcategory-column">
+          <h3>Productos</h3>
+          <ul>
+            <li><a href="products.html?category=${category.slug}">Ver todos los productos</a></li>
+          </ul>
+        </div>
+      `;
+    }
+
+    return subcategories.map(sub => `
+      <div class="subcategory-column">
+        <h3>${this.escapeHtml(sub.title)}</h3>
+        <ul>
+          ${sub.items.map(item => `
+            <li><a href="products.html?category=${category.slug}&search=${encodeURIComponent(item)}">${this.escapeHtml(item)}</a></li>
+          `).join('')}
+        </ul>
+      </div>
+    `).join('');
+  }
+
+  setupMegaMenuListeners() {
+    const categoryItems = document.querySelectorAll('.category-item');
+    const categoryContents = document.querySelectorAll('.category-content');
+
+    categoryItems.forEach(item => {
+      // Remover listeners previos
+      const newItem = item.cloneNode(true);
+      item.parentNode.replaceChild(newItem, item);
+      
+      newItem.addEventListener('click', () => {
+        const category = newItem.getAttribute('data-category');
+        
+        // Remover active de todos
+        categoryItems.forEach(i => i.classList.remove('active'));
+        categoryContents.forEach(c => c.classList.remove('active'));
+        
+        // Agregar active al seleccionado
+        newItem.classList.add('active');
+        const content = document.querySelector(`.category-content[data-category="${category}"]`);
+        if (content) {
+          content.classList.add('active');
+        }
       });
     });
+
+    // Hover para desktop
+    if (window.innerWidth > 768) {
+      categoryItems.forEach(item => {
+        item.addEventListener('mouseenter', function() {
+          const category = this.getAttribute('data-category');
+          
+          if (!this.classList.contains('active')) {
+            categoryItems.forEach(i => i.classList.remove('active'));
+            categoryContents.forEach(c => c.classList.remove('active'));
+            
+            this.classList.add('active');
+            const content = document.querySelector(`.category-content[data-category="${category}"]`);
+            if (content) {
+              content.classList.add('active');
+            }
+          }
+        });
+      });
+    }
   }
 
   isBannerCurrentlyActive(banner) {

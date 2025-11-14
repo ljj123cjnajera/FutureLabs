@@ -301,40 +301,48 @@
 
     <!-- Hero Section -->
     <section class="hero">
-        <div class="hero-slider">
-            <div class="slide active">
-                <div class="slide-content">
-                    <h1>INNOVATION DAYS</h1>
-                    <p>Descubre las mejores ofertas en tecnología de vanguardia</p>
-                    <button class="btn btn-primary btn-lg">Ver promociones</button>
-                </div>
+        <div class="hero-slider" id="heroSlider">
+            <div class="hero-slider-empty" id="heroSliderEmpty">
+                <h2>Agrega slides desde el panel administrativo</h2>
+                <p>Los hero slides que configures aparecerán automáticamente en esta sección.</p>
             </div>
-            <div class="slide">
-                <div class="slide-content">
-                    <h1>TECNOLOGÍA DEL FUTURO</h1>
-                    <p>Los dispositivos más innovadores al mejor precio</p>
-                    <button class="btn btn-primary btn-lg">Explorar productos</button>
-                </div>
-            </div>
-            <div class="slide">
-                <div class="slide-content">
-                    <h1>SMART HOME</h1>
-                    <p>Transforma tu hogar con la última tecnología</p>
-                    <button class="btn btn-primary btn-lg">Descubrir</button>
-                </div>
-            </div>
-            
+            <div class="hero-slides" id="heroSlidesContainer"></div>
             <button type="button" class="slider-arrow prev" aria-label="Mostrar slide anterior">
                 <i class="fas fa-chevron-left" aria-hidden="true"></i>
             </button>
             <button type="button" class="slider-arrow next" aria-label="Mostrar siguiente slide">
                 <i class="fas fa-chevron-right" aria-hidden="true"></i>
             </button>
-            
-            <div class="slider-controls">
-                <button type="button" class="slider-dot active" aria-label="Slide 1"></button>
-                <button type="button" class="slider-dot" aria-label="Slide 2"></button>
-                <button type="button" class="slider-dot" aria-label="Slide 3"></button>
+            <div class="slider-controls" id="heroSliderDots"></div>
+        </div>
+    </section>
+
+    <!-- Featured Products Section -->
+    <section class="section" id="featured-products">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Productos Destacados</h2>
+                <p class="section-description">
+                    Descubre nuestra selección de productos más populares y mejor valorados por nuestros clientes.
+                </p>
+            </div>
+            <div class="products-grid" id="featuredProductsGrid">
+                <!-- Productos destacados se cargarán aquí dinámicamente -->
+            </div>
+        </div>
+    </section>
+
+    <!-- On Sale Products Section -->
+    <section class="section" id="on-sale-products">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">🔥 Ofertas Especiales</h2>
+                <p class="section-description">
+                    Aprovecha nuestras mejores ofertas y descuentos por tiempo limitado. ¡No te las pierdas!
+                </p>
+            </div>
+            <div class="products-grid" id="onSaleProductsGrid">
+                <!-- Productos en oferta se cargarán aquí dinámicamente -->
             </div>
         </div>
     </section>
@@ -348,42 +356,7 @@
                     Recompensamos tus compras con ventajas pensadas para ti: precios especiales, envíos sin costo y más.
                 </p>
             </div>
-            <div class="benefits-slider" id="benefitsContainer">
-                <!-- Contenido cargado dinámicamente desde admin -->
-                <!-- Contenido por defecto (se reemplaza si hay beneficios en BD) -->
-                <div class="benefit-card">
-                    <div class="benefit-image">
-                        <h3>Descuentos Especiales</h3>
-                    </div>
-                    <div class="benefit-content">
-                        <p>Hasta 40% de descuento en productos seleccionados</p>
-                    </div>
-                </div>
-                <div class="benefit-card">
-                    <div class="benefit-image">
-                        <h3>Envío Gratis</h3>
-                    </div>
-                    <div class="benefit-content">
-                        <p>En compras mayores a S/ 200 en todo Lima</p>
-                    </div>
-                </div>
-                <div class="benefit-card">
-                    <div class="benefit-image">
-                        <h3>Meses Sin Intereses</h3>
-                    </div>
-                    <div class="benefit-content">
-                        <p>Hasta 18 meses sin intereses con tarjetas participantes</p>
-                    </div>
-                </div>
-                <div class="benefit-card">
-                    <div class="benefit-image">
-                        <h3>Garantía Extendida</h3>
-                    </div>
-                    <div class="benefit-content">
-                        <p>+1 año de garantía en productos seleccionados</p>
-                    </div>
-                </div>
-            </div>
+            <div class="benefits-slider" id="benefitsContainer"></div>
         </div>
     </section>
 
@@ -393,20 +366,21 @@
             <div class="affiliate-banner">
                 <h2>Comienza a ganar dinero con FutureLabs Affiliates</h2>
                 <p>Únete a nuestro programa de afiliados y gana comisiones por cada venta</p>
-                <button class="cta-button">Más información</button>
+                <button class="cta-button" type="button" aria-label="Más información sobre el programa de afiliados">Más información</button>
             </div>
         </div>
     </section>
 
     <!-- Flash Offers -->
-    <section class="section">
+    <section class="section" id="flash-offers">
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">Ofertas Flash por tiempo limitado <i class="fas fa-fire"></i></h2>
-                <p class="section-description">Estamos preparando promociones de impacto. Suscríbete para ser el primero en enterarte.</p>
+                <p class="section-description">Aprovecha nuestras mejores promociones con descuentos exclusivos. ¡Por tiempo limitado!</p>
             </div>
-            <div class="flash-offers-message">
-                <p>Próximamente encontrarás aquí nuestras mejores ofertas. ¡Mantente atento!</p>
+            <div class="flash-offers-message" id="flashOffersMessage">
+                <div class="loading-spinner"></div>
+                <p>Cargando ofertas especiales...</p>
             </div>
         </div>
     </section>
@@ -414,37 +388,20 @@
     <!-- Banner Grid -->
     <section class="section">
         <div class="container">
-            <div class="banner-grid">
-                <div class="banner">
-                    <h3>Gaming Zone</h3>
-                    <p>Los mejores equipos para gamers</p>
-                </div>
-                <div class="banner">
-                    <h3>Smart Home</h3>
-                    <p>Automatiza tu hogar</p>
-                </div>
-                <div class="banner">
-                    <h3>Audio Pro</h3>
-                    <p>Experiencia sonora superior</p>
-                </div>
+            <div class="banner-grid" id="bannerGrid">
+                <!-- Banners dinámicos -->
             </div>
         </div>
     </section>
 
-    <!-- Product Carousels by Category -->
+    <!-- Home Sections -->
     <section class="section">
         <div class="container">
             <div class="section-header">
-                <h3 class="section-title">Novedades en Smart Home</h3>
-                <p class="section-description">Iluminación inteligente, seguridad conectada y asistentes que facilitan tu día.</p>
+                <h3 class="section-title">Colecciones destacadas</h3>
+                <p class="section-description">Personaliza qué secciones aparecen en el home desde el panel administrativo.</p>
             </div>
-            <div class="category-carousel">
-                <div class="carousel-message">
-                    <p>Nuestros productos de Smart Home estarán aquí pronto.</p>
-                </div>
-                <div class="carousel-arrow prev"><i class="fas fa-chevron-left"></i></div>
-                <div class="carousel-arrow next"><i class="fas fa-chevron-right"></i></div>
-            </div>
+            <div class="home-sections-grid" id="homeSectionsContainer"></div>
         </div>
     </section>
 
@@ -455,32 +412,8 @@
                 <h2 class="section-title">Descubre nuestros mundos</h2>
                 <p class="section-description">Explora colecciones temáticas y encuentra el ecosistema perfecto para tu estilo de vida.</p>
             </div>
-            <div class="categories-carousel">
-                <div class="category-card">
-                    <div class="category-icon"><i class="fas fa-gamepad"></i></div>
-                    <h3>Mundo Gamer</h3>
-                    <p>Equipos y accesorios gaming</p>
-                </div>
-                <div class="category-card">
-                    <div class="category-icon"><i class="fas fa-laptop"></i></div>
-                    <h3>Mundo Productividad</h3>
-                    <p>Herramientas para trabajar</p>
-                </div>
-                <div class="category-card">
-                    <div class="category-icon"><i class="fas fa-home"></i></div>
-                    <h3>Mundo Hogar Inteligente</h3>
-                    <p>Automatización y control</p>
-                </div>
-                <div class="category-card">
-                    <div class="category-icon"><i class="fas fa-heartbeat"></i></div>
-                    <h3>Mundo Bienestar Tech</h3>
-                    <p>Tecnología para tu salud</p>
-                </div>
-                <div class="category-card">
-                    <div class="category-icon"><i class="fas fa-headphones"></i></div>
-                    <h3>Mundo Audio</h3>
-                    <p>Sonido de alta calidad</p>
-                </div>
+            <div class="categories-carousel" id="categories">
+                <!-- Las categorías se cargarán dinámicamente desde la base de datos -->
             </div>
         </div>
     </section>
@@ -509,15 +442,15 @@
     <footer id="mainFooter"></footer>
 
     <!-- Floating Components -->
-    <div class="sticky-footer">
+    <div class="sticky-footer" id="stickyFooter">
         <div class="container">
             <p>¡Suscríbete y obtén 10% de descuento en tu primera compra!</p>
-            <button class="cta-button">Suscribirme</button>
+            <button class="cta-button" type="button" aria-label="Suscribirse para obtener descuento">Suscribirme</button>
         </div>
     </div>
 
-    <div class="chat-button">
-        <i class="fas fa-comments"></i>
+    <div class="chat-button" id="chatButton" role="button" tabindex="0" aria-label="Abrir chat de ayuda">
+        <i class="fas fa-comments" aria-hidden="true"></i>
     </div>
 
     <!-- Scripts del Sistema Integrado -->
