@@ -897,6 +897,21 @@ class AdminCRUD {
       showError(priceInput, 'El precio debe ser un número válido');
     }
 
+    // Validar precio de descuento
+    const discountPriceInput = document.getElementById('productDiscountPrice');
+    const discountPrice = discountPriceInput?.value.trim();
+    if (discountPrice) {
+      const discountPriceNum = parseFloat(discountPrice);
+      const priceNum = parseFloat(price);
+      if (isNaN(discountPriceNum)) {
+        showError(discountPriceInput, 'El precio de descuento debe ser un número válido');
+      } else if (discountPriceNum <= 0) {
+        showError(discountPriceInput, 'El precio de descuento debe ser mayor a 0');
+      } else if (discountPriceNum >= priceNum) {
+        showError(discountPriceInput, 'El precio de descuento debe ser menor al precio normal');
+      }
+    }
+
     if (!category) {
       showError(categoryInput, 'Debes seleccionar una categoría');
     }
@@ -905,6 +920,8 @@ class AdminCRUD {
       showError(stockInput, 'El stock debe ser mayor o igual a 0');
     } else if (isNaN(parseInt(stock))) {
       showError(stockInput, 'El stock debe ser un número válido');
+    } else if (!Number.isInteger(parseFloat(stock))) {
+      showError(stockInput, 'El stock debe ser un número entero');
     }
     
     if (hasErrors) {
@@ -1297,11 +1314,26 @@ class AdminCRUD {
   }
 
   async saveReview() {
+    const ratingInput = document.getElementById('reviewRating');
+    const rating = parseInt(ratingInput?.value);
+    
+    // Validar rating
+    if (!ratingInput || isNaN(rating) || rating < 1 || rating > 5) {
+      window.notifications?.error('La calificación debe ser un número entre 1 y 5');
+      if (ratingInput) {
+        ratingInput.style.borderColor = '#ef4444';
+        setTimeout(() => {
+          if (ratingInput) ratingInput.style.borderColor = '';
+        }, 3000);
+      }
+      return;
+    }
+    
     const reviewData = {
-      rating: parseInt(document.getElementById('reviewRating').value),
-      title: document.getElementById('reviewTitle').value,
-      comment: document.getElementById('reviewComment').value,
-      is_approved: document.getElementById('reviewIsApproved').checked
+      rating: rating,
+      title: document.getElementById('reviewTitle')?.value?.trim() || null,
+      comment: document.getElementById('reviewComment')?.value?.trim() || null,
+      is_approved: document.getElementById('reviewIsApproved')?.checked || false
     };
 
     try {

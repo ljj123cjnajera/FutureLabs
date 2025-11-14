@@ -278,9 +278,10 @@ class AdminManager {
         if (orders.length === 0) {
           tbody.innerHTML = `
             <tr>
-              <td colspan="6" style="text-align: center; padding: 40px; color: #999;">
-                <i class="fas fa-shopping-bag" style="opacity: 0.5;"></i>
-                <p style="margin-top: 8px; margin-bottom: 0;">No hay pedidos recientes</p>
+              <td colspan="6" style="text-align: center; padding: 60px 20px; color: #999;">
+                <i class="fas fa-shopping-bag" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+                <p style="font-size: 16px; margin: 0;">No hay pedidos recientes</p>
+                <p style="font-size: 14px; margin-top: 8px; opacity: 0.7;">Los últimos 10 pedidos aparecerán aquí</p>
               </td>
             </tr>
           `;
@@ -490,7 +491,17 @@ class AdminManager {
         const orders = response.data.orders;
         
         if (orders.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;">No hay pedidos</td></tr>';
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="7" style="text-align: center; padding: 60px 20px;">
+                <div style="color: #999;">
+                  <i class="fas fa-shopping-bag" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+                  <p style="font-size: 16px; margin: 0;">No hay pedidos registrados</p>
+                  <p style="font-size: 14px; margin-top: 8px; opacity: 0.7;">Los pedidos que se realicen aparecerán aquí</p>
+                </div>
+              </td>
+            </tr>
+          `;
           return;
         }
         
@@ -515,6 +526,9 @@ class AdminManager {
             </td>
           </tr>
         `).join('');
+        
+        // Mostrar toast de éxito
+        window.notifications?.success(`Se cargaron ${orders.length} pedido${orders.length !== 1 ? 's' : ''}`);
       }
     } catch (error) {
       console.error('Error loading orders:', error);
@@ -552,7 +566,17 @@ class AdminManager {
         const users = response.data.users;
         
         if (users.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;">No hay usuarios</td></tr>';
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="7" style="text-align: center; padding: 60px 20px;">
+                <div style="color: #999;">
+                  <i class="fas fa-users" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+                  <p style="font-size: 16px; margin: 0;">No hay usuarios registrados</p>
+                  <p style="font-size: 14px; margin-top: 8px; opacity: 0.7;">Los usuarios que se registren aparecerán aquí</p>
+                </div>
+              </td>
+            </tr>
+          `;
           return;
         }
         
@@ -578,6 +602,9 @@ class AdminManager {
                 </td>
               </tr>
             `).join('');
+        
+        // Mostrar toast de éxito
+        window.notifications?.success(`Se cargaron ${users.length} usuario${users.length !== 1 ? 's' : ''}`);
       }
     } catch (error) {
       console.error('Error loading users:', error);
@@ -646,6 +673,9 @@ class AdminManager {
                 </td>
               </tr>
             `).join('');
+        
+        // Mostrar toast de éxito
+        window.notifications?.success(`Se cargaron ${reviews.length} reseña${reviews.length !== 1 ? 's' : ''}`);
       }
     } catch (error) {
       console.error('Error loading reviews:', error);
