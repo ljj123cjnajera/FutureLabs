@@ -583,7 +583,57 @@
 }
 
 /* ============================================
-   RESPONSIVE
+   EMPTY STATES
+   ============================================ */
+
+.blog-empty-state {
+    text-align: center;
+    padding: clamp(var(--spacing-2xl), 8vw, var(--spacing-4xl)) var(--spacing-lg);
+    color: var(--text-secondary);
+}
+
+.blog-empty-icon {
+    font-size: clamp(48px, 8vw, 72px);
+    color: var(--gray-400);
+    margin-bottom: var(--spacing-lg);
+    opacity: 0.6;
+}
+
+.blog-empty-state h2 {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+    font-weight: 600;
+}
+
+.blog-empty-state p {
+    font-size: clamp(1rem, 2vw, 1.125rem);
+    margin-bottom: var(--spacing-xl);
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.blog-empty-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 480px) {
+    .blog-empty-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .blog-empty-actions .btn {
+        width: 100%;
+    }
+}
+
+/* ============================================
+   RESPIVE
    ============================================ */
 
 @media (max-width: 1024px) {

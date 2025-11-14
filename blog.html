@@ -185,17 +185,20 @@
 
         function showEmptyState() {
             const container = document.getElementById('blogContent');
+            container.setAttribute('aria-busy', 'false');
             container.innerHTML = `
-                <div class="orders-empty-state">
-                    <i class="fas fa-newspaper"></i>
+                <div class="blog-empty-state" role="status" aria-live="polite">
+                    <div class="blog-empty-icon" aria-hidden="true">
+                        <i class="fas fa-newspaper"></i>
+                    </div>
                     <h2>No hay artículos disponibles</h2>
                     <p>Vuelve pronto para ver nuevos contenidos o explora otras secciones.</p>
-                    <div class="orders-empty-actions">
-                        <button class="btn btn-primary btn-sm" type="button" onclick="window.location.href='products.html'">
-                            <i class="fas fa-shopping-bag"></i> Ver productos
+                    <div class="blog-empty-actions" role="group" aria-label="Acciones disponibles">
+                        <button class="btn btn-primary btn-sm" type="button" onclick="window.location.href='products.html'" aria-label="Ver productos disponibles">
+                            <i class="fas fa-shopping-bag" aria-hidden="true"></i> Ver productos
                         </button>
-                        <button class="btn btn-outline btn-sm" type="button" onclick="window.location.href='compare.html'">
-                            <i class="fas fa-balance-scale"></i> Ir al comparador
+                        <button class="btn btn-outline btn-sm" type="button" onclick="window.location.href='compare.html'" aria-label="Ir al comparador de productos">
+                            <i class="fas fa-balance-scale" aria-hidden="true"></i> Ir al comparador
                         </button>
                     </div>
                 </div>
