@@ -357,12 +357,14 @@ class HomeManager {
       const content = document.createElement('div');
       content.className = 'slide-content';
 
-      if (slideData.eyebrow) {
-        const eyebrow = document.createElement('span');
-        eyebrow.className = 'slide-eyebrow';
-        eyebrow.textContent = slideData.eyebrow;
-        content.appendChild(eyebrow);
-      }
+      // Nota: El campo 'eyebrow' no está en la BD actualmente
+      // Si se necesita, agregar en una futura migración
+      // if (slideData.eyebrow) {
+      //   const eyebrow = document.createElement('span');
+      //   eyebrow.className = 'slide-eyebrow';
+      //   eyebrow.textContent = slideData.eyebrow;
+      //   content.appendChild(eyebrow);
+      // }
 
       const title = document.createElement('h1');
       title.textContent = slideData.title || 'FutureLabs';
