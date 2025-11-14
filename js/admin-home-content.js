@@ -46,7 +46,13 @@ class AdminHomeContent {
     if (!container) return;
 
     if (!slides || slides.length === 0) {
-      container.innerHTML = '<p style="padding: 20px; text-align: center; color: #999;">No hay slides. Crea uno nuevo.</p>';
+      container.innerHTML = `
+        <div style="padding: 60px 20px; text-align: center; color: #999;">
+          <i class="fas fa-sliders-h" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+          <p style="font-size: 16px; margin: 0;">No hay hero slides registrados</p>
+          <p style="font-size: 14px; margin-top: 8px; opacity: 0.7;">Crea un slide desde el botón "Nuevo Slide"</p>
+        </div>
+      `;
       return;
     }
 
@@ -129,51 +135,71 @@ class AdminHomeContent {
     const form = document.getElementById('heroSlideForm');
     this.clearFormErrors(form);
 
-    const formData = {
-      title: document.getElementById('heroSlideTitle').value.trim(),
-      description: document.getElementById('heroSlideDescription').value.trim() || null,
-      button_text: document.getElementById('heroSlideButtonText').value.trim() || null,
-      button_link: document.getElementById('heroSlideButtonLink').value.trim() || null,
-      image_url: document.getElementById('heroSlideImageUrl').value.trim() || null,
-      background_color: document.getElementById('heroSlideBackgroundColor').value,
-      order_index: parseInt(document.getElementById('heroSlideOrder').value, 10) || 0,
-      is_active: document.getElementById('heroSlideIsActive').checked
-    };
-
-    let hasErrors = false;
-    if (!formData.title) {
-      this.showFieldError('heroSlideTitle', 'El título es obligatorio');
-      hasErrors = true;
-    }
-
-    if (formData.button_link && !this.isValidUrl(formData.button_link)) {
-      this.showFieldError('heroSlideButtonLink', 'Ingresa un enlace válido (https://...)');
-      hasErrors = true;
-    }
-
-    const imageFile = document.getElementById('heroSlideImageFile').files[0];
-    if (imageFile) {
-      try {
-        const uploadResponse = await window.api.uploadImage(imageFile);
-        if (uploadResponse.success) {
-          formData.image_url = uploadResponse.data.url;
-        }
-      } catch (error) {
-        this.showFieldError('heroSlideImageFile', 'No se pudo subir la imagen. Inténtalo de nuevo.');
-        window.notifications?.error('Error al subir imagen');
-        return;
-      }
-    } else if (!formData.image_url && !this.currentEditId) {
-      this.showFieldError('heroSlideImageUrl', 'Adjunta una imagen o ingresa una URL.');
-      hasErrors = true;
-    }
-
-    if (hasErrors) {
-      window.notifications?.error('Corrige los errores y vuelve a intentarlo.');
-      return;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn?.textContent;
+    
+    // Mostrar loading en botón
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<div class="loading-spinner small"></div> Guardando...';
     }
 
     try {
+      const formData = {
+        title: document.getElementById('heroSlideTitle').value.trim(),
+        description: document.getElementById('heroSlideDescription').value.trim() || null,
+        button_text: document.getElementById('heroSlideButtonText').value.trim() || null,
+        button_link: document.getElementById('heroSlideButtonLink').value.trim() || null,
+        image_url: document.getElementById('heroSlideImageUrl').value.trim() || null,
+        background_color: document.getElementById('heroSlideBackgroundColor').value,
+        order_index: parseInt(document.getElementById('heroSlideOrder').value, 10) || 0,
+        is_active: document.getElementById('heroSlideIsActive').checked
+      };
+
+      let hasErrors = false;
+      if (!formData.title) {
+        this.showFieldError('heroSlideTitle', 'El título es obligatorio');
+        hasErrors = true;
+      }
+
+      if (formData.button_link && !this.isValidUrl(formData.button_link)) {
+        this.showFieldError('heroSlideButtonLink', 'Ingresa un enlace válido (https://...)');
+        hasErrors = true;
+      }
+
+      // Validar order_index
+      const orderValue = document.getElementById('heroSlideOrder').value;
+      if (orderValue && (isNaN(parseInt(orderValue)) || parseInt(orderValue) < 0)) {
+        this.showFieldError('heroSlideOrder', 'El orden debe ser un número entero mayor o igual a 0');
+        hasErrors = true;
+      }
+
+      const imageFile = document.getElementById('heroSlideImageFile').files[0];
+      if (imageFile) {
+        try {
+          window.notifications?.info('Subiendo imagen...');
+          const uploadResponse = await window.api.uploadImage(imageFile);
+          if (uploadResponse.success) {
+            formData.image_url = uploadResponse.data.url;
+            window.notifications?.success('Imagen subida exitosamente');
+          } else {
+            throw new Error(uploadResponse.message || 'Error al subir imagen');
+          }
+        } catch (error) {
+          this.showFieldError('heroSlideImageFile', 'No se pudo subir la imagen. Inténtalo de nuevo.');
+          window.notifications?.error('Error al subir imagen: ' + (error.message || 'Error desconocido'));
+          return;
+        }
+      } else if (!formData.image_url && !this.currentEditId) {
+        this.showFieldError('heroSlideImageUrl', 'Adjunta una imagen o ingresa una URL.');
+        hasErrors = true;
+      }
+
+      if (hasErrors) {
+        window.notifications?.error('Corrige los errores y vuelve a intentarlo.');
+        return;
+      }
+
       const response = this.currentEditId
         ? await window.api.updateHeroSlide(this.currentEditId, formData)
         : await window.api.createHeroSlide(formData);
@@ -182,10 +208,18 @@ class AdminHomeContent {
         window.notifications?.success(response.message || 'Slide guardado exitosamente');
         this.hideModal(document.getElementById('heroSlideModal'));
         this.loadHeroSlides();
+      } else {
+        throw new Error(response.message || 'Error al guardar slide');
       }
     } catch (error) {
       console.error('Error saving hero slide:', error);
-      window.notifications?.error('Error al guardar slide');
+      window.notifications?.error('Error al guardar slide: ' + (error.message || 'Error desconocido'));
+    } finally {
+      // Restaurar botón
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalBtnText;
+      }
     }
   }
 
@@ -225,7 +259,13 @@ class AdminHomeContent {
     if (!container) return;
 
     if (!banners || banners.length === 0) {
-      container.innerHTML = '<p style="padding: 20px; text-align: center; color: #999;">No hay banners. Crea uno nuevo.</p>';
+      container.innerHTML = `
+        <div style="padding: 60px 20px; text-align: center; color: #999;">
+          <i class="fas fa-image" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+          <p style="font-size: 16px; margin: 0;">No hay banners registrados</p>
+          <p style="font-size: 14px; margin-top: 8px; opacity: 0.7;">Crea un banner desde el botón "Nuevo Banner"</p>
+        </div>
+      `;
       return;
     }
 
@@ -313,69 +353,97 @@ class AdminHomeContent {
     const form = document.getElementById('bannerForm');
     this.clearFormErrors(form);
 
-    const formData = {
-      title: document.getElementById('bannerTitle').value.trim(),
-      description: document.getElementById('bannerDescription').value.trim() || null,
-      button_text: document.getElementById('bannerButtonText').value.trim() || null,
-      button_link: document.getElementById('bannerButtonLink').value.trim() || null,
-      image_url: document.getElementById('bannerImageUrl').value.trim() || null,
-      banner_type: document.getElementById('bannerType').value,
-      position: document.getElementById('bannerPosition').value || null,
-      start_date: document.getElementById('bannerStartDate').value || null,
-      end_date: document.getElementById('bannerEndDate').value || null,
-      order_index: parseInt(document.getElementById('bannerOrder').value) || 0,
-      is_active: document.getElementById('bannerIsActive').checked
-    };
-
-    let hasErrors = false;
-    if (!formData.title) {
-      this.showFieldError('bannerTitle', 'El título es obligatorio');
-      hasErrors = true;
-    }
-
-    if (!formData.banner_type) {
-      this.showFieldError('bannerType', 'Selecciona un tipo de banner');
-      hasErrors = true;
-    }
-
-    if (formData.button_link && !this.isValidUrl(formData.button_link)) {
-      this.showFieldError('bannerButtonLink', 'Ingresa un enlace válido (https://...)');
-      hasErrors = true;
-    }
-
-    const startDate = formData.start_date ? new Date(formData.start_date) : null;
-    const endDate = formData.end_date ? new Date(formData.end_date) : null;
-    if (startDate && endDate && startDate > endDate) {
-      this.showFieldError('bannerEndDate', 'La fecha final debe ser posterior a la inicial');
-      hasErrors = true;
-    }
-
-    // Subir imagen si hay archivo
-    const imageFile = document.getElementById('bannerImageFile').files[0];
-    if (imageFile) {
-      try {
-        const uploadResponse = await window.api.uploadImage(imageFile);
-        if (uploadResponse.success) {
-          formData.image_url = uploadResponse.data.url;
-        }
-      } catch (error) {
-        this.showFieldError('bannerImageFile', 'Error al subir la imagen');
-        window.notifications?.error('Error al subir imagen');
-        return;
-      }
-    }
-
-    if (!formData.image_url && !imageFile && !this.currentEditId) {
-      this.showFieldError('bannerImageUrl', 'Debes proporcionar una imagen o URL.');
-      hasErrors = true;
-    }
-
-    if (hasErrors) {
-      window.notifications?.error('Corrige los errores y vuelve a intentarlo.');
-      return;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn?.textContent;
+    
+    // Mostrar loading en botón
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<div class="loading-spinner small"></div> Guardando...';
     }
 
     try {
+      const formData = {
+        title: document.getElementById('bannerTitle').value.trim(),
+        description: document.getElementById('bannerDescription').value.trim() || null,
+        button_text: document.getElementById('bannerButtonText').value.trim() || null,
+        button_link: document.getElementById('bannerButtonLink').value.trim() || null,
+        image_url: document.getElementById('bannerImageUrl').value.trim() || null,
+        banner_type: document.getElementById('bannerType').value,
+        position: document.getElementById('bannerPosition').value || null,
+        start_date: document.getElementById('bannerStartDate').value || null,
+        end_date: document.getElementById('bannerEndDate').value || null,
+        order_index: parseInt(document.getElementById('bannerOrder').value) || 0,
+        is_active: document.getElementById('bannerIsActive').checked
+      };
+
+      let hasErrors = false;
+      if (!formData.title) {
+        this.showFieldError('bannerTitle', 'El título es obligatorio');
+        hasErrors = true;
+      }
+
+      if (!formData.banner_type) {
+        this.showFieldError('bannerType', 'Selecciona un tipo de banner');
+        hasErrors = true;
+      }
+
+      if (formData.button_link && !this.isValidUrl(formData.button_link)) {
+        this.showFieldError('bannerButtonLink', 'Ingresa un enlace válido (https://...)');
+        hasErrors = true;
+      }
+
+      // Validar order_index
+      const orderValue = document.getElementById('bannerOrder').value;
+      if (orderValue && (isNaN(parseInt(orderValue)) || parseInt(orderValue) < 0)) {
+        this.showFieldError('bannerOrder', 'El orden debe ser un número entero mayor o igual a 0');
+        hasErrors = true;
+      }
+
+      const startDate = formData.start_date ? new Date(formData.start_date) : null;
+      const endDate = formData.end_date ? new Date(formData.end_date) : null;
+      const now = new Date();
+      
+      if (startDate && endDate && startDate > endDate) {
+        this.showFieldError('bannerEndDate', 'La fecha final debe ser posterior a la inicial');
+        hasErrors = true;
+      }
+      
+      // Validar que start_date no sea en el pasado si es nuevo banner
+      if (!this.currentEditId && startDate && startDate < now) {
+        this.showFieldError('bannerStartDate', 'La fecha de inicio no puede ser en el pasado');
+        hasErrors = true;
+      }
+
+      // Subir imagen si hay archivo
+      const imageFile = document.getElementById('bannerImageFile').files[0];
+      if (imageFile) {
+        try {
+          window.notifications?.info('Subiendo imagen...');
+          const uploadResponse = await window.api.uploadImage(imageFile);
+          if (uploadResponse.success) {
+            formData.image_url = uploadResponse.data.url;
+            window.notifications?.success('Imagen subida exitosamente');
+          } else {
+            throw new Error(uploadResponse.message || 'Error al subir imagen');
+          }
+        } catch (error) {
+          this.showFieldError('bannerImageFile', 'Error al subir la imagen');
+          window.notifications?.error('Error al subir imagen: ' + (error.message || 'Error desconocido'));
+          return;
+        }
+      }
+
+      if (!formData.image_url && !imageFile && !this.currentEditId) {
+        this.showFieldError('bannerImageUrl', 'Debes proporcionar una imagen o URL.');
+        hasErrors = true;
+      }
+
+      if (hasErrors) {
+        window.notifications?.error('Corrige los errores y vuelve a intentarlo.');
+        return;
+      }
+
       let response;
       if (this.currentEditId) {
         response = await window.api.updateBanner(this.currentEditId, formData);
@@ -387,10 +455,18 @@ class AdminHomeContent {
         window.notifications?.success(response.message || 'Banner guardado exitosamente');
         this.hideModal(document.getElementById('bannerModal'));
         this.loadBanners();
+      } else {
+        throw new Error(response.message || 'Error al guardar banner');
       }
     } catch (error) {
       console.error('Error saving banner:', error);
-      window.notifications?.error('Error al guardar banner');
+      window.notifications?.error('Error al guardar banner: ' + (error.message || 'Error desconocido'));
+    } finally {
+      // Restaurar botón
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalBtnText;
+      }
     }
   }
 
@@ -430,7 +506,13 @@ class AdminHomeContent {
     if (!container) return;
 
     if (!benefits || benefits.length === 0) {
-      container.innerHTML = '<p style="padding: 20px; text-align: center; color: #999;">No hay beneficios. Crea uno nuevo.</p>';
+      container.innerHTML = `
+        <div style="padding: 60px 20px; text-align: center; color: #999;">
+          <i class="fas fa-gift" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+          <p style="font-size: 16px; margin: 0;">No hay beneficios registrados</p>
+          <p style="font-size: 14px; margin-top: 8px; opacity: 0.7;">Crea un beneficio desde el botón "Nuevo Beneficio"</p>
+        </div>
+      `;
       return;
     }
 
@@ -514,48 +596,68 @@ class AdminHomeContent {
     const form = document.getElementById('benefitForm');
     this.clearFormErrors(form);
 
-    const formData = {
-      title: document.getElementById('benefitTitle').value.trim(),
-      description: document.getElementById('benefitDescription').value.trim() || null,
-      icon: document.getElementById('benefitIcon').value.trim() || null,
-      image_url: document.getElementById('benefitImageUrl').value.trim() || null,
-      background_color: document.getElementById('benefitBackgroundColor').value,
-      order_index: parseInt(document.getElementById('benefitOrder').value) || 0,
-      is_active: document.getElementById('benefitIsActive').checked
-    };
-
-    let hasErrors = false;
-    if (!formData.title) {
-      this.showFieldError('benefitTitle', 'El título es obligatorio');
-      hasErrors = true;
-    }
-
-    // Subir imagen si hay archivo
-    const imageFile = document.getElementById('benefitImageFile').files[0];
-    if (imageFile) {
-      try {
-        const uploadResponse = await window.api.uploadImage(imageFile);
-        if (uploadResponse.success) {
-          formData.image_url = uploadResponse.data.url;
-        }
-      } catch (error) {
-        this.showFieldError('benefitImageFile', 'Error al subir la imagen');
-        window.notifications?.error('Error al subir imagen');
-        return;
-      }
-    }
-
-    if (!formData.icon && !formData.image_url && !imageFile && !this.currentEditId) {
-      this.showFieldError('benefitIcon', 'Añade un ícono (fa-solid fa-truck) o una imagen.');
-      hasErrors = true;
-    }
-
-    if (hasErrors) {
-      window.notifications?.error('Corrige los errores y vuelve a intentarlo.');
-      return;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn?.textContent;
+    
+    // Mostrar loading en botón
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<div class="loading-spinner small"></div> Guardando...';
     }
 
     try {
+      const formData = {
+        title: document.getElementById('benefitTitle').value.trim(),
+        description: document.getElementById('benefitDescription').value.trim() || null,
+        icon: document.getElementById('benefitIcon').value.trim() || null,
+        image_url: document.getElementById('benefitImageUrl').value.trim() || null,
+        background_color: document.getElementById('benefitBackgroundColor').value,
+        order_index: parseInt(document.getElementById('benefitOrder').value) || 0,
+        is_active: document.getElementById('benefitIsActive').checked
+      };
+
+      let hasErrors = false;
+      if (!formData.title) {
+        this.showFieldError('benefitTitle', 'El título es obligatorio');
+        hasErrors = true;
+      }
+
+      // Validar order_index
+      const orderValue = document.getElementById('benefitOrder').value;
+      if (orderValue && (isNaN(parseInt(orderValue)) || parseInt(orderValue) < 0)) {
+        this.showFieldError('benefitOrder', 'El orden debe ser un número entero mayor o igual a 0');
+        hasErrors = true;
+      }
+
+      // Subir imagen si hay archivo
+      const imageFile = document.getElementById('benefitImageFile').files[0];
+      if (imageFile) {
+        try {
+          window.notifications?.info('Subiendo imagen...');
+          const uploadResponse = await window.api.uploadImage(imageFile);
+          if (uploadResponse.success) {
+            formData.image_url = uploadResponse.data.url;
+            window.notifications?.success('Imagen subida exitosamente');
+          } else {
+            throw new Error(uploadResponse.message || 'Error al subir imagen');
+          }
+        } catch (error) {
+          this.showFieldError('benefitImageFile', 'Error al subir la imagen');
+          window.notifications?.error('Error al subir imagen: ' + (error.message || 'Error desconocido'));
+          return;
+        }
+      }
+
+      if (!formData.icon && !formData.image_url && !imageFile && !this.currentEditId) {
+        this.showFieldError('benefitIcon', 'Añade un ícono (fa-solid fa-truck) o una imagen.');
+        hasErrors = true;
+      }
+
+      if (hasErrors) {
+        window.notifications?.error('Corrige los errores y vuelve a intentarlo.');
+        return;
+      }
+
       let response;
       if (this.currentEditId) {
         response = await window.api.updateBenefit(this.currentEditId, formData);
@@ -567,10 +669,18 @@ class AdminHomeContent {
         window.notifications?.success(response.message || 'Beneficio guardado exitosamente');
         this.hideModal(document.getElementById('benefitModal'));
         this.loadBenefits();
+      } else {
+        throw new Error(response.message || 'Error al guardar beneficio');
       }
     } catch (error) {
       console.error('Error saving benefit:', error);
-      window.notifications?.error('Error al guardar beneficio');
+      window.notifications?.error('Error al guardar beneficio: ' + (error.message || 'Error desconocido'));
+    } finally {
+      // Restaurar botón
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalBtnText;
+      }
     }
   }
 
@@ -610,7 +720,13 @@ class AdminHomeContent {
     if (!container) return;
 
     if (!sections || sections.length === 0) {
-      container.innerHTML = '<p style="padding: 20px; text-align: center; color: #999;">No hay secciones. Crea una nueva.</p>';
+      container.innerHTML = `
+        <div style="padding: 60px 20px; text-align: center; color: #999;">
+          <i class="fas fa-th-large" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+          <p style="font-size: 16px; margin: 0;">No hay secciones registradas</p>
+          <p style="font-size: 14px; margin-top: 8px; opacity: 0.7;">Crea una sección desde el botón "Nueva Sección"</p>
+        </div>
+      `;
       return;
     }
 
@@ -695,16 +811,55 @@ class AdminHomeContent {
   }
 
   async saveHomeSection() {
-    const formData = {
-      section_type: document.getElementById('homeSectionType').value,
-      title: document.getElementById('homeSectionTitle').value.trim() || null,
-      category_id: document.getElementById('homeSectionCategory').value || null,
-      limit: parseInt(document.getElementById('homeSectionLimit').value) || 8,
-      order_index: parseInt(document.getElementById('homeSectionOrder').value) || 0,
-      is_active: document.getElementById('homeSectionIsActive').checked
-    };
+    const form = document.getElementById('homeSectionForm');
+    this.clearFormErrors(form);
+
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn?.textContent;
+    
+    // Mostrar loading en botón
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<div class="loading-spinner small"></div> Guardando...';
+    }
 
     try {
+      const formData = {
+        section_type: document.getElementById('homeSectionType').value,
+        title: document.getElementById('homeSectionTitle').value.trim() || null,
+        category_id: document.getElementById('homeSectionCategory').value || null,
+        limit: parseInt(document.getElementById('homeSectionLimit').value) || 8,
+        order_index: parseInt(document.getElementById('homeSectionOrder').value) || 0,
+        is_active: document.getElementById('homeSectionIsActive').checked
+      };
+
+      let hasErrors = false;
+
+      // Validar section_type
+      if (!formData.section_type) {
+        this.showFieldError('homeSectionType', 'Selecciona un tipo de sección');
+        hasErrors = true;
+      }
+
+      // Validar limit (debe ser número entero positivo)
+      const limitValue = document.getElementById('homeSectionLimit').value;
+      if (limitValue && (isNaN(parseInt(limitValue)) || parseInt(limitValue) < 1)) {
+        this.showFieldError('homeSectionLimit', 'El límite debe ser un número entero mayor a 0');
+        hasErrors = true;
+      }
+
+      // Validar order_index
+      const orderValue = document.getElementById('homeSectionOrder').value;
+      if (orderValue && (isNaN(parseInt(orderValue)) || parseInt(orderValue) < 0)) {
+        this.showFieldError('homeSectionOrder', 'El orden debe ser un número entero mayor o igual a 0');
+        hasErrors = true;
+      }
+
+      if (hasErrors) {
+        window.notifications?.error('Corrige los errores y vuelve a intentarlo.');
+        return;
+      }
+
       let response;
       if (this.currentEditId) {
         response = await window.api.updateHomeSection(this.currentEditId, formData);
@@ -716,9 +871,18 @@ class AdminHomeContent {
         window.notifications?.success(response.message || 'Sección guardada exitosamente');
         this.hideModal(document.getElementById('homeSectionModal'));
         this.loadHomeSections();
+      } else {
+        throw new Error(response.message || 'Error al guardar sección');
       }
     } catch (error) {
-      window.notifications?.error('Error al guardar sección');
+      console.error('Error saving home section:', error);
+      window.notifications?.error('Error al guardar sección: ' + (error.message || 'Error desconocido'));
+    } finally {
+      // Restaurar botón
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalBtnText;
+      }
     }
   }
 
