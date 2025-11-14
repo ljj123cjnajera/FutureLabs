@@ -745,15 +745,19 @@ class HomeManager {
   showSubscriptionModal() {
     const modal = document.createElement('div');
     modal.className = 'modal';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-labelledby', 'subscriptionModalTitle');
+    modal.setAttribute('aria-modal', 'true');
     modal.style.display = 'flex';
     modal.innerHTML = `
       <div class="modal-content" style="max-width: 500px;">
-        <span class="modal-close" onclick="this.closest('.modal').remove()">&times;</span>
-        <h2 style="margin-bottom: 16px;">¡Suscríbete y obtén 10% de descuento!</h2>
+        <span class="modal-close" onclick="this.closest('.modal').remove()" aria-label="Cerrar modal de suscripción" tabindex="0" role="button">&times;</span>
+        <h2 id="subscriptionModalTitle" style="margin-bottom: 16px;">¡Suscríbete y obtén 10% de descuento!</h2>
         <p style="margin-bottom: 24px; color: #666;">Recibe ofertas exclusivas, novedades y tu código de descuento por email.</p>
         <form id="subscriptionForm" onsubmit="event.preventDefault(); window.homeManager.handleSubscriptionForm(event);">
           <div class="form-group">
-            <input type="email" id="subscriptionEmail" placeholder="tu@email.com" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
+            <label for="subscriptionEmail" class="sr-only">Email para suscripción</label>
+            <input type="email" id="subscriptionEmail" placeholder="tu@email.com" required aria-required="true" aria-label="Email para suscripción" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
           </div>
           <button type="submit" class="btn btn-primary" style="width: 100%;">Suscribirme</button>
         </form>
@@ -770,6 +774,15 @@ class HomeManager {
         modal.remove();
       }
     });
+
+    // Cerrar con ESC
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') {
+        modal.remove();
+        document.removeEventListener('keydown', handleEscape);
+      }
+    };
+    document.addEventListener('keydown', handleEscape);
 
     // Focus en el input
     setTimeout(() => {
@@ -850,23 +863,26 @@ class HomeManager {
   showContactModal() {
     const modal = document.createElement('div');
     modal.className = 'modal';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-labelledby', 'contactModalTitle');
+    modal.setAttribute('aria-modal', 'true');
     modal.style.display = 'flex';
     modal.innerHTML = `
       <div class="modal-content" style="max-width: 600px;">
-        <span class="modal-close" onclick="this.closest('.modal').remove()">&times;</span>
-        <h2 style="margin-bottom: 16px;"><i class="fas fa-comments"></i> ¿Necesitas ayuda?</h2>
+        <span class="modal-close" onclick="this.closest('.modal').remove()" aria-label="Cerrar modal de ayuda" tabindex="0" role="button">&times;</span>
+        <h2 id="contactModalTitle" style="margin-bottom: 16px;"><i class="fas fa-comments" aria-hidden="true"></i> ¿Necesitas ayuda?</h2>
         <p style="margin-bottom: 24px; color: #666;">Estamos aquí para ayudarte. Elige cómo prefieres contactarnos:</p>
-        <div style="display: grid; gap: 16px;">
-          <a href="contact.html" class="btn btn-outline" style="text-align: left; padding: 16px;">
-            <i class="fas fa-envelope"></i> Envíanos un email
+        <nav style="display: grid; gap: 16px;" role="navigation" aria-label="Opciones de contacto">
+          <a href="contact.html" class="btn btn-outline" style="text-align: left; padding: 16px;" aria-label="Enviar un email de contacto">
+            <i class="fas fa-envelope" aria-hidden="true"></i> Envíanos un email
           </a>
-          <a href="faq.html" class="btn btn-outline" style="text-align: left; padding: 16px;">
-            <i class="fas fa-question-circle"></i> Ver preguntas frecuentes
+          <a href="faq.html" class="btn btn-outline" style="text-align: left; padding: 16px;" aria-label="Ver preguntas frecuentes">
+            <i class="fas fa-question-circle" aria-hidden="true"></i> Ver preguntas frecuentes
           </a>
-          <button class="btn btn-outline" onclick="this.closest('.modal').remove(); window.location.href='contact.html';" style="text-align: left; padding: 16px;">
-            <i class="fas fa-phone"></i> Información de contacto
+          <button class="btn btn-outline" type="button" onclick="this.closest('.modal').remove(); window.location.href='contact.html';" style="text-align: left; padding: 16px;" aria-label="Ver información de contacto">
+            <i class="fas fa-phone" aria-hidden="true"></i> Información de contacto
           </button>
-        </div>
+        </nav>
         <p style="margin-top: 24px; font-size: 12px; color: #999; text-align: center;">
           El servicio de chat en vivo estará disponible próximamente.
         </p>
@@ -878,8 +894,18 @@ class HomeManager {
     modal.addEventListener('click', (e) => {
       if (e.target === modal) {
         modal.remove();
+        document.removeEventListener('keydown', handleEscape);
       }
     });
+
+    // Cerrar con ESC
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') {
+        modal.remove();
+        document.removeEventListener('keydown', handleEscape);
+      }
+    };
+    document.addEventListener('keydown', handleEscape);
   }
 
   setupAffiliateBanner() {
@@ -905,33 +931,33 @@ class HomeManager {
         const products = response.data.products.slice(0, 4);
         
         flashSection.innerHTML = `
-          <div class="flash-offers-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 24px;">
-            ${products.map(product => {
+          <div class="flash-offers-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 24px;" role="list" aria-label="Ofertas flash disponibles">
+            ${products.map((product, index) => {
               const discount = product.discount_price ? 
                 Math.round(((product.price - product.discount_price) / product.price) * 100) : 0;
               
               return `
-                <div class="flash-offer-card" onclick="window.location.href='product-detail.html?id=${product.id}'" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 24px; border-radius: 12px; cursor: pointer; transition: transform 0.2s;">
+                <article class="flash-offer-card" role="listitem" onclick="window.location.href='product-detail.html?id=${product.id}'" onkeypress="if(event.key==='Enter') window.location.href='product-detail.html?id=${product.id}'" tabindex="0" aria-label="Oferta flash: ${this.escapeHtml(product.name)} con ${discount}% de descuento" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 24px; border-radius: 12px; cursor: pointer; transition: transform 0.2s;">
                   <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
-                    <span style="background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">-${discount}%</span>
-                    <i class="fas fa-fire" style="font-size: 24px; opacity: 0.8;"></i>
+                    <span style="background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;" aria-label="${discount} por ciento de descuento">-${discount}%</span>
+                    <i class="fas fa-fire" aria-hidden="true" style="font-size: 24px; opacity: 0.8;"></i>
                   </div>
                   <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600;">${this.escapeHtml(product.name)}</h3>
                   <p style="margin: 0 0 16px 0; opacity: 0.9; font-size: 14px;">${this.escapeHtml(product.brand)}</p>
                   <div style="display: flex; justify-content: space-between; align-items: center;">
                     <div>
                       ${product.discount_price ? `
-                        <span style="text-decoration: line-through; opacity: 0.7; font-size: 14px;">S/ ${parseFloat(product.price).toFixed(2)}</span>
-                        <span style="display: block; font-size: 24px; font-weight: 700;">S/ ${parseFloat(product.discount_price).toFixed(2)}</span>
+                        <span style="text-decoration: line-through; opacity: 0.7; font-size: 14px;" aria-label="Precio original">S/ ${parseFloat(product.price).toFixed(2)}</span>
+                        <span style="display: block; font-size: 24px; font-weight: 700;" aria-label="Precio con descuento">S/ ${parseFloat(product.discount_price).toFixed(2)}</span>
                       ` : `
                         <span style="font-size: 24px; font-weight: 700;">S/ ${parseFloat(product.price).toFixed(2)}</span>
                       `}
                     </div>
-                    <button class="btn" style="background: white; color: #667eea; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer;" onclick="event.stopPropagation(); window.location.href='product-detail.html?id=${product.id}'">
+                    <button class="btn" type="button" aria-label="Ver detalles de ${this.escapeHtml(product.name)}" style="background: white; color: #667eea; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer;" onclick="event.stopPropagation(); window.location.href='product-detail.html?id=${product.id}'">
                       Ver oferta
                     </button>
                   </div>
-                </div>
+                </article>
               `;
             }).join('')}
           </div>

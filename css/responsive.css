@@ -25,6 +25,22 @@
     .benefits-slider {
         grid-template-columns: repeat(2, 1fr);
     }
+
+    /* Flash offers en tablet */
+    .flash-offers-grid {
+        grid-template-columns: repeat(2, minmax(250px, 1fr)) !important;
+    }
+
+    /* Productos destacados y ofertas en tablet */
+    #featuredProductsGrid,
+    #onSaleProductsGrid {
+        grid-template-columns: repeat(3, minmax(180px, 1fr)) !important;
+    }
+
+    /* Home sections en tablet */
+    .home-sections-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
 }
 
 /* Mobile */
@@ -137,6 +153,37 @@
         height: 35px;
         font-size: 14px;
     }
+
+    /* Flash Offers Grid */
+    .flash-offers-grid {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+    }
+
+    .flash-offer-card {
+        padding: 20px !important;
+    }
+
+    .flash-offer-card h3 {
+        font-size: 16px !important;
+    }
+
+    .flash-offer-card .btn {
+        padding: 6px 12px !important;
+        font-size: 14px !important;
+    }
+
+    /* Productos destacados y ofertas */
+    #featuredProductsGrid,
+    #onSaleProductsGrid {
+        grid-template-columns: repeat(2, minmax(140px, 1fr)) !important;
+        gap: var(--spacing-md) !important;
+    }
+
+    /* Home sections grid */
+    .home-sections-grid {
+        grid-template-columns: 1fr !important;
+    }
 }
 
 /* Small Mobile */
@@ -176,6 +223,37 @@
     .payment-methods {
         flex-wrap: wrap;
         justify-content: center;
+    }
+
+    /* Flash offers en móvil pequeño */
+    .flash-offer-card {
+        padding: 16px !important;
+    }
+
+    .flash-offer-card h3 {
+        font-size: 14px !important;
+    }
+
+    .flash-offer-card p {
+        font-size: 12px !important;
+    }
+
+    /* Productos en móvil pequeño */
+    #featuredProductsGrid,
+    #onSaleProductsGrid {
+        grid-template-columns: 1fr !important;
+        gap: var(--spacing-sm) !important;
+    }
+
+    /* Modales en móvil pequeño */
+    .modal-content {
+        padding: 20px 16px !important;
+        max-height: 90vh !important;
+        overflow-y: auto !important;
+    }
+
+    .modal-content h2 {
+        font-size: 20px !important;
     }
 }
 
