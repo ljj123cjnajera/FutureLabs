@@ -4,6 +4,10 @@ class HomeManager {
     this.featuredProducts = [];
     this.onSaleProducts = [];
     this.categories = [];
+    this.heroSlides = [];
+    this.homeBenefits = [];
+    this.homeBanners = [];
+    this.homeSections = [];
     this.init();
   }
 
@@ -11,6 +15,7 @@ class HomeManager {
     console.log('🏠 HomeManager init() - Iniciando...');
     try {
       await Promise.all([
+        this.loadHomeContent(),
         this.loadFeaturedProducts(),
         this.loadOnSaleProducts(),
         this.loadCategories()
@@ -21,6 +26,72 @@ class HomeManager {
     } catch (error) {
       console.error('❌ Error inicializando HomeManager:', error);
     }
+  }
+
+  async loadHomeContent() {
+    try {
+      console.log('🏠 Cargando contenido del home...');
+      const response = await window.api.getHomeContent();
+      
+      if (!response || !response.success) {
+        console.warn('⚠️ Respuesta inválida del servidor:', response);
+        this.renderEmptyStates();
+        return;
+      }
+
+      const { hero_slides, benefits, banners, sections } = response.data ?? {};
+      
+      // Procesar hero slides
+      this.heroSlides = Array.isArray(hero_slides)
+        ? hero_slides
+            .filter(slide => slide && slide.is_active !== false)
+            .sort((a, b) => (a?.order_index ?? 0) - (b?.order_index ?? 0))
+        : [];
+      console.log(`✅ Hero slides cargados: ${this.heroSlides.length}`);
+
+      // Procesar beneficios
+      this.homeBenefits = Array.isArray(benefits)
+        ? benefits
+            .filter(benefit => benefit && benefit.is_active !== false)
+            .sort((a, b) => (a?.order_index ?? 0) - (b?.order_index ?? 0))
+        : [];
+      console.log(`✅ Beneficios cargados: ${this.homeBenefits.length}`);
+
+      // Procesar banners
+      this.homeBanners = Array.isArray(banners)
+        ? banners
+            .filter(banner => this.isBannerCurrentlyActive(banner))
+            .sort((a, b) => (a?.order_index ?? 0) - (b?.order_index ?? 0))
+        : [];
+      console.log(`✅ Banners cargados: ${this.homeBanners.length}`);
+
+      // Procesar secciones
+      this.homeSections = Array.isArray(sections)
+        ? sections
+            .filter(section => section && section.is_active !== false)
+            .sort((a, b) => (a?.order_index ?? 0) - (b?.order_index ?? 0))
+        : [];
+      console.log(`✅ Secciones cargadas: ${this.homeSections.length}`);
+
+      // Renderizar todo
+      this.renderHeroSlides();
+      this.renderBenefits();
+      this.renderBanners();
+      this.renderHomeSections();
+      
+      console.log('✅ Contenido del home renderizado correctamente');
+    } catch (error) {
+      console.error('❌ Error cargando contenido del home:', error);
+      this.renderEmptyStates();
+    }
+  }
+
+  renderEmptyStates() {
+    // Renderizar estados vacíos si hay error o no hay datos
+    this.renderHeroSlides();
+    this.renderBenefits();
+    this.renderBanners();
+    this.renderHomeSections();
   }
 
   async loadFeaturedProducts() {
@@ -71,6 +142,7 @@ class HomeManager {
       if (response.success) {
         this.categories = response.data.categories;
         this.renderCategories();
+        this.renderHomeSections();
       }
     } catch (error) {
       console.error('Error loading categories:', error);
@@ -143,6 +215,259 @@ class HomeManager {
     if (window.skeletonLoader) {
       window.skeletonLoader.hide('categories');
     }
+  }
+
+  renderHeroSlides() {
+    const slider = document.getElementById('heroSlider');
+    const slidesContainer = document.getElementById('heroSlidesContainer');
+    const dotsContainer = document.getElementById('heroSliderDots');
+    const emptyState = document.getElementById('heroSliderEmpty');
+    if (!slider || !slidesContainer || !dotsContainer) return;
+
+    slidesContainer.innerHTML = '';
+    dotsContainer.innerHTML = '';
+
+    if (!this.heroSlides.length) {
+      slider.classList.remove('has-data');
+      if (emptyState) emptyState.style.display = 'flex';
+      const prevBtn = slider.querySelector('.slider-arrow.prev');
+      const nextBtn = slider.querySelector('.slider-arrow.next');
+      if (prevBtn) prevBtn.style.display = 'none';
+      if (nextBtn) nextBtn.style.display = 'none';
+      dotsContainer.style.display = 'none';
+      window.initHeroCarousel?.();
+      return;
+    }
+
+    slider.classList.add('has-data');
+    if (emptyState) emptyState.style.display = 'none';
+
+    this.heroSlides.forEach((slideData, index) => {
+      const slide = document.createElement('div');
+      slide.className = `slide${index === 0 ? ' active' : ''}`;
+      slide.style.background = slideData.background_color || 'var(--primary)';
+      if (slideData.image_url) {
+        slide.style.backgroundImage = `linear-gradient(135deg, rgba(15,23,42,0.65), rgba(15,23,42,0.3)), url('${slideData.image_url}')`;
+        slide.style.backgroundSize = 'cover';
+        slide.style.backgroundPosition = 'center';
+      }
+
+      const content = document.createElement('div');
+      content.className = 'slide-content';
+
+      if (slideData.eyebrow) {
+        const eyebrow = document.createElement('span');
+        eyebrow.className = 'slide-eyebrow';
+        eyebrow.textContent = slideData.eyebrow;
+        content.appendChild(eyebrow);
+      }
+
+      const title = document.createElement('h1');
+      title.textContent = slideData.title || 'FutureLabs';
+      content.appendChild(title);
+
+      if (slideData.description) {
+        const paragraph = document.createElement('p');
+        paragraph.textContent = slideData.description;
+        content.appendChild(paragraph);
+      }
+
+      if (slideData.button_text) {
+        const button = document.createElement('button');
+        button.className = 'btn btn-primary btn-lg';
+        button.textContent = slideData.button_text;
+        const link = slideData.button_link;
+        if (link) {
+          button.addEventListener('click', (event) => {
+            event.preventDefault();
+            window.location.href = link;
+          });
+        }
+        content.appendChild(button);
+      }
+
+      slide.appendChild(content);
+      slidesContainer.appendChild(slide);
+
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = `slider-dot${index === 0 ? ' active' : ''}`;
+      dot.setAttribute('aria-label', `Slide ${index + 1}`);
+      dotsContainer.appendChild(dot);
+    });
+
+    const prevBtn = slider.querySelector('.slider-arrow.prev');
+    const nextBtn = slider.querySelector('.slider-arrow.next');
+    const showArrows = this.heroSlides.length > 1;
+    if (prevBtn) prevBtn.style.display = showArrows ? 'flex' : 'none';
+    if (nextBtn) nextBtn.style.display = showArrows ? 'flex' : 'none';
+    dotsContainer.style.display = showArrows ? 'flex' : 'none';
+
+    window.requestAnimationFrame(() => window.initHeroCarousel?.());
+  }
+
+  renderBenefits() {
+    const container = document.getElementById('benefitsContainer');
+    if (!container) return;
+
+    if (!this.homeBenefits.length) {
+      container.innerHTML = `
+        <div class="benefit-card benefit-card--empty">
+          <div class="benefit-content">
+            <h3>Pronto más beneficios</h3>
+            <p>Configura beneficios desde el panel administrativo para mostrarlos aquí.</p>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = this.homeBenefits.map(benefit => {
+      const background = benefit.background_color ? `style="background:${benefit.background_color};"` : '';
+      const hasImage = Boolean(benefit.image_url);
+      const iconMarkup = benefit.icon
+        ? `<span class="benefit-icon"><i class="${benefit.icon}"></i></span>`
+        : '';
+      const imageMarkup = hasImage
+        ? `<img src="${benefit.image_url}" alt="${benefit.title || 'Benefit'}" onerror="this.style.display='none'">`
+        : '';
+
+      return `
+        <article class="benefit-card" ${background}>
+          <div class="benefit-image">
+            ${imageMarkup || iconMarkup || `<span class="benefit-icon"><i class="fas fa-star"></i></span>`}
+          </div>
+          <div class="benefit-content">
+            <h3>${benefit.title || 'Beneficio especial'}</h3>
+            ${benefit.description ? `<p>${benefit.description}</p>` : ''}
+          </div>
+        </article>
+      `;
+    }).join('');
+  }
+
+  renderBanners() {
+    const container = document.getElementById('bannerGrid');
+    if (!container) return;
+
+    if (!this.homeBanners.length) {
+      container.innerHTML = `
+        <div class="banner banner--placeholder">
+          <h3>Configura tus banners</h3>
+          <p>Los banners que crees en el panel aparecerán automáticamente aquí.</p>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = this.homeBanners.slice(0, 3).map(banner => {
+      const backgroundStyle = banner.image_url
+        ? `style="background-image:linear-gradient(135deg, rgba(15,23,42,0.7), rgba(15,23,42,0.25)), url('${banner.image_url}');"`
+        : '';
+      const gradientOnly = !banner.image_url && banner.background_color
+        ? `style="background:${banner.background_color};"`
+        : '';
+      const linkAttr = banner.button_link ? `data-link="${banner.button_link}"` : '';
+      return `
+        <article class="banner" ${backgroundStyle || gradientOnly} ${linkAttr}>
+          <h3>${banner.title || 'Banner destacado'}</h3>
+          ${banner.description ? `<p>${banner.description}</p>` : ''}
+          ${banner.button_text ? `<span class="banner-cta">${banner.button_text}</span>` : ''}
+        </article>
+      `;
+    }).join('');
+
+    this.bindBannerClicks(container);
+  }
+
+  renderHomeSections() {
+    const container = document.getElementById('homeSectionsContainer');
+    if (!container) return;
+
+    if (!this.homeSections.length) {
+      container.innerHTML = `
+        <div class="home-section-card home-section-card--empty">
+          <div class="home-section-content">
+            <h3>Secciones personalizadas</h3>
+            <p>Crea secciones desde el panel administrativo para destacar colecciones, categorías o campañas especiales.</p>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = this.homeSections.map(section => {
+      const settings = this.parseSettings(section.settings);
+      const category = section.category_id ? this.getCategoryById(section.category_id) : null;
+      const title = section.title || settings.title || (category ? category.name : this.getSectionTypeLabel(section.section_type));
+      const description = settings.description || (category ? category.description : '');
+      const ctaText = settings.cta_text || 'Ver colección';
+      const link = settings.cta_link || (category ? `products.html?category=${category.slug}` : 'products.html');
+      const imageUrl = settings.image_url || (category?.image_url ?? null);
+
+      return `
+        <article class="home-section-card" data-link="${link}">
+          <div class="home-section-media">
+            ${imageUrl ? `<img src="${imageUrl}" alt="${title}" onerror="this.style.display='none'">` : `<div class="home-section-placeholder"><i class="fas fa-layer-group"></i></div>`}
+          </div>
+          <div class="home-section-content">
+            <span class="home-section-tag">${this.getSectionTypeLabel(section.section_type)}</span>
+            <h3>${title}</h3>
+            ${description ? `<p>${description}</p>` : ''}
+            <div class="home-section-meta">
+              <span><i class="fas fa-sort-amount-up"></i> Orden: ${section.order_index}</span>
+              <span><i class="fas fa-cubes"></i> Límite: ${section.limit}</span>
+            </div>
+            <button type="button" class="btn btn-outline btn-sm" data-link="${link}">${ctaText}</button>
+          </div>
+        </article>
+      `;
+    }).join('');
+
+    container.querySelectorAll('[data-link]').forEach(element => {
+      element.addEventListener('click', (event) => {
+        const target = event.currentTarget;
+        const url = target.getAttribute('data-link');
+        if (url) {
+          window.location.href = url;
+        }
+      });
+    });
+  }
+
+  parseSettings(rawSettings) {
+    if (!rawSettings) return {};
+    if (typeof rawSettings === 'object') return rawSettings;
+    try {
+      return JSON.parse(rawSettings);
+    } catch (error) {
+      return {};
+    }
+  }
+
+  getSectionTypeLabel(type) {
+    const map = {
+      category_carousel: 'Carrusel de categoría',
+      categories_grid: 'Cuadrícula de categorías',
+      featured_products: 'Productos destacados',
+      custom: 'Sección personalizada'
+    };
+    return map[type] || 'Sección destacada';
+  }
+
+  getCategoryById(id) {
+    return this.categories.find(cat => cat.id === id);
+  }
+
+  bindBannerClicks(container) {
+    container.querySelectorAll('.banner[data-link]').forEach(banner => {
+      banner.addEventListener('click', () => {
+        const url = banner.getAttribute('data-link');
+        if (url) {
+          window.location.href = url;
+        }
+      });
+    });
   }
 
   createProductCard(product) {
@@ -266,20 +591,6 @@ class HomeManager {
       });
     }
 
-    // Botones de navegación rápida
-    document.querySelectorAll('.banner').forEach(banner => {
-      banner.addEventListener('click', function() {
-        const title = this.querySelector('h3').textContent;
-        if (title.includes('Gaming')) {
-          window.location.href = 'products.html?category=gaming';
-        } else if (title.includes('Smart Home')) {
-          window.location.href = 'products.html?category=smart-home';
-        } else if (title.includes('Audio')) {
-          window.location.href = 'products.html?category=audio';
-        }
-      });
-    });
-
     // CTA buttons
     document.querySelectorAll('.cta-button').forEach(btn => {
       btn.addEventListener('click', function(e) {
@@ -287,6 +598,16 @@ class HomeManager {
         window.location.href = 'products.html';
       });
     });
+  }
+
+  isBannerCurrentlyActive(banner) {
+    if (!banner || banner.is_active === false) return false;
+    const now = new Date();
+    const starts = banner.start_date ? new Date(banner.start_date) : null;
+    const ends = banner.end_date ? new Date(banner.end_date) : null;
+    if (starts && now < starts) return false;
+    if (ends && now > ends) return false;
+    return true;
   }
 }
 
