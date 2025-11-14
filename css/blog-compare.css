@@ -607,6 +607,7 @@
     
     .compare-table {
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
     
     .compare-table table {
@@ -620,6 +621,21 @@
     .filter-button {
         width: 100%;
         text-align: center;
+    }
+
+    .compare-header {
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+
+    .compare-actions {
+        flex-wrap: wrap;
+        gap: var(--spacing-sm);
+    }
+
+    .compare-actions .btn {
+        flex: 1 1 auto;
+        min-width: calc(50% - var(--spacing-xs));
     }
 }
 
@@ -642,6 +658,34 @@
     
     .compare-actions button {
         width: 100%;
+    }
+
+    .compare-hero-actions {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+
+    .compare-hero-actions .btn {
+        width: 100%;
+    }
+
+    .blog-hero-actions {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+
+    .blog-hero-actions .btn {
+        width: 100%;
+    }
+
+    .compare-header {
+        flex-direction: column;
+        gap: var(--spacing-lg);
+    }
+
+    .compare-actions {
+        flex-direction: column;
+        gap: var(--spacing-sm);
     }
 }
 

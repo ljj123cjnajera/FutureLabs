@@ -1267,6 +1267,59 @@
     .wishlist-selection-actions .btn-primary {
         width: 100%;
     }
+
+    .profile-hero-actions {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+
+    .profile-hero-actions .btn {
+        width: 100%;
+    }
+
+    .wishlist-hero-actions {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+
+    .wishlist-hero-actions .btn {
+        width: 100%;
+    }
+
+    .wishlist-layout {
+        flex-direction: column;
+    }
+
+    .wishlist-sidebar {
+        width: 100%;
+        margin-bottom: var(--spacing-xl);
+    }
+
+    .wishlist-content {
+        width: 100%;
+    }
+
+    .wishlist-toolbar {
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+
+    .wishlist-toolbar-actions {
+        width: 100%;
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+
+    .wishlist-filters {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--spacing-xs);
+    }
+
+    .wishlist-filter-btn {
+        width: 100%;
+    }
 }
 
 .orders-hero {
