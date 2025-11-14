@@ -517,6 +517,15 @@
             if (window.api) {
                 console.log('✅ API client inicializado');
             }
+
+            // Inicializar megamenú (después de que homeManager cargue las categorías)
+            // El megamenú se inicializará automáticamente cuando homeManager.loadMegaMenu() se ejecute
+            // Pero también necesitamos inicializar los listeners básicos (abrir/cerrar)
+            setTimeout(() => {
+                if (window.initMegaMenu) {
+                    window.initMegaMenu();
+                }
+            }, 1000);
             
             console.log('🎉 FutureLabs está listo!');
         });

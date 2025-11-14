@@ -24,6 +24,9 @@ class HomeManager {
       // Cargar megamenú dinámicamente después de cargar categorías
       this.loadMegaMenu();
       
+      // Cargar flash offers después de cargar productos en oferta
+      await this.initFlashOffers();
+      
       this.setupEventListeners();
       console.log('✅ HomeManager inicializado correctamente');
     } catch (error) {
@@ -687,8 +690,13 @@ class HomeManager {
     // Affiliate Banner
     this.setupAffiliateBanner();
 
-    // Flash Offers - Mejorar diseño
-    this.setupFlashOffers();
+    // Flash Offers - Mejorar diseño (llamar después de cargar productos)
+    // Se llamará después de cargar productos en oferta
+  }
+
+  async initFlashOffers() {
+    // Llamar después de cargar productos en oferta
+    await this.setupFlashOffers();
   }
 
   setupSubscriptionBanner() {

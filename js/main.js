@@ -6,11 +6,16 @@ document.addEventListener('DOMContentLoaded', function() {
     initCartFunctionality();
     initSmoothScrolling();
     initPlaceholderInteractions();
-    initSubscriptionBanner();
-    initChatButton();
     
-    // Cargar productos destacados
-    loadFeaturedProducts();
+    // Nota: initSubscriptionBanner y initChatButton ahora se manejan en home.js
+    // para evitar conflictos. Solo inicializar si homeManager no existe.
+    if (!window.homeManager) {
+        initSubscriptionBanner();
+        initChatButton();
+    }
+    
+    // Cargar productos destacados (ahora se maneja en home.js)
+    // loadFeaturedProducts(); // Comentado - se maneja en home.js
     
     console.log('FutureLabs - Tu portal al futuro está listo!');
 });
@@ -232,14 +237,22 @@ function initMegaMenu() {
     const megaMenu = document.getElementById('megaMenu');
     const overlay = document.getElementById('megaMenuOverlay');
     const closeMenu = document.getElementById('closeMenu');
+    
+    if (!megaMenu || !overlay || !closeMenu) {
+        console.warn('⚠️ Mega menu elements not found');
+        return;
+    }
+    
     const categoryItems = document.querySelectorAll('.category-item');
     const categoryContents = document.querySelectorAll('.category-content');
 
     // Abrir menú
-    menuTrigger.addEventListener('click', function(e) {
-        e.preventDefault();
-        openMegaMenu();
-    });
+    if (menuTrigger) {
+        menuTrigger.addEventListener('click', function(e) {
+            e.preventDefault();
+            openMegaMenu();
+        });
+    }
 
     // Cerrar menú
     closeMenu.addEventListener('click', closeMegaMenu);
