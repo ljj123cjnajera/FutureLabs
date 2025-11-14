@@ -88,6 +88,7 @@ class HomeManager {
       console.log('✅ Contenido del home renderizado correctamente');
     } catch (error) {
       console.error('❌ Error cargando contenido del home:', error);
+      window.notifications?.error('Error al cargar contenido del inicio. Por favor, recarga la página.');
       this.renderEmptyStates();
     }
   }
@@ -119,7 +120,17 @@ class HomeManager {
       }
     } catch (error) {
       console.error('❌ Error cargando productos destacados:', error);
-      this.renderFeaturedProducts(); // Renderizar estado vacío
+      const container = document.getElementById('featuredProductsGrid');
+      if (container) {
+        container.innerHTML = `
+          <div class="empty-state" style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #ef4444;">
+            <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 16px; opacity: 0.7;"></i>
+            <p style="font-size: 16px; margin: 0; font-weight: 600;">Error al cargar productos destacados</p>
+            <p style="font-size: 14px; margin-top: 8px; opacity: 0.8;">Por favor, intenta recargar la página</p>
+            <button class="btn btn-outline" onclick="window.location.reload()" style="margin-top: 16px;">Recargar página</button>
+          </div>
+        `;
+      }
     }
   }
 
@@ -143,7 +154,17 @@ class HomeManager {
       }
     } catch (error) {
       console.error('❌ Error cargando productos en oferta:', error);
-      this.renderOnSaleProducts(); // Renderizar estado vacío
+      const container = document.getElementById('onSaleProductsGrid');
+      if (container) {
+        container.innerHTML = `
+          <div class="empty-state" style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #ef4444;">
+            <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 16px; opacity: 0.7;"></i>
+            <p style="font-size: 16px; margin: 0; font-weight: 600;">Error al cargar ofertas especiales</p>
+            <p style="font-size: 14px; margin-top: 8px; opacity: 0.8;">Por favor, intenta recargar la página</p>
+            <button class="btn btn-outline" onclick="window.location.reload()" style="margin-top: 16px;">Recargar página</button>
+          </div>
+        `;
+      }
     }
   }
 
@@ -168,6 +189,7 @@ class HomeManager {
     } catch (error) {
       console.error('❌ Error cargando categorías:', error);
       // Mantener las categorías placeholder si hay error
+      // No mostrar error al usuario ya que tenemos placeholders
     } finally {
       // Ocultar skeleton loader
       if (window.skeletonLoader) {
@@ -197,10 +219,10 @@ class HomeManager {
     container.innerHTML = this.featuredProducts.map(product => this.createProductCard(product)).join('');
     window.wishlistManager?.syncToggleButtons?.(container);
     
-      // Ocultar skeleton loader
-      if (window.skeletonLoader) {
+    // Ocultar skeleton loader
+    if (window.skeletonLoader) {
         window.skeletonLoader.hide('featuredProductsGrid');
-      }
+    }
   }
 
   renderOnSaleProducts() {
@@ -218,16 +240,16 @@ class HomeManager {
           <p style="font-size: 14px; margin-top: 8px; opacity: 0.7;">Vuelve pronto para ver nuestras mejores promociones</p>
         </div>
       `;
-      return;
+        return;
     }
 
-    container.innerHTML = this.onSaleProducts.map(product => this.createProductCard(product)).join('');
+      container.innerHTML = this.onSaleProducts.map(product => this.createProductCard(product)).join('');
     window.wishlistManager?.syncToggleButtons?.(container);
-    
+      
       // Ocultar skeleton loader
       if (window.skeletonLoader) {
         window.skeletonLoader.hide('onSaleProductsGrid');
-      }
+    }
   }
 
   renderCategories() {
@@ -994,6 +1016,7 @@ class HomeManager {
       console.log('✅ Mega menu cargado dinámicamente');
     } catch (error) {
       console.error('❌ Error cargando mega menu:', error);
+      // No mostrar error al usuario, el menú seguirá funcionando con categorías hardcodeadas si existen
     }
   }
 
