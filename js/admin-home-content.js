@@ -90,6 +90,7 @@ class AdminHomeContent {
   openHeroSlideModal(id = null) {
     this.currentEditId = id;
     const modal = document.getElementById('heroSlideModal');
+    const modalContent = modal?.querySelector('.modal-content');
     const title = document.getElementById('heroSlideModalTitle');
     
     title.textContent = id ? 'Editar Hero Slide' : 'Crear Hero Slide';
@@ -97,11 +98,23 @@ class AdminHomeContent {
     document.getElementById('heroSlidePreviewContainer').style.display = 'none';
     document.getElementById('heroSlideImageFile').value = '';
     
+    // Resetear scroll del modal al abrir
+    if (modalContent) {
+      modalContent.scrollTop = 0;
+    }
+    
     if (id) {
       this.loadHeroSlideForEdit(id);
     }
     
     this.showModal(modal);
+    
+    // Asegurar que el scroll esté en la parte superior después de mostrar
+    setTimeout(() => {
+      if (modalContent) {
+        modalContent.scrollTop = 0;
+      }
+    }, 100);
   }
 
   async loadHeroSlideForEdit(id) {

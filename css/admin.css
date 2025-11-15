@@ -590,9 +590,32 @@ tbody tr:last-child td {
     max-width: 600px;
     max-height: 90vh;
     overflow-y: auto;
+    overflow-x: hidden;
     box-shadow: var(--admin-shadow-lg);
     animation: modalSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid var(--admin-border);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+/* Scrollbar personalizado para modales */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: var(--admin-light);
+    border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: var(--admin-border);
+    border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
 }
 
 .modal-large .modal-content {
@@ -618,6 +641,10 @@ tbody tr:last-child td {
     align-items: center;
     background: var(--admin-light);
     border-radius: 12px 12px 0 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    flex-shrink: 0;
 }
 
 .modal-header h3 {
@@ -648,6 +675,9 @@ tbody tr:last-child td {
 
 .modal form {
     padding: 25px;
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
 }
 
 /* ========================================
