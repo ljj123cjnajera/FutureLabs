@@ -919,8 +919,22 @@ class AdminHomeContent {
 
   showModal(modal) {
     if (!modal) return;
+    const modalContent = modal.querySelector('.modal-content');
+    
+    // Resetear scroll antes de mostrar
+    if (modalContent) {
+      modalContent.scrollTop = 0;
+    }
+    
     modal.style.display = 'flex';
     modal.classList.add('active');
+    
+    // Asegurar scroll en la parte superior después de mostrar
+    setTimeout(() => {
+      if (modalContent) {
+        modalContent.scrollTop = 0;
+      }
+    }, 50);
   }
 
   hideModal(modal) {
