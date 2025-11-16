@@ -15,20 +15,20 @@ class AdminHomeContent {
       console.warn('[AdminHomeContent] No se encontró heroSlideForm al inicializar');
     }
 
-    document.getElementById('bannerForm')?.addEventListener('submit', (e) => {
-      e.preventDefault();
-      this.saveBanner();
-    });
+    const bannerForm = document.getElementById('bannerForm');
+    if (bannerForm) {
+      this.attachBannerFormListener(bannerForm);
+    }
 
-    document.getElementById('benefitForm')?.addEventListener('submit', (e) => {
-      e.preventDefault();
-      this.saveBenefit();
-    });
+    const benefitForm = document.getElementById('benefitForm');
+    if (benefitForm) {
+      this.attachBenefitFormListener(benefitForm);
+    }
 
-    document.getElementById('homeSectionForm')?.addEventListener('submit', (e) => {
-      e.preventDefault();
-      this.saveHomeSection();
-    });
+    const homeSectionForm = document.getElementById('homeSectionForm');
+    if (homeSectionForm) {
+      this.attachHomeSectionFormListener(homeSectionForm);
+    }
   }
 
   // ===== HERO SLIDES =====
@@ -39,6 +39,18 @@ class AdminHomeContent {
       e.preventDefault();
       console.log('[AdminHomeContent] submit HeroSlideForm → saveHeroSlide()');
       this.saveHeroSlide();
+    });
+
+    form.dataset.listenerAttached = 'true';
+  }
+
+  // ===== BANNERS =====
+  attachBannerFormListener(form) {
+    if (!form || form.dataset.listenerAttached === 'true') return;
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      this.saveBanner();
     });
 
     form.dataset.listenerAttached = 'true';
@@ -277,6 +289,28 @@ class AdminHomeContent {
   }
 
   // ===== BANNERS =====
+  attachBenefitFormListener(form) {
+    if (!form || form.dataset.listenerAttached === 'true') return;
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      this.saveBenefit();
+    });
+
+    form.dataset.listenerAttached = 'true';
+  }
+
+  attachHomeSectionFormListener(form) {
+    if (!form || form.dataset.listenerAttached === 'true') return;
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      this.saveHomeSection();
+    });
+
+    form.dataset.listenerAttached = 'true';
+  }
+
   async loadBanners() {
     try {
       const response = await window.api.getAdminBanners();
@@ -339,9 +373,13 @@ class AdminHomeContent {
     this.currentEditId = id;
     const modal = document.getElementById('bannerModal');
     const title = document.getElementById('bannerModalTitle');
-    
-    title.textContent = id ? 'Editar Banner' : 'Crear Banner';
     const form = document.getElementById('bannerForm');
+    
+    if (form) {
+      this.attachBannerFormListener(form);
+    }
+
+    title.textContent = id ? 'Editar Banner' : 'Crear Banner';
     form.reset();
     this.clearFormErrors(form);
     document.getElementById('bannerPreviewContainer').style.display = 'none';
@@ -586,9 +624,13 @@ class AdminHomeContent {
     this.currentEditId = id;
     const modal = document.getElementById('benefitModal');
     const title = document.getElementById('benefitModalTitle');
+    const form = document.getElementById('benefitForm');
+    
+    if (form) {
+      this.attachBenefitFormListener(form);
+    }
     
     title.textContent = id ? 'Editar Beneficio' : 'Crear Beneficio';
-    const form = document.getElementById('benefitForm');
     form.reset();
     this.clearFormErrors(form);
     document.getElementById('benefitPreviewContainer').style.display = 'none';
@@ -813,9 +855,13 @@ class AdminHomeContent {
     this.currentEditId = id;
     const modal = document.getElementById('homeSectionModal');
     const title = document.getElementById('homeSectionModalTitle');
-    
-    title.textContent = id ? 'Editar Sección del Home' : 'Crear Sección del Home';
     const form = document.getElementById('homeSectionForm');
+    
+    if (form) {
+      this.attachHomeSectionFormListener(form);
+    }
+
+    title.textContent = id ? 'Editar Sección del Home' : 'Crear Sección del Home';
     form.reset();
     this.clearFormErrors(form);
     this.loadCategoriesForSection();
