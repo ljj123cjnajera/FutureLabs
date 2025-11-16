@@ -12,7 +12,7 @@ class HomeManager {
   }
 
   async init() {
-    console.log('🏠 HomeManager init() - Iniciando...');
+    window.logger?.info('HOME', 'HomeManager init() - Iniciando...');
     try {
       await Promise.all([
         this.loadHomeContent(),
@@ -28,19 +28,19 @@ class HomeManager {
       await this.initFlashOffers();
       
       this.setupEventListeners();
-      console.log('✅ HomeManager inicializado correctamente');
+      window.logger?.success('HOME', 'HomeManager inicializado correctamente');
     } catch (error) {
-      console.error('❌ Error inicializando HomeManager:', error);
+      window.logger?.error('HOME', 'Error inicializando HomeManager', error);
     }
   }
 
   async loadHomeContent() {
     try {
-      console.log('🏠 Cargando contenido del home...');
+      window.logger?.info('HOME', 'Cargando contenido del home...');
       const response = await window.api.getHomeContent();
       
       if (!response || !response.success) {
-        console.warn('⚠️ Respuesta inválida del servidor:', response);
+        window.logger?.warn('HOME', 'Respuesta inválida del servidor al cargar contenido del home', response);
         this.renderEmptyStates();
         return;
       }
@@ -53,7 +53,7 @@ class HomeManager {
             .filter(slide => slide && slide.is_active !== false)
             .sort((a, b) => (a?.order_index ?? 0) - (b?.order_index ?? 0))
         : [];
-      console.log(`✅ Hero slides cargados: ${this.heroSlides.length}`);
+      window.logger?.debug?.('HOME', `Hero slides cargados: ${this.heroSlides.length}`);
 
       // Procesar beneficios
       this.homeBenefits = Array.isArray(benefits)
@@ -61,7 +61,7 @@ class HomeManager {
             .filter(benefit => benefit && benefit.is_active !== false)
             .sort((a, b) => (a?.order_index ?? 0) - (b?.order_index ?? 0))
         : [];
-      console.log(`✅ Beneficios cargados: ${this.homeBenefits.length}`);
+      window.logger?.debug?.('HOME', `Beneficios cargados: ${this.homeBenefits.length}`);
 
       // Procesar banners
       this.homeBanners = Array.isArray(banners)
@@ -69,7 +69,7 @@ class HomeManager {
             .filter(banner => this.isBannerCurrentlyActive(banner))
             .sort((a, b) => (a?.order_index ?? 0) - (b?.order_index ?? 0))
         : [];
-      console.log(`✅ Banners cargados: ${this.homeBanners.length}`);
+      window.logger?.debug?.('HOME', `Banners cargados: ${this.homeBanners.length}`);
 
       // Procesar secciones
       this.homeSections = Array.isArray(sections)
@@ -77,7 +77,7 @@ class HomeManager {
             .filter(section => section && section.is_active !== false)
             .sort((a, b) => (a?.order_index ?? 0) - (b?.order_index ?? 0))
         : [];
-      console.log(`✅ Secciones cargadas: ${this.homeSections.length}`);
+      window.logger?.debug?.('HOME', `Secciones cargadas: ${this.homeSections.length}`);
 
       // Renderizar todo
       this.renderHeroSlides();
@@ -85,9 +85,9 @@ class HomeManager {
       this.renderBanners();
       this.renderHomeSections();
       
-      console.log('✅ Contenido del home renderizado correctamente');
+      window.logger?.success('HOME', 'Contenido del home renderizado correctamente');
     } catch (error) {
-      console.error('❌ Error cargando contenido del home:', error);
+      window.logger?.error('HOME', 'Error cargando contenido del home', error);
       window.notifications?.error('Error al cargar contenido del inicio. Por favor, recarga la página.');
       this.renderEmptyStates();
     }
@@ -113,13 +113,13 @@ class HomeManager {
       if (response && response.success) {
         this.featuredProducts = response.data?.products || [];
         this.renderFeaturedProducts();
-        console.log(`✅ Productos destacados cargados: ${this.featuredProducts.length}`);
+        window.logger?.debug?.('HOME', `Productos destacados cargados: ${this.featuredProducts.length}`);
       } else {
-        console.warn('⚠️ Respuesta inválida al cargar productos destacados:', response);
+        window.logger?.warn('HOME', 'Respuesta inválida al cargar productos destacados', response);
         this.renderFeaturedProducts(); // Renderizar estado vacío
       }
     } catch (error) {
-      console.error('❌ Error cargando productos destacados:', error);
+      window.logger?.error('HOME', 'Error cargando productos destacados', error);
       const container = document.getElementById('featuredProductsGrid');
       if (container) {
         container.innerHTML = `
@@ -147,13 +147,13 @@ class HomeManager {
       if (response && response.success) {
         this.onSaleProducts = response.data?.products || [];
         this.renderOnSaleProducts();
-        console.log(`✅ Productos en oferta cargados: ${this.onSaleProducts.length}`);
+        window.logger?.debug?.('HOME', `Productos en oferta cargados: ${this.onSaleProducts.length}`);
       } else {
-        console.warn('⚠️ Respuesta inválida al cargar productos en oferta:', response);
+        window.logger?.warn('HOME', 'Respuesta inválida al cargar productos en oferta', response);
         this.renderOnSaleProducts(); // Renderizar estado vacío
       }
     } catch (error) {
-      console.error('❌ Error cargando productos en oferta:', error);
+      window.logger?.error('HOME', 'Error cargando productos en oferta', error);
       const container = document.getElementById('onSaleProductsGrid');
       if (container) {
         container.innerHTML = `
@@ -181,13 +181,13 @@ class HomeManager {
         this.categories = response.data?.categories || [];
         this.renderCategories();
         this.renderHomeSections();
-        console.log(`✅ Categorías cargadas: ${this.categories.length}`);
+        window.logger?.debug?.('HOME', `Categorías cargadas: ${this.categories.length}`);
       } else {
-        console.warn('⚠️ Respuesta inválida al cargar categorías:', response);
+        window.logger?.warn('HOME', 'Respuesta inválida al cargar categorías', response);
         this.renderCategories(); // Renderizar estado vacío o mantener placeholder
       }
     } catch (error) {
-      console.error('❌ Error cargando categorías:', error);
+      window.logger?.error('HOME', 'Error cargando categorías', error);
       // Mantener las categorías placeholder si hay error
       // No mostrar error al usuario ya que tenemos placeholders
     } finally {
@@ -201,7 +201,7 @@ class HomeManager {
   renderFeaturedProducts() {
     const container = document.getElementById('featuredProductsGrid');
     if (!container) {
-      console.warn('⚠️ featuredProductsGrid container not found');
+      window.logger?.warn('HOME', 'featuredProductsGrid container not found');
       return;
     }
 
@@ -228,7 +228,7 @@ class HomeManager {
   renderOnSaleProducts() {
     const container = document.getElementById('onSaleProductsGrid');
     if (!container) {
-      console.warn('⚠️ onSaleProductsGrid container not found');
+      window.logger?.warn('HOME', 'onSaleProductsGrid container not found');
       return;
     }
 
@@ -255,7 +255,7 @@ class HomeManager {
   renderCategories() {
     const container = document.getElementById('categories');
     if (!container) {
-      console.warn('⚠️ categories container not found');
+      window.logger?.warn('HOME', 'categories container not found');
       return;
     }
 
@@ -654,15 +654,15 @@ class HomeManager {
 
   async addToCart(productId) {
     try {
-      console.log('🛒 Intentando agregar producto al carrito:', productId);
-      console.log('🔍 cartManager existe:', typeof window.cartManager);
-      console.log('🔍 notifications existe:', typeof window.notifications);
+      window.logger?.debug?.('HOME', `Intentando agregar producto al carrito: ${productId}`);
+      window.logger?.debug?.('HOME', `cartManager existe: ${typeof window.cartManager}`);
+      window.logger?.debug?.('HOME', `notifications existe: ${typeof window.notifications}`);
       
       await window.cartManager.add(productId, 1);
-      console.log('✅ Producto agregado al carrito');
+      window.logger?.success('HOME', `Producto agregado al carrito: ${productId}`);
       window.notifications.show('Producto agregado al carrito', 'success');
     } catch (error) {
-      console.error('❌ Error al agregar producto:', error);
+      window.logger?.error('HOME', 'Error al agregar producto al carrito', error);
       window.notifications.show('Error al agregar producto', 'error');
     }
   }
@@ -814,7 +814,7 @@ class HomeManager {
       await this.handleSubscription(email);
       form.closest('.modal')?.remove();
     } catch (error) {
-      console.error('Error en suscripción:', error);
+      window.logger?.error('HOME', 'Error en suscripción', error);
       window.notifications?.error('Error al procesar suscripción. Inténtalo de nuevo.');
     } finally {
       if (submitBtn) {
@@ -981,7 +981,7 @@ class HomeManager {
         `;
       }
     } catch (error) {
-      console.error('❌ Error cargando flash offers:', error);
+      window.logger?.error('HOME', 'Error cargando flash offers', error);
       flashSection.innerHTML = `
         <div style="text-align: center; padding: 40px 20px; color: #999;">
           <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
@@ -1007,7 +1007,7 @@ class HomeManager {
       const contentColumn = document.querySelector('.content-column');
       
       if (!categoriesColumn || !contentColumn) {
-        console.warn('⚠️ Mega menu containers not found');
+        window.logger?.warn('HOME', 'Mega menu containers not found');
         return;
       }
 
@@ -1041,9 +1041,9 @@ class HomeManager {
       // Reinicializar event listeners del megamenú
       this.setupMegaMenuListeners();
       
-      console.log('✅ Mega menu cargado dinámicamente');
+      window.logger?.success('HOME', 'Mega menu cargado dinámicamente');
     } catch (error) {
-      console.error('❌ Error cargando mega menu:', error);
+      window.logger?.error('HOME', 'Error cargando mega menu', error);
       // No mostrar error al usuario, el menú seguirá funcionando con categorías hardcodeadas si existen
     }
   }
