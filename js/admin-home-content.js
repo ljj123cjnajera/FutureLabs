@@ -10,11 +10,7 @@ class AdminHomeContent {
     const heroForm = document.getElementById('heroSlideForm');
     if (heroForm) {
       console.log('[AdminHomeContent] Listener de HeroSlideForm inicializado');
-      heroForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        console.log('[AdminHomeContent] submit HeroSlideForm → saveHeroSlide()');
-        this.saveHeroSlide();
-      });
+      this.attachHeroFormListener(heroForm);
     } else {
       console.warn('[AdminHomeContent] No se encontró heroSlideForm al inicializar');
     }
@@ -36,6 +32,18 @@ class AdminHomeContent {
   }
 
   // ===== HERO SLIDES =====
+  attachHeroFormListener(form) {
+    if (!form || form.dataset.listenerAttached === 'true') return;
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      console.log('[AdminHomeContent] submit HeroSlideForm → saveHeroSlide()');
+      this.saveHeroSlide();
+    });
+
+    form.dataset.listenerAttached = 'true';
+  }
+
   async loadHeroSlides() {
     try {
       const response = await window.api.getAdminHeroSlides();
@@ -99,6 +107,12 @@ class AdminHomeContent {
     const modal = document.getElementById('heroSlideModal');
     const modalContent = modal?.querySelector('.modal-content');
     const title = document.getElementById('heroSlideModalTitle');
+    const form = document.getElementById('heroSlideForm');
+
+    // Asegurar que el listener del formulario esté conectado aunque no existiera al init()
+    if (form) {
+      this.attachHeroFormListener(form);
+    }
     
     title.textContent = id ? 'Editar Hero Slide' : 'Crear Hero Slide';
     document.getElementById('heroSlideForm').reset();
