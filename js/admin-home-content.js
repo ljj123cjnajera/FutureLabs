@@ -976,6 +976,14 @@ class AdminHomeContent {
   }
 
   isValidUrl(value) {
+    if (!value) return true;
+
+    // Permitir rutas relativas dentro del sitio (ej: "products.html", "/products")
+    if (value.startsWith('/') || !value.includes('://')) {
+      return true;
+    }
+
+    // Para URLs absolutas, validar protocolo http/https
     try {
       const url = new URL(value);
       return url.protocol === 'http:' || url.protocol === 'https:';
