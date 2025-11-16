@@ -7,10 +7,17 @@ class AdminHomeContent {
 
   init() {
     // Agregar event listeners a los formularios
-    document.getElementById('heroSlideForm')?.addEventListener('submit', (e) => {
-      e.preventDefault();
-      this.saveHeroSlide();
-    });
+    const heroForm = document.getElementById('heroSlideForm');
+    if (heroForm) {
+      console.log('[AdminHomeContent] Listener de HeroSlideForm inicializado');
+      heroForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        console.log('[AdminHomeContent] submit HeroSlideForm → saveHeroSlide()');
+        this.saveHeroSlide();
+      });
+    } else {
+      console.warn('[AdminHomeContent] No se encontró heroSlideForm al inicializar');
+    }
 
     document.getElementById('bannerForm')?.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -145,6 +152,7 @@ class AdminHomeContent {
   }
 
   async saveHeroSlide() {
+    console.log('[AdminHomeContent] saveHeroSlide() llamado');
     const form = document.getElementById('heroSlideForm');
     this.clearFormErrors(form);
 
