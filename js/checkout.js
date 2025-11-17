@@ -872,12 +872,9 @@ async function processOrder() {
                     paymentIntent = stripeResponse.data.client_secret;
                     
                     // Procesar pago con Stripe
-                    if (window.stripeCheckout && window.stripeCheckout.processPayment) {
-                        await window.stripeCheckout.processPayment(paymentIntent);
-                    } else {
-                        // Si Stripe no está disponible, usar método simulado
-                        window.notifications.show('Procesando pago simulado...', 'info');
-                    }
+                    // TODO: Implementar integración completa de Stripe cuando esté configurado
+                    // Por ahora, usar método simulado
+                    window.notifications.show('Procesando pago simulado...', 'info');
                 }
             } catch (error) {
                 // Si hay error con Stripe, continuar con pago simulado
@@ -954,11 +951,10 @@ function selectPaymentMethod(method) {
     selectedPaymentMethod = method;
     renderStep(2); // Re-renderizar el paso de pago
     
-    // Si es Stripe y Stripe está disponible, inicializar card element
-    if (method === 'stripe' && window.stripeCheckout && window.stripeCheckout.showCardForm) {
-        setTimeout(() => {
-            window.stripeCheckout.showCardForm();
-        }, 100);
+    // Si es Stripe, mostrar mensaje de configuración
+    if (method === 'stripe') {
+        // TODO: Implementar inicialización de Stripe Elements cuando esté configurado
+        window.notifications?.info('Integración de Stripe pendiente de configuración');
     }
 }
 
