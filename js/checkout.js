@@ -3,7 +3,7 @@
 // Variables globales
 let currentStep = 1;
 const totalSteps = 4;
-let selectedPaymentMethod = 'stripe';
+let selectedPaymentMethod = 'cash'; // Por defecto efectivo (más seguro si Stripe no está configurado)
 const shippingOptions = {
     standard: {
         label: 'Envío Estándar',
@@ -464,8 +464,17 @@ function loadAddressData(address) {
 window.selectSavedAddress = selectSavedAddress;
 window.useNewAddress = useNewAddress;
 
+// Variables para Stripe
+let stripe = null;
+let stripeElements = null;
+let stripeCardElement = null;
+
 // Renderizar Paso 2: Método de Pago
 function renderPaymentStep() {
+    const subtotal = Number(cartData.subtotal ?? cartData.total ?? 0);
+    const shippingAmount = Number(cartData.shipping ?? shippingOptions[selectedShippingOption]?.amount ?? 0);
+    const total = Math.max(subtotal + shippingAmount - discount - loyaltyPointsDiscount, 0);
+    
     return `
         <div class="checkout-form-section">
             <h2><i class="fas fa-credit-card"></i> Método de Pago</h2>
@@ -477,16 +486,16 @@ function renderPaymentStep() {
                     <div class="method-desc">Visa, Mastercard, Amex</div>
                 </div>
                 
-                <div class="payment-method-card ${selectedPaymentMethod === 'paypal' ? 'selected' : ''}" onclick="selectPaymentMethod('paypal')">
-                    <i class="fab fa-paypal"></i>
-                    <div class="method-name">PayPal</div>
-                    <div class="method-desc">Paga con tu cuenta PayPal</div>
-                </div>
-                
                 <div class="payment-method-card ${selectedPaymentMethod === 'yape' ? 'selected' : ''}" onclick="selectPaymentMethod('yape')">
                     <i class="fas fa-mobile-alt"></i>
                     <div class="method-name">Yape</div>
-                    <div class="method-desc">Pago móvil</div>
+                    <div class="method-desc">Pago móvil rápido</div>
+                </div>
+                
+                <div class="payment-method-card ${selectedPaymentMethod === 'plin' ? 'selected' : ''}" onclick="selectPaymentMethod('plin')">
+                    <i class="fas fa-mobile-alt"></i>
+                    <div class="method-name">Plin</div>
+                    <div class="method-desc">Pago móvil rápido</div>
                 </div>
                 
                 <div class="payment-method-card ${selectedPaymentMethod === 'cash' ? 'selected' : ''}" onclick="selectPaymentMethod('cash')">
@@ -497,12 +506,46 @@ function renderPaymentStep() {
             </div>
             
             ${selectedPaymentMethod === 'stripe' ? `
-                <div class="payment-details active">
+                <div class="payment-details active" id="stripe-payment-details">
                     <h3>Detalles de la Tarjeta</h3>
                     <div id="stripe-card-element" style="border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin: 20px 0; background: white;"></div>
+                    <div id="stripe-card-errors" role="alert" style="color: #dc2626; font-size: 14px; margin-top: 10px;"></div>
                     <p style="color: #666; font-size: 14px; margin-top: 10px;">
                         <i class="fas fa-lock"></i> Tu información está protegida por Stripe
                     </p>
+                </div>
+            ` : ''}
+            
+            ${selectedPaymentMethod === 'yape' || selectedPaymentMethod === 'plin' ? `
+                <div class="payment-details active" id="mobile-payment-details">
+                    <h3>Información de Pago ${selectedPaymentMethod === 'yape' ? 'Yape' : 'Plin'}</h3>
+                    <div class="form-group">
+                        <label for="mobile-phone">Número de teléfono *</label>
+                        <input type="tel" id="mobile-phone" class="form-control" placeholder="Ej: 987654321" required>
+                        <small class="form-text">Ingresa el número asociado a tu ${selectedPaymentMethod === 'yape' ? 'Yape' : 'Plin'}</small>
+                    </div>
+                    <div class="payment-info-box" style="background: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 8px; padding: 16px; margin-top: 16px;">
+                        <p style="margin: 0; color: #0c4a6e;">
+                            <strong>Total a pagar:</strong> ${checkoutCurrencyFormatter.format(total)}
+                        </p>
+                        <p style="margin: 8px 0 0 0; color: #0c4a6e; font-size: 14px;">
+                            Realiza el pago desde tu app y confirma el pedido. Te enviaremos un email con las instrucciones.
+                        </p>
+                    </div>
+                </div>
+            ` : ''}
+            
+            ${selectedPaymentMethod === 'cash' ? `
+                <div class="payment-details active" id="cash-payment-details">
+                    <h3>Pago en Efectivo</h3>
+                    <div class="payment-info-box" style="background: #f0fdf4; border: 1px solid #22c55e; border-radius: 8px; padding: 16px; margin-top: 16px;">
+                        <p style="margin: 0; color: #166534;">
+                            <strong>Total a pagar:</strong> ${checkoutCurrencyFormatter.format(total)}
+                        </p>
+                        <p style="margin: 8px 0 0 0; color: #166534; font-size: 14px;">
+                            Pagarás en efectivo al momento de recibir tu pedido. El repartidor aceptará el pago exacto.
+                        </p>
+                    </div>
                 </div>
             ` : ''}
         </div>
@@ -552,10 +595,10 @@ function renderReviewStep() {
                     <span class="review-info-label">Método:</span>
                     <span class="review-info-value">${getPaymentMethodName(selectedPaymentMethod)}</span>
                 </div>
-                ${selectedPaymentMethod === 'stripe' ? `
+                ${selectedPaymentMethod === 'yape' || selectedPaymentMethod === 'plin' ? `
                 <div class="review-info-item">
-                    <span class="review-info-label">Tarjeta:</span>
-                    <span class="review-info-value">Terminada en ${paymentData.cardNumber ? paymentData.cardNumber.slice(-4) : '****'}</span>
+                    <span class="review-info-label">Teléfono:</span>
+                    <span class="review-info-value">${document.getElementById('mobile-phone')?.value || 'No especificado'}</span>
                 </div>
                 ` : ''}
             </div>
@@ -851,38 +894,71 @@ function handleCouponUpdate(event) {
     renderOrderSummary();
 }
 
+// Validar datos de envío
+function validateShippingData() {
+    if (!shippingData.fullName || !shippingData.address || !shippingData.city || 
+        !shippingData.country || !shippingData.phone || !shippingData.email) {
+        return { valid: false, message: 'Por favor completa todos los campos de envío' };
+    }
+    
+    // Validar email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(shippingData.email)) {
+        return { valid: false, message: 'Por favor ingresa un email válido' };
+    }
+    
+    return { valid: true };
+}
+
+// Validar método de pago
+function validatePaymentMethod() {
+    if (selectedPaymentMethod === 'yape' || selectedPaymentMethod === 'plin') {
+        const phoneInput = document.getElementById('mobile-phone');
+        if (!phoneInput || !phoneInput.value.trim()) {
+            return { valid: false, message: 'Por favor ingresa tu número de teléfono' };
+        }
+        
+        const phone = phoneInput.value.trim();
+        if (phone.length < 9) {
+            return { valid: false, message: 'Por favor ingresa un número de teléfono válido' };
+        }
+    }
+    
+    if (selectedPaymentMethod === 'stripe') {
+        if (!stripeCardElement) {
+            return { valid: false, message: 'Por favor completa los datos de la tarjeta' };
+        }
+    }
+    
+    return { valid: true };
+}
+
 // Procesar pedido
 async function processOrder() {
     try {
+        // Validar datos de envío
+        const shippingValidation = validateShippingData();
+        if (!shippingValidation.valid) {
+            window.notifications.error(shippingValidation.message);
+            currentStep = 1;
+            renderStep(1);
+            return;
+        }
+        
+        // Validar método de pago
+        const paymentValidation = validatePaymentMethod();
+        if (!paymentValidation.valid) {
+            window.notifications.error(paymentValidation.message);
+            currentStep = 2;
+            renderStep(2);
+            if (selectedPaymentMethod === 'stripe') {
+                setTimeout(() => initializeStripeElements(), 100);
+            }
+            return;
+        }
+        
         // Mostrar loading
         window.notifications.show('Procesando pedido...', 'info');
-        
-        // Si es pago con Stripe, crear payment intent primero
-        let paymentIntent = null;
-        if (selectedPaymentMethod === 'stripe') {
-            try {
-                window.notifications.show('Inicializando pago seguro...', 'info');
-                
-                const stripeResponse = await window.api.createStripePaymentIntent({
-                    amount: cartData.total,
-                    currency: 'pen'
-                });
-                
-                if (stripeResponse.success) {
-                    paymentIntent = stripeResponse.data.client_secret;
-                    
-                    // Procesar pago con Stripe
-                    // TODO: Implementar integración completa de Stripe cuando esté configurado
-                    // Por ahora, usar método simulado
-                    window.notifications.show('Procesando pago simulado...', 'info');
-                }
-            } catch (error) {
-                // Si hay error con Stripe, continuar con pago simulado
-                console.log('Error con Stripe:', error.message);
-                selectedPaymentMethod = 'cash'; // Cambiar a efectivo
-                window.notifications.show('Stripe no está configurado. Continuando con pago simulado.', 'warning');
-            }
-        }
         
         // Si se usaron puntos, canjearlos primero
         if (loyaltyPointsUsed > 0) {
@@ -896,11 +972,12 @@ async function processOrder() {
             }
         }
 
-        // Crear pedido
+        // Crear pedido primero
         const subtotal = Number(cartData.subtotal ?? cartData.total ?? 0);
         const shippingOption = shippingOptions[selectedShippingOption] || shippingOptions.standard;
         const shippingAmount = Number(cartData.shipping ?? shippingOption.amount ?? 0);
         const finalTotal = Math.max(subtotal + shippingAmount - discount - loyaltyPointsDiscount, 0);
+        
         const orderData = {
             // Datos de envío (formato plano para el backend)
             shipping_address: shippingData.address,
@@ -920,29 +997,152 @@ async function processOrder() {
             loyalty_points_used: loyaltyPointsUsed
         };
         
-        const response = await window.api.createOrder(orderData);
+        const orderResponse = await window.api.createOrder(orderData);
         
-        if (response.success) {
-            // Guardar número de pedido
-            orderNumber = response.data.order_number || response.data.id;
-            
-            // Limpiar carrito
-            await window.api.clearCart();
-            
-            // Ir a confirmación
-            currentStep = 4;
-            renderStep(4);
-            
-            // Ocultar navegación
-            document.getElementById('checkoutNavigation').style.display = 'none';
-            
-            window.notifications.success('Pedido confirmado exitosamente');
-        } else {
-            throw new Error(response.message || 'Error al procesar el pedido');
+        if (!orderResponse.success) {
+            throw new Error(orderResponse.message || 'Error al crear el pedido');
         }
+        
+        const orderId = orderResponse.data.id || orderResponse.data.order?.id;
+        orderNumber = orderResponse.data.order_number || orderResponse.data.order?.order_number;
+        
+        // Procesar pago según el método seleccionado
+        if (selectedPaymentMethod === 'stripe') {
+            await processStripePayment(orderId, finalTotal);
+        } else if (selectedPaymentMethod === 'yape' || selectedPaymentMethod === 'plin') {
+            await processMobilePayment(orderId, finalTotal);
+        } else if (selectedPaymentMethod === 'cash') {
+            await processCashPayment(orderId);
+        }
+        
+        // Limpiar carrito
+        await window.api.clearCart();
+        
+        // Ir a confirmación
+        currentStep = 4;
+        renderStep(4);
+        
+        // Ocultar navegación
+        const navElement = document.getElementById('checkoutNavigation');
+        if (navElement) {
+            navElement.style.display = 'none';
+        }
+        
+        window.notifications.success('Pedido confirmado exitosamente');
+        
     } catch (error) {
         console.error('Error al procesar pedido:', error);
         window.notifications.error(error.message || 'Error al procesar el pedido');
+    }
+}
+
+// Procesar pago con Stripe
+async function processStripePayment(orderId, amount) {
+    try {
+        window.notifications.show('Procesando pago con tarjeta...', 'info');
+        
+        // Crear payment intent
+        const intentResponse = await window.api.createStripePaymentIntent({
+            order_id: orderId,
+            amount: amount,
+            currency: 'pen'
+        });
+        
+        if (!intentResponse.success) {
+            throw new Error(intentResponse.message || 'Error al crear intención de pago');
+        }
+        
+        const clientSecret = intentResponse.data.client_secret;
+        
+        // Confirmar pago con Stripe
+        if (!stripe || !stripeCardElement) {
+            throw new Error('Stripe no está inicializado correctamente');
+        }
+        
+        const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+            payment_method: {
+                card: stripeCardElement,
+                billing_details: {
+                    name: shippingData.fullName,
+                    email: shippingData.email,
+                    phone: shippingData.phone,
+                    address: {
+                        line1: shippingData.address,
+                        city: shippingData.city,
+                        country: shippingData.country,
+                        postal_code: shippingData.postalCode
+                    }
+                }
+            }
+        });
+        
+        if (error) {
+            throw new Error(error.message || 'Error al procesar el pago');
+        }
+        
+        // Procesar pago en el backend
+        // Obtener payment method ID del payment intent
+        const paymentMethodId = paymentIntent.payment_method || paymentIntent.payment_method?.id;
+        if (!paymentMethodId) {
+            throw new Error('No se pudo obtener el método de pago');
+        }
+        
+        const paymentResponse = await window.api.processStripePayment(orderId, paymentMethodId);
+        
+        if (!paymentResponse.success) {
+            throw new Error(paymentResponse.message || 'Error al confirmar el pago');
+        }
+        
+        window.notifications.success('Pago procesado exitosamente');
+        
+    } catch (error) {
+        console.error('Error procesando pago Stripe:', error);
+        throw error;
+    }
+}
+
+// Procesar pago móvil (Yape/Plin)
+async function processMobilePayment(orderId, amount) {
+    try {
+        const phoneInput = document.getElementById('mobile-phone');
+        const phoneNumber = phoneInput ? phoneInput.value.trim() : '';
+        
+        if (!phoneNumber) {
+            throw new Error('Número de teléfono requerido');
+        }
+        
+        window.notifications.show(`Procesando pago con ${selectedPaymentMethod === 'yape' ? 'Yape' : 'Plin'}...`, 'info');
+        
+        const paymentResponse = await window.api.processMobilePayment(orderId, phoneNumber, amount);
+        
+        if (!paymentResponse.success) {
+            throw new Error(paymentResponse.message || 'Error al procesar el pago');
+        }
+        
+        window.notifications.success(`Pago con ${selectedPaymentMethod === 'yape' ? 'Yape' : 'Plin'} registrado. Te enviaremos un email de confirmación.`);
+        
+    } catch (error) {
+        console.error('Error procesando pago móvil:', error);
+        throw error;
+    }
+}
+
+// Procesar pago en efectivo
+async function processCashPayment(orderId) {
+    try {
+        window.notifications.show('Registrando pago en efectivo...', 'info');
+        
+        const paymentResponse = await window.api.processCashPayment(orderId);
+        
+        if (!paymentResponse.success) {
+            throw new Error(paymentResponse.message || 'Error al registrar el pago');
+        }
+        
+        window.notifications.success('Pago en efectivo registrado. Pagarás al momento de recibir tu pedido.');
+        
+    } catch (error) {
+        console.error('Error procesando pago en efectivo:', error);
+        throw error;
     }
 }
 
@@ -951,10 +1151,75 @@ function selectPaymentMethod(method) {
     selectedPaymentMethod = method;
     renderStep(2); // Re-renderizar el paso de pago
     
-    // Si es Stripe, mostrar mensaje de configuración
+    // Inicializar Stripe Elements si es necesario
     if (method === 'stripe') {
-        // TODO: Implementar inicialización de Stripe Elements cuando esté configurado
-        window.notifications?.info('Integración de Stripe pendiente de configuración');
+        setTimeout(() => {
+            initializeStripeElements();
+        }, 100);
+    }
+}
+
+// Inicializar Stripe Elements
+async function initializeStripeElements() {
+    try {
+        // Verificar si Stripe.js está cargado
+        if (typeof Stripe === 'undefined') {
+            window.notifications?.warning('Stripe no está disponible. Por favor, recarga la página.');
+            return;
+        }
+
+        // Obtener o crear instancia de Stripe
+        // Nota: En producción, deberías obtener la clave pública del backend
+        const stripePublicKey = 'pk_test_placeholder'; // Reemplazar con clave real del backend
+        
+        if (!stripe) {
+            stripe = Stripe(stripePublicKey);
+        }
+
+        // Crear elementos
+        if (!stripeElements) {
+            stripeElements = stripe.elements();
+        }
+
+        // Crear elemento de tarjeta
+        const cardElementContainer = document.getElementById('stripe-card-element');
+        if (!cardElementContainer) return;
+
+        // Limpiar contenedor
+        cardElementContainer.innerHTML = '';
+
+        // Crear elemento de tarjeta
+        stripeCardElement = stripeElements.create('card', {
+            style: {
+                base: {
+                    fontSize: '16px',
+                    color: '#424770',
+                    '::placeholder': {
+                        color: '#aab7c4',
+                    },
+                },
+                invalid: {
+                    color: '#9e2146',
+                },
+            },
+        });
+
+        // Montar elemento
+        stripeCardElement.mount('#stripe-card-element');
+
+        // Manejar errores
+        stripeCardElement.on('change', (event) => {
+            const displayError = document.getElementById('stripe-card-errors');
+            if (event.error) {
+                displayError.textContent = event.error.message;
+            } else {
+                displayError.textContent = '';
+            }
+        });
+
+    } catch (error) {
+        console.error('Error inicializando Stripe:', error);
+        window.notifications?.warning('No se pudo inicializar el formulario de pago. Puedes usar otro método de pago.');
     }
 }
 
