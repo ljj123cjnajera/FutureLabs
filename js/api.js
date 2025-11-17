@@ -341,6 +341,30 @@ class FutureLabsAPI {
     return this.request(`/categories/slug/${slug}`);
   }
 
+  // ========== HOME CONTENT ==========
+
+  async getHomeHeroSlides() {
+    return this.request('/home-content/hero-slides');
+  }
+
+  async getHomeBanners(filters = {}) {
+    const params = new URLSearchParams(filters);
+    const query = params.toString();
+    return this.request(`/home-content/banners${query ? `?${query}` : ''}`);
+  }
+
+  async getHomeBenefits() {
+    return this.request('/home-content/benefits');
+  }
+
+  async getHomeSections() {
+    return this.request('/home-content/sections');
+  }
+
+  async getHomeContent() {
+    return this.request('/home-content/all');
+  }
+
   // ========== CARRITO ==========
 
   async getCart() {

@@ -1,12 +1,16 @@
 // Carrusel Hero
 class HeroCarousel {
     constructor() {
-        this.slides = document.querySelectorAll('.hero-slider .slide');
-        this.dots = document.querySelectorAll('.slider-dot');
+        this.slides = Array.from(document.querySelectorAll('.hero-slider .slide'));
+        this.dots = Array.from(document.querySelectorAll('.slider-dot'));
         this.prevBtn = document.querySelector('.slider-arrow.prev');
         this.nextBtn = document.querySelector('.slider-arrow.next');
         this.currentSlide = 0;
         this.slideInterval = null;
+        
+        if (!this.slides.length || !this.prevBtn || !this.nextBtn) {
+            return;
+        }
         
         this.init();
     }
@@ -17,17 +21,23 @@ class HeroCarousel {
         this.nextBtn.addEventListener('click', () => this.nextSlide());
         
         // Dot navigation
-        this.dots.forEach((dot, index) => {
-            dot.addEventListener('click', () => this.goToSlide(index));
-        });
+        if (this.dots.length) {
+            this.dots.forEach((dot, index) => {
+                dot.addEventListener('click', () => this.goToSlide(index));
+            });
+        }
         
         // Auto slide
         this.startAutoSlide();
         
         // Pause on hover
         const slider = document.querySelector('.hero-slider');
-        slider.addEventListener('mouseenter', () => this.stopAutoSlide());
-        slider.addEventListener('mouseleave', () => this.startAutoSlide());
+        if (slider) {
+            slider.addEventListener('mouseenter', () => this.stopAutoSlide());
+            slider.addEventListener('mouseleave', () => this.startAutoSlide());
+        }
+        
+        this.showSlide(0);
     }
     
     showSlide(index) {
@@ -75,14 +85,20 @@ class HeroCarousel {
     }
 }
 
-// Inicializar carruseles cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', function() {
-    // Inicializar carrusel hero
-    if (document.querySelector('.hero-slider')) {
-        new HeroCarousel();
+window.initHeroCarousel = function initHeroCarousel() {
+    if (window.heroCarouselInstance) {
+        window.heroCarouselInstance.stopAutoSlide();
+        window.heroCarouselInstance = null;
     }
     
-    // Inicializar carruseles horizontales
+    if (document.querySelector('.hero-slider .slide')) {
+        window.heroCarouselInstance = new HeroCarousel();
+    }
+};
+
+// Inicializar carruseles cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+    window.initHeroCarousel();
     initHorizontalCarousels();
 });
 
