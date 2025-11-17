@@ -1060,21 +1060,30 @@ async function processStripePayment(orderId, amount) {
             throw new Error('Stripe no está inicializado correctamente');
         }
         
-        const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-            payment_method: {
-                card: stripeCardElement,
-                billing_details: {
-                    name: shippingData.fullName,
-                    email: shippingData.email,
-                    phone: shippingData.phone,
-                    address: {
-                        line1: shippingData.address,
-                        city: shippingData.city,
-                        country: shippingData.country,
-                        postal_code: shippingData.postalCode
-                    }
+        // Crear payment method primero
+        const { error: pmError, paymentMethod } = await stripe.createPaymentMethod({
+            type: 'card',
+            card: stripeCardElement,
+            billing_details: {
+                name: shippingData.fullName,
+                email: shippingData.email,
+                phone: shippingData.phone,
+                address: {
+                    line1: shippingData.address,
+                    city: shippingData.city,
+                    country: shippingData.country,
+                    postal_code: shippingData.postalCode
                 }
             }
+        });
+        
+        if (pmError) {
+            throw new Error(pmError.message || 'Error al crear método de pago');
+        }
+        
+        // Confirmar pago con el payment method
+        const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+            payment_method: paymentMethod.id
         });
         
         if (error) {
@@ -1082,13 +1091,7 @@ async function processStripePayment(orderId, amount) {
         }
         
         // Procesar pago en el backend
-        // Obtener payment method ID del payment intent
-        const paymentMethodId = paymentIntent.payment_method || paymentIntent.payment_method?.id;
-        if (!paymentMethodId) {
-            throw new Error('No se pudo obtener el método de pago');
-        }
-        
-        const paymentResponse = await window.api.processStripePayment(orderId, paymentMethodId);
+        const paymentResponse = await window.api.processStripePayment(orderId, paymentMethod.id);
         
         if (!paymentResponse.success) {
             throw new Error(paymentResponse.message || 'Error al confirmar el pago');
