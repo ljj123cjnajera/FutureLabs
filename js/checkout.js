@@ -1214,9 +1214,13 @@ async function processCashPayment(orderId) {
         
         window.notifications.success('Pago en efectivo registrado. Pagarás al momento de recibir tu pedido.');
         
+        return true;
+        
     } catch (error) {
         console.error('Error procesando pago en efectivo:', error);
-        throw error;
+        // Para efectivo, no es crítico si falla, el pedido queda como pendiente
+        window.notifications.info('El pedido fue creado. El pago se confirmará al momento de la entrega.');
+        return false;
     }
 }
 
