@@ -659,6 +659,7 @@ function getPaymentMethodName(method) {
         'stripe': 'Tarjeta de Crédito/Débito',
         'paypal': 'PayPal',
         'yape': 'Yape',
+        'plin': 'Plin',
         'cash': 'Pago en Efectivo'
     };
     return methods[method] || method;
