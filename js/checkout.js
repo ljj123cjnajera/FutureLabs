@@ -213,6 +213,8 @@ function updateNavigationButtons() {
     const btnPrevious = document.getElementById('btnPrevious');
     const btnNext = document.getElementById('btnNext');
     
+    if (!btnPrevious || !btnNext) return;
+    
     // Botón Atrás
     if (currentStep === 1) {
         btnPrevious.style.display = 'none';
@@ -221,12 +223,20 @@ function updateNavigationButtons() {
     }
     
     // Botón Siguiente/Completar
-    if (currentStep === totalSteps) {
-        btnNext.innerHTML = '<i class="fas fa-check"></i> Confirmar Pedido';
+    if (currentStep === 3) {
+        // Paso 3 (Revisar): Aquí se procesa el pedido y pago
+        btnNext.innerHTML = '<i class="fas fa-check"></i> Confirmar y Pagar';
         btnNext.onclick = processOrder;
+        btnNext.disabled = false;
+    } else if (currentStep === 4) {
+        // Paso 4 (Confirmación): Ya no hay botón de acción
+        btnNext.style.display = 'none';
+        btnPrevious.style.display = 'none';
     } else {
         btnNext.innerHTML = 'Continuar <i class="fas fa-arrow-right"></i>';
         btnNext.onclick = nextStep;
+        btnNext.disabled = false;
+        btnNext.style.display = 'flex';
     }
 }
 
@@ -936,13 +946,27 @@ function validatePaymentMethod() {
 
 // Procesar pedido
 async function processOrder() {
+    const btnNext = document.getElementById('btnNext');
+    const btnPrevious = document.getElementById('btnPrevious');
+    
     try {
+        // Deshabilitar botones durante el procesamiento
+        if (btnNext) {
+            btnNext.disabled = true;
+            btnNext.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+        }
+        if (btnPrevious) {
+            btnPrevious.disabled = true;
+        }
+        
         // Validar datos de envío
         const shippingValidation = validateShippingData();
         if (!shippingValidation.valid) {
             window.notifications.error(shippingValidation.message);
             currentStep = 1;
             renderStep(1);
+            if (btnNext) btnNext.disabled = false;
+            if (btnPrevious) btnPrevious.disabled = false;
             return;
         }
         
@@ -955,6 +979,8 @@ async function processOrder() {
             if (selectedPaymentMethod === 'stripe') {
                 setTimeout(() => initializeStripeElements(), 100);
             }
+            if (btnNext) btnNext.disabled = false;
+            if (btnPrevious) btnPrevious.disabled = false;
             return;
         }
         
@@ -998,30 +1024,61 @@ async function processOrder() {
             loyalty_points_used: loyaltyPointsUsed
         };
         
+        window.notifications.show('Creando pedido...', 'info');
         const orderResponse = await window.api.createOrder(orderData);
         
         if (!orderResponse.success) {
             throw new Error(orderResponse.message || 'Error al crear el pedido');
         }
         
-        const orderId = orderResponse.data.id || orderResponse.data.order?.id;
-        orderNumber = orderResponse.data.order_number || orderResponse.data.order?.order_number;
+        // Obtener orderId y orderNumber del response
+        // El backend devuelve: { success: true, data: { order } }
+        const order = orderResponse.data.order || orderResponse.data;
+        if (!order) {
+            throw new Error('No se recibió información del pedido');
+        }
+        
+        const orderId = order.id;
+        orderNumber = order.order_number || order.orderNumber;
+        
+        if (!orderId) {
+            throw new Error('No se pudo obtener el ID del pedido');
+        }
+        
+        console.log('Pedido creado:', { orderId, orderNumber, order });
         
         // Procesar pago según el método seleccionado
-        if (selectedPaymentMethod === 'stripe') {
-            await processStripePayment(orderId, finalTotal);
-        } else if (selectedPaymentMethod === 'yape' || selectedPaymentMethod === 'plin') {
-            await processMobilePayment(orderId, finalTotal);
-        } else if (selectedPaymentMethod === 'cash') {
-            await processCashPayment(orderId);
+        try {
+            if (selectedPaymentMethod === 'stripe') {
+                await processStripePayment(orderId, finalTotal);
+            } else if (selectedPaymentMethod === 'yape' || selectedPaymentMethod === 'plin') {
+                await processMobilePayment(orderId, finalTotal);
+            } else if (selectedPaymentMethod === 'cash') {
+                await processCashPayment(orderId);
+            } else {
+                // Si no hay método de pago válido, marcar como pendiente
+                console.warn('Método de pago no reconocido, marcando como pendiente');
+            }
+        } catch (paymentError) {
+            console.error('Error procesando pago:', paymentError);
+            // El pedido ya fue creado, pero el pago falló
+            // Mostrar mensaje pero continuar con la confirmación
+            window.notifications.warning('El pedido fue creado pero hubo un problema con el pago. Contacta con soporte.');
         }
         
         // Limpiar carrito
-        await window.api.clearCart();
+        try {
+            await window.api.clearCart();
+        } catch (error) {
+            console.error('Error limpiando carrito:', error);
+            // No es crítico, continuar
+        }
         
         // Ir a confirmación
         currentStep = 4;
         renderStep(4);
+        updateNavigationButtons();
+        updateProgressIndicator();
         
         // Ocultar navegación
         const navElement = document.getElementById('checkoutNavigation');
@@ -1029,11 +1086,20 @@ async function processOrder() {
             navElement.style.display = 'none';
         }
         
-        window.notifications.success('Pedido confirmado exitosamente');
+        window.notifications.success('¡Pedido confirmado exitosamente!');
         
     } catch (error) {
         console.error('Error al procesar pedido:', error);
-        window.notifications.error(error.message || 'Error al procesar el pedido');
+        window.notifications.error(error.message || 'Error al procesar el pedido. Por favor, intenta nuevamente.');
+        
+        // Re-habilitar botones
+        if (btnNext) {
+            btnNext.disabled = false;
+            btnNext.innerHTML = '<i class="fas fa-check"></i> Confirmar y Pagar';
+        }
+        if (btnPrevious) {
+            btnPrevious.disabled = false;
+        }
     }
 }
 
@@ -1125,9 +1191,13 @@ async function processMobilePayment(orderId, amount) {
         
         window.notifications.success(`Pago con ${selectedPaymentMethod === 'yape' ? 'Yape' : 'Plin'} registrado. Te enviaremos un email de confirmación.`);
         
+        return true;
+        
     } catch (error) {
         console.error('Error procesando pago móvil:', error);
-        throw error;
+        // Para pagos móviles, mostrar advertencia pero continuar
+        window.notifications.warning('El pedido fue creado. Por favor, confirma el pago desde tu app móvil.');
+        return false;
     }
 }
 
