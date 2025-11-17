@@ -670,6 +670,7 @@ function getPaymentMethodName(method) {
         'paypal': 'PayPal',
         'yape': 'Yape',
         'plin': 'Plin',
+        'bank_transfer': 'Transferencia Bancaria',
         'cash': 'Pago en Efectivo'
     };
     return methods[method] || method;

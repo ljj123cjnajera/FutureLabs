@@ -34,7 +34,7 @@ const createOrderValidation = [
     .notEmpty()
     .withMessage('El teléfono es requerido'),
   body('payment_method')
-    .isIn(['stripe', 'paypal', 'yape', 'plin', 'cash'])
+    .isIn(['stripe', 'paypal', 'yape', 'plin', 'bank_transfer', 'cash'])
     .withMessage('Método de pago inválido'),
   body('shipping_cost')
     .optional()
