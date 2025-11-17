@@ -1,0 +1,795 @@
+/* ========================================
+   HOME PAGE - ESTILOS MEJORADOS Y UNIFICADOS
+   Sistema de Diseño Coherente
+   ======================================== */
+
+/* Variables específicas del home */
+:root {
+    --home-hero-min-height: clamp(400px, 60vh, 600px);
+    --home-hero-mobile-height: 450px;
+    --home-section-spacing: clamp(60px, 8vw, 100px);
+    --home-card-radius: 16px;
+    --home-card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    --home-card-shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.15);
+    --home-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ========================================
+   HERO SLIDER - MEJORADO
+   ======================================== */
+
+.hero {
+    margin-bottom: var(--home-section-spacing);
+    position: relative;
+    padding-top: var(--spacing-xl);
+}
+
+.hero-slider {
+    position: relative;
+    min-height: var(--home-hero-min-height);
+    overflow: hidden;
+    border-radius: var(--home-card-radius);
+    box-shadow: var(--home-card-shadow);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+}
+
+.slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    min-height: inherit;
+    opacity: 0;
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    color: var(--white);
+    text-align: left;
+    padding: 0;
+}
+
+.slide::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.7) 0%, rgba(15, 23, 42, 0.4) 100%);
+    z-index: 1;
+}
+
+.slide.active {
+    opacity: 1;
+    z-index: 2;
+}
+
+.slide-content {
+    position: relative;
+    z-index: 3;
+    max-width: 680px;
+    padding: clamp(var(--spacing-2xl), 6vw, var(--spacing-4xl));
+    animation: slideInUp 0.8s ease-out;
+    width: 100%;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.slide h1 {
+    font-size: clamp(2.25rem, 5.5vw, 4rem);
+    font-weight: 800;
+    margin-bottom: var(--spacing-lg);
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    color: var(--white);
+}
+
+.slide p {
+    font-size: clamp(1.125rem, 2.2vw, 1.375rem);
+    margin-bottom: var(--spacing-2xl);
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+    opacity: 0.95;
+    font-weight: 400;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.slide .btn-primary.btn-lg {
+    background: var(--white);
+    color: var(--primary);
+    padding: clamp(14px, 1.5vw, 18px) clamp(32px, 4vw, 48px);
+    border-radius: var(--radius-full);
+    font-weight: 700;
+    font-size: clamp(1rem, 1.4vw, 1.125rem);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    transition: var(--home-transition);
+    border: none;
+    cursor: pointer;
+}
+
+.slide .btn-primary.btn-lg:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.slide .btn-primary.btn-lg:active {
+    transform: translateY(-1px);
+}
+
+/* Slider Controls */
+.slider-controls {
+    position: absolute;
+    bottom: var(--spacing-2xl);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    gap: var(--spacing-sm);
+    align-items: center;
+}
+
+.slider-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    background: transparent;
+    cursor: pointer;
+    transition: var(--home-transition);
+    padding: 0;
+}
+
+.slider-dot.active {
+    background: var(--white);
+    border-color: var(--white);
+    width: 32px;
+    border-radius: 6px;
+}
+
+.slider-dot:hover {
+    border-color: var(--white);
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.slider-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--home-transition);
+    z-index: 10;
+    font-size: 18px;
+}
+
+.slider-arrow:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.slider-arrow.prev {
+    left: var(--spacing-xl);
+}
+
+.slider-arrow.next {
+    right: var(--spacing-xl);
+}
+
+/* Hero Empty State */
+#heroSliderEmpty {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--home-hero-min-height);
+    text-align: center;
+    padding: var(--spacing-4xl);
+    color: var(--text-light);
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--secondary-light) 100%);
+    border-radius: var(--home-card-radius);
+}
+
+#heroSliderEmpty i {
+    font-size: 64px;
+    margin-bottom: var(--spacing-lg);
+    opacity: 0.5;
+    color: var(--primary);
+}
+
+#heroSliderEmpty h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: var(--spacing-md);
+    color: var(--text);
+}
+
+#heroSliderEmpty p {
+    font-size: 1rem;
+    color: var(--text-light);
+    max-width: 500px;
+}
+
+/* ========================================
+   BENEFITS SECTION - MEJORADO
+   ======================================== */
+
+.benefits-slider {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-xl);
+    padding: var(--spacing-md) 0;
+}
+
+.benefit-card {
+    background: var(--white);
+    border-radius: var(--home-card-radius);
+    box-shadow: var(--home-card-shadow);
+    overflow: hidden;
+    transition: var(--home-transition);
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    height: 100%;
+}
+
+.benefit-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--home-card-shadow-hover);
+    border-color: var(--primary);
+}
+
+.benefit-image {
+    min-height: 200px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    padding: var(--spacing-2xl);
+    position: relative;
+    overflow: hidden;
+}
+
+.benefit-image::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+    animation: shimmer 4s infinite;
+}
+
+.benefit-icon {
+    font-size: 3.5rem;
+    margin-bottom: var(--spacing-md);
+    z-index: 1;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+    color: var(--white);
+}
+
+.benefit-image img {
+    max-width: 100%;
+    max-height: 100px;
+    object-fit: contain;
+    margin-bottom: var(--spacing-md);
+    z-index: 1;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+.benefit-content {
+    padding: var(--spacing-2xl);
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.benefit-content h3 {
+    font-size: 1.375rem;
+    font-weight: 700;
+    margin-bottom: var(--spacing-md);
+    color: var(--text);
+    line-height: 1.3;
+}
+
+.benefit-content p {
+    color: var(--text-light);
+    line-height: 1.7;
+    font-size: 1rem;
+    margin: 0;
+}
+
+.benefit-card--empty {
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--secondary-light) 100%);
+    border-color: var(--primary);
+}
+
+.benefit-card--empty .benefit-content {
+    text-align: center;
+}
+
+.benefit-card--empty h3 {
+    color: var(--primary);
+}
+
+.benefit-card--empty p {
+    color: var(--text-light);
+}
+
+/* ========================================
+   BANNER GRID - MEJORADO
+   ======================================== */
+
+.banner-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: var(--spacing-xl);
+    padding: var(--spacing-md) 0;
+}
+
+.banner {
+    position: relative;
+    border-radius: var(--home-card-radius);
+    padding: var(--spacing-3xl);
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    text-align: left;
+    color: var(--white);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+    cursor: pointer;
+    transition: var(--home-transition);
+    box-shadow: var(--home-card-shadow);
+}
+
+.banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.75) 0%, rgba(15, 23, 42, 0.4) 100%);
+    z-index: 1;
+    transition: var(--home-transition);
+}
+
+.banner:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--home-card-shadow-hover);
+}
+
+.banner:hover::before {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.65) 0%, rgba(15, 23, 42, 0.3) 100%);
+}
+
+.banner > * {
+    position: relative;
+    z-index: 2;
+}
+
+.banner h3 {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 800;
+    margin-bottom: var(--spacing-md);
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+    line-height: 1.2;
+}
+
+.banner p {
+    font-size: clamp(1rem, 1.8vw, 1.125rem);
+    margin-bottom: var(--spacing-lg);
+    opacity: 0.95;
+    line-height: 1.6;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.banner-cta {
+    display: inline-block;
+    padding: var(--spacing-sm) var(--spacing-xl);
+    background: var(--white);
+    color: var(--primary);
+    border-radius: var(--radius-full);
+    font-weight: 700;
+    font-size: 0.95rem;
+    transition: var(--home-transition);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.banner:hover .banner-cta {
+    transform: translateX(4px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.banner--placeholder {
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--secondary-light) 100%);
+    border: 2px dashed var(--primary);
+    color: var(--text);
+    text-align: center;
+}
+
+.banner--placeholder::before {
+    display: none;
+}
+
+.banner--placeholder h3 {
+    color: var(--primary);
+    text-shadow: none;
+}
+
+.banner--placeholder p {
+    color: var(--text-light);
+    text-shadow: none;
+}
+
+/* ========================================
+   HOME SECTIONS - MEJORADO
+   ======================================== */
+
+.home-sections-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: var(--spacing-xl);
+    padding: var(--spacing-md) 0;
+}
+
+.home-section-card {
+    background: var(--white);
+    border-radius: var(--home-card-radius);
+    box-shadow: var(--home-card-shadow);
+    overflow: hidden;
+    transition: var(--home-transition);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    height: 100%;
+}
+
+.home-section-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--home-card-shadow-hover);
+    border-color: var(--primary);
+}
+
+.home-section-media {
+    position: relative;
+    width: 100%;
+    height: 220px;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--secondary-light) 100%);
+}
+
+.home-section-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: var(--home-transition);
+}
+
+.home-section-card:hover .home-section-media img {
+    transform: scale(1.05);
+}
+
+.home-section-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    font-size: 4rem;
+    opacity: 0.3;
+}
+
+.home-section-content {
+    padding: var(--spacing-2xl);
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.home-section-tag {
+    display: inline-block;
+    padding: 6px 12px;
+    background: var(--primary-light);
+    color: var(--primary);
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: var(--spacing-md);
+    width: fit-content;
+}
+
+.home-section-content h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: var(--spacing-sm);
+    color: var(--text);
+    line-height: 1.3;
+}
+
+.home-section-content p {
+    color: var(--text-light);
+    line-height: 1.7;
+    font-size: 0.95rem;
+    margin-bottom: var(--spacing-lg);
+    flex-grow: 1;
+}
+
+.home-section-meta {
+    display: flex;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+    font-size: 0.875rem;
+    color: var(--text-light);
+}
+
+.home-section-meta span {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.home-section-meta i {
+    color: var(--primary);
+}
+
+.home-section-card .btn-outline {
+    width: 100%;
+    justify-content: center;
+    margin-top: auto;
+}
+
+.home-section-card--empty {
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--secondary-light) 100%);
+    border-color: var(--primary);
+    text-align: center;
+}
+
+.home-section-card--empty .home-section-content h3 {
+    color: var(--primary);
+}
+
+/* ========================================
+   FLASH OFFERS - MEJORADO
+   ======================================== */
+
+.flash-offers-message {
+    padding: var(--spacing-2xl) 0;
+    text-align: center;
+}
+
+.flash-offers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-xl);
+    margin-top: var(--spacing-2xl);
+}
+
+.flash-offer-card {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    color: var(--white);
+    padding: var(--spacing-2xl);
+    border-radius: var(--home-card-radius);
+    cursor: pointer;
+    transition: var(--home-transition);
+    box-shadow: var(--home-card-shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+.flash-offer-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    animation: shimmer 4s infinite;
+}
+
+.flash-offer-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--home-card-shadow-hover);
+}
+
+.flash-offer-card h3 {
+    font-size: 1.375rem;
+    font-weight: 700;
+    margin-bottom: var(--spacing-sm);
+    line-height: 1.3;
+}
+
+.flash-offer-card p {
+    font-size: 0.95rem;
+    opacity: 0.9;
+    margin-bottom: var(--spacing-lg);
+}
+
+.flash-offer-card .btn {
+    background: var(--white);
+    color: var(--primary);
+    border: none;
+    padding: var(--spacing-sm) var(--spacing-xl);
+    border-radius: var(--radius-full);
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--home-transition);
+}
+
+.flash-offer-card .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* ========================================
+   RESPONSIVE - MEJORADO
+   ======================================== */
+
+@media (max-width: 1024px) {
+    .hero-slider {
+        min-height: clamp(380px, 55vw, 500px);
+    }
+    
+    .slide-content {
+        padding: var(--spacing-2xl);
+    }
+    
+    .benefits-slider {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .banner-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .home-sections-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .flash-offers-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .hero {
+        margin-bottom: var(--spacing-3xl);
+        padding-top: var(--spacing-lg);
+    }
+    
+    .hero-slider {
+        min-height: var(--home-hero-mobile-height);
+        border-radius: var(--radius-xl);
+    }
+    
+    .slide-content {
+        padding: var(--spacing-xl);
+        max-width: 100%;
+    }
+    
+    .slide h1 {
+        font-size: 2rem;
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .slide p {
+        font-size: 1rem;
+        margin-bottom: var(--spacing-lg);
+    }
+    
+    .slide .btn-primary.btn-lg {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .slider-arrow {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+    
+    .slider-arrow.prev {
+        left: var(--spacing-md);
+    }
+    
+    .slider-arrow.next {
+        right: var(--spacing-md);
+    }
+    
+    .slider-controls {
+        bottom: var(--spacing-lg);
+    }
+    
+    .benefits-slider {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-lg);
+    }
+    
+    .banner-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .banner {
+        min-height: 240px;
+        padding: var(--spacing-2xl);
+    }
+    
+    .home-sections-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .flash-offers-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .benefit-image {
+        min-height: 160px;
+    }
+    
+    .home-section-media {
+        height: 180px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-slider {
+        min-height: 400px;
+    }
+    
+    .slide-content {
+        padding: var(--spacing-lg);
+    }
+    
+    .slide h1 {
+        font-size: 1.75rem;
+    }
+    
+    .banner {
+        padding: var(--spacing-xl);
+        min-height: 200px;
+    }
+    
+    .benefit-content,
+    .home-section-content {
+        padding: var(--spacing-xl);
+    }
+}
+
