@@ -185,7 +185,7 @@ router.post('/mobile/process', authenticateToken, mobilePaymentValidation, async
 
     res.json({
       success: true,
-      message: 'Pago procesado exitosamente',
+      message: result.message || 'Pago procesado exitosamente',
       data: result
     });
   } catch (error) {
