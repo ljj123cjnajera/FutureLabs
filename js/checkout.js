@@ -1256,9 +1256,21 @@ async function initializeStripeElements() {
             return;
         }
 
-        // Obtener o crear instancia de Stripe
-        // Nota: En producción, deberías obtener la clave pública del backend
-        const stripePublicKey = 'pk_test_placeholder'; // Reemplazar con clave real del backend
+        // Obtener clave pública de Stripe del backend
+        let stripePublicKey = null;
+        
+        try {
+            const keyResponse = await window.api.getStripePublicKey();
+            if (keyResponse.success && keyResponse.data.public_key) {
+                stripePublicKey = keyResponse.data.public_key;
+            } else {
+                throw new Error('No se pudo obtener la clave pública de Stripe');
+            }
+        } catch (error) {
+            console.error('Error obteniendo clave pública de Stripe:', error);
+            window.notifications?.warning('Stripe no está configurado. Por favor, usa otro método de pago o contacta con soporte.');
+            return;
+        }
         
         if (!stripe) {
             stripe = Stripe(stripePublicKey);
