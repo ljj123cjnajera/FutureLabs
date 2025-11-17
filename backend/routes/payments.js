@@ -35,6 +35,33 @@ const mobilePaymentValidation = [
     .withMessage('El monto debe ser un número positivo')
 ];
 
+// GET /api/payments/stripe/public-key - Obtener clave pública de Stripe
+router.get('/stripe/public-key', (req, res) => {
+  try {
+    const publicKey = process.env.STRIPE_PUBLISHABLE_KEY;
+    
+    if (!publicKey) {
+      return res.status(503).json({
+        success: false,
+        message: 'Stripe no está configurado. Configura STRIPE_PUBLISHABLE_KEY en las variables de entorno.'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: {
+        public_key: publicKey
+      }
+    });
+  } catch (error) {
+    console.error('Error obteniendo clave pública de Stripe:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error obteniendo clave pública'
+    });
+  }
+});
+
 // POST /api/payments/stripe/create-intent - Crear intención de pago con Stripe
 router.post('/stripe/create-intent', authenticateToken, async (req, res) => {
   try {
@@ -147,9 +174,14 @@ router.post('/mobile/process', authenticateToken, mobilePaymentValidation, async
       });
     }
 
-    const { order_id, phone_number, amount } = req.body;
+    const { order_id, phone_number, amount, payment_type } = req.body;
 
-    const result = await PaymentService.processMobilePayment(order_id, phone_number, amount);
+    const result = await PaymentService.processMobilePayment(
+      order_id, 
+      phone_number, 
+      amount, 
+      payment_type || 'yape'
+    );
 
     res.json({
       success: true,
@@ -161,6 +193,43 @@ router.post('/mobile/process', authenticateToken, mobilePaymentValidation, async
     res.status(500).json({
       success: false,
       message: error.message || 'Error procesando pago'
+    });
+  }
+});
+
+// GET /api/payments/mobile/info - Obtener información de cuentas Yape/Plin
+router.get('/mobile/info', (req, res) => {
+  try {
+    const yapePhone = process.env.YAPE_PHONE || null;
+    const plinPhone = process.env.PLIN_PHONE || null;
+    const bankAccount = process.env.BANK_ACCOUNT || null;
+    const bankName = process.env.BANK_NAME || 'Banco de la Nación';
+    const bankCCI = process.env.BANK_CCI || null;
+
+    res.json({
+      success: true,
+      data: {
+        yape: yapePhone ? {
+          phone: yapePhone,
+          available: true
+        } : { available: false },
+        plin: plinPhone ? {
+          phone: plinPhone,
+          available: true
+        } : { available: false },
+        bank_transfer: bankAccount ? {
+          account: bankAccount,
+          bank: bankName,
+          cci: bankCCI,
+          available: true
+        } : { available: false }
+      }
+    });
+  } catch (error) {
+    console.error('Error obteniendo información de pagos:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error obteniendo información'
     });
   }
 });

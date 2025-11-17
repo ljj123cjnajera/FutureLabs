@@ -425,6 +425,14 @@ class FutureLabsAPI {
 
   // ========== PAGOS ==========
 
+  async getStripePublicKey() {
+    return this.request('/payments/stripe/public-key');
+  }
+
+  async getMobilePaymentInfo() {
+    return this.request('/payments/mobile/info');
+  }
+
   async createStripePaymentIntent(orderData) {
     return this.request('/payments/stripe/create-intent', {
       method: 'POST',
@@ -453,10 +461,15 @@ class FutureLabsAPI {
     });
   }
 
-  async processMobilePayment(orderId, phoneNumber, amount) {
+  async processMobilePayment(orderId, phoneNumber, amount, paymentType = 'yape') {
     return this.request('/payments/mobile/process', {
       method: 'POST',
-      body: JSON.stringify({ order_id: orderId, phone_number: phoneNumber, amount })
+      body: JSON.stringify({ 
+        order_id: orderId, 
+        phone_number: phoneNumber, 
+        amount,
+        payment_type: paymentType
+      })
     });
   }
 

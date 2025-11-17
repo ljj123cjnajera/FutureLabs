@@ -1051,8 +1051,8 @@ async function processOrder() {
         try {
             if (selectedPaymentMethod === 'stripe') {
                 await processStripePayment(orderId, finalTotal);
-            } else if (selectedPaymentMethod === 'yape' || selectedPaymentMethod === 'plin') {
-                await processMobilePayment(orderId, finalTotal);
+        } else if (selectedPaymentMethod === 'yape' || selectedPaymentMethod === 'plin') {
+            await processMobilePayment(orderId, finalTotal, selectedPaymentMethod);
             } else if (selectedPaymentMethod === 'cash') {
                 await processCashPayment(orderId);
             } else {
@@ -1172,24 +1172,33 @@ async function processStripePayment(orderId, amount) {
 }
 
 // Procesar pago móvil (Yape/Plin)
-async function processMobilePayment(orderId, amount) {
+async function processMobilePayment(orderId, amount, paymentType = 'yape') {
     try {
         const phoneInput = document.getElementById('mobile-phone');
-        const phoneNumber = phoneInput ? phoneInput.value.trim() : '';
+        const phoneNumber = phoneInput ? phoneInput.value.trim().replace(/\s+/g, '') : '';
         
         if (!phoneNumber) {
             throw new Error('Número de teléfono requerido');
         }
         
-        window.notifications.show(`Procesando pago con ${selectedPaymentMethod === 'yape' ? 'Yape' : 'Plin'}...`, 'info');
+        // Validar formato de teléfono peruano
+        if (!/^9\d{8}$/.test(phoneNumber)) {
+            throw new Error('Número de teléfono inválido. Debe ser un número peruano de 9 dígitos (ej: 987654321)');
+        }
         
-        const paymentResponse = await window.api.processMobilePayment(orderId, phoneNumber, amount);
+        window.notifications.show(`Procesando pago con ${paymentType === 'yape' ? 'Yape' : 'Plin'}...`, 'info');
+        
+        const paymentResponse = await window.api.processMobilePayment(orderId, phoneNumber, amount, paymentType);
         
         if (!paymentResponse.success) {
             throw new Error(paymentResponse.message || 'Error al procesar el pago');
         }
         
-        window.notifications.success(`Pago con ${selectedPaymentMethod === 'yape' ? 'Yape' : 'Plin'} registrado. Te enviaremos un email de confirmación.`);
+        // Mostrar información del pago
+        const paymentData = paymentResponse.data;
+        const message = paymentData.message || `Pago con ${paymentType === 'yape' ? 'Yape' : 'Plin'} registrado. Realiza el pago a ${paymentData.merchant_phone} y espera la confirmación.`;
+        
+        window.notifications.success(message, 10000); // Mostrar por 10 segundos
         
         return true;
         

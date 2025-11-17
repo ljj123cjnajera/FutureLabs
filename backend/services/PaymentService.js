@@ -142,8 +142,8 @@ class PaymentService {
     }
   }
 
-  // Procesar pago con Yape/Plin (simulado)
-  static async processMobilePayment(orderId, phoneNumber, amount) {
+  // Procesar pago con Yape/Plin
+  static async processMobilePayment(orderId, phoneNumber, amount, paymentType = 'yape') {
     try {
       const order = await Order.getById(orderId);
 
@@ -155,20 +155,38 @@ class PaymentService {
         throw new Error('El pedido ya ha sido pagado');
       }
 
-      // Verificar que el monto coincida
-      if (parseFloat(amount) !== parseFloat(order.total_amount)) {
+      // Verificar que el monto coincida (con tolerancia de 0.01 para redondeos)
+      const amountDiff = Math.abs(parseFloat(amount) - parseFloat(order.total_amount));
+      if (amountDiff > 0.01) {
         throw new Error('El monto no coincide con el total del pedido');
       }
 
-      // Aquí iría la integración real con Yape/Plin
-      // Por ahora, simulamos el pago
-      const paymentId = `YAPE-${Date.now()}`;
-      await Order.updatePaymentStatus(order.id, 'paid', paymentId);
+      // Validar número de teléfono peruano (9 dígitos)
+      const phoneRegex = /^9\d{8}$/;
+      if (!phoneRegex.test(phoneNumber.replace(/\s+/g, ''))) {
+        throw new Error('Número de teléfono inválido. Debe ser un número peruano de 9 dígitos (ej: 987654321)');
+      }
+
+      // Obtener información de cuenta de Yape/Plin desde variables de entorno
+      const yapePhone = process.env.YAPE_PHONE || '999999999';
+      const plinPhone = process.env.PLIN_PHONE || '999999999';
+      
+      const merchantPhone = paymentType === 'yape' ? yapePhone : plinPhone;
+      const paymentId = `${paymentType.toUpperCase()}-${Date.now()}`;
+      
+      // Marcar como pendiente - el pago se confirmará manualmente o mediante webhook
+      // En producción, aquí iría la integración real con la API de Yape/Plin
+      await Order.updatePaymentStatus(order.id, 'pending', paymentId);
 
       return {
         success: true,
         payment_id: paymentId,
-        order: await Order.getById(order.id)
+        payment_type: paymentType,
+        merchant_phone: merchantPhone,
+        customer_phone: phoneNumber,
+        amount: order.total_amount,
+        order: await Order.getById(order.id),
+        message: `Pago con ${paymentType === 'yape' ? 'Yape' : 'Plin'} registrado. Realiza el pago a ${merchantPhone} y espera la confirmación.`
       };
     } catch (error) {
       console.error('Error procesando pago móvil:', error);
