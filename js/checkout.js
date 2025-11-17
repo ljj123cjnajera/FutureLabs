@@ -508,6 +508,12 @@ function renderPaymentStep() {
                     <div class="method-desc">Pago móvil rápido</div>
                 </div>
                 
+                <div class="payment-method-card ${selectedPaymentMethod === 'bank_transfer' ? 'selected' : ''}" onclick="selectPaymentMethod('bank_transfer')">
+                    <i class="fas fa-university"></i>
+                    <div class="method-name">Transferencia</div>
+                    <div class="method-desc">Bancaria</div>
+                </div>
+                
                 <div class="payment-method-card ${selectedPaymentMethod === 'cash' ? 'selected' : ''}" onclick="selectPaymentMethod('cash')">
                     <i class="fas fa-money-bill-wave"></i>
                     <div class="method-name">Efectivo</div>
@@ -540,6 +546,25 @@ function renderPaymentStep() {
                         </p>
                         <p style="margin: 8px 0 0 0; color: #0c4a6e; font-size: 14px;">
                             Realiza el pago desde tu app y confirma el pedido. Te enviaremos un email con las instrucciones.
+                        </p>
+                    </div>
+                </div>
+            ` : ''}
+            
+            ${selectedPaymentMethod === 'bank_transfer' ? `
+                <div class="payment-details active" id="bank-transfer-details">
+                    <h3>Transferencia Bancaria</h3>
+                    <div id="bank-transfer-info" style="background: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 8px; padding: 16px; margin-top: 16px;">
+                        <p style="margin: 0 0 12px 0; color: #0c4a6e; font-weight: 600;">
+                            <strong>Total a pagar:</strong> ${checkoutCurrencyFormatter.format(total)}
+                        </p>
+                        <div id="bank-account-details" style="color: #0c4a6e;">
+                            <p style="margin: 8px 0; font-size: 14px;">
+                                <i class="fas fa-spinner fa-spin"></i> Cargando información bancaria...
+                            </p>
+                        </div>
+                        <p style="margin: 12px 0 0 0; color: #0c4a6e; font-size: 14px;">
+                            <i class="fas fa-info-circle"></i> Realiza la transferencia y envía el comprobante. Te enviaremos un email con las instrucciones.
                         </p>
                     </div>
                 </div>
@@ -942,6 +967,11 @@ function validatePaymentMethod() {
         }
     }
     
+    if (selectedPaymentMethod === 'bank_transfer') {
+        // No requiere validación adicional, solo confirmación
+        return { valid: true };
+    }
+    
     return { valid: true };
 }
 
@@ -1054,7 +1084,9 @@ async function processOrder() {
                 await processStripePayment(orderId, finalTotal);
         } else if (selectedPaymentMethod === 'yape' || selectedPaymentMethod === 'plin') {
             await processMobilePayment(orderId, finalTotal, selectedPaymentMethod);
-            } else if (selectedPaymentMethod === 'cash') {
+        } else if (selectedPaymentMethod === 'bank_transfer') {
+            await processBankTransfer(orderId);
+        } else if (selectedPaymentMethod === 'cash') {
                 await processCashPayment(orderId);
             } else {
                 // Si no hay método de pago válido, marcar como pendiente
@@ -1211,6 +1243,26 @@ async function processMobilePayment(orderId, amount, paymentType = 'yape') {
     }
 }
 
+// Procesar transferencia bancaria
+async function processBankTransfer(orderId) {
+    try {
+        window.notifications.show('Registrando transferencia bancaria...', 'info');
+        
+        // Para transferencia bancaria, el pago queda pendiente hasta confirmación manual
+        // El backend ya creó el pedido con payment_method: 'bank_transfer'
+        // Aquí solo confirmamos que el pedido fue creado
+        
+        window.notifications.success('Transferencia bancaria registrada. Realiza la transferencia y envía el comprobante. Te contactaremos para confirmar el pago.');
+        
+        return true;
+        
+    } catch (error) {
+        console.error('Error procesando transferencia bancaria:', error);
+        window.notifications.info('El pedido fue creado. Por favor, realiza la transferencia y envía el comprobante.');
+        return false;
+    }
+}
+
 // Procesar pago en efectivo
 async function processCashPayment(orderId) {
     try {
@@ -1244,6 +1296,42 @@ function selectPaymentMethod(method) {
         setTimeout(() => {
             initializeStripeElements();
         }, 100);
+    }
+    
+    // Cargar información bancaria si es transferencia
+    if (method === 'bank_transfer') {
+        setTimeout(() => {
+            loadBankTransferInfo();
+        }, 100);
+    }
+}
+
+// Cargar información de transferencia bancaria
+async function loadBankTransferInfo() {
+    try {
+        const infoResponse = await window.api.getMobilePaymentInfo();
+        if (infoResponse.success && infoResponse.data.bank_transfer.available) {
+            const bankInfo = infoResponse.data.bank_transfer;
+            const detailsContainer = document.getElementById('bank-account-details');
+            if (detailsContainer) {
+                detailsContainer.innerHTML = `
+                    <p style="margin: 4px 0;"><strong>Banco:</strong> ${bankInfo.bank}</p>
+                    <p style="margin: 4px 0;"><strong>Cuenta:</strong> ${bankInfo.account}</p>
+                    ${bankInfo.cci ? `<p style="margin: 4px 0;"><strong>CCI:</strong> ${bankInfo.cci}</p>` : ''}
+                `;
+            }
+        } else {
+            const detailsContainer = document.getElementById('bank-account-details');
+            if (detailsContainer) {
+                detailsContainer.innerHTML = '<p style="color: #dc2626;">Transferencia bancaria no configurada. Contacta con soporte.</p>';
+            }
+        }
+    } catch (error) {
+        console.error('Error cargando información bancaria:', error);
+        const detailsContainer = document.getElementById('bank-account-details');
+        if (detailsContainer) {
+            detailsContainer.innerHTML = '<p style="color: #dc2626;">Error al cargar información bancaria.</p>';
+        }
     }
 }
 
