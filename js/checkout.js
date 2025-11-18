@@ -537,15 +537,20 @@ function renderPaymentStep() {
                     <h3>Información de Pago ${selectedPaymentMethod === 'yape' ? 'Yape' : 'Plin'}</h3>
                     <div class="form-group">
                         <label for="mobile-phone">Número de teléfono *</label>
-                        <input type="tel" id="mobile-phone" class="form-control" placeholder="Ej: 987654321" required>
-                        <small class="form-text">Ingresa el número asociado a tu ${selectedPaymentMethod === 'yape' ? 'Yape' : 'Plin'}</small>
+                        <input type="tel" id="mobile-phone" class="form-control" placeholder="Ej: 987654321" pattern="[0-9]{9}" maxlength="9" required>
+                        <small class="form-text">Ingresa tu número de celular asociado a ${selectedPaymentMethod === 'yape' ? 'Yape' : 'Plin'} (9 dígitos, sin espacios)</small>
                     </div>
-                    <div class="payment-info-box" style="background: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 8px; padding: 16px; margin-top: 16px;">
-                        <p style="margin: 0; color: #0c4a6e;">
+                    <div id="mobile-payment-info" class="payment-info-box" style="background: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 8px; padding: 16px; margin-top: 16px;">
+                        <p style="margin: 0 0 12px 0; color: #0c4a6e; font-weight: 600;">
                             <strong>Total a pagar:</strong> ${checkoutCurrencyFormatter.format(total)}
                         </p>
+                        <div id="mobile-account-info" style="color: #0c4a6e; margin-bottom: 12px;">
+                            <p style="margin: 4px 0; font-size: 14px;">
+                                <i class="fas fa-spinner fa-spin"></i> Cargando información de cuenta...
+                            </p>
+                        </div>
                         <p style="margin: 8px 0 0 0; color: #0c4a6e; font-size: 14px;">
-                            Realiza el pago desde tu app y confirma el pedido. Te enviaremos un email con las instrucciones.
+                            <i class="fas fa-info-circle"></i> Realiza el pago desde tu app ${selectedPaymentMethod === 'yape' ? 'Yape' : 'Plin'} y espera la confirmación. Te enviaremos un email con las instrucciones.
                         </p>
                     </div>
                 </div>
@@ -1350,6 +1355,44 @@ function selectPaymentMethod(method) {
         setTimeout(() => {
             loadBankTransferInfo();
         }, 100);
+    }
+    
+    // Cargar información de cuenta móvil si es Yape/Plin
+    if (method === 'yape' || method === 'plin') {
+        setTimeout(() => {
+            loadMobilePaymentInfo(method);
+        }, 100);
+    }
+}
+
+// Cargar información de cuenta Yape/Plin
+async function loadMobilePaymentInfo(paymentType) {
+    try {
+        const infoResponse = await window.api.getMobilePaymentInfo();
+        if (infoResponse.success) {
+            const accountInfo = paymentType === 'yape' ? infoResponse.data.yape : infoResponse.data.plin;
+            const detailsContainer = document.getElementById('mobile-account-info');
+            if (detailsContainer) {
+                if (accountInfo.available && accountInfo.phone) {
+                    detailsContainer.innerHTML = `
+                        <p style="margin: 4px 0; font-size: 14px;">
+                            <strong>Realiza el pago a:</strong> ${accountInfo.phone}
+                        </p>
+                        <p style="margin: 4px 0; font-size: 14px; color: #0c4a6e;">
+                            <i class="fas fa-mobile-alt"></i> Usa este número para realizar la transferencia desde tu app
+                        </p>
+                    `;
+                } else {
+                    detailsContainer.innerHTML = '<p style="color: #dc2626; font-size: 14px;">' + (paymentType === 'yape' ? 'Yape' : 'Plin') + ' no configurado. Contacta con soporte.</p>';
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Error cargando información de pago móvil:', error);
+        const detailsContainer = document.getElementById('mobile-account-info');
+        if (detailsContainer) {
+            detailsContainer.innerHTML = '<p style="color: #dc2626; font-size: 14px;">Error al cargar información de cuenta.</p>';
+        }
     }
 }
 

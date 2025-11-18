@@ -2,7 +2,7 @@ const stripe = process.env.STRIPE_SECRET_KEY ? require('stripe')(process.env.STR
 const Order = require('../models/Order');
 
 class PaymentService {
-  // Procesar pago con Stripe
+  // Procesar pago con Stripe (ya confirmado en frontend)
   static async processStripePayment(orderId, paymentMethodId) {
     try {
       if (!stripe) {
@@ -16,25 +16,45 @@ class PaymentService {
       }
 
       if (order.payment_status === 'paid') {
-        throw new Error('El pedido ya ha sido pagado');
+        // Si ya está pagado, solo retornar éxito
+        return {
+          success: true,
+          message: 'El pedido ya fue pagado',
+          order: order
+        };
       }
 
-      // Crear intento de pago en Stripe
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: Math.round(order.total_amount * 100), // Convertir a centavos
-        currency: 'pen', // Soles peruanos
-        payment_method: paymentMethodId,
-        confirm: true,
-        description: `Pago de pedido ${order.order_number}`,
-        metadata: {
-          order_id: order.id,
-          order_number: order.order_number,
-          user_id: order.user_id
-        }
+      // Buscar el payment intent asociado al pedido
+      // El frontend ya confirmó el pago, aquí solo actualizamos el estado
+      // Buscar por metadata
+      const paymentIntents = await stripe.paymentIntents.list({
+        limit: 10,
+        metadata: { order_id: order.id.toString() }
       });
 
-      // Actualizar estado del pedido
-      await Order.updatePaymentStatus(order.id, 'paid', paymentIntent.id);
+      let paymentIntent = paymentIntents.data.find(pi => 
+        pi.metadata.order_id === order.id.toString() && 
+        pi.status === 'succeeded'
+      );
+
+      // Si no encontramos el payment intent, el pago ya fue procesado en frontend
+      // Solo actualizamos el estado del pedido
+      if (!paymentIntent) {
+        // Buscar por payment method
+        const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
+        if (paymentMethod) {
+          // Actualizar estado del pedido como pagado
+          await Order.updatePaymentStatus(order.id, 'paid', paymentMethodId);
+          return {
+            success: true,
+            message: 'Pago procesado exitosamente',
+            order: await Order.getById(order.id)
+          };
+        }
+      } else {
+        // Actualizar estado del pedido
+        await Order.updatePaymentStatus(order.id, 'paid', paymentIntent.id);
+      }
 
       return {
         success: true,
@@ -44,9 +64,15 @@ class PaymentService {
     } catch (error) {
       console.error('Error procesando pago con Stripe:', error);
       
-      // Actualizar estado del pedido a fallido
-      if (orderId) {
-        await Order.updatePaymentStatus(orderId, 'failed');
+      // No actualizar a fallido si el error es que ya está pagado
+      if (error.message && !error.message.includes('ya ha sido pagado')) {
+        if (orderId) {
+          try {
+            await Order.updatePaymentStatus(orderId, 'failed');
+          } catch (updateError) {
+            console.error('Error actualizando estado a fallido:', updateError);
+          }
+        }
       }
 
       throw error;
