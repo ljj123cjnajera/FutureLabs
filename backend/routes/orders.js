@@ -267,6 +267,52 @@ router.put('/:id/payment-status', authenticateToken, requireAdmin, async (req, r
   }
 });
 
+// PUT /api/orders/:id/payment-intent - Actualizar payment_intent_id del pedido
+router.put('/:id/payment-intent', authenticateToken, async (req, res) => {
+  try {
+    const { payment_intent_id } = req.body;
+
+    if (!payment_intent_id) {
+      return res.status(400).json({
+        success: false,
+        message: 'El payment_intent_id es requerido'
+      });
+    }
+
+    // Verificar que el pedido pertenece al usuario
+    const order = await Order.getById(req.params.id);
+    
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Pedido no encontrado'
+      });
+    }
+
+    if (order.user_id !== req.user.id && !req.user.is_admin) {
+      return res.status(403).json({
+        success: false,
+        message: 'No tienes permiso para actualizar este pedido'
+      });
+    }
+
+    // Actualizar payment_id
+    const updatedOrder = await Order.updatePaymentStatus(req.params.id, order.payment_status, payment_intent_id);
+
+    res.json({
+      success: true,
+      message: 'Payment intent actualizado',
+      data: { order: updatedOrder }
+    });
+  } catch (error) {
+    console.error('Error actualizando payment intent:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error actualizando payment intent'
+    });
+  }
+});
+
 // GET /api/orders/admin/all - Obtener todos los pedidos (admin)
 router.get('/admin/all', authenticateToken, requireAdmin, async (req, res) => {
   try {

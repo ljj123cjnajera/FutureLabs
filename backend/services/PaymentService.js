@@ -252,6 +252,41 @@ class PaymentService {
     }
   }
 
+  // Procesar transferencia bancaria
+  static async processBankTransfer(orderId) {
+    try {
+      const order = await Order.getById(orderId);
+
+      if (!order) {
+        throw new Error('Pedido no encontrado');
+      }
+
+      if (order.payment_status === 'paid') {
+        throw new Error('El pedido ya ha sido pagado');
+      }
+
+      // Transferencia bancaria: el estado queda en pending hasta que se confirme
+      const paymentId = `BANK-TRANSFER-${Date.now()}`;
+      await Order.updatePaymentStatus(order.id, 'pending', paymentId);
+
+      return {
+        success: true,
+        payment_id: paymentId,
+        payment_type: 'bank_transfer',
+        order: await Order.getById(order.id),
+        message: 'Transferencia bancaria registrada. Realiza la transferencia y envía el comprobante. Espera la confirmación.'
+      };
+    } catch (error) {
+      console.error('Error procesando transferencia bancaria:', error);
+      
+      if (orderId) {
+        await Order.updatePaymentStatus(orderId, 'failed');
+      }
+
+      throw error;
+    }
+  }
+
   // Reembolsar pago
   static async refundPayment(orderId) {
     try {

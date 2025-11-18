@@ -1,315 +1,311 @@
 # 🔍 Análisis Completo del Sistema de Pagos - FutureLabs
 
-## 📊 Estado Actual del Sistema
+## 📊 Estado Actual
 
-### ✅ **Implementado y Funcional**
+### ✅ **Implementado**
 
 #### **Frontend (checkout.js)**
 - ✅ Selección de métodos de pago (Stripe, Yape, Plin, Transferencia, Efectivo)
-- ✅ Formulario de Stripe Elements con validación
+- ✅ Formulario de Stripe Elements (inicialización mejorada)
 - ✅ Validación de datos de envío
 - ✅ Validación de métodos de pago
-- ✅ Integración con cupones
-- ✅ Integración con puntos de fidelidad
-- ✅ Procesamiento de pedidos
-- ✅ Manejo de errores básico
-- ✅ Estados de carga
+- ✅ Flujo de creación de pedido
+- ✅ Procesamiento de pagos por método
+- ✅ Manejo básico de errores
+- ✅ UI mejorada para formulario de Stripe
 
-#### **Backend (PaymentService.js)**
-- ✅ Procesamiento de Stripe (con payment intents)
-- ✅ Procesamiento de Yape/Plin (simulado)
-- ✅ Procesamiento de Transferencia Bancaria
-- ✅ Procesamiento de Efectivo
-- ✅ Webhook de Stripe (básico)
-- ✅ Reembolsos (básico)
-
-#### **Backend (routes/payments.js)**
+#### **Backend**
 - ✅ Endpoints para todos los métodos de pago
+- ✅ PaymentService con lógica de procesamiento
+- ✅ Webhook de Stripe (básico)
+- ✅ Actualización de estados de pedido
 - ✅ Validaciones de entrada
-- ✅ Endpoint para clave pública de Stripe
-- ✅ Endpoint para información de pagos móviles
+- ✅ Manejo de errores básico
 
 ---
 
-## ❌ **Funcionalidades Faltantes**
+## ❌ **Problemas Identificados**
 
-### 🔴 **Críticas (Alta Prioridad)**
+### 🔴 **Críticos**
 
-#### **1. Webhooks de Stripe Completos**
-- ❌ **Problema**: El webhook existe pero no está completamente implementado
-- ❌ **Falta**: Manejo de todos los eventos de Stripe (payment_intent.succeeded, payment_intent.payment_failed, etc.)
-- ❌ **Falta**: Verificación de firma del webhook
-- ❌ **Falta**: Actualización automática del estado del pedido desde webhooks
-- ❌ **Falta**: Notificaciones al usuario cuando el pago se confirma vía webhook
+1. **Stripe Payment Intent no se vincula correctamente**
+   - El `payment_intent` se crea pero no se guarda en el pedido antes de confirmar
+   - El backend busca el payment intent por metadata, pero puede no encontrarlo
+   - **Solución**: Guardar `payment_intent_id` en el pedido al crearlo
 
-**Impacto**: Los pagos pueden quedar como "pending" aunque se hayan procesado correctamente en Stripe.
+2. **Cupones no se aplican en el backend**
+   - El frontend calcula el descuento pero el backend no lo valida ni aplica
+   - El total del pedido puede no incluir el descuento del cupón
+   - **Solución**: Validar y aplicar cupones en `Order.createFromCart`
 
-#### **2. Confirmación Manual de Pagos Pendientes (Admin)**
-- ❌ **Falta**: Panel de admin para confirmar pagos de Yape/Plin/Transferencia
-- ❌ **Falta**: Subida de comprobantes de pago
-- ❌ **Falta**: Notificación al usuario cuando se confirma el pago manualmente
-- ❌ **Falta**: Historial de confirmaciones de pago
+3. **Puntos de fidelidad no se deducen del total**
+   - El frontend calcula el descuento pero el backend no lo aplica
+   - El total del pedido puede ser incorrecto
+   - **Solución**: Aplicar descuento de puntos en `Order.createFromCart`
 
-**Impacto**: Los pagos pendientes no se pueden confirmar sin acceso directo a la base de datos.
+4. **Falta endpoint para transferencia bancaria**
+   - `processBankTransfer` existe en PaymentService pero no hay ruta
+   - **Solución**: Agregar ruta `/api/payments/bank-transfer/process`
 
-#### **3. Manejo de Errores de Pago Mejorado**
-- ❌ **Falta**: Reintentos automáticos para pagos fallidos
-- ❌ **Falta**: Logs detallados de errores de pago
-- ❌ **Falta**: Notificaciones al admin cuando un pago falla
-- ❌ **Falta**: Recuperación automática de pagos fallidos
+5. **Webhook de Stripe no está configurado**
+   - El webhook existe pero no está registrado en Stripe
+   - No hay endpoint público para recibir webhooks
+   - **Solución**: Configurar webhook en Stripe y exponer endpoint público
 
-**Impacto**: Los errores de pago no se manejan adecuadamente y pueden causar pérdida de pedidos.
+### 🟡 **Importantes**
 
-#### **4. Validación de Cupones en Backend**
-- ❌ **Falta**: Validar que el cupón existe y está activo al crear el pedido
-- ❌ **Falta**: Validar que el cupón no ha sido usado por el usuario
-- ❌ **Falta**: Validar límites de uso del cupón
-- ❌ **Falta**: Aplicar descuento del cupón en el backend
+6. **No hay confirmación manual de pagos pendientes**
+   - Yape/Plin/Transferencia quedan como "pending" pero no hay forma de confirmarlos
+   - **Solución**: Crear endpoint/admin UI para confirmar pagos manualmente
 
-**Impacto**: Los cupones pueden aplicarse incorrectamente o múltiples veces.
+7. **Falta historial de transacciones**
+   - No se guarda un log de intentos de pago
+   - No hay forma de rastrear qué pasó con un pago
+   - **Solución**: Crear tabla `payment_transactions` y guardar todos los intentos
 
-#### **5. Aplicación de Puntos de Fidelidad en Backend**
-- ❌ **Falta**: Validar que el usuario tiene suficientes puntos
-- ❌ **Falta**: Aplicar descuento de puntos al total del pedido
-- ❌ **Falta**: Validar que los puntos no exceden el máximo permitido
-- ❌ **Falta**: Canjear puntos automáticamente al crear el pedido
+8. **Emails de confirmación no se envían correctamente**
+   - El email se envía pero puede no incluir información del pago
+   - No hay email para pagos pendientes con instrucciones
+   - **Solución**: Mejorar templates de email
 
-**Impacto**: Los puntos pueden aplicarse incorrectamente o no aplicarse en absoluto.
+9. **No hay reintentos automáticos**
+   - Si un pago falla, no hay forma de reintentarlo
+   - **Solución**: Implementar sistema de reintentos
 
----
+10. **Validación de monto en frontend vs backend**
+    - El frontend calcula el total pero el backend puede tener un total diferente
+    - **Solución**: Validar que los totales coincidan
 
-### 🟡 **Importantes (Media Prioridad)**
+### 🟢 **Mejoras Deseadas**
 
-#### **6. Historial de Pagos**
-- ❌ **Falta**: Tabla de historial de intentos de pago
-- ❌ **Falta**: Registro de todos los intentos de pago (exitosos y fallidos)
-- ❌ **Falta**: Información detallada de cada pago (método, monto, fecha, estado)
-- ❌ **Falta**: Visualización del historial en el panel de admin
+11. **Dashboard de pagos en admin**
+    - Ver todos los pagos pendientes
+    - Confirmar pagos manualmente
+    - Ver estadísticas de pagos
+    - **Solución**: Crear panel de administración de pagos
 
-**Impacto**: No hay trazabilidad de los pagos, dificulta el debugging y soporte.
+12. **Integración real de Yape/Plin**
+    - Actualmente es simulado
+    - **Solución**: Integrar con APIs reales cuando estén disponibles
 
-#### **7. Notificaciones de Pago**
-- ❌ **Falta**: Email cuando el pago es exitoso
-- ❌ **Falta**: Email cuando el pago falla
-- ❌ **Falta**: Email cuando el pago está pendiente
-- ❌ **Falta**: Notificaciones push (si se implementa)
+13. **Sistema de notificaciones de pago**
+    - Notificar al usuario cuando su pago es confirmado
+    - Notificar al admin cuando hay un pago pendiente
+    - **Solución**: Implementar sistema de notificaciones
 
-**Impacto**: Los usuarios no reciben confirmación inmediata del estado de su pago.
+14. **Logs de transacciones**
+    - Guardar todos los intentos de pago
+    - Guardar errores y respuestas
+    - **Solución**: Crear tabla de logs
 
-#### **8. Reembolsos Completos**
-- ❌ **Falta**: Endpoint para procesar reembolsos desde admin
-- ❌ **Falta**: Validación de que el pedido puede ser reembolsado
-- ❌ **Falta**: Reembolsos parciales
-- ❌ **Falta**: Notificación al usuario cuando se procesa un reembolso
-- ❌ **Falta**: Devolución de puntos de fidelidad al reembolsar
-
-**Impacto**: Los reembolsos no se pueden procesar desde el panel de admin.
-
-#### **9. Integración Real de Yape/Plin**
-- ❌ **Falta**: Integración con API real de Yape/Plin (cuando esté disponible)
-- ❌ **Falta**: Verificación automática de pagos móviles
-- ❌ **Falta**: Webhooks de Yape/Plin para confirmación automática
-
-**Impacto**: Los pagos móviles requieren confirmación manual.
-
-#### **10. Validación de Stock al Crear Pedido**
-- ❌ **Falta**: Verificar que hay stock disponible antes de crear el pedido
-- ❌ **Falta**: Reservar stock temporalmente durante el checkout
-- ❌ **Falta**: Liberar stock si el pago falla
-- ❌ **Falta**: Actualizar stock cuando el pago es exitoso
-
-**Impacto**: Pueden crearse pedidos para productos sin stock.
+15. **Validación de stock antes de crear pedido**
+    - Verificar que todos los productos tengan stock
+    - **Solución**: Validar stock en `Order.createFromCart`
 
 ---
 
-### 🟢 **Mejoras (Baja Prioridad)**
+## 🛠️ **Plan de Implementación**
 
-#### **11. Métodos de Pago Adicionales**
-- ❌ **Falta**: PayPal (parcialmente implementado pero no funcional)
-- ❌ **Falta**: Otros métodos de pago locales (si aplica)
+### **Fase 1: Correcciones Críticas** 🔴
 
-#### **12. Pagos Recurrentes**
-- ❌ **Falta**: Suscripciones
-- ❌ **Falta**: Pagos programados
+#### **1.1. Corregir flujo de Stripe**
+- [ ] Guardar `payment_intent_id` en el pedido al crearlo
+- [ ] Mejorar búsqueda de payment intent en backend
+- [ ] Asegurar que el payment intent se vincule correctamente
 
-#### **13. Análisis y Reportes**
-- ❌ **Falta**: Dashboard de pagos en admin
-- ❌ **Falta**: Estadísticas de métodos de pago más usados
-- ❌ **Falta**: Reportes de pagos fallidos
-- ❌ **Falta**: Análisis de conversión de pagos
+#### **1.2. Aplicar cupones en backend**
+- [ ] Validar cupón en `Order.createFromCart`
+- [ ] Aplicar descuento al total del pedido
+- [ ] Guardar información del cupón en el pedido
 
----
+#### **1.3. Aplicar puntos de fidelidad en backend**
+- [ ] Validar puntos disponibles
+- [ ] Aplicar descuento al total del pedido
+- [ ] Guardar puntos usados en el pedido
 
-## 🐛 **Errores Identificados**
+#### **1.4. Agregar endpoint de transferencia bancaria**
+- [ ] Crear ruta `/api/payments/bank-transfer/process`
+- [ ] Conectar con `PaymentService.processBankTransfer`
 
-### 🔴 **Errores Críticos**
+#### **1.5. Validar totales frontend vs backend**
+- [ ] Enviar total calculado desde frontend
+- [ ] Validar que coincida con cálculo del backend
+- [ ] Rechazar si hay diferencia
 
-#### **1. Flujo de Stripe Incompleto**
-- **Problema**: El payment intent se crea dos veces (una en frontend, otra en backend)
-- **Ubicación**: `js/checkout.js:1255` y `backend/services/PaymentService.js:83`
-- **Impacto**: Puede causar pagos duplicados o errores de sincronización
-- **Solución**: Crear el payment intent solo una vez (preferiblemente en backend)
+### **Fase 2: Funcionalidades Importantes** 🟡
 
-#### **2. Falta de Validación de Cupones en Backend**
-- **Problema**: Los cupones se validan solo en frontend
-- **Ubicación**: `backend/models/Order.js:createFromCart`
-- **Impacto**: Los cupones pueden ser manipulados desde el frontend
-- **Solución**: Validar y aplicar cupones en el backend
+#### **2.1. Sistema de confirmación manual de pagos**
+- [ ] Crear tabla `payment_confirmations` (opcional)
+- [ ] Endpoint para confirmar pagos pendientes (admin)
+- [ ] UI en admin panel para ver y confirmar pagos
+- [ ] Notificar usuario cuando se confirma
 
-#### **3. Falta de Validación de Puntos en Backend**
-- **Problema**: Los puntos se validan solo en frontend
-- **Ubicación**: `backend/models/Order.js:createFromCart`
-- **Impacto**: Los puntos pueden ser manipulados desde el frontend
-- **Solución**: Validar y aplicar puntos en el backend
+#### **2.2. Historial de transacciones**
+- [ ] Crear tabla `payment_transactions`
+- [ ] Guardar todos los intentos de pago
+- [ ] Incluir: método, monto, estado, error, timestamp
+- [ ] Endpoint para obtener historial
 
-#### **4. No se Aplica Descuento de Cupón al Total del Pedido**
-- **Problema**: El cupón se aplica en frontend pero no se refleja en el total del pedido en backend
-- **Ubicación**: `backend/models/Order.js:createFromCart`
-- **Impacto**: El total del pedido puede ser incorrecto
-- **Solución**: Aplicar descuento del cupón al calcular el total
+#### **2.3. Mejorar emails de confirmación**
+- [ ] Template para pago exitoso (Stripe)
+- [ ] Template para pago pendiente (Yape/Plin/Transferencia)
+- [ ] Incluir instrucciones de pago
+- [ ] Incluir información del pedido
 
-#### **5. No se Aplica Descuento de Puntos al Total del Pedido**
-- **Problema**: Los puntos se aplican en frontend pero no se reflejan en el total del pedido en backend
-- **Ubicación**: `backend/models/Order.js:createFromCart`
-- **Impacto**: El total del pedido puede ser incorrecto
-- **Solución**: Aplicar descuento de puntos al calcular el total
+#### **2.4. Validación de stock**
+- [ ] Verificar stock antes de crear pedido
+- [ ] Rechazar si no hay stock suficiente
+- [ ] Mostrar mensaje claro al usuario
 
-#### **6. Webhook de Stripe No Verifica Firma**
-- **Problema**: El webhook no verifica la firma de Stripe
-- **Ubicación**: `backend/services/PaymentService.js:293`
-- **Impacto**: Vulnerabilidad de seguridad, webhooks falsos pueden modificar pedidos
-- **Solución**: Verificar la firma del webhook usando `STRIPE_WEBHOOK_SECRET`
+### **Fase 3: Mejoras y Optimizaciones** 🟢
 
-#### **7. Falta Manejo de Errores en Procesamiento de Pago**
-- **Problema**: Si el pago falla, el pedido queda creado pero sin procesar
-- **Ubicación**: `js/checkout.js:1193`
-- **Impacto**: Pedidos huérfanos que no se pueden completar
-- **Solución**: Implementar rollback o marcado de pedidos como "payment_failed"
+#### **3.1. Dashboard de pagos en admin**
+- [ ] Vista de pagos pendientes
+- [ ] Vista de pagos exitosos
+- [ ] Vista de pagos fallidos
+- [ ] Estadísticas de pagos
+- [ ] Filtros y búsqueda
 
----
+#### **3.2. Sistema de notificaciones**
+- [ ] Notificar usuario cuando pago es confirmado
+- [ ] Notificar admin cuando hay pago pendiente
+- [ ] Notificar usuario cuando pago falla
 
-### 🟡 **Errores Importantes**
-
-#### **8. No se Actualiza Stock al Crear Pedido**
-- **Problema**: El stock no se actualiza cuando se crea un pedido
-- **Ubicación**: `backend/models/Order.js:createFromCart`
-- **Impacto**: Pueden venderse productos sin stock
-- **Solución**: Actualizar stock al crear el pedido (o reservarlo temporalmente)
-
-#### **9. Falta Validación de Monto en Pagos Móviles**
-- **Problema**: El monto se valida en frontend pero no se verifica en backend
-- **Ubicación**: `backend/services/PaymentService.js:172`
-- **Impacto**: Los montos pueden ser manipulados
-- **Solución**: Validar el monto contra el total del pedido en backend
-
-#### **10. No se Envían Emails de Confirmación de Pago**
-- **Problema**: Solo se envía email de confirmación de pedido, no de pago
-- **Ubicación**: `backend/routes/orders.js:82`
-- **Impacto**: Los usuarios no reciben confirmación del pago
-- **Solución**: Enviar email específico cuando el pago es exitoso
+#### **3.3. Logs y auditoría**
+- [ ] Guardar todos los intentos de pago
+- [ ] Guardar errores y respuestas
+- [ ] Endpoint para consultar logs
 
 ---
 
-## 🔧 **Mejoras Necesarias**
+## 📝 **Código que Necesita Corrección**
 
-### **Frontend**
+### **Backend - Order.createFromCart**
+```javascript
+// FALTA:
+// 1. Validar y aplicar cupones
+// 2. Aplicar descuento de puntos de fidelidad
+// 3. Validar stock de productos
+// 4. Guardar payment_intent_id si existe
+```
 
-1. **Mejorar Manejo de Errores**
-   - Mostrar errores específicos de cada método de pago
-   - Implementar reintentos automáticos
-   - Mejorar mensajes de error para el usuario
+### **Backend - PaymentService.processStripePayment**
+```javascript
+// PROBLEMA:
+// Busca payment intent por metadata pero puede no encontrarlo
+// SOLUCIÓN:
+// Guardar payment_intent_id en el pedido al crearlo
+```
 
-2. **Mejorar UX del Checkout**
-   - Mostrar resumen de descuentos aplicados
-   - Mostrar desglose detallado de costos
-   - Agregar animaciones y transiciones suaves
-   - Mejorar feedback visual durante el procesamiento
+### **Backend - routes/payments.js**
+```javascript
+// FALTA:
+// POST /api/payments/bank-transfer/process
+```
 
-3. **Validaciones Mejoradas**
-   - Validar formato de teléfono peruano en frontend
-   - Validar que el cupón es válido antes de aplicar
-   - Validar que hay suficientes puntos antes de usar
+### **Frontend - checkout.js**
+```javascript
+// PROBLEMA:
+// No valida que el total del backend coincida con el frontend
+// SOLUCIÓN:
+// Validar totales antes de procesar pago
+```
 
-4. **Mejorar Confirmación de Pago**
-   - Mostrar detalles del pago en la confirmación
-   - Mostrar instrucciones específicas según método de pago
-   - Agregar botón para descargar comprobante (cuando esté disponible)
+---
+
+## 🎯 **Prioridades**
+
+### **Alta Prioridad (Hacer Ahora)**
+1. ✅ Corregir flujo de Stripe (guardar payment_intent_id)
+2. ✅ Aplicar cupones en backend
+3. ✅ Aplicar puntos de fidelidad en backend
+4. ✅ Agregar endpoint de transferencia bancaria
+5. ✅ Validar totales frontend vs backend
+
+### **Media Prioridad (Próximos)**
+6. Sistema de confirmación manual de pagos
+7. Historial de transacciones
+8. Mejorar emails de confirmación
+9. Validación de stock
+
+### **Baja Prioridad (Mejoras)**
+10. Dashboard de pagos en admin
+11. Sistema de notificaciones
+12. Logs y auditoría
+
+---
+
+## 🔧 **Archivos que Necesitan Modificación**
 
 ### **Backend**
+- `backend/models/Order.js` - Aplicar cupones y puntos
+- `backend/services/PaymentService.js` - Mejorar búsqueda de payment intent
+- `backend/routes/payments.js` - Agregar endpoint de transferencia
+- `backend/routes/orders.js` - Validar totales
 
-1. **Mejorar Seguridad**
-   - Validar todos los datos en backend
-   - Implementar rate limiting en endpoints de pago
-   - Agregar logging de todas las operaciones de pago
-   - Implementar verificación de firma en webhooks
+### **Frontend**
+- `js/checkout.js` - Validar totales, mejorar manejo de errores
+- `js/api.js` - Agregar método para transferencia bancaria
 
-2. **Mejorar Manejo de Transacciones**
-   - Usar transacciones de base de datos para operaciones críticas
-   - Implementar rollback si el pago falla
-   - Implementar idempotencia en operaciones de pago
-
-3. **Mejorar Notificaciones**
-   - Enviar emails para todos los estados de pago
-   - Implementar notificaciones push (opcional)
-   - Agregar webhooks para notificar a sistemas externos
-
-4. **Mejorar Logging y Monitoreo**
-   - Logging detallado de todas las operaciones de pago
-   - Alertas cuando hay errores de pago
-   - Métricas de conversión de pagos
+### **Nuevos Archivos**
+- `backend/models/PaymentTransaction.js` - Historial de transacciones
+- `backend/routes/admin-payments.js` - Endpoints de admin para pagos
+- `backend/database/migrations/XXX_create_payment_transactions.js` - Tabla de transacciones
 
 ---
 
-## 📋 **Plan de Implementación Recomendado**
+## 📋 **Checklist de Implementación**
 
-### **Fase 1: Correcciones Críticas (Prioridad Alta)**
+### **Fase 1: Correcciones Críticas**
+- [ ] Guardar payment_intent_id en pedido
+- [ ] Aplicar cupones en Order.createFromCart
+- [ ] Aplicar puntos de fidelidad en Order.createFromCart
+- [ ] Agregar endpoint /api/payments/bank-transfer/process
+- [ ] Validar totales frontend vs backend
+- [ ] Validar stock antes de crear pedido
 
-1. ✅ Validar y aplicar cupones en backend
-2. ✅ Validar y aplicar puntos de fidelidad en backend
-3. ✅ Aplicar descuentos al total del pedido
-4. ✅ Verificar firma del webhook de Stripe
-5. ✅ Implementar manejo completo de webhooks
-6. ✅ Implementar rollback si el pago falla
+### **Fase 2: Funcionalidades**
+- [ ] Crear tabla payment_transactions
+- [ ] Endpoint para confirmar pagos pendientes (admin)
+- [ ] UI en admin para confirmar pagos
+- [ ] Mejorar templates de email
+- [ ] Sistema de notificaciones
 
-### **Fase 2: Funcionalidades Críticas (Prioridad Alta)**
-
-1. ✅ Panel de admin para confirmar pagos pendientes
-2. ✅ Subida de comprobantes de pago
-3. ✅ Notificaciones de pago mejoradas
-4. ✅ Validación de stock al crear pedido
-5. ✅ Actualización de stock al procesar pago
-
-### **Fase 3: Mejoras Importantes (Prioridad Media)**
-
-1. ✅ Historial de pagos
-2. ✅ Reembolsos completos desde admin
-3. ✅ Dashboard de pagos en admin
-4. ✅ Mejoras en manejo de errores
-5. ✅ Logging y monitoreo mejorado
-
-### **Fase 4: Mejoras Adicionales (Prioridad Baja)**
-
-1. ✅ Integración real de Yape/Plin (cuando esté disponible)
-2. ✅ PayPal funcional
-3. ✅ Métodos de pago adicionales
-4. ✅ Análisis y reportes avanzados
+### **Fase 3: Mejoras**
+- [ ] Dashboard de pagos en admin
+- [ ] Logs y auditoría
+- [ ] Estadísticas de pagos
 
 ---
 
-## 🎯 **Próximos Pasos Inmediatos**
+## 🚨 **Errores Conocidos**
 
-1. **Corregir validación de cupones en backend**
-2. **Corregir validación de puntos en backend**
-3. **Aplicar descuentos al total del pedido**
-4. **Implementar webhook de Stripe completo**
-5. **Crear panel de admin para confirmar pagos pendientes**
+1. **Stripe payment intent no se encuentra**
+   - Causa: No se guarda payment_intent_id en el pedido
+   - Impacto: El pago puede no actualizarse correctamente
+   - Solución: Guardar payment_intent_id al crear payment intent
+
+2. **Cupones no se aplican**
+   - Causa: Backend no valida ni aplica cupones
+   - Impacto: El total puede ser incorrecto
+   - Solución: Validar y aplicar en Order.createFromCart
+
+3. **Puntos de fidelidad no se deducen**
+   - Causa: Backend no aplica descuento de puntos
+   - Impacto: El total puede ser incorrecto
+   - Solución: Aplicar descuento en Order.createFromCart
+
+4. **Transferencia bancaria sin endpoint**
+   - Causa: Falta ruta en backend
+   - Impacto: No se puede procesar transferencia
+   - Solución: Agregar ruta en routes/payments.js
 
 ---
 
-## 📝 **Notas Adicionales**
+## 📚 **Documentación Necesaria**
 
-- El sistema actual es funcional para pagos básicos pero necesita mejoras significativas para producción
-- Los pagos de Stripe funcionan pero el flujo puede optimizarse
-- Los pagos móviles (Yape/Plin) requieren confirmación manual hasta que se implemente la integración real
-- Se recomienda implementar las correcciones críticas antes de lanzar a producción
-
+- [ ] Guía de configuración de webhooks de Stripe
+- [ ] Guía de confirmación manual de pagos
+- [ ] Guía de integración de Yape/Plin (cuando esté disponible)
+- [ ] Documentación de API de pagos
+- [ ] Guía de troubleshooting de pagos

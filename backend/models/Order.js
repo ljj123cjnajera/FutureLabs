@@ -1,5 +1,7 @@
 const db = require('../database/config');
 const { v4: uuidv4 } = require('uuid');
+const Coupon = require('./Coupon');
+const LoyaltyPoints = require('./LoyaltyPoints');
 
 class Order {
   // Generar número de pedido único
@@ -124,7 +126,7 @@ class Order {
   // Crear pedido desde carrito
   static async createFromCart(userId, orderData) {
     return await db.transaction(async (trx) => {
-      // Obtener items del carrito
+      // Obtener items del carrito con información completa
       const cartItems = await trx('cart')
         .select(
           'cart.quantity',
@@ -132,7 +134,10 @@ class Order {
           'products.name as product_name',
           'products.sku as product_sku',
           'products.price',
-          'products.discount_price'
+          'products.discount_price',
+          'products.stock',
+          'products.category_id',
+          'products.brand'
         )
         .leftJoin('products', 'cart.product_id', 'products.id')
         .where('cart.user_id', userId);
@@ -141,7 +146,17 @@ class Order {
         throw new Error('El carrito está vacío');
       }
 
-      // Calcular totales
+      // Validar stock antes de crear pedido
+      for (const item of cartItems) {
+        if (!item.product_id) {
+          throw new Error(`Producto no encontrado en el carrito`);
+        }
+        if (item.stock !== null && item.stock < item.quantity) {
+          throw new Error(`Stock insuficiente para ${item.product_name}. Disponible: ${item.stock}, Solicitado: ${item.quantity}`);
+        }
+      }
+
+      // Calcular subtotal
       let subtotal = 0;
       const items = cartItems.map(item => {
         const price = item.discount_price || item.price;
@@ -155,13 +170,84 @@ class Order {
           price: item.price,
           discount_price: item.discount_price,
           quantity: item.quantity,
-          total
+          total,
+          category_id: item.category_id,
+          brand: item.brand
         };
       });
 
       const shippingCost = orderData.shipping_cost || 0;
       const tax = orderData.tax || 0;
-      const totalAmount = subtotal + shippingCost + tax;
+      let totalBeforeDiscounts = subtotal + shippingCost + tax;
+
+      // Aplicar cupón si existe
+      let couponDiscount = 0;
+      let couponCode = null;
+      let couponId = null;
+      
+      if (orderData.coupon_code) {
+        const couponResult = await Coupon.apply(
+          orderData.coupon_code,
+          totalBeforeDiscounts,
+          items
+        );
+
+        if (!couponResult.valid) {
+          throw new Error(couponResult.message || 'Cupón inválido');
+        }
+
+        couponDiscount = couponResult.discount;
+        couponCode = couponResult.coupon.code;
+        couponId = couponResult.coupon.id;
+
+        // Marcar cupón como usado
+        await Coupon.use(orderData.coupon_code);
+      }
+
+      // Aplicar puntos de fidelidad si se usan
+      let loyaltyPointsDiscount = 0;
+      let loyaltyPointsUsed = 0;
+      
+      if (orderData.loyalty_points_used && orderData.loyalty_points_used > 0) {
+        const userPoints = await LoyaltyPoints.getPointsForUser(userId);
+        
+        if (userPoints.points < orderData.loyalty_points_used) {
+          throw new Error('No tienes suficientes puntos de fidelidad');
+        }
+
+        // Validar que no se use más del 20% del total
+        const maxPointsValue = totalBeforeDiscounts * 0.2;
+        const pointsValue = orderData.loyalty_points_used / 100; // 100 puntos = S/ 1
+        
+        if (pointsValue > maxPointsValue) {
+          throw new Error(`Solo puedes usar puntos para hasta el 20% del total (máximo S/ ${maxPointsValue.toFixed(2)})`);
+        }
+
+        loyaltyPointsDiscount = Math.min(pointsValue, maxPointsValue);
+        loyaltyPointsUsed = orderData.loyalty_points_used;
+
+        // Canjear puntos
+        await LoyaltyPoints.redeemPoints(
+          userId,
+          loyaltyPointsUsed,
+          `Compra: Pedido pendiente`
+        );
+      }
+
+      // Calcular total final después de descuentos
+      const totalDiscount = couponDiscount + loyaltyPointsDiscount;
+      const totalAmount = Math.max(totalBeforeDiscounts - totalDiscount, 0);
+
+      // Validar total si viene del frontend
+      if (orderData.expected_total !== undefined) {
+        const expectedTotal = parseFloat(orderData.expected_total);
+        const calculatedTotal = parseFloat(totalAmount.toFixed(2));
+        
+        // Permitir diferencia de hasta 0.01 por redondeos
+        if (Math.abs(expectedTotal - calculatedTotal) > 0.01) {
+          throw new Error(`El total calculado (S/ ${calculatedTotal}) no coincide con el total esperado (S/ ${expectedTotal}). Por favor, recarga la página e intenta nuevamente.`);
+        }
+      }
 
       // Crear pedido
       const orderNumber = Order.generateOrderNumber();
@@ -176,6 +262,7 @@ class Order {
           status: 'pending',
           payment_status: 'pending',
           payment_method: orderData.payment_method,
+          payment_id: orderData.payment_intent_id || null, // Guardar payment_intent_id si existe
           shipping_address: orderData.shipping_address,
           shipping_city: orderData.shipping_city,
           shipping_state: orderData.shipping_state,
@@ -184,7 +271,12 @@ class Order {
           shipping_phone: orderData.shipping_phone,
           shipping_email: orderData.shipping_email,
           shipping_full_name: orderData.shipping_full_name,
-          notes: orderData.notes
+          notes: orderData.notes || null,
+          coupon_code: couponCode,
+          coupon_id: couponId,
+          coupon_discount: couponDiscount,
+          loyalty_points_used: loyaltyPointsUsed,
+          loyalty_points_discount: loyaltyPointsDiscount
         })
         .returning('*');
 

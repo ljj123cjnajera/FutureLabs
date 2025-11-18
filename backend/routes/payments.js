@@ -262,6 +262,34 @@ router.post('/cash/process', authenticateToken, async (req, res) => {
   }
 });
 
+// POST /api/payments/bank-transfer/process - Procesar transferencia bancaria
+router.post('/bank-transfer/process', authenticateToken, async (req, res) => {
+  try {
+    const { order_id } = req.body;
+
+    if (!order_id) {
+      return res.status(400).json({
+        success: false,
+        message: 'El ID del pedido es requerido'
+      });
+    }
+
+    const result = await PaymentService.processBankTransfer(order_id);
+
+    res.json({
+      success: true,
+      message: result.message || 'Transferencia bancaria registrada',
+      data: result
+    });
+  } catch (error) {
+    console.error('Error procesando transferencia bancaria:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error procesando transferencia bancaria'
+    });
+  }
+});
+
 // POST /api/payments/refund - Reembolsar pago (admin)
 router.post('/refund', authenticateToken, requireAdmin, async (req, res) => {
   try {

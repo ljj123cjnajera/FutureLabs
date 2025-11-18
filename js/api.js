@@ -480,6 +480,20 @@ class FutureLabsAPI {
     });
   }
 
+  async processBankTransfer(orderId) {
+    return this.request('/payments/bank-transfer/process', {
+      method: 'POST',
+      body: JSON.stringify({ order_id: orderId })
+    });
+  }
+
+  async updateOrderPaymentIntent(orderId, paymentIntentId) {
+    return this.request(`/orders/${orderId}/payment-intent`, {
+      method: 'PUT',
+      body: JSON.stringify({ payment_intent_id: paymentIntentId })
+    });
+  }
+
   // ===== REVIEWS =====
   async getProductReviews(productId, limit = null) {
     const params = limit ? `?limit=${limit}` : '';

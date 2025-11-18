@@ -1263,6 +1263,17 @@ async function processStripePayment(orderId, amount) {
         }
         
         const clientSecret = intentResponse.data.client_secret;
+        const paymentIntentId = intentResponse.data.payment_intent_id;
+        
+        // Guardar payment_intent_id en el pedido
+        if (paymentIntentId) {
+            try {
+                await window.api.updateOrderPaymentIntent(orderId, paymentIntentId);
+            } catch (error) {
+                console.warn('No se pudo guardar payment_intent_id:', error);
+                // Continuar de todas formas
+            }
+        }
         
         // Confirmar pago con Stripe
         if (!stripe || !stripeCardElement) {
