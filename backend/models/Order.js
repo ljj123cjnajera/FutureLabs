@@ -199,10 +199,32 @@ class Order {
       // Limpiar carrito
       await trx('cart').where('user_id', userId).del();
 
-      // Obtener pedido completo
-      const fullOrder = await Order.getById(order.id);
+      // Obtener pedido completo dentro de la transacción
+      const fullOrder = await trx('orders')
+        .where({ id: order.id })
+        .first();
 
-      return fullOrder;
+      if (!fullOrder) {
+        throw new Error('Error al recuperar el pedido creado');
+      }
+
+      // Obtener items del pedido
+      const orderItems = await trx('order_items')
+        .select(
+          'order_items.*',
+          'products.name as product_name',
+          'products.slug as product_slug',
+          'products.image_url as image_url',
+          'products.brand as product_brand',
+          'products.sku as product_sku'
+        )
+        .leftJoin('products', 'order_items.product_id', 'products.id')
+        .where({ order_id: order.id });
+
+      return {
+        ...fullOrder,
+        items: orderItems
+      };
     });
   }
 

@@ -59,6 +59,14 @@ router.post('/', authenticateToken, createOrderValidation, async (req, res) => {
 
     const order = await Order.createFromCart(req.user.id, req.body);
 
+    // Validar que el pedido se creó correctamente
+    if (!order) {
+      return res.status(500).json({
+        success: false,
+        message: 'Error al crear el pedido. Por favor, intenta nuevamente.'
+      });
+    }
+
     // Otorgar puntos de fidelidad si el pedido es pagado
     if (order.payment_status === 'paid') {
       const pointsToAdd = await LoyaltyPoints.calculatePointsFromOrder(order.total_amount);
