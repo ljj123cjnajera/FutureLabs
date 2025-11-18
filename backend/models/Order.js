@@ -189,12 +189,12 @@ class Order {
         .returning('*');
 
       // Crear items del pedido
-      const orderItems = items.map(item => ({
+      const orderItemsToInsert = items.map(item => ({
         order_id: order.id,
         ...item
       }));
 
-      await trx('order_items').insert(orderItems);
+      await trx('order_items').insert(orderItemsToInsert);
 
       // Limpiar carrito
       await trx('cart').where('user_id', userId).del();
