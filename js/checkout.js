@@ -179,6 +179,23 @@ function renderStep(step) {
             break;
         case 2:
             container.innerHTML = renderPaymentStep();
+            // Inicializar Stripe Elements si es necesario
+            if (selectedPaymentMethod === 'stripe') {
+                setTimeout(() => {
+                    initializeStripeElements();
+                }, 100);
+            }
+            // Cargar información de métodos de pago
+            if (selectedPaymentMethod === 'yape' || selectedPaymentMethod === 'plin') {
+                setTimeout(() => {
+                    loadMobilePaymentInfo(selectedPaymentMethod);
+                }, 100);
+            }
+            if (selectedPaymentMethod === 'bank_transfer') {
+                setTimeout(() => {
+                    loadBankTransferInfo();
+                }, 100);
+            }
             break;
         case 3:
             container.innerHTML = renderReviewStep();
