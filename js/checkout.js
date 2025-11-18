@@ -540,12 +540,37 @@ function renderPaymentStep() {
             
             ${selectedPaymentMethod === 'stripe' ? `
                 <div class="payment-details active" id="stripe-payment-details">
-                    <h3>Detalles de la Tarjeta</h3>
-                    <div id="stripe-card-element" style="border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin: 20px 0; background: white;"></div>
-                    <div id="stripe-card-errors" role="alert" style="color: #dc2626; font-size: 14px; margin-top: 10px;"></div>
-                    <p style="color: #666; font-size: 14px; margin-top: 10px;">
-                        <i class="fas fa-lock"></i> Tu información está protegida por Stripe
-                    </p>
+                    <div class="stripe-payment-header">
+                        <h3><i class="fas fa-credit-card"></i> Detalles de la Tarjeta</h3>
+                        <p class="stripe-payment-subtitle">Ingresa la información de tu tarjeta de crédito o débito</p>
+                    </div>
+                    
+                    <div class="stripe-card-container">
+                        <label class="stripe-card-label">
+                            <span>Información de la Tarjeta</span>
+                            <span class="stripe-card-icons">
+                                <i class="fab fa-cc-visa" title="Visa"></i>
+                                <i class="fab fa-cc-mastercard" title="Mastercard"></i>
+                                <i class="fab fa-cc-amex" title="American Express"></i>
+                            </span>
+                        </label>
+                        <div id="stripe-card-element" class="stripe-card-element"></div>
+                        <div id="stripe-card-errors" role="alert" class="stripe-card-errors"></div>
+                    </div>
+                    
+                    <div class="stripe-payment-info">
+                        <div class="stripe-security-badge">
+                            <i class="fas fa-shield-alt"></i>
+                            <div>
+                                <strong>Pago Seguro</strong>
+                                <p>Tu información está protegida con encriptación SSL de 256 bits</p>
+                            </div>
+                        </div>
+                        <div class="stripe-test-info">
+                            <i class="fas fa-info-circle"></i>
+                            <p><strong>Modo de Prueba:</strong> Usa la tarjeta de prueba <code>4242 4242 4242 4242</code> con cualquier CVV y fecha futura</p>
+                        </div>
+                    </div>
                 </div>
             ` : selectedPaymentMethod === null ? `
                 <div class="payment-details" style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 16px; margin-top: 20px;">
@@ -1574,14 +1599,27 @@ async function initializeStripeElements() {
                 style: {
                     base: {
                         fontSize: '16px',
-                        color: '#424770',
+                        color: '#32325d',
+                        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
                         '::placeholder': {
                             color: '#aab7c4',
                         },
+                        ':focus': {
+                            color: '#32325d',
+                        },
                     },
                     invalid: {
-                        color: '#9e2146',
+                        color: '#dc2626',
+                        iconColor: '#dc2626',
                     },
+                    complete: {
+                        iconColor: '#22c55e',
+                    },
+                },
+                classes: {
+                    base: 'stripe-card-input',
+                    focus: 'stripe-card-input-focus',
+                    invalid: 'stripe-card-input-invalid',
                 },
             });
 
