@@ -643,6 +643,27 @@ function renderReviewStep() {
 
 // Renderizar Paso 4: Confirmación
 function renderConfirmationStep() {
+    // Obtener información del método de pago para mostrar mensaje apropiado
+    const paymentMethodName = getPaymentMethodName(selectedPaymentMethod);
+    let paymentStatusMessage = '';
+    let paymentInstructions = '';
+    
+    if (selectedPaymentMethod === 'cash') {
+        paymentStatusMessage = 'Pago pendiente - Efectivo';
+        paymentInstructions = 'Pagarás en efectivo al momento de recibir tu pedido. El repartidor aceptará el pago exacto.';
+    } else if (selectedPaymentMethod === 'yape' || selectedPaymentMethod === 'plin') {
+        paymentStatusMessage = 'Pago pendiente - ' + (selectedPaymentMethod === 'yape' ? 'Yape' : 'Plin');
+        paymentInstructions = 'Realiza el pago desde tu app ' + (selectedPaymentMethod === 'yape' ? 'Yape' : 'Plin') + '. Te enviaremos un email de confirmación cuando recibamos el pago.';
+    } else if (selectedPaymentMethod === 'bank_transfer') {
+        paymentStatusMessage = 'Pago pendiente - Transferencia Bancaria';
+        paymentInstructions = 'Realiza la transferencia bancaria según los datos proporcionados. Envía el comprobante a nuestro correo de soporte. Te contactaremos para confirmar el pago.';
+    } else if (selectedPaymentMethod === 'stripe') {
+        paymentStatusMessage = 'Pago procesado - Tarjeta';
+        paymentInstructions = 'Tu pago ha sido procesado exitosamente. Recibirás un email de confirmación con los detalles.';
+    } else {
+        paymentStatusMessage = 'Pago pendiente';
+        paymentInstructions = 'Te contactaremos para confirmar el pago.';
+    }
     return `
         <div class="confirmation-section">
             <div class="confirmation-icon">
@@ -664,6 +685,20 @@ function renderConfirmationStep() {
                     <span>Total:</span>
                     <strong>S/ ${cartData.total.toFixed(2)}</strong>
                 </div>
+                <div class="confirmation-detail-item">
+                    <span>Método de Pago:</span>
+                    <strong>${paymentMethodName}</strong>
+                </div>
+                <div class="confirmation-detail-item">
+                    <span>Estado del Pago:</span>
+                    <strong style="color: ${selectedPaymentMethod === 'stripe' ? '#22c55e' : '#f59e0b'};">${paymentStatusMessage}</strong>
+                </div>
+            </div>
+            
+            <div style="background: ${selectedPaymentMethod === 'stripe' ? '#f0fdf4' : '#fffbeb'}; border: 1px solid ${selectedPaymentMethod === 'stripe' ? '#22c55e' : '#f59e0b'}; border-radius: 8px; padding: 16px; margin: 20px 0;">
+                <p style="margin: 0; color: ${selectedPaymentMethod === 'stripe' ? '#166534' : '#92400e'}; font-weight: 600;">
+                    <i class="fas fa-info-circle"></i> ${paymentInstructions}
+                </p>
             </div>
             
             <p style="color: var(--text-secondary); margin-bottom: var(--spacing-lg);">
@@ -1119,7 +1154,19 @@ async function processOrder() {
             navElement.style.display = 'none';
         }
         
-        window.notifications.success('¡Pedido confirmado exitosamente!');
+        // Mostrar mensaje según método de pago
+        let confirmationMessage = '¡Pedido confirmado exitosamente!';
+        if (selectedPaymentMethod === 'cash') {
+            confirmationMessage = '¡Pedido confirmado! Pagarás en efectivo al momento de recibir tu pedido.';
+        } else if (selectedPaymentMethod === 'yape' || selectedPaymentMethod === 'plin') {
+            confirmationMessage = '¡Pedido confirmado! Realiza el pago desde tu app móvil. Te contactaremos para confirmar.';
+        } else if (selectedPaymentMethod === 'bank_transfer') {
+            confirmationMessage = '¡Pedido confirmado! Realiza la transferencia bancaria y envía el comprobante.';
+        } else if (selectedPaymentMethod === 'stripe') {
+            confirmationMessage = '¡Pedido y pago confirmados exitosamente!';
+        }
+        
+        window.notifications.success(confirmationMessage);
         
     } catch (error) {
         console.error('Error al procesar pedido:', error);
