@@ -3,7 +3,7 @@
 // Variables globales
 let currentStep = 1;
 const totalSteps = 4;
-let selectedPaymentMethod = 'cash'; // Por defecto efectivo (más seguro si Stripe no está configurado)
+let selectedPaymentMethod = null; // Sin selección por defecto - el usuario debe elegir explícitamente
 const shippingOptions = {
     standard: {
         label: 'Envío Estándar',
