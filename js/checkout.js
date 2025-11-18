@@ -810,42 +810,51 @@ function validateShippingForm() {
 
 // Validar formulario de pago
 function validatePaymentForm() {
+    // Validar que se haya seleccionado un método de pago
+    if (!selectedPaymentMethod) {
+        window.notifications.error('Por favor, selecciona un método de pago');
+        return false;
+    }
+    
+    // Validar según el método seleccionado
     if (selectedPaymentMethod === 'stripe') {
-        const cardNumber = document.getElementById('cardNumber').value;
-        const cardName = document.getElementById('cardName').value;
-        const cardExpiry = document.getElementById('cardExpiry').value;
-        const cardCvv = document.getElementById('cardCvv').value;
-        
-        const errors = [];
-        
-        if (!cardNumber || cardNumber.length < 13) {
-            errors.push('El número de tarjeta no es válido');
-        }
-        
-        if (!cardName || cardName.length < 3) {
-            errors.push('El nombre en la tarjeta no es válido');
-        }
-        
-        if (!cardExpiry || !/^\d{2}\/\d{2}$/.test(cardExpiry)) {
-            errors.push('La fecha de vencimiento no es válida');
-        }
-        
-        if (!cardCvv || cardCvv.length < 3) {
-            errors.push('El CVV no es válido');
-        }
-        
-        if (errors.length > 0) {
-            window.notifications.error(errors[0]);
+        // Para Stripe, validamos que el elemento de tarjeta esté presente
+        // La validación real se hace cuando se crea el payment method
+        if (!stripe || !stripeCardElement) {
+            window.notifications.error('El sistema de pago con tarjeta no está disponible. Por favor, selecciona otro método.');
             return false;
         }
         
-        // Guardar datos de pago
-        paymentData = {
-            cardNumber: cardNumber.replace(/\s/g, ''),
-            cardName,
-            cardExpiry,
-            cardCvv
-        };
+        // Verificar que el elemento de tarjeta esté montado
+        const cardElement = document.getElementById('stripe-card-element');
+        if (!cardElement || cardElement.children.length === 0) {
+            window.notifications.error('Por favor, completa los datos de tu tarjeta');
+            return false;
+        }
+    } else if (selectedPaymentMethod === 'yape' || selectedPaymentMethod === 'plin') {
+        // Validar número de teléfono para Yape/Plin
+        const phoneInput = document.getElementById('mobile-phone');
+        if (!phoneInput) {
+            window.notifications.error('Por favor, ingresa tu número de teléfono');
+            return false;
+        }
+        
+        const phoneNumber = phoneInput.value.trim().replace(/\s+/g, '');
+        if (!phoneNumber) {
+            window.notifications.error('Por favor, ingresa tu número de teléfono');
+            return false;
+        }
+        
+        // Validar formato de teléfono peruano
+        if (!/^9\d{8}$/.test(phoneNumber)) {
+            window.notifications.error('Número de teléfono inválido. Debe ser un número peruano de 9 dígitos (ej: 987654321)');
+            return false;
+        }
+    } else if (selectedPaymentMethod === 'bank_transfer') {
+        // Transferencia bancaria no requiere validación adicional
+        // Los datos se muestran automáticamente
+    } else if (selectedPaymentMethod === 'cash') {
+        // Efectivo no requiere validación adicional
     }
     
     return true;
