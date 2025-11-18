@@ -547,6 +547,12 @@ function renderPaymentStep() {
                         <i class="fas fa-lock"></i> Tu información está protegida por Stripe
                     </p>
                 </div>
+            ` : selectedPaymentMethod === null ? `
+                <div class="payment-details" style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 16px; margin-top: 20px;">
+                    <p style="margin: 0; color: #92400e;">
+                        <i class="fas fa-info-circle"></i> Por favor, selecciona un método de pago arriba
+                    </p>
+                </div>
             ` : ''}
             
             ${selectedPaymentMethod === 'yape' || selectedPaymentMethod === 'plin' ? `
