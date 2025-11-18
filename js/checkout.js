@@ -1150,7 +1150,9 @@ async function processOrder() {
             shipping_cost: shippingAmount,
             coupon_code: appliedCoupon,
             // Incluir información de puntos (el backend ajustará el total si es necesario)
-            loyalty_points_used: loyaltyPointsUsed
+            loyalty_points_used: loyaltyPointsUsed,
+            // Incluir total esperado para validación
+            expected_total: finalTotal
         };
         
         window.notifications.show('Creando pedido...', 'info');
@@ -1391,21 +1393,23 @@ async function processMobilePayment(orderId, amount, paymentType = 'yape') {
 }
 
 // Procesar transferencia bancaria
-async function processBankTransfer(orderId) {
+async function processBankTransfer(orderId, amount) {
     try {
         window.notifications.show('Registrando transferencia bancaria...', 'info');
         
-        // Para transferencia bancaria, el pago queda pendiente hasta confirmación manual
-        // El backend ya creó el pedido con payment_method: 'bank_transfer'
-        // Aquí solo confirmamos que el pedido fue creado
+        const paymentResponse = await window.api.processBankTransfer(orderId);
         
-        window.notifications.success('Transferencia bancaria registrada. Realiza la transferencia y envía el comprobante. Te contactaremos para confirmar el pago.');
+        if (!paymentResponse.success) {
+            throw new Error(paymentResponse.message || 'Error al procesar transferencia bancaria');
+        }
+        
+        window.notifications.success(paymentResponse.data?.message || 'Transferencia bancaria registrada. Realiza la transferencia y envía el comprobante.');
         
         return true;
         
     } catch (error) {
         console.error('Error procesando transferencia bancaria:', error);
-        window.notifications.info('El pedido fue creado. Por favor, realiza la transferencia y envía el comprobante.');
+        window.notifications.warning('El pedido fue creado. Por favor, realiza la transferencia y envía el comprobante.');
         return false;
     }
 }
