@@ -1229,26 +1229,52 @@ async function processStripePayment(orderId, amount) {
         });
         
         if (pmError) {
-            throw new Error(pmError.message || 'Error al crear método de pago');
+            // Mostrar error específico de Stripe
+            const errorElement = document.getElementById('stripe-card-errors');
+            if (errorElement) {
+                errorElement.textContent = pmError.message;
+            }
+            throw new Error(pmError.message || 'Error al procesar la tarjeta');
+        }
+        
+        // Limpiar errores previos
+        const errorElement = document.getElementById('stripe-card-errors');
+        if (errorElement) {
+            errorElement.textContent = '';
         }
         
         // Confirmar pago con el payment method
-        const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+        const { error: confirmError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
             payment_method: paymentMethod.id
         });
         
-        if (error) {
-            throw new Error(error.message || 'Error al procesar el pago');
+        if (confirmError) {
+            // Mostrar error específico
+            if (errorElement) {
+                errorElement.textContent = confirmError.message;
+            }
+            throw new Error(confirmError.message || 'Error al confirmar el pago');
         }
         
-        // Procesar pago en el backend
-        const paymentResponse = await window.api.processStripePayment(orderId, paymentMethod.id);
-        
-        if (!paymentResponse.success) {
-            throw new Error(paymentResponse.message || 'Error al confirmar el pago');
+        // Verificar que el pago fue exitoso
+        if (paymentIntent.status !== 'succeeded') {
+            throw new Error(`El pago no fue exitoso. Estado: ${paymentIntent.status}`);
         }
         
-        window.notifications.success('Pago procesado exitosamente');
+        // Procesar pago en backend para actualizar estado del pedido
+        try {
+            const paymentResponse = await window.api.processStripePayment(orderId, paymentMethod.id);
+            if (!paymentResponse.success) {
+                console.warn('Advertencia: El pago fue procesado en Stripe pero hubo un problema actualizando el pedido:', paymentResponse.message);
+                // No lanzar error aquí porque el pago ya fue exitoso en Stripe
+            }
+        } catch (backendError) {
+            console.error('Error actualizando pedido en backend:', backendError);
+            // No lanzar error porque el pago ya fue exitoso en Stripe
+            // El webhook de Stripe actualizará el estado eventualmente
+        }
+        
+        window.notifications.success('Pago con tarjeta procesado exitosamente');
         
     } catch (error) {
         console.error('Error procesando pago Stripe:', error);
