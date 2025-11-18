@@ -1222,7 +1222,7 @@ async function processStripePayment(orderId, amount) {
                 address: {
                     line1: shippingData.address,
                     city: shippingData.city,
-                    country: shippingData.country,
+                    country: shippingData.country || 'PE',
                     postal_code: shippingData.postalCode
                 }
             }
