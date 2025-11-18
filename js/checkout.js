@@ -183,7 +183,7 @@ function renderStep(step) {
             if (selectedPaymentMethod === 'stripe') {
                 setTimeout(() => {
                     initializeStripeElements();
-                }, 100);
+                }, 300); // Aumentar timeout para dar tiempo al DOM
             }
             // Cargar información de métodos de pago
             if (selectedPaymentMethod === 'yape' || selectedPaymentMethod === 'plin') {
