@@ -556,6 +556,10 @@ function renderPaymentStep() {
                         </label>
                         <div id="stripe-card-element" class="stripe-card-element"></div>
                         <div id="stripe-card-errors" role="alert" class="stripe-card-errors"></div>
+                        <div class="stripe-security-info">
+                            <i class="fas fa-lock"></i>
+                            <span>Tu información está protegida por Stripe. No almacenamos los datos de tu tarjeta.</span>
+                        </div>
                     </div>
                     
                     <div class="stripe-payment-info">
