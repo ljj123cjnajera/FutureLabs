@@ -1478,9 +1478,20 @@ async function loadBankTransferInfo() {
     }
 }
 
+// Flag para evitar múltiples inicializaciones simultáneas
+let isInitializingStripe = false;
+
 // Inicializar Stripe Elements
 async function initializeStripeElements() {
+    // Evitar múltiples inicializaciones simultáneas
+    if (isInitializingStripe) {
+        console.log('Stripe Elements ya se está inicializando, esperando...');
+        return;
+    }
+
     try {
+        isInitializingStripe = true;
+
         // Verificar si Stripe.js está cargado
         if (typeof Stripe === 'undefined') {
             console.error('Stripe.js no está cargado');
@@ -1494,9 +1505,25 @@ async function initializeStripeElements() {
             console.error('Contenedor stripe-card-element no encontrado');
             // Reintentar después de un breve delay
             setTimeout(() => {
+                isInitializingStripe = false;
                 initializeStripeElements();
             }, 200);
             return;
+        }
+
+        // Si ya hay un elemento montado y funcionando, no hacer nada
+        if (stripeCardElement) {
+            try {
+                // Verificar si el elemento está montado correctamente
+                const mountedElement = cardElementContainer.querySelector('.StripeElement');
+                if (mountedElement) {
+                    console.log('Stripe Elements ya está montado, reutilizando...');
+                    isInitializingStripe = false;
+                    return;
+                }
+            } catch (e) {
+                // Si hay error verificando, continuar con la inicialización
+            }
         }
 
         // Obtener clave pública de Stripe del backend
@@ -1512,6 +1539,7 @@ async function initializeStripeElements() {
         } catch (error) {
             console.error('Error obteniendo clave pública de Stripe:', error);
             window.notifications?.warning('Stripe no está configurado. Por favor, usa otro método de pago o contacta con soporte.');
+            isInitializingStripe = false;
             return;
         }
         
@@ -1525,66 +1553,99 @@ async function initializeStripeElements() {
             stripeElements = stripe.elements();
         }
 
-        // Limpiar contenedor antes de crear nuevo elemento
-        cardElementContainer.innerHTML = '';
-
         // Si ya existe un elemento montado, desmontarlo primero
         if (stripeCardElement) {
             try {
                 stripeCardElement.unmount();
+                stripeCardElement = null;
             } catch (e) {
-                // Ignorar errores al desmontar
+                console.warn('Error al desmontar elemento anterior:', e);
+                // Continuar de todas formas
+                stripeCardElement = null;
             }
-            stripeCardElement = null;
         }
 
+        // Limpiar contenedor antes de crear nuevo elemento
+        cardElementContainer.innerHTML = '';
+
         // Crear elemento de tarjeta
-        stripeCardElement = stripeElements.create('card', {
-            style: {
-                base: {
-                    fontSize: '16px',
-                    color: '#424770',
-                    '::placeholder': {
-                        color: '#aab7c4',
+        try {
+            stripeCardElement = stripeElements.create('card', {
+                style: {
+                    base: {
+                        fontSize: '16px',
+                        color: '#424770',
+                        '::placeholder': {
+                            color: '#aab7c4',
+                        },
+                    },
+                    invalid: {
+                        color: '#9e2146',
                     },
                 },
-                invalid: {
-                    color: '#9e2146',
-                },
-            },
-        });
+            });
 
-        // Montar elemento
-        stripeCardElement.mount('#stripe-card-element');
+            // Montar elemento
+            stripeCardElement.mount('#stripe-card-element');
 
-        // Manejar errores de validación en tiempo real
-        stripeCardElement.on('change', (event) => {
-            const displayError = document.getElementById('stripe-card-errors');
-            if (displayError) {
-                if (event.error) {
-                    displayError.textContent = event.error.message;
-                } else {
-                    displayError.textContent = '';
+            // Manejar errores de validación en tiempo real
+            stripeCardElement.on('change', (event) => {
+                const displayError = document.getElementById('stripe-card-errors');
+                if (displayError) {
+                    if (event.error) {
+                        displayError.textContent = event.error.message;
+                    } else {
+                        displayError.textContent = '';
+                    }
                 }
-            }
-        });
+            });
 
-        console.log('Stripe Elements inicializado correctamente');
+            console.log('Stripe Elements inicializado correctamente');
+        } catch (createError) {
+            // Si el error es que ya existe un elemento, intentar obtenerlo
+            if (createError.message && createError.message.includes('Can only create one Element')) {
+                console.warn('Elemento de tarjeta ya existe, intentando reutilizar...');
+                // Limpiar y reintentar después de un breve delay
+                setTimeout(() => {
+                    // Resetear todo y reintentar
+                    stripeCardElement = null;
+                    stripeElements = null;
+                    isInitializingStripe = false;
+                    initializeStripeElements();
+                }, 500);
+                return;
+            }
+            throw createError;
+        }
 
     } catch (error) {
         console.error('Error inicializando Stripe:', error);
-        window.notifications?.warning('No se pudo inicializar el formulario de pago. Puedes usar otro método de pago.');
         
         // Mostrar mensaje de error más específico
         const cardElementContainer = document.getElementById('stripe-card-element');
         if (cardElementContainer) {
+            let errorMessage = 'Error al cargar el formulario de pago.';
+            
+            if (error.message && error.message.includes('Content blocker')) {
+                errorMessage = 'Por favor, desactiva el bloqueador de contenido para este sitio y recarga la página.';
+            } else if (error.message && error.message.includes('Can only create one Element')) {
+                errorMessage = 'El formulario ya está cargado. Si no lo ves, por favor recarga la página.';
+            }
+            
             cardElementContainer.innerHTML = `
                 <div style="padding: 20px; text-align: center; color: #dc2626;">
                     <i class="fas fa-exclamation-triangle"></i>
-                    <p style="margin: 10px 0 0 0;">Error al cargar el formulario de pago. Por favor, intenta recargar la página o usa otro método de pago.</p>
+                    <p style="margin: 10px 0 0 0;">${errorMessage}</p>
+                    <button onclick="location.reload()" style="margin-top: 10px; padding: 8px 16px; background: #dc2626; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Recargar Página
+                    </button>
                 </div>
             `;
         }
+        
+        window.notifications?.warning('No se pudo inicializar el formulario de pago. Puedes usar otro método de pago.');
+    } finally {
+        isInitializingStripe = false;
     }
 }
 
