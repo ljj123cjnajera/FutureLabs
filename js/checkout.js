@@ -745,11 +745,8 @@ function renderConfirmationStep() {
     `;
 }
 
-// Seleccionar método de pago
-function selectPaymentMethod(method) {
-    selectedPaymentMethod = method;
-    renderStep(2);
-}
+// Seleccionar método de pago (función antigua - reemplazada por la de abajo)
+// Esta función ya no se usa, se mantiene por compatibilidad
 
 // Obtener nombre del método de pago
 function getPaymentMethodName(method) {
@@ -1401,26 +1398,24 @@ function selectPaymentMethod(method) {
     selectedPaymentMethod = method;
     renderStep(2); // Re-renderizar el paso de pago
     
-    // Inicializar Stripe Elements si es necesario
-    if (method === 'stripe') {
-        setTimeout(() => {
+    // Inicializar métodos de pago después de que el DOM se actualice
+    // Usar un timeout más largo para asegurar que el DOM esté listo
+    setTimeout(() => {
+        // Inicializar Stripe Elements si es necesario
+        if (method === 'stripe') {
             initializeStripeElements();
-        }, 100);
-    }
-    
-    // Cargar información bancaria si es transferencia
-    if (method === 'bank_transfer') {
-        setTimeout(() => {
+        }
+        
+        // Cargar información bancaria si es transferencia
+        if (method === 'bank_transfer') {
             loadBankTransferInfo();
-        }, 100);
-    }
-    
-    // Cargar información de cuenta móvil si es Yape/Plin
-    if (method === 'yape' || method === 'plin') {
-        setTimeout(() => {
+        }
+        
+        // Cargar información de cuenta móvil si es Yape/Plin
+        if (method === 'yape' || method === 'plin') {
             loadMobilePaymentInfo(method);
-        }, 100);
-    }
+        }
+    }, 300); // Aumentar timeout para dar tiempo al DOM
 }
 
 // Cargar información de cuenta Yape/Plin
@@ -1488,7 +1483,19 @@ async function initializeStripeElements() {
     try {
         // Verificar si Stripe.js está cargado
         if (typeof Stripe === 'undefined') {
+            console.error('Stripe.js no está cargado');
             window.notifications?.warning('Stripe no está disponible. Por favor, recarga la página.');
+            return;
+        }
+
+        // Verificar que el contenedor exista
+        const cardElementContainer = document.getElementById('stripe-card-element');
+        if (!cardElementContainer) {
+            console.error('Contenedor stripe-card-element no encontrado');
+            // Reintentar después de un breve delay
+            setTimeout(() => {
+                initializeStripeElements();
+            }, 200);
             return;
         }
 
@@ -1508,21 +1515,28 @@ async function initializeStripeElements() {
             return;
         }
         
+        // Inicializar Stripe si no está inicializado
         if (!stripe) {
             stripe = Stripe(stripePublicKey);
         }
 
-        // Crear elementos
+        // Crear elementos si no existen
         if (!stripeElements) {
             stripeElements = stripe.elements();
         }
 
-        // Crear elemento de tarjeta
-        const cardElementContainer = document.getElementById('stripe-card-element');
-        if (!cardElementContainer) return;
-
-        // Limpiar contenedor
+        // Limpiar contenedor antes de crear nuevo elemento
         cardElementContainer.innerHTML = '';
+
+        // Si ya existe un elemento montado, desmontarlo primero
+        if (stripeCardElement) {
+            try {
+                stripeCardElement.unmount();
+            } catch (e) {
+                // Ignorar errores al desmontar
+            }
+            stripeCardElement = null;
+        }
 
         // Crear elemento de tarjeta
         stripeCardElement = stripeElements.create('card', {
@@ -1543,19 +1557,34 @@ async function initializeStripeElements() {
         // Montar elemento
         stripeCardElement.mount('#stripe-card-element');
 
-        // Manejar errores
+        // Manejar errores de validación en tiempo real
         stripeCardElement.on('change', (event) => {
             const displayError = document.getElementById('stripe-card-errors');
-            if (event.error) {
-                displayError.textContent = event.error.message;
-            } else {
-                displayError.textContent = '';
+            if (displayError) {
+                if (event.error) {
+                    displayError.textContent = event.error.message;
+                } else {
+                    displayError.textContent = '';
+                }
             }
         });
+
+        console.log('Stripe Elements inicializado correctamente');
 
     } catch (error) {
         console.error('Error inicializando Stripe:', error);
         window.notifications?.warning('No se pudo inicializar el formulario de pago. Puedes usar otro método de pago.');
+        
+        // Mostrar mensaje de error más específico
+        const cardElementContainer = document.getElementById('stripe-card-element');
+        if (cardElementContainer) {
+            cardElementContainer.innerHTML = `
+                <div style="padding: 20px; text-align: center; color: #dc2626;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p style="margin: 10px 0 0 0;">Error al cargar el formulario de pago. Por favor, intenta recargar la página o usa otro método de pago.</p>
+                </div>
+            `;
+        }
     }
 }
 
