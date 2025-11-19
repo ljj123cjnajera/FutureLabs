@@ -46,6 +46,10 @@
                     <i class="fas fa-shopping-bag"></i>
                     <span>Pedidos</span>
                 </div>
+                <div class="menu-item" data-section="payments">
+                    <i class="fas fa-credit-card"></i>
+                    <span>Pagos</span>
+                </div>
                 <div class="menu-item" data-section="users">
                     <i class="fas fa-users"></i>
                     <span>Usuarios</span>
@@ -277,6 +281,79 @@
                             <tbody id="ordersTable">
                                 <tr>
                                     <td colspan="7" style="text-align: center; padding: 40px;">Cargando...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Payments Section -->
+                <div class="section" id="payments">
+                    <div class="section-header">
+                        <h3>Gestión de Pagos</h3>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn-secondary" onclick="window.adminManager?.loadPayments('all')">
+                                <i class="fas fa-list"></i> Todas
+                            </button>
+                            <button class="btn-secondary" onclick="window.adminManager?.loadPayments('pending')">
+                                <i class="fas fa-clock"></i> Pendientes
+                            </button>
+                            <button class="btn-secondary" onclick="window.adminManager?.loadPayments('succeeded')">
+                                <i class="fas fa-check-circle"></i> Exitosos
+                            </button>
+                            <button class="btn-secondary" onclick="window.adminManager?.loadPayments('failed')">
+                                <i class="fas fa-times-circle"></i> Fallidos
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-grid" style="margin-bottom: 20px;">
+                        <div class="stat-card">
+                            <div class="stat-card-header">
+                                <div class="stat-card-title">Pendientes</div>
+                                <div class="stat-card-icon" style="background: #fff3cd; color: #ffc107;">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                            </div>
+                            <div class="stat-card-value" id="pendingPaymentsCount">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-header">
+                                <div class="stat-card-title">Monto Pendiente</div>
+                                <div class="stat-card-icon" style="background: #e3f2fd; color: #2196f3;">
+                                    <i class="fas fa-dollar-sign"></i>
+                                </div>
+                            </div>
+                            <div class="stat-card-value" id="pendingPaymentsAmount">S/ 0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-header">
+                                <div class="stat-card-title">Total Procesado</div>
+                                <div class="stat-card-icon" style="background: #e8f5e9; color: #4caf50;">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                            </div>
+                            <div class="stat-card-value" id="totalProcessedAmount">S/ 0</div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID Transacción</th>
+                                    <th>Pedido</th>
+                                    <th>Cliente</th>
+                                    <th>Método</th>
+                                    <th>Monto</th>
+                                    <th>Estado</th>
+                                    <th>Fecha</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="paymentsTable">
+                                <tr>
+                                    <td colspan="8" style="text-align: center; padding: 40px;">Cargando...</td>
                                 </tr>
                             </tbody>
                         </table>

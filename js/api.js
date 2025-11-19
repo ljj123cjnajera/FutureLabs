@@ -1034,6 +1034,51 @@ class FutureLabsAPI {
       method: 'DELETE'
     });
   }
+
+  // ===== ADMIN PAYMENTS =====
+  async getPaymentTransactions(filters = {}) {
+    const params = new URLSearchParams();
+    if (filters.status) params.append('status', filters.status);
+    if (filters.payment_method) params.append('payment_method', filters.payment_method);
+    if (filters.order_id) params.append('order_id', filters.order_id);
+    if (filters.user_email) params.append('user_email', filters.user_email);
+    const query = params.toString();
+    return this.request(`/admin/payments/transactions${query ? '?' + query : ''}`);
+  }
+
+  async getPendingPayments() {
+    return this.request('/admin/payments/pending');
+  }
+
+  async getPaymentStatistics(filters = {}) {
+    const params = new URLSearchParams();
+    if (filters.date_from) params.append('date_from', filters.date_from);
+    if (filters.date_to) params.append('date_to', filters.date_to);
+    const query = params.toString();
+    return this.request(`/admin/payments/statistics${query ? '?' + query : ''}`);
+  }
+
+  async getPaymentTransaction(transactionId) {
+    return this.request(`/admin/payments/transactions/${transactionId}`);
+  }
+
+  async confirmPayment(transactionId, adminNotes = null) {
+    return this.request('/admin/payments/confirm', {
+      method: 'POST',
+      body: JSON.stringify({ transaction_id: transactionId, admin_notes: adminNotes })
+    });
+  }
+
+  async updatePaymentStatus(transactionId, status) {
+    return this.request(`/admin/payments/transactions/${transactionId}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status })
+    });
+  }
+
+  async getPaymentNotifications() {
+    return this.request('/admin/payments/notifications');
+  }
 }
 
 // Crear instancia global

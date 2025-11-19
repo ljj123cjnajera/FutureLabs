@@ -94,6 +94,7 @@ class AdminManager {
       products: 'Productos',
       categories: 'Categorías',
       orders: 'Pedidos',
+      payments: 'Pagos',
       users: 'Usuarios',
       reviews: 'Reseñas',
       reports: 'Reportes',
@@ -115,6 +116,9 @@ class AdminManager {
         break;
       case 'products':
         await this.loadProducts();
+        break;
+      case 'payments':
+        await this.loadPayments('pending');
         break;
       case 'categories':
         await this.loadCategories();
