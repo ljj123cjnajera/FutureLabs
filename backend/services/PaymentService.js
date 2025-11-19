@@ -212,6 +212,7 @@ class PaymentService {
 
   // Procesar pago con Yape/Plin
   static async processMobilePayment(orderId, phoneNumber, amount, paymentType = 'yape') {
+    let transaction = null;
     try {
       const order = await Order.getById(orderId);
 
@@ -242,6 +243,19 @@ class PaymentService {
       const merchantPhone = paymentType === 'yape' ? yapePhone : plinPhone;
       const paymentId = `${paymentType.toUpperCase()}-${Date.now()}`;
       
+      // Crear registro de transacción
+      transaction = await PaymentTransaction.create({
+        order_id: orderId,
+        payment_method: paymentType,
+        amount: order.total_amount,
+        status: 'pending',
+        payment_id: paymentId,
+        metadata: {
+          customer_phone: phoneNumber,
+          merchant_phone: merchantPhone
+        }
+      });
+      
       // Marcar como pendiente - el pago se confirmará manualmente o mediante webhook
       // En producción, aquí iría la integración real con la API de Yape/Plin
       await Order.updatePaymentStatus(order.id, 'pending', paymentId);
@@ -253,11 +267,22 @@ class PaymentService {
         merchant_phone: merchantPhone,
         customer_phone: phoneNumber,
         amount: order.total_amount,
+        transaction_id: transaction.id,
         order: await Order.getById(order.id),
         message: `Pago con ${paymentType === 'yape' ? 'Yape' : 'Plin'} registrado. Realiza el pago a ${merchantPhone} y espera la confirmación.`
       };
     } catch (error) {
       console.error('Error procesando pago móvil:', error);
+      
+      // Actualizar transacción como fallida
+      if (transaction) {
+        await PaymentTransaction.updateStatus(
+          transaction.id, 
+          'failed', 
+          null, 
+          error.message
+        );
+      }
       
       if (orderId) {
         await Order.updatePaymentStatus(orderId, 'failed');
