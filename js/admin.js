@@ -799,6 +799,128 @@ function editProduct(productId, event) {
   }
 }
 
+// Funciones globales para pagos
+window.confirmPayment = async function(transactionId) {
+  if (!confirm('¿Estás seguro de confirmar este pago? Esto marcará el pedido como pagado.')) {
+    return;
+  }
+  
+  try {
+    window.notifications?.show('Confirmando pago...', 'info');
+    const response = await window.api.confirmPayment(transactionId);
+    
+    if (response.success) {
+      window.notifications?.success('Pago confirmado exitosamente');
+      // Recargar la lista de pagos
+      await window.adminManager?.loadPayments('pending');
+    } else {
+      throw new Error(response.message || 'Error al confirmar pago');
+    }
+  } catch (error) {
+    console.error('Error confirmando pago:', error);
+    window.notifications?.error('Error al confirmar pago: ' + (error.message || 'Error desconocido'));
+  }
+};
+
+window.viewPaymentDetails = async function(transactionId) {
+  try {
+    const response = await window.api.getPaymentTransaction(transactionId);
+    
+    if (response.success) {
+      const transaction = response.data;
+      const details = `
+        <div style="padding: 20px;">
+          <h3 style="margin-bottom: 20px;">Detalles de Transacción</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+            <div>
+              <strong>ID Transacción:</strong><br>
+              ${transaction.id}
+            </div>
+            <div>
+              <strong>Estado:</strong><br>
+              ${window.adminManager?.getPaymentStatusBadge(transaction.status)}
+            </div>
+            <div>
+              <strong>Método de Pago:</strong><br>
+              ${window.adminManager?.getPaymentMethodName(transaction.payment_method)}
+            </div>
+            <div>
+              <strong>Monto:</strong><br>
+              S/ ${parseFloat(transaction.amount || 0).toFixed(2)}
+            </div>
+            <div>
+              <strong>Pedido:</strong><br>
+              ${transaction.order_number || 'N/A'}
+            </div>
+            <div>
+              <strong>Cliente:</strong><br>
+              ${transaction.user_email || 'N/A'}
+            </div>
+            <div>
+              <strong>Fecha de Creación:</strong><br>
+              ${new Date(transaction.created_at).toLocaleString('es-PE')}
+            </div>
+            <div>
+              <strong>Última Actualización:</strong><br>
+              ${new Date(transaction.updated_at).toLocaleString('es-PE')}
+            </div>
+          </div>
+          ${transaction.error_message ? `
+            <div style="background: #fee; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #f00;">
+              <strong>Error:</strong><br>
+              ${transaction.error_message}
+            </div>
+          ` : ''}
+          ${transaction.metadata ? `
+            <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+              <strong>Metadata:</strong><br>
+              <pre style="margin: 10px 0; white-space: pre-wrap;">${JSON.stringify(transaction.metadata, null, 2)}</pre>
+            </div>
+          ` : ''}
+          ${transaction.status === 'pending' ? `
+            <div style="margin-top: 20px;">
+              <button class="btn-primary" onclick="window.confirmPayment('${transaction.id}'); window.closePaymentModal();">
+                <i class="fas fa-check"></i> Confirmar Pago
+              </button>
+            </div>
+          ` : ''}
+        </div>
+      `;
+      
+      // Crear modal
+      const modal = document.createElement('div');
+      modal.className = 'modal';
+      modal.style.display = 'flex';
+      modal.innerHTML = `
+        <div class="modal-content" style="max-width: 700px;">
+          <div class="modal-header">
+            <h3>Detalles de Transacción</h3>
+            <span class="modal-close" onclick="window.closePaymentModal()">&times;</span>
+          </div>
+          ${details}
+        </div>
+      `;
+      document.body.appendChild(modal);
+      
+      // Cerrar al hacer clic fuera
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          window.closePaymentModal();
+        }
+      });
+      
+      window.closePaymentModal = function() {
+        modal.remove();
+      };
+    } else {
+      throw new Error(response.message || 'Error al cargar detalles');
+    }
+  } catch (error) {
+    console.error('Error cargando detalles de pago:', error);
+    window.notifications?.error('Error al cargar detalles: ' + (error.message || 'Error desconocido'));
+  }
+};
+
 function deleteProduct(productId) {
   if (window.adminCRUD && window.adminCRUD.deleteProduct) {
     window.adminCRUD.deleteProduct(productId);
