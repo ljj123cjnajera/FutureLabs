@@ -1,6 +1,8 @@
 const stripe = process.env.STRIPE_SECRET_KEY ? require('stripe')(process.env.STRIPE_SECRET_KEY) : null;
 const Order = require('../models/Order');
 const PaymentTransaction = require('../models/PaymentTransaction');
+const emailService = require('./emailService');
+const User = require('../models/User');
 
 class PaymentService {
   // Procesar pago con Stripe (ya confirmado en frontend)

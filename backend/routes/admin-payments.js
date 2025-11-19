@@ -3,6 +3,7 @@ const router = express.Router();
 const { authenticateToken, requireAdmin } = require('../middleware/auth');
 const PaymentTransaction = require('../models/PaymentTransaction');
 const PaymentService = require('../services/PaymentService');
+const NotificationService = require('../services/NotificationService');
 const { body, validationResult } = require('express-validator');
 
 // GET /api/admin/payments/transactions - Obtener todas las transacciones
@@ -69,6 +70,24 @@ router.get('/statistics', authenticateToken, requireAdmin, async (req, res) => {
     res.status(500).json({
       success: false,
       message: error.message || 'Error obteniendo estadísticas'
+    });
+  }
+});
+
+// GET /api/admin/payments/notifications - Obtener resumen de notificaciones pendientes
+router.get('/notifications', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const summary = await NotificationService.getPendingNotificationsSummary();
+
+    res.json({
+      success: true,
+      data: summary
+    });
+  } catch (error) {
+    console.error('Error obteniendo resumen de notificaciones:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error obteniendo resumen de notificaciones'
     });
   }
 });

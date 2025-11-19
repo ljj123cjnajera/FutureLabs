@@ -79,19 +79,48 @@ router.post('/', authenticateToken, createOrderValidation, async (req, res) => {
     // Enviar email de confirmación en background
     const user = await User.getById(req.user.id);
     if (user && user.email) {
-      emailService.sendOrderConfirmation(
-        user.email,
-        {
-          order_number: order.order_number,
-          total_amount: order.total_amount,
-          items: order.items,
-          shipping_address: order.shipping_address,
-          shipping_city: order.shipping_city,
-          shipping_country: order.shipping_country
-        },
-        `${user.first_name} ${user.last_name}`
-      ).then(() => console.log('✅ Email de confirmación de pedido enviado'))
-       .catch((error) => console.log('⚠️  Error enviando email de confirmación:', error.message));
+      // Determinar qué tipo de email enviar según el estado de pago
+      if (order.payment_status === 'paid') {
+        // Si ya está pagado, enviar email de pago exitoso
+        emailService.sendPaymentSuccess(
+          user.email,
+          order,
+          `${user.first_name} ${user.last_name}`,
+          order.payment_method
+        ).then(() => console.log('✅ Email de pago exitoso enviado'))
+         .catch((error) => console.log('⚠️  Error enviando email de pago exitoso:', error.message));
+      } else if (order.payment_status === 'pending') {
+        // Si está pendiente, enviar email con instrucciones
+        const paymentInstructions = emailService.getPendingPaymentInstructions(order.payment_method, order);
+        emailService.sendPaymentPending(
+          user.email,
+          order,
+          `${user.first_name} ${user.last_name}`,
+          order.payment_method,
+          paymentInstructions
+        ).then(() => console.log('✅ Email de pago pendiente enviado'))
+         .catch((error) => console.log('⚠️  Error enviando email de pago pendiente:', error.message));
+      } else {
+        // Email de confirmación de pedido genérico
+        emailService.sendOrderConfirmation(
+          user.email,
+          {
+            order_number: order.order_number,
+            total_amount: order.total_amount,
+            items: order.items,
+            shipping_address: order.shipping_address,
+            shipping_city: order.shipping_city,
+            shipping_country: order.shipping_country,
+            shipping_phone: order.shipping_phone,
+            payment_status: order.payment_status,
+            payment_method: order.payment_method,
+            coupon_discount: order.coupon_discount || 0,
+            loyalty_points_discount: order.loyalty_points_discount || 0
+          },
+          `${user.first_name} ${user.last_name}`
+        ).then(() => console.log('✅ Email de confirmación de pedido enviado'))
+         .catch((error) => console.log('⚠️  Error enviando email de confirmación:', error.message));
+      }
     }
 
     res.status(201).json({
