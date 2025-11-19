@@ -90,10 +90,32 @@ class PaymentService {
         await PaymentTransaction.updateStatus(transaction.id, 'succeeded', paymentIntent.id);
       }
 
+      const updatedOrder = await Order.getById(order.id);
+
+      // Enviar email de pago exitoso y notificaciones
+      try {
+        const user = await User.getById(order.user_id);
+        if (user && user.email) {
+          emailService.sendPaymentSuccess(
+            user.email,
+            updatedOrder,
+            `${user.first_name} ${user.last_name}`,
+            'stripe'
+          ).catch(err => console.error('Error enviando email de pago exitoso:', err));
+          
+          // Notificar confirmación
+          NotificationService.notifyPaymentConfirmed(order.id).catch(err => 
+            console.error('Error en notificación:', err)
+          );
+        }
+      } catch (emailError) {
+        console.error('Error obteniendo usuario para email:', emailError);
+      }
+
       return {
         success: true,
         payment_intent: paymentIntent,
-        order: await Order.getById(order.id)
+        order: updatedOrder
       };
     } catch (error) {
       console.error('Error procesando pago con Stripe:', error);
@@ -113,6 +135,28 @@ class PaymentService {
         if (orderId) {
           try {
             await Order.updatePaymentStatus(orderId, 'failed');
+            
+            // Enviar email de pago fallido
+            try {
+              const failedOrder = await Order.getById(orderId);
+              if (failedOrder) {
+                const user = await User.getById(failedOrder.user_id);
+                if (user && user.email) {
+                  emailService.sendPaymentFailed(
+                    user.email,
+                    failedOrder,
+                    `${user.first_name} ${user.last_name}`,
+                    error.message
+                  ).catch(err => console.error('Error enviando email de pago fallido:', err));
+                  
+                  NotificationService.notifyPaymentFailed(orderId, error.message).catch(err => 
+                    console.error('Error en notificación de pago fallido:', err)
+                  );
+                }
+              }
+            } catch (emailError) {
+              console.error('Error obteniendo usuario para email de pago fallido:', emailError);
+            }
           } catch (updateError) {
             console.error('Error actualizando estado a fallido:', updateError);
           }
@@ -262,6 +306,30 @@ class PaymentService {
       // En producción, aquí iría la integración real con la API de Yape/Plin
       await Order.updatePaymentStatus(order.id, 'pending', paymentId);
 
+      const updatedOrder = await Order.getById(order.id);
+
+      // Enviar email de pago pendiente y notificaciones
+      try {
+        const user = await User.getById(order.user_id);
+        if (user && user.email) {
+          const paymentInstructions = emailService.getPendingPaymentInstructions(paymentType, updatedOrder);
+          emailService.sendPaymentPending(
+            user.email,
+            updatedOrder,
+            `${user.first_name} ${user.last_name}`,
+            paymentType,
+            paymentInstructions
+          ).catch(err => console.error('Error enviando email de pago pendiente:', err));
+          
+          // Notificar a admin sobre pago pendiente
+          NotificationService.notifyAdminPendingPayment(transaction.id).catch(err => 
+            console.error('Error en notificación a admin:', err)
+          );
+        }
+      } catch (emailError) {
+        console.error('Error obteniendo usuario para email:', emailError);
+      }
+
       return {
         success: true,
         payment_id: paymentId,
@@ -270,7 +338,7 @@ class PaymentService {
         customer_phone: phoneNumber,
         amount: order.total_amount,
         transaction_id: transaction.id,
-        order: await Order.getById(order.id),
+        order: updatedOrder,
         message: `Pago con ${paymentType === 'yape' ? 'Yape' : 'Plin'} registrado. Realiza el pago a ${merchantPhone} y espera la confirmación.`
       };
     } catch (error) {
@@ -323,10 +391,34 @@ class PaymentService {
       // Pago en efectivo: el estado queda en pending hasta que se confirme
       await Order.updatePaymentStatus(order.id, 'pending', paymentId);
 
+      const updatedOrder = await Order.getById(order.id);
+
+      // Enviar email de pago pendiente y notificaciones
+      try {
+        const user = await User.getById(order.user_id);
+        if (user && user.email) {
+          const paymentInstructions = emailService.getPendingPaymentInstructions('cash', updatedOrder);
+          emailService.sendPaymentPending(
+            user.email,
+            updatedOrder,
+            `${user.first_name} ${user.last_name}`,
+            'cash',
+            paymentInstructions
+          ).catch(err => console.error('Error enviando email de pago pendiente:', err));
+          
+          // Notificar a admin sobre pago pendiente
+          NotificationService.notifyAdminPendingPayment(transaction.id).catch(err => 
+            console.error('Error en notificación a admin:', err)
+          );
+        }
+      } catch (emailError) {
+        console.error('Error obteniendo usuario para email:', emailError);
+      }
+
       return {
         success: true,
         transaction_id: transaction.id,
-        order: await Order.getById(order.id),
+        order: updatedOrder,
         message: 'Pago en efectivo registrado. Se confirmará al momento de la entrega.'
       };
     } catch (error) {
@@ -384,6 +476,30 @@ class PaymentService {
       
       await Order.updatePaymentStatus(order.id, 'pending', paymentId);
 
+      const updatedOrder = await Order.getById(order.id);
+
+      // Enviar email de pago pendiente y notificaciones
+      try {
+        const user = await User.getById(order.user_id);
+        if (user && user.email) {
+          const paymentInstructions = emailService.getPendingPaymentInstructions('bank_transfer', updatedOrder);
+          emailService.sendPaymentPending(
+            user.email,
+            updatedOrder,
+            `${user.first_name} ${user.last_name}`,
+            'bank_transfer',
+            paymentInstructions
+          ).catch(err => console.error('Error enviando email de pago pendiente:', err));
+          
+          // Notificar a admin sobre pago pendiente
+          NotificationService.notifyAdminPendingPayment(transaction.id).catch(err => 
+            console.error('Error en notificación a admin:', err)
+          );
+        }
+      } catch (emailError) {
+        console.error('Error obteniendo usuario para email:', emailError);
+      }
+
       return {
         success: true,
         payment_id: paymentId,
@@ -392,7 +508,7 @@ class PaymentService {
         bank_account: bankAccount,
         bank_name: bankName,
         bank_cci: bankCCI,
-        order: await Order.getById(order.id),
+        order: updatedOrder,
         message: 'Transferencia bancaria registrada. Realiza la transferencia y envía el comprobante. Espera la confirmación.'
       };
     } catch (error) {
@@ -441,11 +557,33 @@ class PaymentService {
       // Actualizar pedido
       await Order.updatePaymentStatus(order.id, 'paid', transaction.payment_id);
 
+      const updatedOrder = await Order.getById(order.id);
+
+      // Enviar email de pago exitoso y notificaciones
+      try {
+        const user = await User.getById(order.user_id);
+        if (user && user.email) {
+          emailService.sendPaymentSuccess(
+            user.email,
+            updatedOrder,
+            `${user.first_name} ${user.last_name}`,
+            transaction.payment_method
+          ).catch(err => console.error('Error enviando email de pago exitoso:', err));
+          
+          // Notificar confirmación
+          NotificationService.notifyPaymentConfirmed(order.id).catch(err => 
+            console.error('Error en notificación:', err)
+          );
+        }
+      } catch (emailError) {
+        console.error('Error obteniendo usuario para email:', emailError);
+      }
+
       return {
         success: true,
         message: 'Pago confirmado exitosamente',
         transaction: await PaymentTransaction.getById(transaction.id),
-        order: await Order.getById(order.id)
+        order: updatedOrder
       };
     } catch (error) {
       console.error('Error confirmando pago pendiente:', error);
