@@ -1,9 +1,11 @@
 const stripe = process.env.STRIPE_SECRET_KEY ? require('stripe')(process.env.STRIPE_SECRET_KEY) : null;
 const Order = require('../models/Order');
+const PaymentTransaction = require('../models/PaymentTransaction');
 
 class PaymentService {
   // Procesar pago con Stripe (ya confirmado en frontend)
   static async processStripePayment(orderId, paymentMethodId) {
+    let transaction = null;
     try {
       if (!stripe) {
         throw new Error('Stripe no está configurado. Configura STRIPE_SECRET_KEY en las variables de entorno.');
@@ -24,18 +26,41 @@ class PaymentService {
         };
       }
 
-      // Buscar el payment intent asociado al pedido
-      // El frontend ya confirmó el pago, aquí solo actualizamos el estado
-      // Buscar por metadata
-      const paymentIntents = await stripe.paymentIntents.list({
-        limit: 10,
-        metadata: { order_id: order.id.toString() }
+      // Crear registro de transacción
+      transaction = await PaymentTransaction.create({
+        order_id: orderId,
+        payment_method: 'stripe',
+        amount: order.total_amount,
+        status: 'processing',
+        payment_id: paymentMethodId,
+        metadata: { payment_method_id: paymentMethodId }
       });
 
-      let paymentIntent = paymentIntents.data.find(pi => 
-        pi.metadata.order_id === order.id.toString() && 
-        pi.status === 'succeeded'
-      );
+      // Buscar el payment intent asociado al pedido
+      // El frontend ya confirmó el pago, aquí solo actualizamos el estado
+      // Buscar por metadata o payment_id del pedido
+      let paymentIntent = null;
+      
+      if (order.payment_id) {
+        try {
+          paymentIntent = await stripe.paymentIntents.retrieve(order.payment_id);
+        } catch (e) {
+          console.warn('No se pudo recuperar payment intent por payment_id:', e.message);
+        }
+      }
+
+      if (!paymentIntent) {
+        // Buscar por metadata
+        const paymentIntents = await stripe.paymentIntents.list({
+          limit: 10,
+          metadata: { order_id: order.id.toString() }
+        });
+
+        paymentIntent = paymentIntents.data.find(pi => 
+          pi.metadata.order_id === order.id.toString() && 
+          pi.status === 'succeeded'
+        );
+      }
 
       // Si no encontramos el payment intent, el pago ya fue procesado en frontend
       // Solo actualizamos el estado del pedido
@@ -45,6 +70,10 @@ class PaymentService {
         if (paymentMethod) {
           // Actualizar estado del pedido como pagado
           await Order.updatePaymentStatus(order.id, 'paid', paymentMethodId);
+          
+          // Actualizar transacción
+          await PaymentTransaction.updateStatus(transaction.id, 'succeeded', paymentMethodId);
+          
           return {
             success: true,
             message: 'Pago procesado exitosamente',
@@ -54,6 +83,9 @@ class PaymentService {
       } else {
         // Actualizar estado del pedido
         await Order.updatePaymentStatus(order.id, 'paid', paymentIntent.id);
+        
+        // Actualizar transacción
+        await PaymentTransaction.updateStatus(transaction.id, 'succeeded', paymentIntent.id);
       }
 
       return {
@@ -63,6 +95,16 @@ class PaymentService {
       };
     } catch (error) {
       console.error('Error procesando pago con Stripe:', error);
+      
+      // Actualizar transacción como fallida
+      if (transaction) {
+        await PaymentTransaction.updateStatus(
+          transaction.id, 
+          'failed', 
+          null, 
+          error.message
+        );
+      }
       
       // No actualizar a fallido si el error es que ya está pagado
       if (error.message && !error.message.includes('ya ha sido pagado')) {
@@ -227,6 +269,7 @@ class PaymentService {
 
   // Procesar pago en efectivo (contra entrega)
   static async processCashPayment(orderId) {
+    let transaction = null;
     try {
       const order = await Order.getById(orderId);
 
@@ -238,22 +281,47 @@ class PaymentService {
         throw new Error('El pedido ya ha sido pagado');
       }
 
+      const paymentId = `CASH-${Date.now()}`;
+
+      // Crear registro de transacción
+      transaction = await PaymentTransaction.create({
+        order_id: orderId,
+        payment_method: 'cash',
+        amount: order.total_amount,
+        status: 'pending',
+        payment_id: paymentId,
+        metadata: { type: 'contra_entrega' }
+      });
+
       // Pago en efectivo: el estado queda en pending hasta que se confirme
-      await Order.updatePaymentStatus(order.id, 'pending');
+      await Order.updatePaymentStatus(order.id, 'pending', paymentId);
 
       return {
         success: true,
+        transaction_id: transaction.id,
         order: await Order.getById(order.id),
         message: 'Pago en efectivo registrado. Se confirmará al momento de la entrega.'
       };
     } catch (error) {
       console.error('Error procesando pago en efectivo:', error);
+      
+      // Actualizar transacción como fallida
+      if (transaction) {
+        await PaymentTransaction.updateStatus(
+          transaction.id, 
+          'failed', 
+          null, 
+          error.message
+        );
+      }
+      
       throw error;
     }
   }
 
   // Procesar transferencia bancaria
   static async processBankTransfer(orderId) {
+    let transaction = null;
     try {
       const order = await Order.getById(orderId);
 
@@ -265,24 +333,95 @@ class PaymentService {
         throw new Error('El pedido ya ha sido pagado');
       }
 
+      // Obtener información bancaria
+      const bankAccount = process.env.BANK_ACCOUNT || null;
+      const bankName = process.env.BANK_NAME || 'Banco de la Nación';
+      const bankCCI = process.env.BANK_CCI || null;
+
       // Transferencia bancaria: el estado queda en pending hasta que se confirme
       const paymentId = `BANK-TRANSFER-${Date.now()}`;
+      
+      // Crear registro de transacción
+      transaction = await PaymentTransaction.create({
+        order_id: orderId,
+        payment_method: 'bank_transfer',
+        amount: order.total_amount,
+        status: 'pending',
+        payment_id: paymentId,
+        metadata: {
+          bank_account: bankAccount,
+          bank_name: bankName,
+          bank_cci: bankCCI
+        }
+      });
+      
       await Order.updatePaymentStatus(order.id, 'pending', paymentId);
 
       return {
         success: true,
         payment_id: paymentId,
         payment_type: 'bank_transfer',
+        transaction_id: transaction.id,
+        bank_account: bankAccount,
+        bank_name: bankName,
+        bank_cci: bankCCI,
         order: await Order.getById(order.id),
         message: 'Transferencia bancaria registrada. Realiza la transferencia y envía el comprobante. Espera la confirmación.'
       };
     } catch (error) {
       console.error('Error procesando transferencia bancaria:', error);
       
+      // Actualizar transacción como fallida
+      if (transaction) {
+        await PaymentTransaction.updateStatus(
+          transaction.id, 
+          'failed', 
+          null, 
+          error.message
+        );
+      }
+      
       if (orderId) {
         await Order.updatePaymentStatus(orderId, 'failed');
       }
 
+      throw error;
+    }
+  }
+
+  // Confirmar pago pendiente (admin)
+  static async confirmPendingPayment(transactionId, adminNotes = null) {
+    try {
+      const transaction = await PaymentTransaction.getById(transactionId);
+      
+      if (!transaction) {
+        throw new Error('Transacción no encontrada');
+      }
+
+      if (transaction.status !== 'pending') {
+        throw new Error(`La transacción ya está ${transaction.status}. Solo se pueden confirmar pagos pendientes.`);
+      }
+
+      const order = await Order.getById(transaction.order_id);
+      
+      if (!order) {
+        throw new Error('Pedido no encontrado');
+      }
+
+      // Actualizar transacción
+      await PaymentTransaction.updateStatus(transaction.id, 'succeeded', transaction.payment_id);
+      
+      // Actualizar pedido
+      await Order.updatePaymentStatus(order.id, 'paid', transaction.payment_id);
+
+      return {
+        success: true,
+        message: 'Pago confirmado exitosamente',
+        transaction: await PaymentTransaction.getById(transaction.id),
+        order: await Order.getById(order.id)
+      };
+    } catch (error) {
+      console.error('Error confirmando pago pendiente:', error);
       throw error;
     }
   }
