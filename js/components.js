@@ -8,12 +8,11 @@ class Components {
         <div class="container">
           <div class="footer-content">
             <div class="footer-column">
-              <h3>Sobre FutureLabs</h3>
+              <h3>Sobre SneakersShop</h3>
               <ul>
                 <li><a href="about.html">Quiénes somos</a></li>
                 <li><a href="blog.html">Blog</a></li>
                 <li><a href="contact.html">Trabaja con nosotros</a></li>
-                <li><a href="contact.html">Sala de prensa</a></li>
               </ul>
             </div>
             <div class="footer-column">
@@ -68,7 +67,7 @@ class Components {
             </div>
           </div>
           <div class="copyright">
-            <p>&copy; ${new Date().getFullYear()} FutureLabs. Todos los derechos reservados.</p>
+            <p>&copy; ${new Date().getFullYear()} SneakersShop. Todos los derechos reservados.</p>
           </div>
         </div>
       </footer>
@@ -78,12 +77,12 @@ class Components {
   static getHeader(showSearch = true, showNav = true) {
     const searchBar = showSearch ? `
             <div class="search-bar">
-              <input type="text" placeholder="Busca en FutureLabs.com" id="searchInput">
+              <input type="text" placeholder="Buscar en SneakersShop..." id="searchInput">
               <button class="search-btn" onclick="performSearch()"><i class="fas fa-search"></i></button>
               <div id="searchSuggestions" class="search-suggestions" style="display: none;"></div>
             </div>
     ` : '';
-    
+
     const navBar = showNav ? `
           <nav class="nav-bar">
             <a href="products.html" class="all-categories"><i class="fas fa-bars"></i> Todas las categorías</a>
@@ -96,15 +95,14 @@ class Components {
             <a href="financing.html"><i class="fas fa-university"></i> Financiamiento</a>
           </nav>
     ` : '';
-    
+
     return `
       <!-- Header -->
       <header class="header">
         <div class="container">
           <div class="top-bar ${!showSearch && !showNav ? 'header-simple' : ''}">
             <div class="logo" onclick="window.location.href='index.html'">
-              <i class="fas fa-rocket"></i>
-              FutureLabs
+              <img src="assets/images/logo-original.jpg" alt="SneakersShop" style="height: 60px; max-width: 200px; object-fit: contain;">
             </div>
             ${searchBar}
             <div class="user-actions">
@@ -130,11 +128,11 @@ class Components {
     console.log('🔵 [COMPONENTS] initHeader() ejecutado');
     this.ensureWishlistAssets();
     this.ensureVerificationAssets();
-    
+
     // FORZAR VISIBILIDAD DE TODOS LOS BOTONES DEL HEADER
     function forceAllHeaderButtons() {
       console.log('🔵 [COMPONENTS] forceAllHeaderButtons() ejecutado');
-      
+
       // Lista de todos los botones que necesitan fix (sin home-link que fue eliminado)
       const buttonsToFix = [
         'a.affiliate-link',
@@ -144,16 +142,16 @@ class Components {
         'a.admin-link',
         '.admin-link'
       ];
-      
+
       buttonsToFix.forEach(selector => {
         const buttons = document.querySelectorAll(selector);
         buttons.forEach(button => {
           if (button) {
             console.log(`🔵 [COMPONENTS] Aplicando fix a: ${selector}`, button);
-            
+
             // Eliminar estilos primero
             button.removeAttribute('style');
-            
+
             // Aplicar estilos críticos
             button.style.setProperty('background', 'rgb(255, 255, 255)', 'important');
             button.style.setProperty('background-color', 'rgb(255, 255, 255)', 'important');
@@ -164,7 +162,7 @@ class Components {
             button.style.setProperty('position', 'relative', 'important');
             button.style.setProperty('z-index', '1000', 'important');
             button.style.setProperty('pointer-events', 'auto', 'important');
-            
+
             // Iconos dentro del botón
             const icons = button.querySelectorAll('i');
             icons.forEach(icon => {
@@ -172,44 +170,44 @@ class Components {
               icon.style.setProperty('opacity', '1', 'important');
               icon.style.setProperty('visibility', 'visible', 'important');
             });
-            
+
             // Remover clases problemáticas
             button.classList.remove('btn-ghost', 'btn-outline');
           }
         });
       });
     }
-    
+
     // Ejecutar para TODOS los botones
     forceAllHeaderButtons();
-    
+
     // Ejecutar inmediatamente y varias veces para asegurar que se apliquen los estilos
     setTimeout(() => { forceAllHeaderButtons(); }, 0);
     setTimeout(() => { forceAllHeaderButtons(); }, 50);
     setTimeout(() => { forceAllHeaderButtons(); }, 100);
     setTimeout(() => { forceAllHeaderButtons(); }, 300);
     setTimeout(() => { forceAllHeaderButtons(); }, 500);
-    
+
     // Manejar botón de cuenta
     const accountLink = document.getElementById('accountLink');
     const accountText = document.getElementById('accountText');
-    
+
     if (accountLink && accountText) {
       // Función para habilitar el botón
       const enableButton = () => {
         accountLink.style.pointerEvents = 'auto';
         accountLink.style.opacity = '1';
       };
-      
+
       // Función para deshabilitar el botón
       const disableButton = () => {
         accountLink.style.pointerEvents = 'none';
         accountLink.style.opacity = '0.5';
       };
-      
+
       // Deshabilitar el botón mientras está inicializando
       disableButton();
-      
+
       // Verificar periódicamente si la inicialización se completó
       const checkInitialization = setInterval(() => {
         if (window.authManager && !window.authManager.isInitializing) {
@@ -218,16 +216,16 @@ class Components {
           console.log('✅ Botón "Cuenta" habilitado');
         }
       }, 100);
-      
-      accountLink.addEventListener('click', function(e) {
+
+      accountLink.addEventListener('click', function (e) {
         e.preventDefault();
-        
+
         // Verificar si está inicializando
         if (window.authManager && window.authManager.isInitializing) {
           console.log('⏳ AuthManager está inicializando, esperando...');
           return;
         }
-        
+
         if (window.authManager && window.authManager.isAuthenticated()) {
           window.location.href = 'profile.html';
         } else {
@@ -236,17 +234,17 @@ class Components {
           }
         }
       });
-      
+
       // Actualizar texto del botón si está autenticado
       if (window.authManager && window.authManager.isAuthenticated()) {
         accountText.textContent = 'Mi Cuenta';
       }
-      
+
       // Escuchar cambios en el estado de autenticación
       document.addEventListener('authStateChanged', async () => {
         if (window.authManager && window.authManager.isAuthenticated()) {
           accountText.textContent = 'Mi Cuenta';
-          
+
           // Verificar si es admin y mostrar botón de admin
           try {
             const user = await window.authManager.getCurrentUser();
@@ -263,7 +261,7 @@ class Components {
           this.hideAdminButton();
         }
       });
-      
+
       // Verificar si ya hay usuario admin al inicializar
       setTimeout(async () => {
         await this.checkAndShowAdminButton();
@@ -276,10 +274,10 @@ class Components {
     if (document.getElementById('adminButton')) {
       return;
     }
-    
+
     const userActions = document.querySelector('.user-actions');
     if (!userActions) return;
-    
+
     // Crear botón de admin
     const adminButton = document.createElement('a');
     adminButton.href = 'admin.html';
@@ -287,21 +285,21 @@ class Components {
     adminButton.id = 'adminButton';
     adminButton.innerHTML = '<i class="fas fa-cog"></i> Admin';
     adminButton.style.cssText = 'color: #667eea; font-weight: 600;';
-    
+
     // Insertar antes del botón de cuenta
     const accountLink = document.getElementById('accountLink');
     if (accountLink && accountLink.parentNode) {
       userActions.insertBefore(adminButton, accountLink);
     }
   }
-  
+
   static hideAdminButton() {
     const adminButton = document.getElementById('adminButton');
     if (adminButton) {
       adminButton.remove();
     }
   }
-  
+
   static async checkAndShowAdminButton() {
     try {
       if (window.authManager && window.authManager.isAuthenticated()) {
@@ -402,7 +400,7 @@ class Components {
       document.body.appendChild(script);
     }
   }
-  
+
   static initCartCounter() {
     // Actualizar contador de carrito
     document.addEventListener('cartUpdated', (e) => {

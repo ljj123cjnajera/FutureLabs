@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Wishlist - FutureLabs</title>
+    <title>Mi Wishlist - SneakersShop</title>
     
     <!-- Google Fonts - Fuentes Profesionales -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -455,7 +455,7 @@
             function renderWishlistCard(item, isSelected, index) {
                 const hasDiscount = Boolean(item.discount_price);
                 const isAvailable = Number(item.stock_quantity || 0) > 0;
-                const productName = escapeHTML(item.product_name || 'Producto FutureLabs');
+                const productName = escapeHTML(item.product_name || 'Producto SneakersShop');
                 const availabilityLabel = isAvailable 
                     ? '<span class="wishlist-badge success" aria-label="Producto disponible">Disponible</span>' 
                     : '<span class="wishlist-badge warning" aria-label="Producto agotado">Agotado</span>';
@@ -478,12 +478,12 @@
                                 aria-label="Seleccionar ${productName}">
                         </div>
                         <div class="wishlist-item-media">
-                            <img src="${item.image_url || 'https://via.placeholder.com/480x480?text=FutureLabs'}" alt="${productName}">
+                            <img src="${item.image_url || 'https://via.placeholder.com/480x480?text=SneakersShop'}" alt="${productName}">
                             ${hasDiscount ? '<span class="wishlist-item-badge" aria-label="Producto en oferta">Oferta</span>' : ''}
                         </div>
                         <div class="wishlist-item-body">
                             <div class="wishlist-item-meta">
-                                <span class="wishlist-item-brand">${escapeHTML(item.brand || 'FutureLabs')}</span>
+                                <span class="wishlist-item-brand">${escapeHTML(item.brand || 'SneakersShop')}</span>
                                 ${availabilityLabel}
                             </div>
                             <button class="wishlist-item-title" type="button" data-product-link="${item.product_id}" aria-label="Ver detalles de ${productName}">
@@ -874,13 +874,13 @@
                 if (!list) return;
 
                 const shareUrl = `${window.location.origin}${window.location.pathname}?list=${list.id}`;
-                const message = `Lista "${list.name}" en FutureLabs (${list.items?.length || 0} productos)\n${shareUrl}`;
+                const message = `Lista "${list.name}" en SneakersShop (${list.items?.length || 0} productos)\n${shareUrl}`;
 
                 try {
                     if (navigator.share) {
                         await navigator.share({
-                            title: `Wishlist FutureLabs - ${list.name}`,
-                            text: `Mira mi lista "${list.name}" en FutureLabs`,
+                            title: `Wishlist SneakersShop - ${list.name}`,
+                            text: `Mira mi lista "${list.name}" en SneakersShop`,
                             url: shareUrl
                         });
                     } else if (navigator.clipboard) {

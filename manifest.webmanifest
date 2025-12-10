@@ -1,14 +1,18 @@
 {
-  "name": "FutureLabs - Tu portal al futuro",
-  "short_name": "FutureLabs",
-  "description": "Tienda online de tecnología con los mejores productos y precios",
+  "name": "Sneakers Shop - Las Mejores Zapatillas",
+  "short_name": "SneakersShop",
+  "description": "Tienda exclusiva de zapatillas y moda urbana",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#667eea",
   "orientation": "portrait-primary",
-  "categories": ["shopping", "technology", "electronics"],
+  "categories": [
+    "shopping",
+    "fashion",
+    "lifestyle"
+  ],
   "lang": "es-PE",
   "dir": "ltr",
   "icons": [
@@ -73,8 +77,3 @@
   ],
   "prefer_related_applications": false
 }
-
-
-
-
-

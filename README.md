@@ -1,4 +1,4 @@
-# 🚀 FutureLabs - E-commerce de Tecnología
+# 👟 Sneakers Shop - E-commerce de Zapatillas
 
 ![Estado](https://img.shields.io/badge/Estado-Producción-green)
 ![Completitud](https://img.shields.io/badge/Completitud-75%25-yellow)
@@ -6,7 +6,7 @@
 
 ## 📖 Descripción
 
-FutureLabs es una plataforma moderna de e-commerce especializada en productos tecnológicos. Incluye sistema completo de autenticación, carrito de compras, checkout, panel de administración y más.
+Sneakers Shop es una plataforma moderna de e-commerce especializada en calzado y moda urbana. Encuentra las últimas colecciones de Nike, Adidas, Jordan y más.
 
 ## ✨ Características Principales
 
