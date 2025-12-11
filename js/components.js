@@ -102,7 +102,7 @@ class Components {
         <div class="container">
           <div class="top-bar ${!showSearch && !showNav ? 'header-simple' : ''}">
             <div class="logo" onclick="window.location.href='index.html'">
-              <img src="assets/images/logo-original.jpg" alt="SneakersShop" style="height: 60px; max-width: 200px; object-fit: contain;">
+              <img src="assets/images/logo-clean.png" alt="SneakersShop" style="height: 60px; max-width: 200px; object-fit: contain;">
             </div>
             ${searchBar}
             <div class="user-actions">
