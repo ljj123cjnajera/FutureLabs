@@ -595,12 +595,13 @@ class HomeManager {
           </div>
 
           <div class="product-quick-actions">
-            <button class="product-quick-action" onclick="event.stopPropagation(); window.wishlistManager.toggle('${product.id}')" title="Agregar a favoritos">
+            <button class="product-quick-action" onclick="event.stopPropagation(); window.wishlistManager?.toggle('${product.id}')" title="Agregar a favoritos">
               <i class="far fa-heart"></i>
             </button>
-            <button class="product-quick-action" onclick="event.stopPropagation();" title="Vista rápida">
-              <i class="far fa-eye"></i>
+            <button class="product-quick-action" onclick="event.stopPropagation(); window.openQuickView('${product.id}')" title="Vista Rápida">
+              <i class="fas fa-eye"></i>
             </button>
+
           </div>
         </div>
 
@@ -1166,4 +1167,82 @@ class HomeManager {
 
 // Crear instancia global
 window.homeManager = new HomeManager();
+
+// ==========================================
+// Quick View Logic
+// ==========================================
+window.currentQuickViewProduct = null;
+
+window.openQuickView = async function (productId) {
+  const modal = document.getElementById('quickViewModal');
+  if (!modal) return;
+
+  // Show active state immediately (maybe show spinner later?)
+  modal.classList.add('active');
+
+  try {
+    // Try to get full product details if API supports it
+    let product = null;
+
+    // First check if we have it in memory (from homeManager)
+    if (window.homeManager && window.homeManager.products) {
+      product = window.homeManager.products.find(p => p.id == productId);
+    }
+
+    if (!product) {
+      // Fetch from API
+      const response = await window.api.getProduct(productId);
+      if (response.success) {
+        product = response.data;
+      }
+    }
+
+    if (product) {
+      window.currentQuickViewProduct = product;
+
+      // Populate Modal
+      const img = document.getElementById('qvImage');
+      img.src = product.image_url || 'assets/images/products/placeholder.jpg';
+      img.onerror = () => { img.src = 'assets/images/products/placeholder.jpg'; };
+
+      document.getElementById('qvBrand').textContent = product.brand || 'Sneakers Shop';
+      document.getElementById('qvTitle').textContent = product.name;
+
+      const priceHtml = product.discount_price
+        ? `<span class="text-red-600">S/ ${parseFloat(product.discount_price).toFixed(2)}</span> <span class="original-price" style="text-decoration: line-through; color: #999; font-size: 0.8em;">S/ ${parseFloat(product.price).toFixed(2)}</span>`
+        : `S/ ${parseFloat(product.price).toFixed(2)}`;
+      document.getElementById('qvPrice').innerHTML = priceHtml;
+
+      document.getElementById('qvDescription').textContent = product.description || 'Sin descripción disponible.';
+      document.getElementById('qvFullDetails').href = `product-detail.html?id=${product.id}`;
+    }
+  } catch (error) {
+    console.error('Error loading quick view:', error);
+  }
+};
+
+window.closeQuickView = function () {
+  const modal = document.getElementById('quickViewModal');
+  if (modal) {
+    modal.classList.remove('active');
+    window.currentQuickViewProduct = null;
+  }
+};
+
+window.addToCartFromQuickView = function () {
+  if (!window.currentQuickViewProduct) return;
+
+  // For quick view, we redirect to PDP to ensure size selection is handled correctly
+  // or if we had a size selector here we could add directly.
+  // Given the "Winning" goal, redirecting is safer UX than adding without size.
+  window.location.href = `product-detail.html?id=${window.currentQuickViewProduct.id}`;
+};
+
+// Close modal on outside click
+document.addEventListener('click', (e) => {
+  const modal = document.getElementById('quickViewModal');
+  if (e.target === modal) {
+    window.closeQuickView();
+  }
+});
 

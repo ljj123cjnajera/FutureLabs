@@ -4,22 +4,23 @@
    ======================================== */
 
 /* Variables del Sistema */
+/* Variables del Sistema - Sneakers Shop Identity */
 :root {
-    --admin-primary: #667eea;
-    --admin-primary-dark: #5568d3;
-    --admin-secondary: #764ba2;
-    --admin-secondary-dark: #5f3a7d;
+    --admin-primary: #000000;
+    --admin-primary-dark: #1a1a1a;
+    --admin-secondary: #ff0000;
+    --admin-secondary-dark: #cc0000;
     --admin-success: #10b981;
     --admin-danger: #ef4444;
     --admin-warning: #f59e0b;
     --admin-info: #3b82f6;
-    --admin-dark: #1f2937;
-    --admin-light: #f3f4f6;
-    --admin-border: #e5e7eb;
+    --admin-dark: #111111;
+    --admin-light: #f5f5f5;
+    --admin-border: #e0e0e0;
     --admin-white: #ffffff;
-    --admin-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    --admin-shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.3);
-    --admin-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --admin-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);
+    --admin-shadow-lg: 8px 8px 0px rgba(0, 0, 0, 0.2);
+    --admin-transition: all 0.2s ease-out;
 }
 
 /* Reset y Base */
@@ -48,12 +49,12 @@ body {
    ======================================== */
 .sidebar {
     width: 260px;
-    background: linear-gradient(135deg, var(--admin-primary) 0%, var(--admin-secondary) 100%);
+    background: var(--admin-primary);
     color: var(--admin-white);
     position: fixed;
     height: 100vh;
     overflow-y: auto;
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    border-right: 1px solid var(--admin-border);
     z-index: 100;
 }
 
@@ -138,14 +139,13 @@ body {
 }
 
 .menu-item.active {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--admin-secondary);
     border-left-color: var(--admin-white);
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .menu-item.active::before {
-    width: 3px;
-    background: var(--admin-white);
+    width: 0;
 }
 
 .menu-item i {
@@ -205,14 +205,14 @@ body {
 .user-avatar {
     width: 40px;
     height: 40px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--admin-primary) 0%, var(--admin-secondary) 100%);
+    border-radius: 0;
+    background: var(--admin-secondary);
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--admin-white);
     font-weight: 700;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    box-shadow: none;
     transition: var(--admin-transition);
 }
 
@@ -493,22 +493,24 @@ tbody tr:last-child td {
 
 .btn-primary {
     padding: 12px 24px;
-    background: linear-gradient(135deg, var(--admin-primary) 0%, var(--admin-secondary) 100%);
+    background: var(--admin-primary);
     color: var(--admin-white);
     border: none;
-    border-radius: 8px;
+    border-radius: 0;
     cursor: pointer;
-    font-weight: 600;
+    font-weight: 700;
+    text-transform: uppercase;
     transition: var(--admin-transition);
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
 }
 
 .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.3);
+    background: var(--admin-secondary);
 }
 
 .btn-primary:active {
@@ -553,6 +555,7 @@ tbody tr:last-child td {
         opacity: 0;
         transform: translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -627,6 +630,7 @@ tbody tr:last-child td {
         opacity: 0;
         transform: translateY(-50px) scale(0.95);
     }
+
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -949,6 +953,7 @@ tbody tr:last-child td {
     from {
         transform: rotate(0deg);
     }
+
     to {
         transform: rotate(360deg);
     }

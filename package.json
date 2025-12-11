@@ -1,0 +1,20 @@
+{
+  "name": "futurelabs-sneakers-shop",
+  "version": "2.0.0",
+  "description": "Sneakers Shop - E-commerce Fullstack",
+  "scripts": {
+    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+    "start:backend": "cd backend && npm start",
+    "start:frontend": "npx serve .",
+    "install:all": "npm install && cd backend && npm install",
+    "verify:order": "node scripts/verify-order.js"
+  },
+  "dependencies": {
+    "node-fetch": "^2.7.0"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "author": "FutureLabs",
+  "license": "MIT"
+}

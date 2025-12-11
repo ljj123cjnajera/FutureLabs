@@ -436,6 +436,31 @@
             console.log('🎉 SneakersShop está listo!');
         });
     </script>
+    <!-- Quick View Modal -->
+    <link rel="stylesheet" href="css/quickview.css">
+    <div id="quickViewModal" class="quick-view-modal">
+        <div class="quick-view-content">
+            <span class="quick-view-close" onclick="closeQuickView()">&times;</span>
+            <div class="quick-view-image">
+                <img id="qvImage" src="" alt="">
+            </div>
+            <div class="quick-view-details">
+                <div id="qvBrand" class="quick-view-brand">Brand</div>
+                <h2 id="qvTitle" class="quick-view-title">Product Name</h2>
+                <div id="qvPrice" class="quick-view-price">$0.00</div>
+                <p id="qvDescription" class="quick-view-description">Description</p>
+                <div class="quick-view-actions">
+                    <button class="quick-view-btn" onclick="addToCartFromQuickView()">
+                        Añadir al Carrito
+                    </button>
+                    <a id="qvFullDetails" href="#"
+                        style="display: block; text-align: center; margin-top: 15px; color: #666; text-decoration: underline; font-size: 12px;">Ver
+                        detalles completos</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>
