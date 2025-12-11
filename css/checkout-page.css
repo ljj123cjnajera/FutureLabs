@@ -388,3 +388,149 @@
         box-shadow: 4px 4px 0px rgba(0, 0, 0, 1);
     }
 }
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    border: 2px dashed #ccc;
+    background: #f9f9f9;
+    margin-top: 20px;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    color: #000;
+    margin-bottom: 20px;
+}
+
+.empty-state h3 {
+    font-size: 1.5rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    color: #000;
+}
+
+.empty-state p {
+    color: #666;
+    margin-bottom: 30px;
+    font-size: 1.1rem;
+}
+
+
+/* Payment Info Boxes (Replaces Inline Styles) */
+.payment-info-box {
+    border: 2px solid #000;
+    padding: 20px;
+    margin-top: 15px;
+    font-weight: 600;
+}
+
+.payment-info-box.warning {
+    background: #fff;
+    border-color: #f59e0b;
+    border-left-width: 8px;
+    color: #000;
+}
+
+.payment-info-box.info {
+    background: #fff;
+    border-color: #0ea5e9;
+    border-left-width: 8px;
+    color: #000;
+}
+
+.payment-info-box.success {
+    background: #fff;
+    border-color: #22c55e;
+    border-left-width: 8px;
+    color: #000;
+}
+
+.payment-info-box.error {
+    background: #fff;
+    border-color: #ef4444;
+    border-left-width: 8px;
+    color: #000;
+}
+
+.payment-info-box i {
+    margin-right: 8px;
+    font-size: 1.1em;
+}
+
+/* Specific text colors for high contrast within these boxes */
+.payment-info-box.warning p {
+    color: #000;
+}
+
+.payment-info-box.info p {
+    color: #000;
+}
+
+.payment-info-box.success p {
+    color: #000;
+}
+
+/* Saved Addresses */
+.saved-addresses-container {
+    margin-bottom: 25px;
+    padding: 20px;
+    background: #f8f9fa;
+    border: 2px solid #000;
+}
+
+.saved-addresses-title {
+    margin: 0 0 15px 0;
+    font-size: 1rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.saved-addresses-grid {
+    display: grid;
+    gap: 10px;
+}
+
+.saved-address-label {
+    display: flex;
+    align-items: start;
+    gap: 10px;
+    padding: 15px;
+    border: 2px solid #ddd;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.saved-address-label:hover {
+    border-color: #000;
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 1);
+}
+
+.saved-address-label.selected {
+    border-color: #000;
+    background: #fff;
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 1);
+}
+
+.saved-address-info strong {
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.default-badge {
+    background: #000;
+    color: white;
+    padding: 2px 8px;
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-left: 5px;
+}
+
+.btn-new-address {
+    margin-top: 15px;
+    width: auto;
+}

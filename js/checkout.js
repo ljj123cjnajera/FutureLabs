@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             setupEventListeners();
         }
     }, 100);
-    
+
     // Timeout de seguridad después de 5 segundos
     setTimeout(() => {
         clearInterval(checkAuthInterval);
@@ -75,7 +75,7 @@ function setupEventListeners() {
 // Cargar checkout
 async function loadCheckout() {
     const container = document.getElementById('checkoutContent');
-    
+
     try {
         // Verificar autenticación
         if (!window.authManager.isAuthenticated()) {
@@ -92,7 +92,7 @@ async function loadCheckout() {
 
         // Obtener carrito
         const cartResponse = await window.api.getCart();
-        
+
         if (!cartResponse.success || cartResponse.data.items.length === 0) {
             container.innerHTML = `
                 <div class="checkout-loading">
@@ -122,7 +122,7 @@ async function loadCheckout() {
             window.couponsManager.setCartContext(couponItems, baseSubtotal);
             window.couponsManager.context = 'checkout';
         }
-        
+
         // Cargar puntos de fidelidad disponibles
         try {
             const pointsResponse = await window.api.getLoyaltyPoints();
@@ -148,17 +148,17 @@ async function loadCheckout() {
         } catch (error) {
             console.log('No se pudieron cargar direcciones guardadas:', error);
         }
-        
+
         // Renderizar paso 1
         renderStep(1);
         renderOrderSummary();
-        
+
         // Mostrar navegación
         const navigation = document.getElementById('checkoutNavigation');
         if (navigation) {
             navigation.style.display = 'flex';
         }
-        
+
     } catch (error) {
         console.error('Error al cargar checkout:', error);
         window.notifications.error('Error al cargar el checkout');
@@ -169,10 +169,10 @@ async function loadCheckout() {
 function renderStep(step) {
     currentStep = step;
     updateProgressIndicator();
-    
+
     const container = document.getElementById('checkoutContent');
-    
-    switch(step) {
+
+    switch (step) {
         case 1:
             container.innerHTML = renderShippingStep();
             initializeShippingStep();
@@ -204,7 +204,7 @@ function renderStep(step) {
             container.innerHTML = renderConfirmationStep();
             break;
     }
-    
+
     updateNavigationButtons();
 }
 
@@ -215,7 +215,7 @@ function updateProgressIndicator() {
         const stepNumber = index + 1;
         step.classList.remove('active', 'completed');
         step.removeAttribute('aria-current');
-        
+
         if (stepNumber < currentStep) {
             step.classList.add('completed');
         } else if (stepNumber === currentStep) {
@@ -229,16 +229,16 @@ function updateProgressIndicator() {
 function updateNavigationButtons() {
     const btnPrevious = document.getElementById('btnPrevious');
     const btnNext = document.getElementById('btnNext');
-    
+
     if (!btnPrevious || !btnNext) return;
-    
+
     // Botón Atrás
     if (currentStep === 1) {
         btnPrevious.style.display = 'none';
     } else {
         btnPrevious.style.display = 'flex';
     }
-    
+
     // Botón Siguiente/Completar
     if (currentStep === 3) {
         // Paso 3 (Revisar): Aquí se procesa el pedido y pago
@@ -277,7 +277,7 @@ function previousStep() {
 
 // Validar paso actual
 function validateCurrentStep() {
-    switch(currentStep) {
+    switch (currentStep) {
         case 1:
             return validateShippingForm();
         case 2:
@@ -313,17 +313,17 @@ function renderShippingStep() {
             <h2><i class="fas fa-map-marker-alt"></i> Dirección de Envío</h2>
             
             ${savedAddresses.length > 0 ? `
-            <div class="saved-addresses" style="margin-bottom: 25px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
-                <h3 style="margin: 0 0 15px 0; font-size: 16px;">Direcciones Guardadas</h3>
-                <div style="display: grid; gap: 10px;">
+            <div class="saved-addresses-container">
+                <h3 class="saved-addresses-title">Direcciones Guardadas</h3>
+                <div class="saved-addresses-grid">
                     ${savedAddresses.map(addr => `
-                        <label style="display: flex; align-items: start; gap: 10px; padding: 15px; border: 2px solid ${selectedAddressId === addr.id ? '#667eea' : '#ddd'}; border-radius: 8px; background: white; cursor: pointer; transition: all 0.3s;">
+                        <label class="saved-address-label ${selectedAddressId === addr.id ? 'selected' : ''}" onclick="window.selectSavedAddress('${addr.id}')">
                             <input type="radio" name="savedAddress" value="${addr.id}" ${selectedAddressId === addr.id ? 'checked' : ''} 
-                                   onchange="selectSavedAddress('${addr.id}')" style="margin-top: 4px;">
+                                   onchange="window.selectSavedAddress('${addr.id}')" style="margin-top: 4px;">
                             <div style="flex: 1;">
                                 <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 5px;">
-                                    <strong>${addr.label || 'Dirección'}</strong>
-                                    ${addr.is_default ? '<span style="background: #10b981; color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px;">POR DEFECTO</span>' : ''}
+                                    <strong style="text-transform: uppercase;">${addr.label || 'Dirección'}</strong>
+                                    ${addr.is_default ? '<span class="default-badge">POR DEFECTO</span>' : ''}
                                 </div>
                                 <p style="margin: 0; color: #666; font-size: 14px; line-height: 1.5;">
                                     ${addr.full_name}<br>
@@ -334,7 +334,7 @@ function renderShippingStep() {
                         </label>
                     `).join('')}
                 </div>
-                <button type="button" class="btn btn-outline" onclick="useNewAddress()" style="margin-top: 15px; padding: 8px 16px; font-size: 14px;">
+                <button type="button" class="btn btn-outline btn-new-address" onclick="window.useNewAddress()">
                     <i class="fas fa-plus"></i> Usar Nueva Dirección
                 </button>
             </div>
@@ -501,7 +501,7 @@ function renderPaymentStep() {
     const subtotal = Number(cartData.subtotal ?? cartData.total ?? 0);
     const shippingAmount = Number(cartData.shipping ?? shippingOptions[selectedShippingOption]?.amount ?? 0);
     const total = Math.max(subtotal + shippingAmount - discount - loyaltyPointsDiscount, 0);
-    
+
     return `
         <div class="checkout-form-section">
             <h2><i class="fas fa-credit-card"></i> Método de Pago</h2>
@@ -577,12 +577,14 @@ function renderPaymentStep() {
                     </div>
                 </div>
             ` : selectedPaymentMethod === null ? `
-                <div class="payment-details" style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 16px; margin-top: 20px;">
-                    <p style="margin: 0; color: #92400e;">
+            ` : selectedPaymentMethod === null ? `
+                <div class="payment-info-box warning">
+                    <p>
                         <i class="fas fa-info-circle"></i> Por favor, selecciona un método de pago arriba
                     </p>
                 </div>
             ` : ''}
+
             
             ${selectedPaymentMethod === 'yape' || selectedPaymentMethod === 'plin' ? `
                 <div class="payment-details active" id="mobile-payment-details">
@@ -592,16 +594,16 @@ function renderPaymentStep() {
                         <input type="tel" id="mobile-phone" class="form-control" placeholder="Ej: 987654321" pattern="[0-9]{9}" maxlength="9" required>
                         <small class="form-text">Ingresa tu número de celular asociado a ${selectedPaymentMethod === 'yape' ? 'Yape' : 'Plin'} (9 dígitos, sin espacios)</small>
                     </div>
-                    <div id="mobile-payment-info" class="payment-info-box" style="background: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 8px; padding: 16px; margin-top: 16px;">
-                        <p style="margin: 0 0 12px 0; color: #0c4a6e; font-weight: 600;">
+                    <div id="mobile-payment-info" class="payment-info-box info">
+                        <p class="font-bold">
                             <strong>Total a pagar:</strong> ${checkoutCurrencyFormatter.format(total)}
                         </p>
-                        <div id="mobile-account-info" style="color: #0c4a6e; margin-bottom: 12px;">
-                            <p style="margin: 4px 0; font-size: 14px;">
+                        <div id="mobile-account-info" class="mt-2">
+                            <p>
                                 <i class="fas fa-spinner fa-spin"></i> Cargando información de cuenta...
                             </p>
                         </div>
-                        <p style="margin: 8px 0 0 0; color: #0c4a6e; font-size: 14px;">
+                        <p class="mt-2 text-sm">
                             <i class="fas fa-info-circle"></i> Realiza el pago desde tu app ${selectedPaymentMethod === 'yape' ? 'Yape' : 'Plin'} y espera la confirmación. Te enviaremos un email con las instrucciones.
                         </p>
                     </div>
@@ -611,16 +613,16 @@ function renderPaymentStep() {
             ${selectedPaymentMethod === 'bank_transfer' ? `
                 <div class="payment-details active" id="bank-transfer-details">
                     <h3>Transferencia Bancaria</h3>
-                    <div id="bank-transfer-info" style="background: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 8px; padding: 16px; margin-top: 16px;">
-                        <p style="margin: 0 0 12px 0; color: #0c4a6e; font-weight: 600;">
+                    <div id="bank-transfer-info" class="payment-info-box info">
+                        <p class="font-bold">
                             <strong>Total a pagar:</strong> ${checkoutCurrencyFormatter.format(total)}
                         </p>
-                        <div id="bank-account-details" style="color: #0c4a6e;">
-                            <p style="margin: 8px 0; font-size: 14px;">
+                        <div id="bank-account-details" class="mt-2">
+                            <p>
                                 <i class="fas fa-spinner fa-spin"></i> Cargando información bancaria...
                             </p>
                         </div>
-                        <p style="margin: 12px 0 0 0; color: #0c4a6e; font-size: 14px;">
+                        <p class="mt-2 text-sm">
                             <i class="fas fa-info-circle"></i> Realiza la transferencia y envía el comprobante. Te enviaremos un email con las instrucciones.
                         </p>
                     </div>
@@ -630,11 +632,11 @@ function renderPaymentStep() {
             ${selectedPaymentMethod === 'cash' ? `
                 <div class="payment-details active" id="cash-payment-details">
                     <h3>Pago en Efectivo</h3>
-                    <div class="payment-info-box" style="background: #f0fdf4; border: 1px solid #22c55e; border-radius: 8px; padding: 16px; margin-top: 16px;">
-                        <p style="margin: 0; color: #166534;">
+                    <div class="payment-info-box success">
+                        <p class="font-bold">
                             <strong>Total a pagar:</strong> ${checkoutCurrencyFormatter.format(total)}
                         </p>
-                        <p style="margin: 8px 0 0 0; color: #166534; font-size: 14px;">
+                        <p class="mt-2 text-sm">
                             Pagarás en efectivo al momento de recibir tu pedido. El repartidor aceptará el pago exacto.
                         </p>
                     </div>
@@ -704,7 +706,7 @@ function renderConfirmationStep() {
     const paymentMethodName = getPaymentMethodName(selectedPaymentMethod);
     let paymentStatusMessage = '';
     let paymentInstructions = '';
-    
+
     if (selectedPaymentMethod === 'cash') {
         paymentStatusMessage = 'Pago pendiente - Efectivo';
         paymentInstructions = 'Pagarás en efectivo al momento de recibir tu pedido. El repartidor aceptará el pago exacto.';
@@ -752,8 +754,8 @@ function renderConfirmationStep() {
                 </div>
             </div>
             
-            <div style="background: ${selectedPaymentMethod === 'stripe' ? '#f0fdf4' : '#fffbeb'}; border: 1px solid ${selectedPaymentMethod === 'stripe' ? '#22c55e' : '#f59e0b'}; border-radius: 8px; padding: 16px; margin: 20px 0;">
-                <p style="margin: 0; color: ${selectedPaymentMethod === 'stripe' ? '#166534' : '#92400e'}; font-weight: 600;">
+            <div class="payment-info-box ${selectedPaymentMethod === 'stripe' ? 'success' : 'warning'}">
+                <p>
                     <i class="fas fa-info-circle"></i> ${paymentInstructions}
                 </p>
             </div>
@@ -815,34 +817,34 @@ function validateShippingForm() {
     const city = document.getElementById('city')?.value;
     const phone = document.getElementById('phone')?.value;
     const email = document.getElementById('email')?.value;
-    
+
     const errors = [];
-    
+
     if (!fullName || fullName.length < 3) {
         errors.push('El nombre debe tener al menos 3 caracteres');
     }
-    
+
     if (!address || address.length < 10) {
         errors.push('La dirección debe tener al menos 10 caracteres');
     }
-    
+
     if (!city) {
         errors.push('La ciudad es requerida');
     }
-    
+
     if (!phone || !/^\+?[0-9]{9,15}$/.test(phone)) {
         errors.push('El teléfono no es válido');
     }
-    
+
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         errors.push('El email no es válido');
     }
-    
+
     if (errors.length > 0) {
         window.notifications.error(errors[0]);
         return false;
     }
-    
+
     // Guardar datos de envío
     shippingData = {
         fullName,
@@ -853,7 +855,7 @@ function validateShippingForm() {
         phone,
         email
     };
-    
+
     return true;
 }
 
@@ -864,7 +866,7 @@ function validatePaymentForm() {
         window.notifications.error('Por favor, selecciona un método de pago');
         return false;
     }
-    
+
     // Validar según el método seleccionado
     if (selectedPaymentMethod === 'stripe') {
         // Para Stripe, validamos que el elemento de tarjeta esté presente
@@ -873,7 +875,7 @@ function validatePaymentForm() {
             window.notifications.error('El sistema de pago con tarjeta no está disponible. Por favor, selecciona otro método.');
             return false;
         }
-        
+
         // Verificar que el elemento de tarjeta esté montado
         const cardElement = document.getElementById('stripe-card-element');
         if (!cardElement || cardElement.children.length === 0) {
@@ -887,13 +889,13 @@ function validatePaymentForm() {
             window.notifications.error('Por favor, ingresa tu número de teléfono');
             return false;
         }
-        
+
         const phoneNumber = phoneInput.value.trim().replace(/\s+/g, '');
         if (!phoneNumber) {
             window.notifications.error('Por favor, ingresa tu número de teléfono');
             return false;
         }
-        
+
         // Validar formato de teléfono peruano
         if (!/^9\d{8}$/.test(phoneNumber)) {
             window.notifications.error('Número de teléfono inválido. Debe ser un número peruano de 9 dígitos (ej: 987654321)');
@@ -905,7 +907,7 @@ function validatePaymentForm() {
     } else if (selectedPaymentMethod === 'cash') {
         // Efectivo no requiere validación adicional
     }
-    
+
     return true;
 }
 
@@ -1031,17 +1033,17 @@ function handleCouponUpdate(event) {
 
 // Validar datos de envío
 function validateShippingData() {
-    if (!shippingData.fullName || !shippingData.address || !shippingData.city || 
+    if (!shippingData.fullName || !shippingData.address || !shippingData.city ||
         !shippingData.country || !shippingData.phone || !shippingData.email) {
         return { valid: false, message: 'Por favor completa todos los campos de envío' };
     }
-    
+
     // Validar email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(shippingData.email)) {
         return { valid: false, message: 'Por favor ingresa un email válido' };
     }
-    
+
     return { valid: true };
 }
 
@@ -1052,24 +1054,24 @@ function validatePaymentMethod() {
         if (!phoneInput || !phoneInput.value.trim()) {
             return { valid: false, message: 'Por favor ingresa tu número de teléfono' };
         }
-        
+
         const phone = phoneInput.value.trim();
         if (phone.length < 9) {
             return { valid: false, message: 'Por favor ingresa un número de teléfono válido' };
         }
     }
-    
+
     if (selectedPaymentMethod === 'stripe') {
         if (!stripeCardElement) {
             return { valid: false, message: 'Por favor completa los datos de la tarjeta' };
         }
     }
-    
+
     if (selectedPaymentMethod === 'bank_transfer') {
         // No requiere validación adicional, solo confirmación
         return { valid: true };
     }
-    
+
     return { valid: true };
 }
 
@@ -1077,7 +1079,7 @@ function validatePaymentMethod() {
 async function processOrder() {
     const btnNext = document.getElementById('btnNext');
     const btnPrevious = document.getElementById('btnPrevious');
-    
+
     try {
         // Deshabilitar botones durante el procesamiento
         if (btnNext) {
@@ -1087,7 +1089,7 @@ async function processOrder() {
         if (btnPrevious) {
             btnPrevious.disabled = true;
         }
-        
+
         // Validar datos de envío
         const shippingValidation = validateShippingData();
         if (!shippingValidation.valid) {
@@ -1098,7 +1100,7 @@ async function processOrder() {
             if (btnPrevious) btnPrevious.disabled = false;
             return;
         }
-        
+
         // Validar método de pago
         const paymentValidation = validatePaymentMethod();
         if (!paymentValidation.valid) {
@@ -1112,10 +1114,10 @@ async function processOrder() {
             if (btnPrevious) btnPrevious.disabled = false;
             return;
         }
-        
+
         // Mostrar loading
         window.notifications.show('Procesando pedido...', 'info');
-        
+
         // Si se usaron puntos, canjearlos primero
         if (loyaltyPointsUsed > 0) {
             try {
@@ -1133,7 +1135,7 @@ async function processOrder() {
         const shippingOption = shippingOptions[selectedShippingOption] || shippingOptions.standard;
         const shippingAmount = Number(cartData.shipping ?? shippingOption.amount ?? 0);
         const finalTotal = Math.max(subtotal + shippingAmount - discount - loyaltyPointsDiscount, 0);
-        
+
         const orderData = {
             // Datos de envío (formato plano para el backend)
             shipping_address: shippingData.address,
@@ -1154,39 +1156,39 @@ async function processOrder() {
             // Incluir total esperado para validación
             expected_total: finalTotal
         };
-        
+
         window.notifications.show('Creando pedido...', 'info');
         const orderResponse = await window.api.createOrder(orderData);
-        
+
         if (!orderResponse.success) {
             throw new Error(orderResponse.message || 'Error al crear el pedido');
         }
-        
+
         // Obtener orderId y orderNumber del response
         // El backend devuelve: { success: true, data: { order } }
         const order = orderResponse.data.order || orderResponse.data;
         if (!order) {
             throw new Error('No se recibió información del pedido');
         }
-        
+
         const orderId = order.id;
         orderNumber = order.order_number || order.orderNumber;
-        
+
         if (!orderId) {
             throw new Error('No se pudo obtener el ID del pedido');
         }
-        
+
         console.log('Pedido creado:', { orderId, orderNumber, order });
-        
+
         // Procesar pago según el método seleccionado
         try {
             if (selectedPaymentMethod === 'stripe') {
                 await processStripePayment(orderId, finalTotal);
-        } else if (selectedPaymentMethod === 'yape' || selectedPaymentMethod === 'plin') {
-            await processMobilePayment(orderId, finalTotal, selectedPaymentMethod);
-        } else if (selectedPaymentMethod === 'bank_transfer') {
-            await processBankTransfer(orderId);
-        } else if (selectedPaymentMethod === 'cash') {
+            } else if (selectedPaymentMethod === 'yape' || selectedPaymentMethod === 'plin') {
+                await processMobilePayment(orderId, finalTotal, selectedPaymentMethod);
+            } else if (selectedPaymentMethod === 'bank_transfer') {
+                await processBankTransfer(orderId);
+            } else if (selectedPaymentMethod === 'cash') {
                 await processCashPayment(orderId);
             } else {
                 // Si no hay método de pago válido, marcar como pendiente
@@ -1198,7 +1200,7 @@ async function processOrder() {
             // Mostrar mensaje pero continuar con la confirmación
             window.notifications.warning('El pedido fue creado pero hubo un problema con el pago. Contacta con soporte.');
         }
-        
+
         // Limpiar carrito
         try {
             await window.api.clearCart();
@@ -1206,19 +1208,19 @@ async function processOrder() {
             console.error('Error limpiando carrito:', error);
             // No es crítico, continuar
         }
-        
+
         // Ir a confirmación
         currentStep = 4;
         renderStep(4);
         updateNavigationButtons();
         updateProgressIndicator();
-        
+
         // Ocultar navegación
         const navElement = document.getElementById('checkoutNavigation');
         if (navElement) {
             navElement.style.display = 'none';
         }
-        
+
         // Mostrar mensaje según método de pago
         let confirmationMessage = '¡Pedido confirmado exitosamente!';
         if (selectedPaymentMethod === 'cash') {
@@ -1230,13 +1232,13 @@ async function processOrder() {
         } else if (selectedPaymentMethod === 'stripe') {
             confirmationMessage = '¡Pedido y pago confirmados exitosamente!';
         }
-        
+
         window.notifications.success(confirmationMessage);
-        
+
     } catch (error) {
         console.error('Error al procesar pedido:', error);
         window.notifications.error(error.message || 'Error al procesar el pedido. Por favor, intenta nuevamente.');
-        
+
         // Re-habilitar botones
         if (btnNext) {
             btnNext.disabled = false;
@@ -1252,21 +1254,21 @@ async function processOrder() {
 async function processStripePayment(orderId, amount) {
     try {
         window.notifications.show('Procesando pago con tarjeta...', 'info');
-        
+
         // Crear payment intent
         const intentResponse = await window.api.createStripePaymentIntent({
             order_id: orderId,
             amount: amount,
             currency: 'pen'
         });
-        
+
         if (!intentResponse.success) {
             throw new Error(intentResponse.message || 'Error al crear intención de pago');
         }
-        
+
         const clientSecret = intentResponse.data.client_secret;
         const paymentIntentId = intentResponse.data.payment_intent_id;
-        
+
         // Guardar payment_intent_id en el pedido
         if (paymentIntentId) {
             try {
@@ -1276,12 +1278,12 @@ async function processStripePayment(orderId, amount) {
                 // Continuar de todas formas
             }
         }
-        
+
         // Confirmar pago con Stripe
         if (!stripe || !stripeCardElement) {
             throw new Error('Stripe no está inicializado correctamente');
         }
-        
+
         // Crear payment method primero
         const { error: pmError, paymentMethod } = await stripe.createPaymentMethod({
             type: 'card',
@@ -1298,7 +1300,7 @@ async function processStripePayment(orderId, amount) {
                 }
             }
         });
-        
+
         if (pmError) {
             // Mostrar error específico de Stripe
             const errorElement = document.getElementById('stripe-card-errors');
@@ -1307,18 +1309,18 @@ async function processStripePayment(orderId, amount) {
             }
             throw new Error(pmError.message || 'Error al procesar la tarjeta');
         }
-        
+
         // Limpiar errores previos
         const errorElement = document.getElementById('stripe-card-errors');
         if (errorElement) {
             errorElement.textContent = '';
         }
-        
+
         // Confirmar pago con el payment method
         const { error: confirmError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
             payment_method: paymentMethod.id
         });
-        
+
         if (confirmError) {
             // Mostrar error específico
             if (errorElement) {
@@ -1326,12 +1328,12 @@ async function processStripePayment(orderId, amount) {
             }
             throw new Error(confirmError.message || 'Error al confirmar el pago');
         }
-        
+
         // Verificar que el pago fue exitoso
         if (paymentIntent.status !== 'succeeded') {
             throw new Error(`El pago no fue exitoso. Estado: ${paymentIntent.status}`);
         }
-        
+
         // Procesar pago en backend para actualizar estado del pedido
         try {
             const paymentResponse = await window.api.processStripePayment(orderId, paymentMethod.id);
@@ -1344,9 +1346,9 @@ async function processStripePayment(orderId, amount) {
             // No lanzar error porque el pago ya fue exitoso en Stripe
             // El webhook de Stripe actualizará el estado eventualmente
         }
-        
+
         window.notifications.success('Pago con tarjeta procesado exitosamente');
-        
+
     } catch (error) {
         console.error('Error procesando pago Stripe:', error);
         throw error;
@@ -1358,32 +1360,32 @@ async function processMobilePayment(orderId, amount, paymentType = 'yape') {
     try {
         const phoneInput = document.getElementById('mobile-phone');
         const phoneNumber = phoneInput ? phoneInput.value.trim().replace(/\s+/g, '') : '';
-        
+
         if (!phoneNumber) {
             throw new Error('Número de teléfono requerido');
         }
-        
+
         // Validar formato de teléfono peruano
         if (!/^9\d{8}$/.test(phoneNumber)) {
             throw new Error('Número de teléfono inválido. Debe ser un número peruano de 9 dígitos (ej: 987654321)');
         }
-        
+
         window.notifications.show(`Procesando pago con ${paymentType === 'yape' ? 'Yape' : 'Plin'}...`, 'info');
-        
+
         const paymentResponse = await window.api.processMobilePayment(orderId, phoneNumber, amount, paymentType);
-        
+
         if (!paymentResponse.success) {
             throw new Error(paymentResponse.message || 'Error al procesar el pago');
         }
-        
+
         // Mostrar información del pago
         const paymentData = paymentResponse.data;
         const message = paymentData.message || `Pago con ${paymentType === 'yape' ? 'Yape' : 'Plin'} registrado. Realiza el pago a ${paymentData.merchant_phone} y espera la confirmación.`;
-        
+
         window.notifications.success(message, 10000); // Mostrar por 10 segundos
-        
+
         return true;
-        
+
     } catch (error) {
         console.error('Error procesando pago móvil:', error);
         // Para pagos móviles, mostrar advertencia pero continuar
@@ -1396,17 +1398,17 @@ async function processMobilePayment(orderId, amount, paymentType = 'yape') {
 async function processBankTransfer(orderId, amount) {
     try {
         window.notifications.show('Registrando transferencia bancaria...', 'info');
-        
+
         const paymentResponse = await window.api.processBankTransfer(orderId);
-        
+
         if (!paymentResponse.success) {
             throw new Error(paymentResponse.message || 'Error al procesar transferencia bancaria');
         }
-        
+
         window.notifications.success(paymentResponse.data?.message || 'Transferencia bancaria registrada. Realiza la transferencia y envía el comprobante.');
-        
+
         return true;
-        
+
     } catch (error) {
         console.error('Error procesando transferencia bancaria:', error);
         window.notifications.warning('El pedido fue creado. Por favor, realiza la transferencia y envía el comprobante.');
@@ -1418,17 +1420,17 @@ async function processBankTransfer(orderId, amount) {
 async function processCashPayment(orderId) {
     try {
         window.notifications.show('Registrando pago en efectivo...', 'info');
-        
+
         const paymentResponse = await window.api.processCashPayment(orderId);
-        
+
         if (!paymentResponse.success) {
             throw new Error(paymentResponse.message || 'Error al registrar el pago');
         }
-        
+
         window.notifications.success('Pago en efectivo registrado. Pagarás al momento de recibir tu pedido.');
-        
+
         return true;
-        
+
     } catch (error) {
         console.error('Error procesando pago en efectivo:', error);
         // Para efectivo, no es crítico si falla, el pedido queda como pendiente
@@ -1441,7 +1443,7 @@ async function processCashPayment(orderId) {
 function selectPaymentMethod(method) {
     selectedPaymentMethod = method;
     renderStep(2); // Re-renderizar el paso de pago
-    
+
     // Inicializar métodos de pago después de que el DOM se actualice
     // Usar un timeout más largo para asegurar que el DOM esté listo
     setTimeout(() => {
@@ -1449,12 +1451,12 @@ function selectPaymentMethod(method) {
         if (method === 'stripe') {
             initializeStripeElements();
         }
-        
+
         // Cargar información bancaria si es transferencia
         if (method === 'bank_transfer') {
             loadBankTransferInfo();
         }
-        
+
         // Cargar información de cuenta móvil si es Yape/Plin
         if (method === 'yape' || method === 'plin') {
             loadMobilePaymentInfo(method);
@@ -1572,7 +1574,7 @@ async function initializeStripeElements() {
 
         // Obtener clave pública de Stripe del backend
         let stripePublicKey = null;
-        
+
         try {
             const keyResponse = await window.api.getStripePublicKey();
             if (keyResponse.success && keyResponse.data.public_key) {
@@ -1586,7 +1588,7 @@ async function initializeStripeElements() {
             isInitializingStripe = false;
             return;
         }
-        
+
         // Inicializar Stripe si no está inicializado
         if (!stripe) {
             stripe = Stripe(stripePublicKey);
@@ -1677,18 +1679,18 @@ async function initializeStripeElements() {
 
     } catch (error) {
         console.error('Error inicializando Stripe:', error);
-        
+
         // Mostrar mensaje de error más específico
         const cardElementContainer = document.getElementById('stripe-card-element');
         if (cardElementContainer) {
             let errorMessage = 'Error al cargar el formulario de pago.';
-            
+
             if (error.message && error.message.includes('Content blocker')) {
                 errorMessage = 'Por favor, desactiva el bloqueador de contenido para este sitio y recarga la página.';
             } else if (error.message && error.message.includes('Can only create one Element')) {
                 errorMessage = 'El formulario ya está cargado. Si no lo ves, por favor recarga la página.';
             }
-            
+
             cardElementContainer.innerHTML = `
                 <div style="padding: 20px; text-align: center; color: #dc2626;">
                     <i class="fas fa-exclamation-triangle"></i>
@@ -1699,7 +1701,7 @@ async function initializeStripeElements() {
                 </div>
             `;
         }
-        
+
         window.notifications?.warning('No se pudo inicializar el formulario de pago. Puedes usar otro método de pago.');
     } finally {
         isInitializingStripe = false;
