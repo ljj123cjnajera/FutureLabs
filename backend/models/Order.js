@@ -135,7 +135,7 @@ class Order {
           'products.sku as product_sku',
           'products.price',
           'products.discount_price',
-          'products.stock',
+          'products.stock_quantity as stock',
           'products.category_id',
           'products.brand'
         )
@@ -184,7 +184,7 @@ class Order {
       let couponDiscount = 0;
       let couponCode = null;
       let couponId = null;
-      
+
       if (orderData.coupon_code) {
         const couponResult = await Coupon.apply(
           orderData.coupon_code,
@@ -207,10 +207,10 @@ class Order {
       // Aplicar puntos de fidelidad si se usan
       let loyaltyPointsDiscount = 0;
       let loyaltyPointsUsed = 0;
-      
+
       if (orderData.loyalty_points_used && orderData.loyalty_points_used > 0) {
         const userPoints = await LoyaltyPoints.getPointsForUser(userId);
-        
+
         if (userPoints.points < orderData.loyalty_points_used) {
           throw new Error('No tienes suficientes puntos de fidelidad');
         }
@@ -218,7 +218,7 @@ class Order {
         // Validar que no se use más del 20% del total
         const maxPointsValue = totalBeforeDiscounts * 0.2;
         const pointsValue = orderData.loyalty_points_used / 100; // 100 puntos = S/ 1
-        
+
         if (pointsValue > maxPointsValue) {
           throw new Error(`Solo puedes usar puntos para hasta el 20% del total (máximo S/ ${maxPointsValue.toFixed(2)})`);
         }
@@ -242,7 +242,7 @@ class Order {
       if (orderData.expected_total !== undefined) {
         const expectedTotal = parseFloat(orderData.expected_total);
         const calculatedTotal = parseFloat(totalAmount.toFixed(2));
-        
+
         // Permitir diferencia de hasta 0.01 por redondeos
         if (Math.abs(expectedTotal - calculatedTotal) > 0.01) {
           throw new Error(`El total calculado (S/ ${calculatedTotal}) no coincide con el total esperado (S/ ${expectedTotal}). Por favor, recarga la página e intenta nuevamente.`);
