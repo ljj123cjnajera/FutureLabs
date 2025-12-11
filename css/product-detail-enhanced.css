@@ -1,0 +1,191 @@
+/* =========================================
+   PDP ENHANCED STYLES - SNEAKERS SHOP
+   ========================================= */
+
+/* --- Size Selector --- */
+.size-selector-container {
+    margin: 24px 0;
+}
+
+.size-selector-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.size-label {
+    font-weight: 600;
+    color: var(--black);
+    font-size: 0.95rem;
+}
+
+.size-guide-link {
+    color: var(--gray-600);
+    font-size: 0.85rem;
+    text-decoration: underline;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.2s;
+}
+
+.size-guide-link:hover {
+    color: var(--black);
+}
+
+.size-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    gap: 10px;
+}
+
+.size-option {
+    border: 1px solid var(--gray-300);
+    background: transparent;
+    padding: 12px 4px;
+    text-align: center;
+    cursor: pointer;
+    font-family: var(--font-primary);
+    font-weight: 500;
+    font-size: 1rem;
+    color: var(--black);
+    transition: all 0.2s ease;
+    width: 100%;
+    border-radius: 0;
+    /* Boxy aesthetic */
+}
+
+.size-option:hover {
+    border-color: var(--black);
+}
+
+.size-option.selected {
+    background: var(--black);
+    color: var(--white);
+    border-color: var(--black);
+    font-weight: 700;
+}
+
+.size-option.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: var(--gray-100);
+    text-decoration: line-through;
+    border-color: var(--gray-200);
+}
+
+.size-option.disabled:hover {
+    border-color: var(--gray-200);
+}
+
+/* --- Validation Error --- */
+.validation-message {
+    color: var(--error);
+    font-size: 0.85rem;
+    margin-top: 8px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0;
+    transform: translateY(-5px);
+    transition: all 0.2s ease;
+}
+
+.validation-message.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.shake-animation {
+    animation: shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
+}
+
+@keyframes shake {
+
+    10%,
+    90% {
+        transform: translate3d(-1px, 0, 0);
+    }
+
+    20%,
+    80% {
+        transform: translate3d(2px, 0, 0);
+    }
+
+    30%,
+    50%,
+    70% {
+        transform: translate3d(-4px, 0, 0);
+    }
+
+    40%,
+    60% {
+        transform: translate3d(4px, 0, 0);
+    }
+}
+
+/* --- Size Guide Modal Content --- */
+.size-guide-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.size-guide-table th,
+.size-guide-table td {
+    border: 1px solid var(--gray-200);
+    padding: 12px;
+    text-align: center;
+}
+
+.size-guide-table th {
+    background: var(--gray-100);
+    font-weight: 600;
+}
+
+.size-guide-tabs {
+    display: flex;
+    gap: 20px;
+    border-bottom: 2px solid var(--gray-200);
+    margin-bottom: 20px;
+}
+
+.size-tab {
+    padding: 10px 0;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--gray-500);
+    position: relative;
+}
+
+.size-tab.active {
+    color: var(--black);
+}
+
+.size-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--black);
+}
+
+/* --- Style It With Section --- */
+.style-it-with-section {
+    margin-top: 60px;
+    padding-top: 40px;
+    border-top: 1px solid var(--gray-200);
+}
+
+.style-it-with-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+    font-family: var(--font-heading);
+}

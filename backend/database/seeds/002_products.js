@@ -25,7 +25,9 @@ exports.seed = async function (knex) {
         'Suela': 'Goma',
         'Amortiguación': 'Air-Sole',
         'Color': 'University Blue',
-        'Tallas Disponibles': 'US 7-13'
+        'Tallas Disponibles': 'US 7-13',
+        'Año de Lanzamiento': '1985',
+        'Silueta': 'High'
       }),
       rating: 4.9,
       review_count: 125,
@@ -46,7 +48,13 @@ exports.seed = async function (knex) {
       rating: 4.8,
       review_count: 340,
       featured: true,
-      category_id: '550e8400-e29b-41d4-a716-446655440001'
+      category_id: '550e8400-e29b-41d4-a716-446655440001',
+      specifications: JSON.stringify({
+        'Material': 'Cuero',
+        'Tecnología': 'Nike Air',
+        'Año de Lanzamiento': '1982',
+        'Silueta': 'Low'
+      })
     },
     {
       id: '660e8400-e29b-41d4-a716-446655440003',
@@ -61,7 +69,12 @@ exports.seed = async function (knex) {
       rating: 4.7,
       review_count: 89,
       featured: true,
-      category_id: '550e8400-e29b-41d4-a716-446655440001'
+      category_id: '550e8400-e29b-41d4-a716-446655440001',
+      specifications: JSON.stringify({
+        'Material': 'Cuero',
+        'Año de Lanzamiento': '1985',
+        'Silueta': 'Low'
+      })
     },
     // Adidas
     {
@@ -77,7 +90,13 @@ exports.seed = async function (knex) {
       rating: 4.6,
       review_count: 210,
       featured: true,
-      category_id: '550e8400-e29b-41d4-a716-446655440002'
+      category_id: '550e8400-e29b-41d4-a716-446655440002',
+      specifications: JSON.stringify({
+        'Material': 'Primeknit',
+        'Amortiguación': 'Boost',
+        'Año de Lanzamiento': '2016',
+        'Silueta': 'Low'
+      })
     },
     {
       id: '660e8400-e29b-41d4-a716-446655440005',
@@ -92,7 +111,12 @@ exports.seed = async function (knex) {
       image_url: 'assets/images/products/forum.jpg',
       rating: 4.5,
       review_count: 56,
-      category_id: '550e8400-e29b-41d4-a716-446655440002'
+      category_id: '550e8400-e29b-41d4-a716-446655440002',
+      specifications: JSON.stringify({
+        'Material': 'Cuero',
+        'Año de Lanzamiento': '1984',
+        'Silueta': 'Low'
+      })
     },
     // New Balance
     {
@@ -108,7 +132,12 @@ exports.seed = async function (knex) {
       rating: 4.8,
       review_count: 75,
       featured: true,
-      category_id: '550e8400-e29b-41d4-a716-446655440005'
+      category_id: '550e8400-e29b-41d4-a716-446655440005',
+      specifications: JSON.stringify({
+        'Material': 'Cuero/Sintético',
+        'Año de Lanzamiento': '1989',
+        'Silueta': 'Low'
+      })
     },
     // Vans
     {
@@ -123,7 +152,13 @@ exports.seed = async function (knex) {
       image_url: 'assets/images/products/vans-old-skool.jpg',
       rating: 4.9,
       review_count: 500,
-      category_id: '550e8400-e29b-41d4-a716-446655440006'
+      category_id: '550e8400-e29b-41d4-a716-446655440006',
+      specifications: JSON.stringify({
+        'Material': 'Lona/Ante',
+        'Suela': 'Waffle',
+        'Año de Lanzamiento': '1977',
+        'Silueta': 'Low'
+      })
     },
     // Puma
     {
@@ -138,7 +173,12 @@ exports.seed = async function (knex) {
       image_url: 'assets/images/products/puma-suede.jpg',
       rating: 4.4,
       review_count: 45,
-      category_id: '550e8400-e29b-41d4-a716-446655440004'
+      category_id: '550e8400-e29b-41d4-a716-446655440004',
+      specifications: JSON.stringify({
+        'Material': 'Ante',
+        'Año de Lanzamiento': '1968',
+        'Silueta': 'Low'
+      })
     },
     // Converse
     {
@@ -154,7 +194,12 @@ exports.seed = async function (knex) {
       rating: 4.8,
       review_count: 310,
       featured: true,
-      category_id: '550e8400-e29b-41d4-a716-446655440007'
+      category_id: '550e8400-e29b-41d4-a716-446655440007',
+      specifications: JSON.stringify({
+        'Material': 'Lona Premium',
+        'Año de Lanzamiento': '1970',
+        'Silueta': 'High'
+      })
     },
     // Accesorios
     {
@@ -169,7 +214,11 @@ exports.seed = async function (knex) {
       image_url: 'assets/images/products/crep-kit.jpg',
       rating: 4.7,
       review_count: 98,
-      category_id: '550e8400-e29b-41d4-a716-446655440008'
+      category_id: '550e8400-e29b-41d4-a716-446655440008',
+      specifications: JSON.stringify({
+        'Tipo': 'Limpieza',
+        'Uso': 'Todo tipo de material'
+      })
     }
   ]);
 };

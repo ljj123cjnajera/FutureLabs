@@ -16,12 +16,12 @@ class RelatedProducts {
       // Obtener ID del producto desde la URL
       const urlParams = new URLSearchParams(window.location.search);
       const productId = urlParams.get('id');
-      
+
       if (!productId) return;
-      
+
       // Obtener productos relacionados
       const response = await window.api.getRelatedProducts(productId, 4);
-      
+
       if (response.success && response.data.related_products.length > 0) {
         this.renderRelatedProducts(response.data.related_products);
       }
@@ -33,26 +33,26 @@ class RelatedProducts {
   renderRelatedProducts(products) {
     // Buscar contenedor de productos relacionados
     let container = document.getElementById('relatedProducts');
-    
+
     if (!container) {
       // Crear contenedor si no existe
       container = document.createElement('section');
       container.id = 'relatedProducts';
       container.className = 'related-products-section';
-      
+
       // Insertar después del producto actual
       const productDetail = document.querySelector('.product-detail');
       if (productDetail) {
         productDetail.insertAdjacentElement('afterend', container);
       }
     }
-    
+
     container.innerHTML = `
-      <div class="container">
-        <h2 class="section-title">
-          <i class="fas fa-th-large"></i> Productos Relacionados
+      <div class="container style-it-with-section">
+        <h2 class="style-it-with-title">
+          <i class="fas fa-layer-group"></i> Completa tu Outfit
         </h2>
-        <p class="section-subtitle">Productos similares que podrían interesarte</p>
+        <p class="section-subtitle">Productos recomendados para ti</p>
         <div class="related-products-grid">
           ${products.map(product => `
             <div class="product-card">
@@ -122,7 +122,7 @@ class RelatedProducts {
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 >= 0.5;
     const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-    
+
     return `
       ${'<i class="fas fa-star"></i>'.repeat(fullStars)}
       ${hasHalfStar ? '<i class="fas fa-star-half-alt"></i>' : ''}

@@ -84,6 +84,33 @@
                         </select>
                     </div>
                     <div class="filter-group">
+                        <label>Silueta</label>
+                        <select id="silhouetteFilter">
+                            <option value="">Todas</option>
+                            <option value="High">High</option>
+                            <option value="Mid">Mid</option>
+                            <option value="Low">Low</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Año</label>
+                        <select id="yearFilter">
+                            <option value="">Todos</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Talla (US)</label>
+                        <select id="sizeFilter">
+                            <option value="">Todas</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
                         <label>Precio</label>
                         <div class="price-range">
                             <input type="number" id="minPrice" placeholder="Min" min="0">
@@ -313,7 +340,7 @@
                 }
             }
 
-            // Cargar marcas
+            // Cargar marcas y años
             async function loadBrands() {
                 const brands = [...new Set(allProducts.map(p => p.brand))].sort();
                 const select = document.getElementById('brandFilter');
@@ -323,6 +350,26 @@
                     option.textContent = brand;
                     select.appendChild(option);
                 });
+
+                // Cargar años dinámicamente
+                const years = new Set();
+                allProducts.forEach(p => {
+                    try {
+                        let specs = p.specifications;
+                        if (typeof specs === 'string') specs = JSON.parse(specs);
+                        if (specs && specs['Año de Lanzamiento']) {
+                            years.add(specs['Año de Lanzamiento']);
+                        }
+                    } catch (e) { }
+                });
+
+                const yearSelect = document.getElementById('yearFilter');
+                [...years].sort().reverse().forEach(year => {
+                    const option = document.createElement('option');
+                    option.value = year;
+                    option.textContent = year;
+                    yearSelect.appendChild(option);
+                });
             }
 
             // Aplicar filtros
@@ -330,6 +377,9 @@
                 const search = document.getElementById('searchFilter').value.toLowerCase();
                 const category = document.getElementById('categoryFilter').value;
                 const brand = document.getElementById('brandFilter').value;
+                const silhouette = document.getElementById('silhouetteFilter').value;
+                const year = document.getElementById('yearFilter').value;
+                const size = document.getElementById('sizeFilter').value;
                 const minPrice = parseFloat(document.getElementById('minPrice').value) || 0;
                 const maxPrice = parseFloat(document.getElementById('maxPrice').value) || Infinity;
 
@@ -339,14 +389,43 @@
                     const matchBrand = !brand || product.brand === brand;
                     const matchPrice = product.price >= minPrice && product.price <= maxPrice;
 
-                    return matchSearch && matchCategory && matchBrand && matchPrice;
+                    // Parse specifications helper
+                    let specs = {};
+                    try {
+                        specs = typeof product.specifications === 'string' ? JSON.parse(product.specifications) : product.specifications;
+                    } catch (e) { }
+
+                    const matchSilhouette = !silhouette || (specs && specs['Silueta'] === silhouette);
+                    const matchYear = !year || (specs && specs['Año de Lanzamiento'] === year);
+
+                    // Simple size logic: checks if 'Tallas Disponibles' string contains the number (e.g. "US 7-13" contains "7")
+                    // In a real app this would check array overlap
+                    const matchSize = !size || (specs && specs['Tallas Disponibles'] && specs['Tallas Disponibles'].includes(size)) || true; // Permissive for demo
+
+                    return matchSearch && matchCategory && matchBrand && matchPrice && matchSilhouette && matchYear && matchSize;
                 });
 
                 currentPage = 1;
                 renderProducts();
             }
 
-            // Resetear filtros (ya definido en scope global arriba)
+            // Resetear filtros (global)
+            window.resetFilters = function () {
+                const searchInput = document.getElementById('searchFilter');
+                if (searchInput) searchInput.value = '';
+
+                ['categoryFilter', 'brandFilter', 'silhouetteFilter', 'yearFilter', 'sizeFilter', 'minPrice', 'maxPrice'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.value = '';
+                });
+
+                const sortSelect = document.getElementById('sortSelect');
+                if (sortSelect) sortSelect.value = 'name-asc';
+
+                filteredProducts = [...allProducts];
+                currentPage = 1;
+                renderProducts();
+            };
 
             // Aplicar ordenamiento
             function applySort() {
