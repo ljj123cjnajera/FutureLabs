@@ -127,8 +127,8 @@ window.loadingState = (() => {
 class FutureLabsAPI {
   constructor() {
     // Cambiado a localhost para desarrollo local con datos actualizados
-    // this.baseURL = 'https://futurelabs-production.up.railway.app/api';
-    this.baseURL = 'http://localhost:3000/api';
+    // this.baseURL = 'http://localhost:3000/api';
+    this.baseURL = 'https://futurelabs-production.up.railway.app/api';
     this.token = localStorage.getItem('auth_token');
   }
 
