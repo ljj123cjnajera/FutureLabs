@@ -20,13 +20,13 @@ class HomeManager {
         this.loadOnSaleProducts(),
         this.loadCategories()
       ]);
-      
+
       // Cargar megamenú dinámicamente después de cargar categorías
       this.loadMegaMenu();
-      
+
       // Cargar flash offers después de cargar productos en oferta
       await this.initFlashOffers();
-      
+
       this.setupEventListeners();
       window.logger?.success('HOME', 'HomeManager inicializado correctamente');
     } catch (error) {
@@ -38,7 +38,7 @@ class HomeManager {
     try {
       window.logger?.info('HOME', 'Cargando contenido del home...');
       const response = await window.api.getHomeContent();
-      
+
       if (!response || !response.success) {
         window.logger?.warn('HOME', 'Respuesta inválida del servidor al cargar contenido del home', response);
         this.renderEmptyStates();
@@ -46,36 +46,36 @@ class HomeManager {
       }
 
       const { hero_slides, benefits, banners, sections } = response.data ?? {};
-      
+
       // Procesar hero slides
       this.heroSlides = Array.isArray(hero_slides)
         ? hero_slides
-            .filter(slide => slide && slide.is_active !== false)
-            .sort((a, b) => (a?.order_index ?? 0) - (b?.order_index ?? 0))
+          .filter(slide => slide && slide.is_active !== false)
+          .sort((a, b) => (a?.order_index ?? 0) - (b?.order_index ?? 0))
         : [];
       window.logger?.debug?.('HOME', `Hero slides cargados: ${this.heroSlides.length}`);
 
       // Procesar beneficios
       this.homeBenefits = Array.isArray(benefits)
         ? benefits
-            .filter(benefit => benefit && benefit.is_active !== false)
-            .sort((a, b) => (a?.order_index ?? 0) - (b?.order_index ?? 0))
+          .filter(benefit => benefit && benefit.is_active !== false)
+          .sort((a, b) => (a?.order_index ?? 0) - (b?.order_index ?? 0))
         : [];
       window.logger?.debug?.('HOME', `Beneficios cargados: ${this.homeBenefits.length}`);
 
       // Procesar banners
       this.homeBanners = Array.isArray(banners)
         ? banners
-            .filter(banner => this.isBannerCurrentlyActive(banner))
-            .sort((a, b) => (a?.order_index ?? 0) - (b?.order_index ?? 0))
+          .filter(banner => this.isBannerCurrentlyActive(banner))
+          .sort((a, b) => (a?.order_index ?? 0) - (b?.order_index ?? 0))
         : [];
       window.logger?.debug?.('HOME', `Banners cargados: ${this.homeBanners.length}`);
 
       // Procesar secciones
       this.homeSections = Array.isArray(sections)
         ? sections
-            .filter(section => section && section.is_active !== false)
-            .sort((a, b) => (a?.order_index ?? 0) - (b?.order_index ?? 0))
+          .filter(section => section && section.is_active !== false)
+          .sort((a, b) => (a?.order_index ?? 0) - (b?.order_index ?? 0))
         : [];
       window.logger?.debug?.('HOME', `Secciones cargadas: ${this.homeSections.length}`);
 
@@ -84,7 +84,7 @@ class HomeManager {
       this.renderBenefits();
       this.renderBanners();
       this.renderHomeSections();
-      
+
       window.logger?.success('HOME', 'Contenido del home renderizado correctamente');
     } catch (error) {
       window.logger?.error('HOME', 'Error cargando contenido del home', error);
@@ -108,7 +108,7 @@ class HomeManager {
       if (container && window.skeletonLoader) {
         window.skeletonLoader.show('featuredProductsGrid', 'product-grid');
       }
-      
+
       const response = await window.api.getFeaturedProducts();
       if (response && response.success) {
         this.featuredProducts = response.data?.products || [];
@@ -141,9 +141,9 @@ class HomeManager {
       if (container && window.skeletonLoader) {
         window.skeletonLoader.show('onSaleProductsGrid', 'product-grid');
       }
-      
+
       const response = await window.api.getOnSaleProducts(8);
-      
+
       if (response && response.success) {
         this.onSaleProducts = response.data?.products || [];
         this.renderOnSaleProducts();
@@ -175,7 +175,7 @@ class HomeManager {
       if (container && window.skeletonLoader) {
         window.skeletonLoader.show('categories', 'categories');
       }
-      
+
       const response = await window.api.getCategories();
       if (response && response.success) {
         this.categories = response.data?.categories || [];
@@ -218,10 +218,10 @@ class HomeManager {
 
     container.innerHTML = this.featuredProducts.map(product => this.createProductCard(product)).join('');
     window.wishlistManager?.syncToggleButtons?.(container);
-    
+
     // Ocultar skeleton loader
     if (window.skeletonLoader) {
-        window.skeletonLoader.hide('featuredProductsGrid');
+      window.skeletonLoader.hide('featuredProductsGrid');
     }
   }
 
@@ -240,15 +240,15 @@ class HomeManager {
           <p style="font-size: 14px; margin-top: 8px; opacity: 0.7;">Vuelve pronto para ver nuestras mejores promociones</p>
         </div>
       `;
-        return;
+      return;
     }
 
-      container.innerHTML = this.onSaleProducts.map(product => this.createProductCard(product)).join('');
+    container.innerHTML = this.onSaleProducts.map(product => this.createProductCard(product)).join('');
     window.wishlistManager?.syncToggleButtons?.(container);
-      
-      // Ocultar skeleton loader
-      if (window.skeletonLoader) {
-        window.skeletonLoader.hide('onSaleProductsGrid');
+
+    // Ocultar skeleton loader
+    if (window.skeletonLoader) {
+      window.skeletonLoader.hide('onSaleProductsGrid');
     }
   }
 
@@ -263,29 +263,29 @@ class HomeManager {
       // Mantener categorías placeholder si no hay categorías
       container.innerHTML = `
         <div class="category-card">
-          <div class="category-icon"><i class="fas fa-gamepad"></i></div>
-          <h3>Mundo Gamer</h3>
-          <p>Equipos y accesorios gaming</p>
+          <div class="category-icon"><i class="fas fa-fire"></i></div>
+          <h3>Lanzamientos</h3>
+          <p>Lo último en hype</p>
         </div>
         <div class="category-card">
-          <div class="category-icon"><i class="fas fa-laptop"></i></div>
-          <h3>Mundo Productividad</h3>
-          <p>Herramientas para trabajar</p>
+          <div class="category-icon"><i class="fas fa-basketball-ball"></i></div>
+          <h3>Jordan Retro</h3>
+          <p>Iconos del deporte</p>
         </div>
         <div class="category-card">
-          <div class="category-icon"><i class="fas fa-home"></i></div>
-          <h3>Mundo Hogar Inteligente</h3>
-          <p>Automatización y control</p>
+          <div class="category-icon"><i class="fas fa-shoe-prints"></i></div>
+          <h3>Running & Sport</h3>
+          <p>Performance y estilo</p>
         </div>
         <div class="category-card">
-          <div class="category-icon"><i class="fas fa-heartbeat"></i></div>
-          <h3>Mundo Bienestar Tech</h3>
-          <p>Tecnología para tu salud</p>
+          <div class="category-icon"><i class="fas fa-tshirt"></i></div>
+          <h3>Streetwear</h3>
+          <p>Ropa y accesorios</p>
         </div>
         <div class="category-card">
-          <div class="category-icon"><i class="fas fa-headphones"></i></div>
-          <h3>Mundo Audio</h3>
-          <p>Sonido de alta calidad</p>
+          <div class="category-icon"><i class="fas fa-tags"></i></div>
+          <h3>Sale</h3>
+          <p>Oportunidades únicas</p>
         </div>
       `;
       return;
@@ -300,7 +300,7 @@ class HomeManager {
         <p>${this.escapeHtml(category.description || 'Explora esta categoría')}</p>
       </div>
     `).join('');
-    
+
     // Agregar event listeners para teclado (accesibilidad)
     container.querySelectorAll('.category-card').forEach(card => {
       card.addEventListener('keypress', (e) => {
@@ -575,52 +575,55 @@ class HomeManager {
   }
 
   createProductCard(product) {
-    const discount = product.discount_price ? 
+    const discount = product.discount_price ?
       Math.round(((product.price - product.discount_price) / product.price) * 100) : 0;
-    
+
+    // Mock sizes for visual demo (randomized for variety)
+    const mockSizes = Math.random() > 0.5 ? 'US 7 • 8 • 9 • 10 • 11' : 'US 8 • 9.5 • 10 • 12';
+
     return `
       <div class="product-card" onclick="window.location.href='product-detail.html?id=${product.id}'">
-        <div class="product-image">
+        <div class="product-image-container">
           <img src="${product.image_url || 'assets/images/products/placeholder.jpg'}" 
+               class="product-image"
                alt="${product.name}" 
                onerror="this.src='assets/images/products/placeholder.jpg'">
-          ${discount > 0 ? `<span class="discount-badge">-${discount}%</span>` : ''}
-          <button
-            class="favorite-btn"
-            type="button"
-            data-wishlist-toggle
-            data-product-id="${product.id}"
-            data-label-inactive="Agregar a favoritos"
-            data-label-active="En tu wishlist"
-            data-icon-inactive="far fa-heart"
-            data-icon-active="fas fa-heart"
-          >
-            <i class="far fa-heart"></i>
-          </button>
+          
+          <div class="product-badges">
+            ${discount > 0 ? `<span class="product-badge product-badge-sale">-${discount}%</span>` : ''}
+            ${product.is_new ? `<span class="product-badge product-badge-new">NUEVO</span>` : ''}
+          </div>
+
+          <div class="product-quick-actions">
+            <button class="product-quick-action" onclick="event.stopPropagation(); window.wishlistManager.toggle('${product.id}')" title="Agregar a favoritos">
+              <i class="far fa-heart"></i>
+            </button>
+            <button class="product-quick-action" onclick="event.stopPropagation();" title="Vista rápida">
+              <i class="far fa-eye"></i>
+            </button>
+          </div>
         </div>
-        <div class="product-info">
-          <span class="product-brand">${product.brand}</span>
-          <h3 class="product-name">${product.name}</h3>
-          <div class="product-rating">
-            ${this.generateStars(product.rating)}
-            <span class="rating-text">(${product.review_count || 0})</span>
+
+        <div class="product-content">
+          <span class="product-category">${product.brand || 'Sneakers'}</span>
+          <h3 class="product-title">${product.name}</h3>
+          
+          <div class="product-price-container">
+            <div class="product-price">
+              ${product.discount_price ? `
+                <span class="product-price-new">S/ ${parseFloat(product.discount_price).toFixed(2)}</span>
+                <span class="product-price-old">S/ ${parseFloat(product.price).toFixed(2)}</span>
+              ` : `
+                <span class="product-price-current">S/ ${parseFloat(product.price).toFixed(2)}</span>
+              `}
+            </div>
           </div>
-          <div class="product-price">
-            ${product.discount_price ? `
-              <span class="price-old">S/ ${parseFloat(product.price).toFixed(2)}</span>
-              <span class="price-new">S/ ${parseFloat(product.discount_price).toFixed(2)}</span>
-            ` : `
-              <span class="price-current">S/ ${parseFloat(product.price).toFixed(2)}</span>
-            `}
-          </div>
-          <div class="product-actions">
-            <button class="btn-cart" onclick="event.stopPropagation(); homeManager.addToCart('${product.id}')">
-              <i class="fas fa-shopping-cart"></i> Agregar
-            </button>
-            <button class="btn-buy" onclick="event.stopPropagation(); homeManager.buyNow('${product.id}')">
-              Comprar
-            </button>
-          </div>
+
+          <div class="product-size-preview">${mockSizes}</div>
+
+          <button class="product-btn" onclick="event.stopPropagation(); homeManager.addToCart('${product.id}')">
+            AGREGAR AL CARRITO
+          </button>
         </div>
       </div>
     `;
@@ -630,7 +633,7 @@ class HomeManager {
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 >= 0.5;
     const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-    
+
     return `
       ${'<i class="fas fa-star"></i>'.repeat(fullStars)}
       ${hasHalfStar ? '<i class="fas fa-star-half-alt"></i>' : ''}
@@ -640,16 +643,18 @@ class HomeManager {
 
   getCategoryIcon(slug) {
     const icons = {
-      'gaming': 'fa-gamepad',
-      'smartphones': 'fa-mobile-alt',
-      'laptops': 'fa-laptop',
-      'audio': 'fa-headphones',
-      'smart-home': 'fa-home',
-      'wearables': 'fa-heartbeat',
-      'cameras': 'fa-camera',
-      'accessories': 'fa-plug'
+      'jordan': 'fa-basketball-ball',
+      'nike': 'fa-check',
+      'adidas': 'fa-bars',
+      'yeezy': 'fa-wind',
+      'running': 'fa-running',
+      'sport': 'fa-dumbbell',
+      'casual': 'fa-shoe-prints',
+      'limited': 'fa-fire',
+      'sale': 'fa-tags',
+      'accessories': 'fa-socks'
     };
-    return icons[slug] || 'fa-box';
+    return icons[slug] || 'fa-box-open';
   }
 
   async addToCart(productId) {
@@ -657,7 +662,7 @@ class HomeManager {
       window.logger?.debug?.('HOME', `Intentando agregar producto al carrito: ${productId}`);
       window.logger?.debug?.('HOME', `cartManager existe: ${typeof window.cartManager}`);
       window.logger?.debug?.('HOME', `notifications existe: ${typeof window.notifications}`);
-      
+
       await window.cartManager.add(productId, 1);
       window.logger?.success('HOME', `Producto agregado al carrito: ${productId}`);
       window.notifications.show('Producto agregado al carrito', 'success');
@@ -680,7 +685,7 @@ class HomeManager {
     // Búsqueda
     const searchInput = document.querySelector('.search-bar input');
     const searchBtn = document.querySelector('.search-btn');
-    
+
     if (searchInput && searchBtn) {
       const performSearch = () => {
         const query = searchInput.value.trim();
@@ -688,7 +693,7 @@ class HomeManager {
           window.location.href = `products.html?search=${encodeURIComponent(query)}`;
         }
       };
-      
+
       searchBtn.addEventListener('click', performSearch);
       searchInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') performSearch();
@@ -698,7 +703,7 @@ class HomeManager {
     // CTA buttons genéricos
     document.querySelectorAll('.cta-button:not([data-action])').forEach(btn => {
       if (!btn.closest('.sticky-footer') && !btn.closest('.affiliate-banner')) {
-        btn.addEventListener('click', function(e) {
+        btn.addEventListener('click', function (e) {
           e.preventDefault();
           window.location.href = 'products.html';
         });
@@ -729,7 +734,7 @@ class HomeManager {
 
     subscribeBtn.addEventListener('click', async (e) => {
       e.preventDefault();
-      
+
       // Verificar si el usuario está logueado
       const user = await window.authManager?.getCurrentUser().catch(() => null);
       const email = user?.email;
@@ -804,7 +809,7 @@ class HomeManager {
 
     const submitBtn = form.querySelector('button[type="submit"]');
     const originalText = submitBtn?.textContent;
-    
+
     if (submitBtn) {
       submitBtn.disabled = true;
       submitBtn.textContent = 'Suscribiendo...';
@@ -829,7 +834,7 @@ class HomeManager {
       // TODO: Implementar endpoint de suscripción en backend
       // Por ahora, solo mostrar notificación
       window.notifications?.success(`¡Te has suscrito con ${email}! Pronto recibirás tu código de descuento del 10%.`);
-      
+
       // Guardar en localStorage para evitar spam
       const subscriptions = JSON.parse(localStorage.getItem('subscriptions') || '[]');
       if (!subscriptions.includes(email)) {
@@ -928,17 +933,17 @@ class HomeManager {
     try {
       // Cargar productos en oferta para mostrar en flash offers
       const response = await window.api.getOnSaleProducts(4);
-      
+
       if (response && response.success && response.data?.products?.length > 0) {
         const products = response.data.products.slice(0, 4);
-        
+
         flashSection.innerHTML = `
           <div class="flash-offers-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 24px;" role="list" aria-label="Ofertas flash disponibles">
             ${products.map((product, index) => {
-              const discount = product.discount_price ? 
-                Math.round(((product.price - product.discount_price) / product.price) * 100) : 0;
-              
-              return `
+          const discount = product.discount_price ?
+            Math.round(((product.price - product.discount_price) / product.price) * 100) : 0;
+
+          return `
                 <article class="flash-offer-card" role="listitem" onclick="window.location.href='product-detail.html?id=${product.id}'" onkeypress="if(event.key==='Enter') window.location.href='product-detail.html?id=${product.id}'" tabindex="0" aria-label="Oferta flash: ${this.escapeHtml(product.name)} con ${discount}% de descuento" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 24px; border-radius: 12px; cursor: pointer; transition: transform 0.2s;">
                   <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
                     <span style="background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;" aria-label="${discount} por ciento de descuento">-${discount}%</span>
@@ -961,7 +966,7 @@ class HomeManager {
                   </div>
                 </article>
               `;
-            }).join('')}
+        }).join('')}
           </div>
           <div style="text-align: center; margin-top: 24px;">
             <a href="products.html?on_sale=true" class="btn btn-primary">Ver todas las ofertas</a>
@@ -1005,7 +1010,7 @@ class HomeManager {
 
       const categoriesColumn = document.querySelector('.categories-column');
       const contentColumn = document.querySelector('.content-column');
-      
+
       if (!categoriesColumn || !contentColumn) {
         window.logger?.warn('HOME', 'Mega menu containers not found');
         return;
@@ -1024,7 +1029,7 @@ class HomeManager {
       contentColumn.innerHTML = this.categories.slice(0, 8).map((category, index) => {
         // Obtener subcategorías si existen (por ahora, usar placeholder)
         const subcategories = this.getSubcategoriesForCategory(category);
-        
+
         return `
           <div class="category-content ${index === 0 ? 'active' : ''}" data-category="${category.slug}">
             <div class="content-header">
@@ -1040,7 +1045,7 @@ class HomeManager {
 
       // Reinicializar event listeners del megamenú
       this.setupMegaMenuListeners();
-      
+
       window.logger?.success('HOME', 'Mega menu cargado dinámicamente');
     } catch (error) {
       window.logger?.error('HOME', 'Error cargando mega menu', error);
@@ -1052,15 +1057,24 @@ class HomeManager {
     // Por ahora, retornar subcategorías genéricas basadas en el slug
     // TODO: Implementar subcategorías reales desde la BD
     const subcategoriesMap = {
-      'laptops': [
-        { title: 'Componentes', items: ['Procesadores (CPU)', 'Tarjetas de Video (GPU)', 'Placas Madre', 'Memoria RAM', 'Almacenamiento SSD/HDD'] },
-        { title: 'Periféricos', items: ['Teclados', 'Mouses', 'Monitores', 'Webcams y Micrófonos', 'Audífonos'] },
-        { title: 'Laptops por Tipo', items: ['Laptops para Gaming', 'Laptops Ultraligeras', 'Laptops para Trabajo', 'Laptops Convertibles 2-en-1'] }
+      'jordan': [
+        { title: 'Retro High', items: ['Jordan 1', 'Jordan 3', 'Jordan 4'] },
+        { title: 'Mid & Low', items: ['Jordan 1 Mid', 'Jordan 1 Low', 'Legacy 312'] },
+        { title: 'Colaboraciones', items: ['Travis Scott', 'Union LA', 'Off-White'] }
       ],
-      'gaming': [
-        { title: 'Consolas', items: ['PlayStation', 'Xbox', 'Nintendo Switch', 'PC Gaming'] },
-        { title: 'Periféricos Gaming', items: ['Teclados Mecánicos', 'Mouses Gaming', 'Headsets', 'Mousepads'] },
-        { title: 'Componentes', items: ['Tarjetas Gráficas', 'Procesadores Gaming', 'Refrigeración Líquida', 'Gabinetes Gaming'] }
+      'yeezy': [
+        { title: 'Modelos Populares', items: ['Yeezy Boost 350', 'Yeezy 500', 'Yeezy 700'] },
+        { title: 'Slides & Foam', items: ['Yeezy Slide', 'Foam Runner'] }
+      ],
+      'nike': [
+        { title: 'Air Max', items: ['Air Max 1', 'Air Max 90', 'Air Max 97'] },
+        { title: 'Icons', items: ['Air Force 1', 'Dunk Low', 'Dunk High', 'Blazer'] },
+        { title: 'Running', items: ['Pegasus', 'Vaporfly', 'Alphafly'] }
+      ],
+      'adidas': [
+        { title: 'Originals', items: ['Samba', 'Gazelle', 'Superstar', 'Stan Smith'] },
+        { title: 'Performance', items: ['Ultraboost', 'Adizero', '4D'] },
+        { title: 'Bad Bunny', items: ['Campus', 'Forum', 'Response CL'] }
       ]
     };
 
@@ -1101,14 +1115,14 @@ class HomeManager {
       // Remover listeners previos
       const newItem = item.cloneNode(true);
       item.parentNode.replaceChild(newItem, item);
-      
+
       newItem.addEventListener('click', () => {
         const category = newItem.getAttribute('data-category');
-        
+
         // Remover active de todos
         categoryItems.forEach(i => i.classList.remove('active'));
         categoryContents.forEach(c => c.classList.remove('active'));
-        
+
         // Agregar active al seleccionado
         newItem.classList.add('active');
         const content = document.querySelector(`.category-content[data-category="${category}"]`);
@@ -1121,13 +1135,13 @@ class HomeManager {
     // Hover para desktop
     if (window.innerWidth > 768) {
       categoryItems.forEach(item => {
-        item.addEventListener('mouseenter', function() {
+        item.addEventListener('mouseenter', function () {
           const category = this.getAttribute('data-category');
-          
+
           if (!this.classList.contains('active')) {
             categoryItems.forEach(i => i.classList.remove('active'));
             categoryContents.forEach(c => c.classList.remove('active'));
-            
+
             this.classList.add('active');
             const content = document.querySelector(`.category-content[data-category="${category}"]`);
             if (content) {

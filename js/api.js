@@ -126,7 +126,9 @@ window.loadingState = (() => {
 })();
 class FutureLabsAPI {
   constructor() {
-    this.baseURL = 'https://futurelabs-production.up.railway.app/api';
+    // Cambiado a localhost para desarrollo local con datos actualizados
+    // this.baseURL = 'https://futurelabs-production.up.railway.app/api';
+    this.baseURL = 'http://localhost:3000/api';
     this.token = localStorage.getItem('auth_token');
   }
 
@@ -207,7 +209,7 @@ class FutureLabsAPI {
             effectiveEndpoint = `${endpoint}${separator}_=${Date.now()}`;
             return performRequest(true);
           }
-          
+
           console.warn('⚠️ Segunda respuesta 304 recibida. Forzando nueva solicitud con credenciales frescas.');
           cacheBustingTried = true;
           effectiveEndpoint = `${endpoint}${endpoint.includes('?') ? '&' : '?'}force=${Date.now()}`;
@@ -279,7 +281,7 @@ class FutureLabsAPI {
       } else {
         console.log('⚠️ No hay token, saltando petición al backend');
       }
-      
+
       // Siempre limpiar el token local
       this.setToken(null);
       console.log('✅ Logout completado en API');
@@ -464,9 +466,9 @@ class FutureLabsAPI {
   async processMobilePayment(orderId, phoneNumber, amount, paymentType = 'yape') {
     return this.request('/payments/mobile/process', {
       method: 'POST',
-      body: JSON.stringify({ 
-        order_id: orderId, 
-        phone_number: phoneNumber, 
+      body: JSON.stringify({
+        order_id: orderId,
+        phone_number: phoneNumber,
         amount,
         payment_type: paymentType
       })
@@ -635,7 +637,7 @@ class FutureLabsAPI {
   }
 
   async getTopSellingProducts(limit = 8, categoryId = null) {
-    const url = categoryId 
+    const url = categoryId
       ? `/related-products/popular/top-selling?limit=${limit}&category_id=${categoryId}`
       : `/related-products/popular/top-selling?limit=${limit}`;
     return this.request(url);
@@ -857,7 +859,7 @@ class FutureLabsAPI {
     try {
       const formData = new FormData();
       formData.append('image', file);
-      
+
       const response = await fetch(`${this.baseURL}/upload/image`, {
         method: 'POST',
         headers: {
@@ -865,16 +867,16 @@ class FutureLabsAPI {
         },
         body: formData
       });
-      
+
       const data = await response.json();
-      
+
       if (!response.ok) {
         return {
           success: false,
           message: data.message || `Error ${response.status}: ${response.statusText}`
         };
       }
-      
+
       return data;
     } catch (error) {
       console.error('Error uploading image:', error);
@@ -890,7 +892,7 @@ class FutureLabsAPI {
     files.forEach(file => {
       formData.append('images', file);
     });
-    
+
     const response = await fetch(`${this.baseURL}/upload/images`, {
       method: 'POST',
       headers: {
@@ -898,7 +900,7 @@ class FutureLabsAPI {
       },
       body: formData
     });
-    
+
     const data = await response.json();
     return data;
   }

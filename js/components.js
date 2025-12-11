@@ -85,14 +85,13 @@ class Components {
 
     const navBar = showNav ? `
           <nav class="nav-bar">
-            <a href="products.html" class="all-categories"><i class="fas fa-bars"></i> Todas las categorías</a>
-            <a href="products.html?filter=on-sale"><i class="fas fa-fire"></i> Ofertas Flash</a>
-            <a href="products.html?filter=featured"><i class="fas fa-rocket"></i> Lanzamientos</a>
-            <a href="products.html?category=laptops"><i class="fas fa-microchip"></i> Laptops & PC</a>
-            <a href="products.html?category=smart-home"><i class="fas fa-home"></i> Smart Home</a>
-            <a href="products.html?category=gaming"><i class="fas fa-gamepad"></i> Gaming</a>
-            <a href="products.html?filter=promo"><i class="fas fa-tag"></i> Promos y Cupones</a>
-            <a href="financing.html"><i class="fas fa-university"></i> Financiamiento</a>
+            <a href="products.html" class="all-categories"><i class="fas fa-bars"></i> Ver Todo</a>
+            <a href="products.html?filter=new-arrivals"><i class="fas fa-fire"></i> New Arrivals</a>
+            <a href="products.html?category=jordan"><i class="fas fa-basketball-ball"></i> Jordan</a>
+            <a href="products.html?category=yeezy"><i class="fas fa-wind"></i> Yeezy</a>
+            <a href="products.html?category=nike"><i class="fas fa-check"></i> Nike</a>
+            <a href="products.html?category=adidas"><i class="fas fa-bars"></i> Adidas</a>
+            <a href="products.html?filter=sale"><i class="fas fa-tag"></i> Sale</a>
           </nav>
     ` : '';
 

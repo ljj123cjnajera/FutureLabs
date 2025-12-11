@@ -5,7 +5,7 @@ const path = require('path');
 // Colores para diferentes categorías de productos
 const productColors = {
     'laptop': '#667eea',
-    'laptop-gaming': '#764ba2',
+    'sneaker-default': '#FF3B30',
     'smartphone': '#10b981',
     'smartwatch': '#f59e0b',
     'teclado': '#ef4444',
@@ -37,7 +37,7 @@ Object.keys(productColors).forEach(productName => {
     </text>
 </svg>
     `.trim();
-    
+
     const filePath = path.join(imagesDir, `${productName}.jpg`);
     // Guardar como SVG (los navegadores modernos lo soportan)
     fs.writeFileSync(filePath.replace('.jpg', '.svg'), svg);

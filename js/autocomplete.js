@@ -17,18 +17,18 @@ class SearchAutocomplete {
   init() {
     // Evitar inicialización múltiple
     if (this.initialized) return;
-    
+
     // Buscar input de búsqueda
     this.searchInput = document.getElementById('searchInput');
-    
+
     if (!this.searchInput) {
       console.log('⏳ SearchAutocomplete: searchInput no encontrado, reintentando...');
       return;
     }
-    
+
     this.initialized = true;
     console.log('✅ SearchAutocomplete inicializado correctamente');
-    
+
     this.searchInput.setAttribute('autocomplete', 'off');
     this.searchInput.setAttribute('role', 'combobox');
     this.searchInput.setAttribute('aria-autocomplete', 'list');
@@ -38,7 +38,7 @@ class SearchAutocomplete {
 
     // Crear contenedor de sugerencias
     this.createSuggestionsContainer();
-    
+
     // Event listeners
     this.searchInput.addEventListener('input', (e) => this.handleInput(e));
     this.searchInput.addEventListener('keydown', (e) => this.handleKeydown(e));
@@ -58,7 +58,7 @@ class SearchAutocomplete {
   createSuggestionsContainer() {
     const searchBar = this.searchInput.closest('.search-bar');
     if (!searchBar) return;
-    
+
     const existingContainer = searchBar.querySelector('.search-suggestions');
     if (existingContainer) {
       this.suggestionsContainer = existingContainer;
@@ -67,7 +67,7 @@ class SearchAutocomplete {
       this.configureSuggestionsContainer();
       return;
     }
-    
+
     const container = document.createElement('div');
     container.className = 'search-suggestions';
     container.style.display = 'none';
@@ -75,15 +75,15 @@ class SearchAutocomplete {
     this.suggestionsContainer = container;
     this.configureSuggestionsContainer();
   }
- 
-   configureSuggestionsContainer() {
-     if (!this.suggestionsContainer) return;
-     this.suggestionsContainer.id = this.containerId;
-     this.suggestionsContainer.setAttribute('role', 'listbox');
-     this.suggestionsContainer.setAttribute('aria-label', 'Sugerencias de búsqueda');
-     this.suggestionsContainer.setAttribute('aria-live', 'polite');
-     this.suggestionsContainer.setAttribute('aria-busy', 'false');
-   }
+
+  configureSuggestionsContainer() {
+    if (!this.suggestionsContainer) return;
+    this.suggestionsContainer.id = this.containerId;
+    this.suggestionsContainer.setAttribute('role', 'listbox');
+    this.suggestionsContainer.setAttribute('aria-label', 'Sugerencias de búsqueda');
+    this.suggestionsContainer.setAttribute('aria-live', 'polite');
+    this.suggestionsContainer.setAttribute('aria-busy', 'false');
+  }
 
   resetOptionCounter() {
     this.optionCounter = 0;
@@ -96,18 +96,18 @@ class SearchAutocomplete {
 
   async handleInput(e) {
     const query = e.target.value.trim();
-    
+
     // Clear previous timer
     if (this.debounceTimer) {
       clearTimeout(this.debounceTimer);
     }
-    
+
     // Show history or trending if query is empty
     if (query.length === 0) {
       this.renderHistoryAndTrending();
       return;
     }
-    
+
     // Hide suggestions if query is too short
     if (query.length < 2) {
       if (this.suggestionsContainer) {
@@ -116,7 +116,7 @@ class SearchAutocomplete {
       this.hideSuggestions();
       return;
     }
-    
+
     // Debounce API call
     this.debounceTimer = setTimeout(async () => {
       await this.fetchSuggestions(query);
@@ -127,9 +127,9 @@ class SearchAutocomplete {
     try {
       this.isLoading = true;
       this.showLoadingState();
-      
+
       const response = await window.api.getSearchSuggestions(query);
-      
+
       if (response.success) {
         this.currentSuggestions = response.data.suggestions;
         this.renderSuggestions();
@@ -151,7 +151,7 @@ class SearchAutocomplete {
 
   showLoadingState() {
     if (!this.suggestionsContainer) return;
-    
+
     this.suggestionsContainer.setAttribute('aria-busy', 'true');
     this.suggestionsContainer.innerHTML = `
       <div class="suggestions-loading">
@@ -167,21 +167,21 @@ class SearchAutocomplete {
 
   renderSuggestions() {
     if (!this.suggestionsContainer) return;
-    
+
     this.resetOptionCounter();
-    
+
     if (this.currentSuggestions.length === 0) {
       this.suggestionsContainer.setAttribute('aria-busy', 'false');
       this.hideSuggestions();
       return;
     }
-    
+
     // Group suggestions by type
     const products = this.currentSuggestions.filter(s => s.type === 'product');
     const categories = this.currentSuggestions.filter(s => s.type === 'category');
-    
+
     let html = '';
-    
+
     // Products
     if (products.length > 0) {
       html += '<div class="suggestions-section" role="presentation">';
@@ -207,7 +207,7 @@ class SearchAutocomplete {
       });
       html += '</div>';
     }
-    
+
     // Categories
     if (categories.length > 0) {
       html += '<div class="suggestions-section" role="presentation">';
@@ -225,7 +225,7 @@ class SearchAutocomplete {
       });
       html += '</div>';
     }
-    
+
     // View all results
     html += `
       <div class="suggestions-footer" role="presentation">
@@ -234,12 +234,12 @@ class SearchAutocomplete {
         </a>
       </div>
     `;
-    
+
     this.suggestionsContainer.innerHTML = html;
     this.suggestionsContainer.setAttribute('aria-busy', 'false');
     this.showSuggestions();
     this.selectedIndex = -1;
-    
+
     // Add click handlers
     this.suggestionsContainer.querySelectorAll('.suggestion-item[role="option"]').forEach(item => {
       item.addEventListener('click', () => {
@@ -251,15 +251,15 @@ class SearchAutocomplete {
   highlightMatch(text) {
     const query = this.searchInput.value.toLowerCase();
     const index = text.toLowerCase().indexOf(query);
-    
+
     if (index === -1) {
       return this.escapeHTML(text);
     }
-    
+
     const before = text.substring(0, index);
     const match = text.substring(index, index + query.length);
     const after = text.substring(index + query.length);
-    
+
     return `${this.escapeHTML(before)}<strong>${this.escapeHTML(match)}</strong>${this.escapeHTML(after)}`;
   }
 
@@ -284,22 +284,22 @@ class SearchAutocomplete {
     if (!this.suggestionsContainer || this.suggestionsContainer.style.display === 'none') {
       return;
     }
-    
+
     const items = this.suggestionsContainer.querySelectorAll('.suggestion-item[role="option"]');
-    
-    switch(e.key) {
+
+    switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
         this.selectedIndex = Math.min(this.selectedIndex + 1, items.length - 1);
         this.updateSelection(items);
         break;
-        
+
       case 'ArrowUp':
         e.preventDefault();
         this.selectedIndex = Math.max(this.selectedIndex - 1, -1);
         this.updateSelection(items);
         break;
-        
+
       case 'Enter':
         e.preventDefault();
         if (this.selectedIndex >= 0 && items[this.selectedIndex]) {
@@ -308,7 +308,7 @@ class SearchAutocomplete {
           this.executeSearch(this.searchInput.value.trim());
         }
         break;
-        
+
       case 'Escape':
         this.hideSuggestions();
         break;
@@ -338,25 +338,25 @@ class SearchAutocomplete {
   }
 
   showSuggestions() {
-     if (this.suggestionsContainer) {
-       this.suggestionsContainer.style.display = 'block';
-       if (this.searchInput) {
-         this.searchInput.setAttribute('aria-expanded', 'true');
-       }
-     }
-   }
- 
-   hideSuggestions() {
-     if (this.suggestionsContainer) {
-       this.suggestionsContainer.style.display = 'none';
-       this.suggestionsContainer.setAttribute('aria-busy', 'false');
-     }
-     this.selectedIndex = -1;
-     if (this.searchInput) {
-       this.searchInput.setAttribute('aria-expanded', 'false');
-       this.searchInput.removeAttribute('aria-activedescendant');
-     }
-   }
+    if (this.suggestionsContainer) {
+      this.suggestionsContainer.style.display = 'block';
+      if (this.searchInput) {
+        this.searchInput.setAttribute('aria-expanded', 'true');
+      }
+    }
+  }
+
+  hideSuggestions() {
+    if (this.suggestionsContainer) {
+      this.suggestionsContainer.style.display = 'none';
+      this.suggestionsContainer.setAttribute('aria-busy', 'false');
+    }
+    this.selectedIndex = -1;
+    if (this.searchInput) {
+      this.searchInput.setAttribute('aria-expanded', 'false');
+      this.searchInput.removeAttribute('aria-activedescendant');
+    }
+  }
 
   // Historial de búsquedas
   loadSearchHistory() {
@@ -368,22 +368,22 @@ class SearchAutocomplete {
     if (!query) return;
     const normalizedQuery = query.trim();
     if (!normalizedQuery) return;
-    
+
     const existingIndex = this.searchHistory.findIndex(
       (item) => item.toLowerCase() === normalizedQuery.toLowerCase()
     );
-    
+
     if (existingIndex !== -1) {
       this.searchHistory.splice(existingIndex, 1);
     }
-    
+
     this.searchHistory.unshift(normalizedQuery);
-    
+
     // Limitar a 10 búsquedas
     if (this.searchHistory.length > 10) {
       this.searchHistory = this.searchHistory.slice(0, 10);
     }
-    
+
     // Guardar en localStorage
     localStorage.setItem('searchHistory', JSON.stringify(this.searchHistory));
   }
@@ -391,7 +391,7 @@ class SearchAutocomplete {
   executeSearch(query) {
     const normalizedQuery = query?.trim();
     if (!normalizedQuery) return;
-    
+
     this.saveSearchHistory(normalizedQuery);
     this.hideSuggestions();
     window.location.href = `products.html?search=${encodeURIComponent(normalizedQuery)}`;
@@ -406,16 +406,16 @@ class SearchAutocomplete {
   // Renderizar historial y búsquedas populares
   async renderHistoryAndTrending() {
     if (!this.suggestionsContainer) return;
-    
+
     this.resetOptionCounter();
 
     let html = '';
-    
+
     // Historial de búsquedas
     if (this.searchHistory.length > 0) {
       html += '<div class="suggestions-section" role="presentation">';
       html += '<div class="suggestions-title" aria-hidden="true"><i class="fas fa-clock" aria-hidden="true"></i> Búsquedas Recientes</div>';
-      
+
       this.searchHistory.slice(0, 5).forEach((query) => {
         const safeAttr = this.escapeAttribute(query);
         const safeLabel = this.escapeHTML(query);
@@ -432,17 +432,17 @@ class SearchAutocomplete {
           </div>
         `;
       });
-      
+
       html += '<div class="suggestions-clear" role="presentation"><button id="clearHistory" type="button">Limpiar historial</button></div>';
       html += '</div>';
     }
-    
+
     // Búsquedas populares
-    const popularSearches = ['laptop gaming', 'smartphone', 'auriculares', 'smartwatch', 'tablet'];
+    const popularSearches = ['jordan 1', 'yeezy', 'dunk low', 'bad bunny', 'air force 1', 'samba'];
     if (popularSearches.length > 0) {
       html += '<div class="suggestions-section" role="presentation">';
       html += '<div class="suggestions-title" aria-hidden="true"><i class="fas fa-fire" aria-hidden="true"></i> Búsquedas Populares</div>';
-      
+
       popularSearches.forEach((query) => {
         const optionId = this.createOptionId('popular');
         const safeAttr = this.escapeAttribute(query);
@@ -456,22 +456,22 @@ class SearchAutocomplete {
           </div>
         `;
       });
-      
+
       html += '</div>';
     }
-    
+
     if (!html.trim()) {
       this.suggestionsContainer.innerHTML = '';
       this.suggestionsContainer.setAttribute('aria-busy', 'false');
       this.hideSuggestions();
       return;
     }
-    
+
     this.suggestionsContainer.innerHTML = html;
     this.suggestionsContainer.setAttribute('aria-busy', 'false');
     this.showSuggestions();
     this.selectedIndex = -1;
-    
+
     // Add click handlers
     this.suggestionsContainer.querySelectorAll('.suggestion-item[role="option"]').forEach(item => {
       item.addEventListener('click', (e) => {
@@ -480,7 +480,7 @@ class SearchAutocomplete {
         }
       });
     });
-    
+
     // Clear history button
     const clearHistoryBtn = this.suggestionsContainer.querySelector('#clearHistory');
     if (clearHistoryBtn) {
@@ -488,7 +488,7 @@ class SearchAutocomplete {
         this.clearSearchHistory();
       });
     }
-    
+
     // Delete individual history item
     this.suggestionsContainer.querySelectorAll('.suggestion-delete').forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -506,7 +506,7 @@ class SearchAutocomplete {
   // Seleccionar sugerencia
   selectSuggestion(item) {
     const type = item.dataset.type;
-    
+
     if (type === 'product') {
       const productId = item.dataset.id;
       if (item.dataset.name) {
@@ -548,19 +548,19 @@ if (document.readyState === 'loading') {
 function initializeAutocomplete() {
   // Crear instancia
   searchAutocomplete = new SearchAutocomplete();
-  
+
   // Intentar inicializar inmediatamente
   searchAutocomplete.init();
-  
+
   // Si no se inicializó, reintentar cada 100ms hasta 5 segundos
   if (!searchAutocomplete.initialized) {
     let attempts = 0;
     const maxAttempts = 50; // 5 segundos
-    
+
     const retryInterval = setInterval(() => {
       attempts++;
       searchAutocomplete.init();
-      
+
       if (searchAutocomplete.initialized || attempts >= maxAttempts) {
         clearInterval(retryInterval);
         if (!searchAutocomplete.initialized) {
