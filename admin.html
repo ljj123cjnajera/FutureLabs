@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,10 +27,13 @@
     <link rel="stylesheet" href="css/components-enhanced.css?v=3.0">
 
     <!-- CSS Específicos de Página -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/admin.css">
-    </head>
+</head>
+
 <body>
     <div class="admin-container">
         <!-- Sidebar -->
@@ -38,7 +42,7 @@
                 <h1>SneakersShop</h1>
                 <p>Panel de Administración</p>
             </div>
-            
+
             <div class="sidebar-menu">
                 <div class="menu-item active" data-section="dashboard">
                     <i class="fas fa-chart-line"></i>
@@ -72,7 +76,8 @@
                     <i class="fas fa-file-alt"></i>
                     <span>Reportes</span>
                 </div>
-                <div class="menu-item" data-section="hero-slides" style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px; padding-top: 20px;">
+                <div class="menu-item" data-section="hero-slides"
+                    style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px; padding-top: 20px;">
                     <i class="fas fa-sliders-h"></i>
                     <span>Hero Slides</span>
                 </div>
@@ -90,7 +95,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Main Content -->
         <div class="main-content">
             <div class="admin-header">
@@ -108,7 +113,7 @@
                     </button>
                 </div>
             </div>
-            
+
             <div class="content-area">
                 <!-- Dashboard Section -->
                 <div class="section active" id="dashboard">
@@ -123,7 +128,7 @@
                             <div class="stat-card-value" id="totalProducts">0</div>
                             <div class="stat-card-change">+12% este mes</div>
                         </div>
-                        
+
                         <div class="stat-card">
                             <div class="stat-card-header">
                                 <div class="stat-card-title">Total Usuarios</div>
@@ -134,7 +139,7 @@
                             <div class="stat-card-value" id="totalUsers">0</div>
                             <div class="stat-card-change">+8% este mes</div>
                         </div>
-                        
+
                         <div class="stat-card">
                             <div class="stat-card-header">
                                 <div class="stat-card-title">Total Pedidos</div>
@@ -145,7 +150,7 @@
                             <div class="stat-card-value" id="totalOrders">0</div>
                             <div class="stat-card-change">+15% este mes</div>
                         </div>
-                        
+
                         <div class="stat-card">
                             <div class="stat-card-header">
                                 <div class="stat-card-title">Ventas Totales</div>
@@ -157,7 +162,7 @@
                             <div class="stat-card-change">+20% este mes</div>
                         </div>
                     </div>
-                    
+
                     <!-- Gráficos -->
                     <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px; margin-top: 30px;">
                         <!-- Gráfico de Ventas -->
@@ -165,14 +170,14 @@
                             <h3>Ventas de los Últimos 7 Días</h3>
                             <canvas id="salesChart"></canvas>
                         </div>
-                        
+
                         <!-- Gráfico de Estados de Pedidos -->
                         <div class="chart-card">
                             <h3>Pedidos por Estado</h3>
                             <canvas id="ordersStatusChart"></canvas>
                         </div>
                     </div>
-                    
+
                     <!-- Segundo row de gráficos -->
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px;">
                         <!-- Top Productos -->
@@ -180,14 +185,14 @@
                             <h3>Top 5 Productos Más Vendidos</h3>
                             <canvas id="topProductsChart"></canvas>
                         </div>
-                        
+
                         <!-- Métodos de Pago -->
                         <div class="chart-card">
                             <h3>Métodos de Pago</h3>
                             <canvas id="paymentMethodsChart"></canvas>
                         </div>
                     </div>
-                    
+
                     <div class="table-container" style="margin-top: 30px;">
                         <div class="table-header">
                             <h3>Pedidos Recientes</h3>
@@ -211,7 +216,7 @@
                         </table>
                     </div>
                 </div>
-                
+
                 <!-- Products Section -->
                 <div class="section" id="products">
                     <div class="table-container">
@@ -241,7 +246,7 @@
                         </table>
                     </div>
                 </div>
-                
+
                 <!-- Categories Section -->
                 <div class="section" id="categories">
                     <div class="table-container">
@@ -269,7 +274,7 @@
                         </table>
                     </div>
                 </div>
-                
+
                 <!-- Orders Section -->
                 <div class="section" id="orders">
                     <div class="table-container">
@@ -296,7 +301,7 @@
                         </table>
                     </div>
                 </div>
-                
+
                 <!-- Payments Section -->
                 <div class="section" id="payments">
                     <div class="section-header">
@@ -316,7 +321,7 @@
                             </button>
                         </div>
                     </div>
-                    
+
                     <div class="stats-grid" style="margin-bottom: 20px;">
                         <div class="stat-card">
                             <div class="stat-card-header">
@@ -346,7 +351,7 @@
                             <div class="stat-card-value" id="totalProcessedAmount">S/ 0</div>
                         </div>
                     </div>
-                    
+
                     <div class="table-container">
                         <table>
                             <thead>
@@ -369,7 +374,7 @@
                         </table>
                     </div>
                 </div>
-                
+
                 <!-- Users Section -->
                 <div class="section" id="users">
                     <div class="table-container">
@@ -396,7 +401,7 @@
                         </table>
                     </div>
                 </div>
-                
+
                 <!-- Reviews Section -->
                 <div class="section" id="reviews">
                     <div class="table-container">
@@ -435,8 +440,10 @@
                             <h3>Reporte de Ventas</h3>
                             <p>Exporta tus ventas en formato CSV</p>
                             <div class="report-filters">
-                                <input type="date" id="salesStartDate" style="margin-bottom: 10px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                                <input type="date" id="salesEndDate" style="margin-bottom: 10px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                <input type="date" id="salesStartDate"
+                                    style="margin-bottom: 10px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                <input type="date" id="salesEndDate"
+                                    style="margin-bottom: 10px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
                             </div>
                             <button class="btn-primary" onclick="exportSalesReport()">
                                 <i class="fas fa-download"></i> Exportar CSV
@@ -517,7 +524,7 @@
     </div>
 
     <!-- Modales -->
-    
+
     <!-- Product Modal -->
     <div id="productModal" class="modal" style="display: none;">
         <div class="modal-content">
@@ -573,27 +580,32 @@
                 <div class="form-group">
                     <label>Imagen del Producto *</label>
                     <div style="margin-bottom: 10px;">
-                        <label class="btn btn-outline" style="display: inline-block; cursor: pointer; padding: 8px 16px; border-radius: 4px; border: 1px solid #ddd;">
+                        <label class="btn btn-outline"
+                            style="display: inline-block; cursor: pointer; padding: 8px 16px; border-radius: 4px; border: 1px solid #ddd;">
                             <i class="fas fa-upload"></i> Subir Imagen
-                            <input type="file" id="productImageFile" accept="image/*" style="display: none;" onchange="previewProductImage(this)">
+                            <input type="file" id="productImageFile" accept="image/*" style="display: none;"
+                                onchange="previewProductImage(this)">
                         </label>
                         <span id="imageFileName" style="margin-left: 10px; color: #666;"></span>
                     </div>
-                    
+
                     <!-- Preview de imagen -->
                     <div id="imagePreviewContainer" style="margin-top: 15px; display: none;">
                         <div style="position: relative; display: inline-block;">
-                            <img id="previewImage" src="" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 1px solid #ddd;">
-                            <button type="button" onclick="clearImagePreview()" style="position: absolute; top: -10px; right: -10px; background: #ef4444; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-size: 14px;">
+                            <img id="previewImage" src="" alt="Preview"
+                                style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 1px solid #ddd;">
+                            <button type="button" onclick="clearImagePreview()"
+                                style="position: absolute; top: -10px; right: -10px; background: #ef4444; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-size: 14px;">
                                 ×
                             </button>
                         </div>
                     </div>
-                    
+
                     <!-- O usar URL -->
                     <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
                         <label style="font-size: 12px; color: #666;">O ingresa una URL de imagen:</label>
-                        <input type="url" id="productImage" placeholder="https://ejemplo.com/imagen.jpg" style="margin-top: 5px;">
+                        <input type="url" id="productImage" placeholder="https://ejemplo.com/imagen.jpg"
+                            style="margin-top: 5px;">
                     </div>
                 </div>
                 <div class="form-row">
@@ -612,7 +624,8 @@
                     </label>
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="window.adminCRUD?.closeModalById('productModal')">Cancelar</button>
+                    <button type="button" class="btn-secondary"
+                        onclick="window.adminCRUD?.closeModalById('productModal')">Cancelar</button>
                     <button type="submit" class="btn-primary">Guardar</button>
                 </div>
             </form>
@@ -644,7 +657,8 @@
                     <input type="url" id="categoryImage">
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="window.adminCRUD?.closeModalById('categoryModal')">Cancelar</button>
+                    <button type="button" class="btn-secondary"
+                        onclick="window.adminCRUD?.closeModalById('categoryModal')">Cancelar</button>
                     <button type="submit" class="btn-primary">Guardar</button>
                 </div>
             </form>
@@ -693,7 +707,8 @@
                     </div>
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="window.adminCRUD?.closeModalById('userModal')">Cancelar</button>
+                    <button type="button" class="btn-secondary"
+                        onclick="window.adminCRUD?.closeModalById('userModal')">Cancelar</button>
                     <button type="submit" class="btn-primary">Guardar</button>
                 </div>
             </form>
@@ -732,7 +747,8 @@
                     </label>
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="window.adminCRUD?.closeModalById('reviewModal')">Cancelar</button>
+                    <button type="button" class="btn-secondary"
+                        onclick="window.adminCRUD?.closeModalById('reviewModal')">Cancelar</button>
                     <button type="submit" class="btn-primary">Guardar</button>
                 </div>
             </form>
@@ -784,12 +800,12 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="order-info-section">
                     <h4>Dirección de Envío</h4>
                     <p id="orderDetailsAddress"></p>
                 </div>
-                
+
                 <div class="order-info-section">
                     <h4>Items del Pedido</h4>
                     <table>
@@ -806,7 +822,7 @@
                         </tbody>
                     </table>
                 </div>
-                
+
                 <div class="order-info-section">
                     <h4>Resumen</h4>
                     <div class="info-grid">
@@ -903,7 +919,8 @@
                     <textarea id="productDescription" rows="4"></textarea>
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="window.adminCRUD?.closeModalById('productModal')">Cancelar</button>
+                    <button type="button" class="btn-secondary"
+                        onclick="window.adminCRUD?.closeModalById('productModal')">Cancelar</button>
                     <button type="submit" class="btn-primary">Guardar</button>
                 </div>
             </form>
@@ -933,7 +950,8 @@
                     <textarea id="categoryDescription" rows="4"></textarea>
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="window.adminCRUD?.closeModalById('categoryModal')">Cancelar</button>
+                    <button type="button" class="btn-secondary"
+                        onclick="window.adminCRUD?.closeModalById('categoryModal')">Cancelar</button>
                     <button type="submit" class="btn-primary">Guardar</button>
                 </div>
             </form>
@@ -977,7 +995,8 @@
                     </div>
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="window.adminCRUD?.closeModalById('userModal')">Cancelar</button>
+                    <button type="button" class="btn-secondary"
+                        onclick="window.adminCRUD?.closeModalById('userModal')">Cancelar</button>
                     <button type="submit" class="btn-primary">Guardar</button>
                 </div>
             </form>
@@ -1013,7 +1032,8 @@
                     <input type="checkbox" id="reviewIsApproved">
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="window.adminCRUD?.closeModalById('reviewModal')">Cancelar</button>
+                    <button type="button" class="btn-secondary"
+                        onclick="window.adminCRUD?.closeModalById('reviewModal')">Cancelar</button>
                     <button type="submit" class="btn-primary">Guardar</button>
                 </div>
             </form>
@@ -1022,15 +1042,15 @@
 
     <!-- Chart.js for Dashboard Graphics -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
-    
+
     <!-- Admin Home Content Management -->
     <script src="js/admin-home-content.js"></script>
-    
+
     <script src="js/api.js"></script>
     <script src="js/notifications.js"></script>
     <script src="js/admin.js"></script>
     <script src="js/admin-crud.js"></script>
-    
+
     <script>
         // Funciones para preview de imagen
         function previewProductImage(input) {
@@ -1051,7 +1071,7 @@
                 }
 
                 const reader = new FileReader();
-                reader.onload = function(event) {
+                reader.onload = function (event) {
                     document.getElementById('previewImage').src = event.target.result;
                     document.getElementById('imagePreviewContainer').style.display = 'block';
                     document.getElementById('imageFileName').textContent = file.name;
@@ -1304,13 +1324,22 @@
                     </div>
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="window.closeHomeSectionModal()">Cancelar</button>
+                    <button type="button" class="btn-secondary"
+                        onclick="window.closeHomeSectionModal()">Cancelar</button>
                     <button type="submit" class="btn-primary">Guardar</button>
                 </div>
             </form>
         </div>
     </div>
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/skeleton.js"></script>
+    <script src="js/modals.js"></script>
+    <script src="js/admin-home-content.js"></script> <!-- Referenced in admin.js -->
+    <script src="js/admin-crud.js"></script>
+    <script src="js/admin.js"></script>
 </body>
+
 </html>
-
-
