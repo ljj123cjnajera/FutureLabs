@@ -1,0 +1,237 @@
+/* 👟 Streetwear Product Experience - v1.0 */
+
+/* ============================================
+   1. GLOBAL OVERRIDES FOR PRODUCTS
+   ============================================ */
+body {
+    background-color: var(--white);
+}
+
+/* Common Header Styles */
+.products-hero-card {
+    background: var(--black) !important;
+    border: none;
+    border-radius: 0;
+    padding: var(--spacing-3xl);
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: var(--spacing-xl);
+}
+
+.products-hero-card::before {
+    /* Abstract Pattern Overlay */
+    content: 'FUTURE LABS';
+    position: absolute;
+    right: -2rem;
+    bottom: -3rem;
+    font-size: 8rem;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.05);
+    white-space: nowrap;
+    pointer-events: none;
+    font-family: 'Poppins', sans-serif;
+}
+
+.products-hero-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 900;
+    font-size: 4rem;
+    text-transform: uppercase;
+    color: var(--white);
+    letter-spacing: -0.02em;
+    margin-bottom: var(--spacing-md);
+    position: relative;
+    z-index: 2;
+}
+
+.products-hero-description {
+    color: var(--gray-300);
+    font-size: 1.2rem;
+    max-width: 600px;
+    position: relative;
+    z-index: 2;
+}
+
+/* ============================================
+   2. BRUTALIST FILTERS (products.html)
+   ============================================ */
+.products-filters {
+    background: var(--white);
+    border: 3px solid var(--black);
+    padding: var(--spacing-lg);
+    border-radius: 0;
+    margin-bottom: var(--spacing-xl);
+}
+
+.filter-group label {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    margin-bottom: var(--spacing-xs);
+    display: block;
+    color: var(--black);
+}
+
+.filter-group select,
+.filter-group input {
+    border: 2px solid var(--black);
+    border-radius: 0;
+    font-weight: 600;
+    padding: 0.75rem;
+    font-size: 1rem;
+    width: 100%;
+}
+
+.filter-group select:focus,
+.filter-group input:focus {
+    outline: none;
+    background-color: var(--black);
+    color: var(--white);
+}
+
+/* ============================================
+   3. PRODUCT GRID OVERRIDES
+   ============================================ */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-lg);
+}
+
+.product-card {
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.product-card:hover {
+    border-color: var(--black);
+    transform: translateY(-5px);
+}
+
+.product-card-image {
+    border-radius: 0;
+    background: var(--gray-100);
+}
+
+/* ============================================
+   4. PRODUCT DETAIL (PDP) - MASSIVE
+   ============================================ */
+/* Hide default breadcrumbs for cleaner look or style them */
+#breadcrumbs {
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-bottom: var(--spacing-lg);
+}
+
+.product-title-large {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 900;
+    font-size: 3.5rem;
+    /* Massive */
+    text-transform: uppercase;
+    line-height: 1;
+    margin-bottom: var(--spacing-sm);
+    color: var(--black);
+}
+
+.product-price-large {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--black);
+    margin-bottom: var(--spacing-lg);
+    display: block;
+}
+
+.add-to-cart-sticky {
+    position: sticky;
+    bottom: var(--spacing-md);
+    z-index: 100;
+    width: 100%;
+}
+
+.btn-massive {
+    width: 100%;
+    padding: 1.5rem;
+    font-size: 1.25rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-radius: 0;
+    background: var(--black);
+    color: var(--white);
+    border: 3px solid var(--black);
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.btn-massive:hover {
+    background: var(--white);
+    color: var(--black);
+    /* box-shadow: 8px 8px 0px var(--accent); */
+    /* Optional accent shadow */
+    transform: translateY(-2px);
+}
+
+/* Selector Grids */
+.size-selector-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    gap: 10px;
+    margin: var(--spacing-md) 0;
+}
+
+.size-option {
+    border: 2px solid var(--gray-300);
+    padding: 10px;
+    text-align: center;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.size-option.selected {
+    background: var(--black);
+    color: var(--white);
+    border-color: var(--black);
+}
+
+.size-option:hover:not(.selected) {
+    border-color: var(--black);
+}
+
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1024px) {
+    .products-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-sm) !important;
+    }
+
+    .products-hero-title,
+    .product-title-large {
+        font-size: 2.5rem;
+    }
+
+    .products-filters {
+        padding: var(--spacing-md);
+    }
+
+    .filters-row {
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+
+    .product-detail-layout {
+        grid-template-columns: 1fr;
+    }
+}

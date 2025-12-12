@@ -36,6 +36,8 @@
     <link rel="stylesheet" href="css/comparator.css?v=1.0">
     <link rel="stylesheet" href="css/breadcrumbs.css?v=1.0">
     <link rel="stylesheet" href="css/recently-viewed.css?v=1.0">
+    <!-- Streetwear Overrides -->
+    <link rel="stylesheet" href="css/products-streetwear.css?v=1.0">
 </head>
 
 <body>
@@ -47,53 +49,49 @@
 
     <!-- Products Page -->
     <div class="products-page">
-        <div class="products-hero">
-            <div class="container">
-                <div class="products-hero-card">
-                    <span class="products-hero-eyebrow"><i class="fas fa-th-large"></i> Catálogo SneakersShop</span>
-                    <h1 class="products-hero-title">Nuestra Colección</h1>
-                    <p class="products-hero-description">Explora los últimos lanzamientos, ediciones limitadas y
-                        clásicos atemporales. Encuentra tu par perfecto.</p>
-                    <div class="products-hero-actions">
-                        <button type="button" class="btn btn-primary btn-sm" onclick="scrollToFilters()">
-                            <i class="fas fa-sliders-h"></i> Explorar filtros
-                        </button>
-                        <button type="button" class="btn btn-outline btn-sm"
-                            onclick="window.location.href='compare.html'">
-                            <i class="fas fa-balance-scale"></i> Ir al comparador
-                        </button>
-                    </div>
-                </div>
+        <div class="container" style="margin-top: 2rem;">
+            <div class="products-hero-card">
+                <span class="products-hero-eyebrow"
+                    style="color: var(--accent); font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1rem; display: block;">
+                    <i class="fas fa-th-large"></i> Catálogo 2024
+                </span>
+                <h1 class="products-hero-title">NUESTRA COLECCIÓN</h1>
+                <p class="products-hero-description">
+                    Explora los últimos lanzamientos, ediciones limitadas y clásicos atemporales. Encuentra tu par
+                    perfecto.
+                </p>
+                <!-- Actions could go here if needed -->
             </div>
         </div>
 
         <div class="container">
             <!-- Filters -->
             <div class="products-filters">
-                <div class="filters-row">
-                    <div class="filter-group">
-                        <label>Buscar Producto</label>
-                        <input type="text" id="searchFilter" placeholder="Buscar por nombre...">
+                <div class="filters-row" style="display: flex; gap: 20px; flex-wrap: wrap;">
+                    <div class="filter-group" style="flex: 2; min-width: 200px;">
+                        <label><i class="fas fa-search"></i> BUSCAR</label>
+                        <input type="text" id="searchFilter" placeholder="Buscar por nombre..."
+                            style="background: #f9f9f9;">
                     </div>
-                    <div class="filter-group">
-                        <label>Categoría</label>
+                    <div class="filter-group" style="flex: 1; min-width: 150px;">
+                        <label>CATEGORÍA</label>
                         <select id="categoryFilter">
-                            <option value="">Todas las categorías</option>
+                            <option value="">TODAS</option>
                         </select>
                     </div>
-                    <div class="filter-group">
-                        <label>Marca</label>
+                    <div class="filter-group" style="flex: 1; min-width: 150px;">
+                        <label>MARCA</label>
                         <select id="brandFilter">
-                            <option value="">Todas las marcas</option>
+                            <option value="">TODAS</option>
                         </select>
                     </div>
-                    <div class="filter-group">
-                        <label>Silueta</label>
+                    <div class="filter-group" style="flex: 1; min-width: 150px;">
+                        <label>SILUETA</label>
                         <select id="silhouetteFilter">
-                            <option value="">Todas</option>
-                            <option value="High">High</option>
-                            <option value="Mid">Mid</option>
-                            <option value="Low">Low</option>
+                            <option value="">CUALQUIERA</option>
+                            <option value="High">HIGH</option>
+                            <option value="Mid">MID</option>
+                            <option value="Low">LOW</option>
                         </select>
                     </div>
                     <div class="filter-group">
