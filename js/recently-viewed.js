@@ -31,20 +31,23 @@ class RecentlyViewed {
 
     const price = Number(rawProduct.price ?? rawProduct.discount_price ?? 0);
     const discountPrice = Number(rawProduct.discount_price ?? 0);
+    const imageUrl = rawProduct.image_url ||
+      rawProduct.thumbnail ||
+      rawProduct.images?.[0] ||
+      this.defaultImage;
 
     return {
       id: rawProduct.id,
       name: rawProduct.name || 'Producto sin nombre',
       brand: rawProduct.brand || '',
-      image:
-        rawProduct.image_url ||
-        rawProduct.thumbnail ||
-        rawProduct.images?.[0] ||
-        this.defaultImage,
+      image_url: imageUrl, // Changed from image to image_url for consistency
       price,
       discount_price: discountPrice > 0 ? discountPrice : null,
       url: `product-detail.html?id=${rawProduct.id}`,
-      added_at: Date.now()
+      added_at: Date.now(),
+      // Adding extra fields if available in rawProduct, to ensure better card rendering
+      is_new: rawProduct.is_new,
+      specifications: rawProduct.specifications
     };
   }
 
@@ -94,20 +97,35 @@ class RecentlyViewed {
       section.style.display = 'block';
     }
 
-    container.innerHTML = products
+    const cardsMarkup = products
       .slice(0, limit)
       .map((product) => this.renderCard(product, options))
       .join('');
+
+    // Ensure we use a grid container that supports the standard card width
+    // Using recently-viewed-grid is fine if it matches product-grid specs
+    container.innerHTML = cardsMarkup;
+
+    // Sync wishlist buttons after rendering
+    if (window.wishlistManager?.syncToggleButtons) {
+      window.wishlistManager.syncToggleButtons(container);
+    }
   }
 
   renderCard(product, options = {}) {
+    if (window.Components && window.Components.getProductCard) {
+      return window.Components.getProductCard(product);
+    }
+
+    // Fallback logic
     const price = product.discount_price ?? product.price;
     const formattedPrice = this.formatCurrency(price);
+    // ... (rest of fallback logic if needed, but ideally rely on Components)
 
     const secondary = product.discount_price
       ? `<span class="recently-viewed-card-price-old">S/ ${Number(
-          product.price
-        ).toFixed(2)}</span>`
+        product.price
+      ).toFixed(2)}</span>`
       : '';
 
     const actionLabel = options.actionLabel || 'Ver producto';
@@ -115,14 +133,13 @@ class RecentlyViewed {
     return `
       <article class="recently-viewed-card">
         <a href="${product.url}" class="recently-viewed-card-image" title="${product.name}">
-          <img src="${product.image}" alt="${product.name}">
+          <img src="${product.image_url}" alt="${product.name}">
         </a>
         <div class="recently-viewed-card-content">
-          ${
-            product.brand
-              ? `<span class="recently-viewed-card-brand">${product.brand}</span>`
-              : ''
-          }
+          ${product.brand
+        ? `<span class="recently-viewed-card-brand">${product.brand}</span>`
+        : ''
+      }
           <h3 class="recently-viewed-card-title">${product.name}</h3>
           <div class="recently-viewed-card-price">
             <span>

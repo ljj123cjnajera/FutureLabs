@@ -53,60 +53,14 @@ class RelatedProducts {
           <i class="fas fa-layer-group"></i> Completa tu Outfit
         </h2>
         <p class="section-subtitle">Productos recomendados para ti</p>
-        <div class="related-products-grid">
-          ${products.map(product => `
-            <div class="product-card">
-              <div class="product-image-container">
-                <img src="${product.image_url || 'https://via.placeholder.com/300'}" 
-                     alt="${product.name}" 
-                     class="product-image"
-                     onclick="window.location.href='product-detail.html?id=${product.id}'">
-                ${product.discount_price ? `
-                  <span class="discount-badge">
-                    ${Math.round((1 - product.discount_price / product.price) * 100)}% OFF
-                  </span>
-                ` : ''}
-                <button
-                  class="wishlist-btn"
-                  type="button"
-                  data-wishlist-toggle
-                  data-product-id="${product.id}"
-                  data-label-inactive="Agregar a favoritos"
-                  data-label-active="En tu wishlist"
-                  data-icon-inactive="far fa-heart"
-                  data-icon-active="fas fa-heart"
-                >
-                  <i class="far fa-heart"></i>
-                </button>
-              </div>
-              <div class="product-info">
-                <h3 class="product-name" onclick="window.location.href='product-detail.html?id=${product.id}'">
-                  ${product.name}
-                </h3>
-                <div class="product-category">${product.category_name || 'Sin categoría'}</div>
-                <div class="product-price">
-                  ${product.discount_price ? `
-                    <span class="price-old">S/ ${parseFloat(product.price).toFixed(2)}</span>
-                    <span class="price-current">S/ ${parseFloat(product.discount_price).toFixed(2)}</span>
-                  ` : `
-                    <span class="price-current">S/ ${parseFloat(product.price).toFixed(2)}</span>
-                  `}
-                </div>
-                <div class="product-rating">
-                  ${this.generateStars(4.5)}
-                  <span class="rating-count">(24)</span>
-                </div>
-                <div class="product-actions">
-                  <button class="btn-add-cart" onclick="addToCart('${product.id}')">
-                    <i class="fas fa-shopping-cart"></i> Agregar
-                  </button>
-                  <button class="btn-compare" data-product-id="${product.id}" data-compare-variant="icon" title="Comparar producto">
-                    <i class="fas fa-balance-scale"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-          `).join('')}
+        <div class="related-products-grid products-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 24px;">
+          ${products.map(product => {
+      if (window.Components && window.Components.getProductCard) {
+        return window.Components.getProductCard(product);
+      }
+      // Fallback
+      return '<div class="error">Error loading card</div>';
+    }).join('')}
         </div>
       </div>
     `;

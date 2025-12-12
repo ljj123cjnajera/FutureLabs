@@ -9,8 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
-    <!-- Estilos inline removidos - migrados a products-page.css -->
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
+        <!-- Estilos inline removidos - migrados a products-page.css -->
 
     <!-- CSS Unificado (Streetwear Standard) -->
     <link rel="stylesheet" href="css/typography.css?v=3.0">
@@ -36,7 +36,7 @@
     <link rel="stylesheet" href="css/comparator.css?v=1.0">
     <link rel="stylesheet" href="css/breadcrumbs.css?v=1.0">
     <link rel="stylesheet" href="css/recently-viewed.css?v=1.0">
-    </head>
+</head>
 
 <body>
     <!-- Header Dinámico -->
@@ -474,70 +474,10 @@
 
                 if (pageProducts.length > 0) {
                     const cardsMarkup = pageProducts.map((product) => {
-                        const basePrice = Number(product.price || 0);
-                        const offerPrice = Number(product.discount_price || 0);
-                        const hasDiscount = offerPrice > 0 && offerPrice < basePrice;
-                        const discountPercent = hasDiscount
-                            ? Math.round(((basePrice - offerPrice) / basePrice) * 100)
-                            : 0;
-                        const rating = Number(product.rating || 0);
-
-                        return `
-                        <article class="product-card-page" data-product-id="${product.id}" onclick="window.location.href='product-detail.html?id=${product.id}'">
-                            <div class="product-image-page">
-                                <img src="${product.image_url || 'assets/images/products/placeholder.jpg'}" alt="${product.name}" loading="lazy">
-                                ${hasDiscount ? `<span class="product-badge-page">-${discountPercent}%</span>` : ''}
-                                <button class="quick-view-btn" type="button" onclick="event.stopPropagation(); window.quickView?.show('${product.id}')" aria-label="Vista rápida de ${product.name}">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                            <button
-                                type="button"
-                                data-wishlist-toggle
-                                data-product-id="${product.id}"
-                                data-label-inactive="Agregar a favoritos"
-                                data-label-active="En tu wishlist"
-                                data-icon-inactive="far fa-heart"
-                                data-icon-active="fas fa-heart"
-                                onclick="event.stopPropagation();"
-                                aria-label="Guardar ${product.name} en tu wishlist"
-                            >
-                                <i class="far fa-heart"></i>
-                            </button>
-                            <div class="product-info-page">
-                                <span class="product-brand-page">${product.brand || 'SneakersShop'}</span>
-                                <h3>${product.name}</h3>
-                                <div class="product-rating">
-                                    <span class="product-rating-stars">${renderStars(rating)}</span>
-                                    <span class="rating-text">(${product.review_count || 0})</span>
-                                </div>
-                                <div class="product-price-page">
-                                    ${hasDiscount
-                                ? `
-                                            <span class="current-price-page">S/ ${offerPrice.toFixed(2)}</span>
-                                            <span class="old-price-page">S/ ${basePrice.toFixed(2)}</span>
-                                        `
-                                : `<span class="current-price-page">S/ ${basePrice.toFixed(2)}</span>`
-                            }
-                                </div>
-                                <div class="product-actions-page">
-                                    <button class="btn btn-primary btn-sm" type="button" onclick="event.stopPropagation(); addToCart('${product.id}')">
-                                        <i class="fas fa-shopping-cart"></i> Agregar
-                                    </button>
-                                    <button class="btn btn-outline btn-sm btn-compare" type="button" data-product-id="${product.id}" data-label-inactive="Comparar" data-label-active="Comparando" onclick="event.stopPropagation();">
-                                        <i class="fas fa-balance-scale"></i> Comparar
-                                    </button>
-                                </div>
-                            </div>
-                        </article>
-                    `;
+                        return window.Components.getProductCard(product);
                     }).join('');
 
-                    container.innerHTML = `
-                    <div class="products-grid-page">
-                        ${cardsMarkup}
-                    </div>
-                `;
+                    container.innerHTML = `<div class="products-grid">${cardsMarkup}</div>`;
                 } else {
                     showEmptyState('No se encontraron productos con estos filtros');
                 }
@@ -550,6 +490,7 @@
                     window.productComparator.updateCompareButtons();
                 }
 
+                // Sincronizar wishlist
                 if (window.wishlistManager) {
                     window.wishlistManager.syncToggleButtons?.(container);
                 }
@@ -568,27 +509,27 @@
                 }
 
                 let html = `
-                <button class="btn btn-outline btn-sm" onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-            `;
+                        < button class="btn btn-outline btn-sm" onclick = "goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+                            <i class="fas fa-chevron-left"></i>
+                </button >
+                        `;
 
                 for (let i = 1; i <= totalPages; i++) {
                     if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
                         html += `
-                        <button class="btn ${i === currentPage ? 'btn-primary' : 'btn-outline'} btn-sm" onclick="goToPage(${i})">
+                        < button class="btn ${i === currentPage ? 'btn-primary' : 'btn-outline'} btn-sm" onclick = "goToPage(${i})" >
                             ${i}
-                        </button>
-                    `;
+                        </button >
+                        `;
                     } else if (i === currentPage - 3 || i === currentPage + 3) {
-                        html += `<span class="btn btn-ghost btn-sm" style="pointer-events: none;">...</span>`;
+                        html += `< span class="btn btn-ghost btn-sm" style = "pointer-events: none;" >...</span > `;
                     }
                 }
 
                 html += `
-                <button class="btn btn-outline btn-sm" onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
-                    <i class="fas fa-chevron-right"></i>
-                </button>
+        < button class= "btn btn-outline btn-sm" onclick = "goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+        <i class="fas fa-chevron-right"></i>
+                </button >
             `;
 
                 pagination.innerHTML = html;
@@ -608,14 +549,14 @@
             function showEmptyState(message) {
                 const container = document.getElementById('productsContainer');
                 container.innerHTML = `
-                <div class="products-empty-state">
+            < div class= "products-empty-state" >
                     <i class="fas fa-box-open"></i>
                     <h3>${message}</h3>
                     <p>Te recomendamos ajustar los filtros o explorar otra categoría.</p>
                     <button type="button" class="btn btn-outline btn-sm" onclick="resetFilters()">
                         <i class="fas fa-redo"></i> Limpiar filtros
                     </button>
-                </div>
+                </div >
             `;
             }
 

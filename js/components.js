@@ -409,6 +409,74 @@ class Components {
       }
     });
   }
+
+  static getProductCard(product) {
+    const discount = product.discount_price ?
+      Math.round(((product.price - product.discount_price) / product.price) * 100) : 0;
+
+    // Mock sizes logic (preserved from Home for consistency, ideally should come from API)
+    // Tallas Disponibles might be a string or array in 'specifications'
+    let sizeText = 'US 7 • 8 • 9 • 10 • 11';
+    try {
+      let specs = product.specifications;
+      if (typeof specs === 'string') specs = JSON.parse(specs);
+      if (specs && specs['Tallas Disponibles']) {
+        const sizes = Array.isArray(specs['Tallas Disponibles'])
+          ? specs['Tallas Disponibles']
+          : specs['Tallas Disponibles'].split(',');
+        sizeText = sizes.slice(0, 5).join(' • ');
+      }
+    } catch (e) { }
+
+
+    return `
+      <div class="product-card" onclick="window.location.href='product-detail.html?id=${product.id}'">
+        <div class="product-image-container">
+          <img src="${product.image_url || 'assets/images/products/placeholder.jpg'}" 
+               class="product-image"
+               alt="${product.name}" 
+               loading="lazy"
+               onerror="this.src='assets/images/products/placeholder.jpg'">
+          
+          <div class="product-badges">
+            ${discount > 0 ? `<span class="product-badge product-badge-sale">-${discount}%</span>` : ''}
+            ${product.is_new ? `<span class="product-badge product-badge-new">NUEVO</span>` : ''}
+          </div>
+
+          <div class="product-quick-actions">
+            <button class="product-quick-action" onclick="event.stopPropagation(); window.wishlistManager?.toggle('${product.id}')" title="Agregar a favoritos">
+              <i class="far fa-heart"></i>
+            </button>
+            <button class="product-quick-action" onclick="event.stopPropagation(); window.openQuickView?.('${product.id}') || window.quickView?.show('${product.id}')" title="Vista Rápida">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="product-content">
+          <span class="product-category">${product.brand || 'Sneakers'}</span>
+          <h3 class="product-title">${product.name}</h3>
+          
+          <div class="product-price-container">
+            <div class="product-price">
+              ${product.discount_price ? `
+                <span class="product-price-new">S/ ${parseFloat(product.discount_price).toFixed(2)}</span>
+                <span class="product-price-old">S/ ${parseFloat(product.price).toFixed(2)}</span>
+              ` : `
+                <span class="product-price-current">S/ ${parseFloat(product.price).toFixed(2)}</span>
+              `}
+            </div>
+          </div>
+
+          <div class="product-size-preview">${sizeText}</div>
+
+          <button class="product-btn" onclick="event.stopPropagation(); window.cartManager?.add('${product.id}', 1)">
+            AGREGAR AL CARRITO
+          </button>
+        </div>
+      </div>
+    `;
+  }
 }
 
 // Función de búsqueda global
