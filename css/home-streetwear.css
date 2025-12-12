@@ -320,6 +320,221 @@ footer .copyright {
     letter-spacing: 0.1em;
 }
 
+
+/* ============================================
+   6. SECTION HEADERS - PREMIUM RESTORED
+   ============================================ */
+.section-header {
+    text-align: center;
+    justify-content: center;
+    margin-bottom: var(--spacing-3xl);
+    flex-direction: column;
+}
+
+.section-title {
+    font-size: 3rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    margin-bottom: var(--spacing-xs);
+    font-family: 'Poppins', sans-serif;
+}
+
+.section-title::after {
+    display: none;
+    /* Remove small underline */
+}
+
+.section-description {
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto;
+    color: var(--gray-500);
+}
+
+/* ============================================
+   7. BANNER GRID & AFFILIATE
+   ============================================ */
+.banner-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-lg);
+}
+
+.banner {
+    min-height: 400px;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    border: 2px solid var(--black);
+    padding: var(--spacing-xl);
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.banner:hover {
+    transform: translateY(-5px);
+    box-shadow: 8px 8px 0px var(--black);
+}
+
+.banner h3 {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--white);
+    text-transform: uppercase;
+    z-index: 2;
+    text-shadow: 2px 2px 0 #000;
+    font-family: 'Poppins', sans-serif;
+    margin-bottom: var(--spacing-sm);
+}
+
+.banner p {
+    color: rgba(255, 255, 255, 0.9);
+    z-index: 2;
+    font-weight: 500;
+    max-width: 80%;
+    margin-bottom: var(--spacing-md);
+}
+
+.banner-cta {
+    background: var(--white);
+    color: var(--black);
+    padding: 0.75rem 1.5rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    z-index: 2;
+}
+
+/* Affiliate Banner */
+.affiliate-banner {
+    background: var(--black);
+    color: var(--white);
+    text-align: center;
+    padding: var(--spacing-3xl) var(--spacing-xl);
+    border: 4px solid var(--black);
+    margin: var(--spacing-3xl) 0;
+}
+
+.affiliate-banner h2 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 2.5rem;
+    margin-bottom: var(--spacing-md);
+    color: var(--white);
+}
+
+.affiliate-banner .cta-button {
+    background: var(--white);
+    color: var(--black);
+    border: none;
+    padding: 1rem 3rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 1.1rem;
+    border-radius: 0;
+    transition: all 0.2s ease;
+}
+
+.affiliate-banner .cta-button:hover {
+    transform: scale(1.05);
+    background: var(--accent);
+    /* Yellow usually */
+    color: var(--black);
+}
+
+/* ============================================
+   8. BENEFITS & SEO
+   ============================================ */
+.benefits-slider {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-xl);
+    padding: var(--spacing-xl) 0;
+    text-align: center;
+}
+
+.benefit-card {
+    background: transparent;
+    padding: var(--spacing-lg);
+    border: 2px solid var(--gray-200);
+    transition: all 0.3s ease;
+}
+
+.benefit-card:hover {
+    border-color: var(--black);
+    transform: translateY(-5px);
+}
+
+.benefit-icon {
+    font-size: 2.5rem;
+    color: var(--black);
+    margin-bottom: var(--spacing-md);
+    display: inline-block;
+}
+
+.benefit-content h3 {
+    font-weight: 800;
+    text-transform: uppercase;
+    margin-bottom: var(--spacing-xs);
+}
+
+/* Tag Cloud */
+.seo-description {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto var(--spacing-xl);
+    font-size: 1.1rem;
+    color: var(--gray-600);
+}
+
+.tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.tag {
+    background: var(--gray-100);
+    color: var(--gray-800);
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+}
+
+.tag:hover {
+    background: var(--black);
+    color: var(--white);
+    border-color: var(--black);
+}
+
+/* Responsive Overrides for new sections */
+@media (max-width: 768px) {
+    .banner-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .section-title {
+        font-size: 2rem;
+    }
+
+    .affiliate-banner h2 {
+        font-size: 1.8rem;
+    }
+}
+
 /* ============================================
    RESPONSIVE
    ============================================ */
