@@ -14,33 +14,50 @@ class HomeManager {
   async init() {
     window.logger?.info('HOME', 'HomeManager init() - Iniciando...');
 
-    // Preloader Logic
-    window.addEventListener('load', () => {
+    // Preloader Logic - Fail-safe (checks readyState and load)
+    const hideLoader = () => {
       setTimeout(() => {
         document.body.classList.add('loaded');
-      }, 500); // Slight delay for drama
-    });
+      }, 500);
+    };
+
+    if (document.readyState === 'complete') {
+      hideLoader();
+    } else {
+      window.addEventListener('load', hideLoader);
+      // Fallback safety timeout (max 3s curtain)
+      setTimeout(hideLoader, 3000);
+    }
+
+    // Granular Safe Loading
+    const safeLoad = async (name, fn) => {
+      try {
+        await fn();
+      } catch (e) {
+        window.logger?.error('HOME', `Error crítico en ${name}`, e);
+      }
+    };
 
     try {
       await Promise.all([
-        this.loadHomeContent(),
-        this.loadFeaturedProducts(),
-        this.loadOnSaleProducts(),
-        this.loadCategories()
+        safeLoad('HomeContent', () => this.loadHomeContent()),
+        safeLoad('FeaturedProducts', () => this.loadFeaturedProducts()),
+        safeLoad('OnSaleProducts', () => this.loadOnSaleProducts()),
+        safeLoad('Categories', () => this.loadCategories())
       ]);
 
       // Cargar megamenú dinámicamente después de cargar categorías
-      this.loadMegaMenu();
+      safeLoad('MegaMenu', () => this.loadMegaMenu());
 
       // Cargar flash offers después de cargar productos en oferta
-      await this.initFlashOffers();
+      await safeLoad('FlashOffers', () => this.initFlashOffers());
 
       this.setupEventListeners();
-      this.initNewsletter(); // New Listener
+      this.initNewsletter();
 
       window.logger?.success('HOME', 'HomeManager inicializado correctamente');
     } catch (error) {
-      document.body.classList.add('loaded'); // Ensure loader goes away even on error
+      document.body.classList.add('loaded'); // Ensure loader goes away even on critical init error
       window.logger?.error('HOME', 'Error inicializando HomeManager', error);
     }
   }
@@ -359,12 +376,13 @@ class HomeManager {
       const image = category.image_url || fallbackImage;
 
       return `
-        < div class="category-card" onclick = "window.location.href='products.html?category=${category.slug}'" role = "button" tabindex = "0" aria - label="Ver productos de ${category.name}" >
+        <div class="category-card" onclick="window.location.href='products.html?category=${category.slug}'" role="button" tabindex="0" aria-label="Ver productos de ${category.name}">
           <img class="category-card-bg" src="${image}" alt="${category.name}" loading="lazy">
             <h3>${this.escapeHtml(category.name)}</h3>
             <p>${this.escapeHtml(category.description || 'Explora esta colección')}</p>
           </div>
-      `}).join('');
+      `;
+    }).join('');
   }
 
   getCategoryFallbackImage(slug) {
