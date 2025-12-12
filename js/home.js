@@ -13,6 +13,14 @@ class HomeManager {
 
   async init() {
     window.logger?.info('HOME', 'HomeManager init() - Iniciando...');
+
+    // Preloader Logic
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.body.classList.add('loaded');
+      }, 500); // Slight delay for drama
+    });
+
     try {
       await Promise.all([
         this.loadHomeContent(),
@@ -28,10 +36,47 @@ class HomeManager {
       await this.initFlashOffers();
 
       this.setupEventListeners();
+      this.initNewsletter(); // New Listener
+
       window.logger?.success('HOME', 'HomeManager inicializado correctamente');
     } catch (error) {
+      document.body.classList.add('loaded'); // Ensure loader goes away even on error
       window.logger?.error('HOME', 'Error inicializando HomeManager', error);
     }
+  }
+
+  initNewsletter() {
+    const form = document.getElementById('newsletterForm');
+    if (!form) return;
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const btn = form.querySelector('button');
+      const originalText = btn.innerText;
+
+      btn.innerText = 'PROCESANDO...';
+      btn.disabled = true;
+
+      // Simulate API call
+      setTimeout(() => {
+        btn.innerText = '¡SUSCRITO!';
+        btn.style.background = '#00ff00';
+        btn.style.color = '#000';
+        btn.style.borderColor = '#00ff00';
+
+        if (window.notifications) {
+          window.notifications.success('Te has unido al futuro. Revisa tu email.');
+        }
+
+        form.reset();
+
+        setTimeout(() => {
+          btn.innerText = originalText;
+          btn.disabled = false;
+          btn.style = '';
+        }, 3000);
+      }, 1500);
+    });
   }
 
   async loadHomeContent() {
@@ -234,11 +279,9 @@ class HomeManager {
 
   renderFeaturedProducts() {
     const container = document.getElementById('featuredProductsGrid');
-    if (!container) {
-      window.logger?.warn('HOME', 'featuredProductsGrid container not found');
-      return;
-    }
+    if (!container) return; // Guard clause
 
+    // Safety check for empty data
     if (!this.featuredProducts || this.featuredProducts.length === 0) {
       container.innerHTML = `
         <div class="empty-state" style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #999;">
@@ -251,7 +294,7 @@ class HomeManager {
     }
 
     container.innerHTML = this.featuredProducts.map(product => this.createProductCard(product)).join('');
-    window.wishlistManager?.syncToggleButtons?.(container);
+    // window.wishlistManager?.syncToggleButtons?.(container); // Remove optional chaining if casing issues, but safe generally
 
     // Ocultar skeleton loader
     if (window.skeletonLoader) {
@@ -261,11 +304,9 @@ class HomeManager {
 
   renderOnSaleProducts() {
     const container = document.getElementById('onSaleProductsGrid');
-    if (!container) {
-      window.logger?.warn('HOME', 'onSaleProductsGrid container not found');
-      return;
-    }
+    if (!container) return; // Guard clause
 
+    // Safety check for empty data
     if (!this.onSaleProducts || this.onSaleProducts.length === 0) {
       container.innerHTML = `
         <div class="empty-state" style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #999;">
@@ -278,7 +319,7 @@ class HomeManager {
     }
 
     container.innerHTML = this.onSaleProducts.map(product => this.createProductCard(product)).join('');
-    window.wishlistManager?.syncToggleButtons?.(container);
+    // window.wishlistManager?.syncToggleButtons?.(container);
 
     // Ocultar skeleton loader
     if (window.skeletonLoader) {
@@ -305,9 +346,9 @@ class HomeManager {
       container.innerHTML = placeholders.map(cat => `
         <div class="category-card" onclick="window.location.href='products.html?search=${cat.name}'">
           <img class="category-card-bg" src="${cat.image}" alt="${cat.name}">
-          <h3>${cat.name}</h3>
-          <p>${cat.description}</p>
-        </div>
+            <h3>${cat.name}</h3>
+            <p>${cat.description}</p>
+          </div>
       `).join('');
       return;
     }
@@ -318,12 +359,12 @@ class HomeManager {
       const image = category.image_url || fallbackImage;
 
       return `
-      <div class="category-card" onclick="window.location.href='products.html?category=${category.slug}'" role="button" tabindex="0" aria-label="Ver productos de ${category.name}">
-        <img class="category-card-bg" src="${image}" alt="${category.name}" loading="lazy">
-        <h3>${this.escapeHtml(category.name)}</h3>
-        <p>${this.escapeHtml(category.description || 'Explora esta colección')}</p>
-      </div>
-    `}).join('');
+        < div class="category-card" onclick = "window.location.href='products.html?category=${category.slug}'" role = "button" tabindex = "0" aria - label="Ver productos de ${category.name}" >
+          <img class="category-card-bg" src="${image}" alt="${category.name}" loading="lazy">
+            <h3>${this.escapeHtml(category.name)}</h3>
+            <p>${this.escapeHtml(category.description || 'Explora esta colección')}</p>
+          </div>
+      `}).join('');
   }
 
   getCategoryFallbackImage(slug) {
@@ -373,10 +414,10 @@ class HomeManager {
 
     this.heroSlides.forEach((slideData, index) => {
       const slide = document.createElement('div');
-      slide.className = `slide${index === 0 ? ' active' : ''}`;
+      slide.className = `slide${index === 0 ? ' active' : ''} `;
       slide.style.background = slideData.background_color || 'var(--primary)';
       if (slideData.image_url) {
-        slide.style.backgroundImage = `linear-gradient(135deg, rgba(15,23,42,0.65), rgba(15,23,42,0.3)), url('${slideData.image_url}')`;
+        slide.style.backgroundImage = `linear - gradient(135deg, rgba(15, 23, 42, 0.65), rgba(15, 23, 42, 0.3)), url('${slideData.image_url}')`;
         slide.style.backgroundSize = 'cover';
         slide.style.backgroundPosition = 'center';
       }
@@ -422,8 +463,8 @@ class HomeManager {
 
       const dot = document.createElement('button');
       dot.type = 'button';
-      dot.className = `slider-dot${index === 0 ? ' active' : ''}`;
-      dot.setAttribute('aria-label', `Slide ${index + 1}`);
+      dot.className = `slider - dot${index === 0 ? ' active' : ''} `;
+      dot.setAttribute('aria-label', `Slide ${index + 1} `);
       dotsContainer.appendChild(dot);
     });
 
@@ -443,28 +484,28 @@ class HomeManager {
 
     if (!this.homeBenefits.length) {
       container.innerHTML = `
-        <div class="benefit-card benefit-card--empty">
+        < div class="benefit-card benefit-card--empty" >
           <div class="benefit-content">
             <h3>Pronto más beneficios</h3>
             <p>Configura beneficios desde el panel administrativo para mostrarlos aquí.</p>
           </div>
-        </div>
-      `;
+        </div >
+        `;
       return;
     }
 
     container.innerHTML = this.homeBenefits.map(benefit => {
-      const background = benefit.background_color ? `style="background:${benefit.background_color};"` : '';
+      const background = benefit.background_color ? `style = "background:${benefit.background_color};"` : '';
       const hasImage = Boolean(benefit.image_url);
       const iconMarkup = benefit.icon
-        ? `<span class="benefit-icon"><i class="${benefit.icon}"></i></span>`
+        ? `< span class="benefit-icon" > <i class="${benefit.icon}"></i></span > `
         : '';
       const imageMarkup = hasImage
-        ? `<img src="${benefit.image_url}" alt="${benefit.title || 'Benefit'}" onerror="this.style.display='none'">`
+        ? `< img src = "${benefit.image_url}" alt = "${benefit.title || 'Benefit'}" onerror = "this.style.display='none'" > `
         : '';
 
       return `
-        <article class="benefit-card" ${background}>
+        < article class="benefit-card" ${background}>
           <div class="benefit-image">
             ${imageMarkup || iconMarkup || `<span class="benefit-icon"><i class="fas fa-star"></i></span>`}
           </div>
@@ -472,8 +513,8 @@ class HomeManager {
             <h3>${benefit.title || 'Beneficio especial'}</h3>
             ${benefit.description ? `<p>${benefit.description}</p>` : ''}
           </div>
-        </article>
-      `;
+        </article >
+        `;
     }).join('');
   }
 
@@ -483,29 +524,29 @@ class HomeManager {
 
     if (!this.homeBanners.length) {
       container.innerHTML = `
-        <div class="banner banner--placeholder">
+        < div class="banner banner--placeholder" >
           <h3>Configura tus banners</h3>
           <p>Los banners que crees en el panel aparecerán automáticamente aquí.</p>
-        </div>
-      `;
+        </div >
+        `;
       return;
     }
 
     container.innerHTML = this.homeBanners.slice(0, 3).map(banner => {
       const backgroundStyle = banner.image_url
-        ? `style="background-image:linear-gradient(135deg, rgba(15,23,42,0.7), rgba(15,23,42,0.25)), url('${banner.image_url}');"`
+        ? `style = "background-image:linear-gradient(135deg, rgba(15,23,42,0.7), rgba(15,23,42,0.25)), url('${banner.image_url}');"`
         : '';
       const gradientOnly = !banner.image_url && banner.background_color
-        ? `style="background:${banner.background_color};"`
+        ? `style = "background:${banner.background_color};"`
         : '';
-      const linkAttr = banner.button_link ? `data-link="${banner.button_link}"` : '';
+      const linkAttr = banner.button_link ? `data - link="${banner.button_link}"` : '';
       return `
-        <article class="banner" ${backgroundStyle || gradientOnly} ${linkAttr}>
+        < article class="banner" ${backgroundStyle || gradientOnly} ${linkAttr}>
           <h3>${banner.title || 'Banner destacado'}</h3>
           ${banner.description ? `<p>${banner.description}</p>` : ''}
           ${banner.button_text ? `<span class="banner-cta">${banner.button_text}</span>` : ''}
-        </article>
-      `;
+        </article >
+        `;
     }).join('');
 
     this.bindBannerClicks(container);
@@ -517,13 +558,13 @@ class HomeManager {
 
     if (!this.homeSections.length) {
       container.innerHTML = `
-        <div class="home-section-card home-section-card--empty">
+        < div class="home-section-card home-section-card--empty" >
           <div class="home-section-content">
             <h3>Secciones personalizadas</h3>
             <p>Crea secciones desde el panel administrativo para destacar colecciones, categorías o campañas especiales.</p>
           </div>
-        </div>
-      `;
+        </div >
+        `;
       return;
     }
 
@@ -533,11 +574,11 @@ class HomeManager {
       const title = section.title || settings.title || (category ? category.name : this.getSectionTypeLabel(section.section_type));
       const description = settings.description || (category ? category.description : '');
       const ctaText = settings.cta_text || 'Ver colección';
-      const link = settings.cta_link || (category ? `products.html?category=${category.slug}` : 'products.html');
+      const link = settings.cta_link || (category ? `products.html ? category = ${category.slug} ` : 'products.html');
       const imageUrl = settings.image_url || (category?.image_url ?? null);
 
       return `
-        <article class="home-section-card" data-link="${link}">
+        < article class="home-section-card" data - link="${link}" >
           <div class="home-section-media">
             ${imageUrl ? `<img src="${imageUrl}" alt="${title}" onerror="this.style.display='none'">` : `<div class="home-section-placeholder"><i class="fas fa-layer-group"></i></div>`}
           </div>
@@ -551,8 +592,8 @@ class HomeManager {
             </div>
             <button type="button" class="btn btn-outline btn-sm" data-link="${link}">${ctaText}</button>
           </div>
-        </article>
-      `;
+        </article >
+        `;
     }).join('');
 
     container.querySelectorAll('[data-link]').forEach(element => {
@@ -620,7 +661,7 @@ class HomeManager {
       ${'<i class="fas fa-star"></i>'.repeat(fullStars)}
       ${hasHalfStar ? '<i class="fas fa-star-half-alt"></i>' : ''}
       ${'<i class="far fa-star"></i>'.repeat(emptyStars)}
-    `;
+      `;
   }
 
   getCategoryIcon(slug) {
@@ -641,12 +682,12 @@ class HomeManager {
 
   async addToCart(productId) {
     try {
-      window.logger?.debug?.('HOME', `Intentando agregar producto al carrito: ${productId}`);
-      window.logger?.debug?.('HOME', `cartManager existe: ${typeof window.cartManager}`);
-      window.logger?.debug?.('HOME', `notifications existe: ${typeof window.notifications}`);
+      window.logger?.debug?.('HOME', `Intentando agregar producto al carrito: ${productId} `);
+      window.logger?.debug?.('HOME', `cartManager existe: ${typeof window.cartManager} `);
+      window.logger?.debug?.('HOME', `notifications existe: ${typeof window.notifications} `);
 
       await window.cartManager.add(productId, 1);
-      window.logger?.success('HOME', `Producto agregado al carrito: ${productId}`);
+      window.logger?.success('HOME', `Producto agregado al carrito: ${productId} `);
       window.notifications.show('Producto agregado al carrito', 'success');
     } catch (error) {
       window.logger?.error('HOME', 'Error al agregar producto al carrito', error);
@@ -672,7 +713,7 @@ class HomeManager {
       const performSearch = () => {
         const query = searchInput.value.trim();
         if (query) {
-          window.location.href = `products.html?search=${encodeURIComponent(query)}`;
+          window.location.href = `products.html ? search = ${encodeURIComponent(query)} `;
         }
       };
 
@@ -739,7 +780,7 @@ class HomeManager {
     modal.setAttribute('aria-modal', 'true');
     modal.style.display = 'flex';
     modal.innerHTML = `
-      <div class="modal-content" style="max-width: 500px;">
+        < div class="modal-content" style = "max-width: 500px;" >
         <span class="modal-close" onclick="this.closest('.modal').remove()" aria-label="Cerrar modal de suscripción" tabindex="0" role="button">&times;</span>
         <h2 id="subscriptionModalTitle" style="margin-bottom: 16px;">¡Suscríbete y obtén 10% de descuento!</h2>
         <p style="margin-bottom: 24px; color: #666;">Recibe ofertas exclusivas, novedades y tu código de descuento por email.</p>
@@ -753,8 +794,8 @@ class HomeManager {
         <p style="margin-top: 16px; font-size: 12px; color: #999; text-align: center;">
           Al suscribirte, aceptas recibir comunicaciones comerciales de FutureLabs.
         </p>
-      </div>
-    `;
+      </div >
+        `;
     document.body.appendChild(modal);
 
     // Cerrar al hacer click fuera
@@ -815,7 +856,7 @@ class HomeManager {
     try {
       // TODO: Implementar endpoint de suscripción en backend
       // Por ahora, solo mostrar notificación
-      window.notifications?.success(`¡Te has suscrito con ${email}! Pronto recibirás tu código de descuento del 10%.`);
+      window.notifications?.success(`¡Te has suscrito con ${email} !Pronto recibirás tu código de descuento del 10 %.`);
 
       // Guardar en localStorage para evitar spam
       const subscriptions = JSON.parse(localStorage.getItem('subscriptions') || '[]');
@@ -857,7 +898,7 @@ class HomeManager {
     modal.setAttribute('aria-modal', 'true');
     modal.style.display = 'flex';
     modal.innerHTML = `
-      <div class="modal-content" style="max-width: 600px;">
+        < div class="modal-content" style = "max-width: 600px;" >
         <span class="modal-close" onclick="this.closest('.modal').remove()" aria-label="Cerrar modal de ayuda" tabindex="0" role="button">&times;</span>
         <h2 id="contactModalTitle" style="margin-bottom: 16px;"><i class="fas fa-comments" aria-hidden="true"></i> ¿Necesitas ayuda?</h2>
         <p style="margin-bottom: 24px; color: #666;">Estamos aquí para ayudarte. Elige cómo prefieres contactarnos:</p>
@@ -875,8 +916,8 @@ class HomeManager {
         <p style="margin-top: 24px; font-size: 12px; color: #999; text-align: center;">
           El servicio de chat en vivo estará disponible próximamente.
         </p>
-      </div>
-    `;
+      </div >
+        `;
     document.body.appendChild(modal);
 
     // Cerrar al hacer click fuera
@@ -920,8 +961,8 @@ class HomeManager {
         const products = response.data.products.slice(0, 4);
 
         flashSection.innerHTML = `
-          <div class="flash-offers-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 24px;" role="list" aria-label="Ofertas flash disponibles">
-            ${products.map((product, index) => {
+        < div class="flash-offers-grid" style = "display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 24px;" role = "list" aria - label="Ofertas flash disponibles" >
+          ${products.map((product, index) => {
           const discount = product.discount_price ?
             Math.round(((product.price - product.discount_price) / product.price) * 100) : 0;
 
@@ -948,34 +989,35 @@ class HomeManager {
                   </div>
                 </article>
               `;
-        }).join('')}
-          </div>
-          <div style="text-align: center; margin-top: 24px;">
-            <a href="products.html?on_sale=true" class="btn btn-primary">Ver todas las ofertas</a>
-          </div>
-        `;
+        }).join('')
+          }
+          </div >
+        <div style="text-align: center; margin-top: 24px;">
+          <a href="products.html?on_sale=true" class="btn btn-primary">Ver todas las ofertas</a>
+        </div>
+      `;
       } else {
         // Si no hay ofertas, mostrar mensaje mejorado
         flashSection.innerHTML = `
-          <div style="text-align: center; padding: 40px 20px;">
+        < div style = "text-align: center; padding: 40px 20px;" >
             <i class="fas fa-fire" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5; color: #ff6b6b;"></i>
             <p style="font-size: 16px; margin: 0; color: #666;">No hay ofertas flash disponibles en este momento</p>
             <p style="font-size: 14px; margin-top: 8px; color: #999;">Suscríbete para ser el primero en enterarte de nuestras próximas promociones</p>
             <button class="btn btn-primary" style="margin-top: 16px;" onclick="document.querySelector('.sticky-footer .cta-button')?.click();">
               Suscribirme
             </button>
-          </div>
+          </div >
         `;
       }
     } catch (error) {
       window.logger?.error('HOME', 'Error cargando flash offers', error);
       flashSection.innerHTML = `
-        <div style="text-align: center; padding: 40px 20px; color: #999;">
+        < div style = "text-align: center; padding: 40px 20px; color: #999;" >
           <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
           <p style="font-size: 16px; margin: 0;">Error al cargar ofertas flash</p>
           <a href="products.html?on_sale=true" class="btn btn-outline" style="margin-top: 16px;">Ver ofertas disponibles</a>
-        </div>
-      `;
+        </div >
+        `;
     }
   }
 
@@ -1000,12 +1042,12 @@ class HomeManager {
 
       // Renderizar categorías en la columna izquierda
       categoriesColumn.innerHTML = this.categories.slice(0, 8).map((category, index) => `
-        <div class="category-item ${index === 0 ? 'active' : ''}" data-category="${category.slug}">
+        < div class="category-item ${index === 0 ? 'active' : ''}" data - category="${category.slug}" >
           <span class="category-text">${this.escapeHtml(category.name)}</span>
           <i class="fas fa-chevron-right" aria-hidden="true"></i>
           <div class="active-indicator"></div>
-        </div>
-      `).join('');
+        </div >
+        `).join('');
 
       // Renderizar contenido de categorías
       contentColumn.innerHTML = this.categories.slice(0, 8).map((category, index) => {
@@ -1013,7 +1055,7 @@ class HomeManager {
         const subcategories = this.getSubcategoriesForCategory(category);
 
         return `
-          <div class="category-content ${index === 0 ? 'active' : ''}" data-category="${category.slug}">
+        < div class="category-content ${index === 0 ? 'active' : ''}" data - category="${category.slug}" >
             <div class="content-header">
               <h2>${this.escapeHtml(category.name)}</h2>
               <a href="products.html?category=${category.slug}" class="view-all">Ver todo <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
@@ -1021,7 +1063,7 @@ class HomeManager {
             <div class="subcategories-grid">
               ${this.renderSubcategoriesGrid(category, subcategories)}
             </div>
-          </div>
+          </div >
         `;
       }).join('');
 
@@ -1068,25 +1110,25 @@ class HomeManager {
   renderSubcategoriesGrid(category, subcategories) {
     if (!subcategories || subcategories.length === 0) {
       return `
-        <div class="subcategory-column">
+        < div class="subcategory-column" >
           <h3>Productos</h3>
           <ul>
             <li><a href="products.html?category=${category.slug}">Ver todos los productos</a></li>
           </ul>
-        </div>
-      `;
+        </div >
+        `;
     }
 
     return subcategories.map(sub => `
-      <div class="subcategory-column">
+        < div class="subcategory-column" >
         <h3>${this.escapeHtml(sub.title)}</h3>
         <ul>
           ${sub.items.map(item => `
             <li><a href="products.html?category=${category.slug}&search=${encodeURIComponent(item)}">${this.escapeHtml(item)}</a></li>
           `).join('')}
         </ul>
-      </div>
-    `).join('');
+      </div >
+        `).join('');
   }
 
   setupMegaMenuListeners() {
@@ -1107,7 +1149,7 @@ class HomeManager {
 
         // Agregar active al seleccionado
         newItem.classList.add('active');
-        const content = document.querySelector(`.category-content[data-category="${category}"]`);
+        const content = document.querySelector(`.category - content[data - category="${category}"]`);
         if (content) {
           content.classList.add('active');
         }
@@ -1125,7 +1167,7 @@ class HomeManager {
             categoryContents.forEach(c => c.classList.remove('active'));
 
             this.classList.add('active');
-            const content = document.querySelector(`.category-content[data-category="${category}"]`);
+            const content = document.querySelector(`.category - content[data - category="${category}"]`);
             if (content) {
               content.classList.add('active');
             }
@@ -1190,12 +1232,12 @@ window.openQuickView = async function (productId) {
       document.getElementById('qvTitle').textContent = product.name;
 
       const priceHtml = product.discount_price
-        ? `<span class="text-red-600">S/ ${parseFloat(product.discount_price).toFixed(2)}</span> <span class="original-price" style="text-decoration: line-through; color: #999; font-size: 0.8em;">S/ ${parseFloat(product.price).toFixed(2)}</span>`
-        : `S/ ${parseFloat(product.price).toFixed(2)}`;
+        ? `< span class="text-red-600" > S / ${parseFloat(product.discount_price).toFixed(2)}</span > <span class="original-price" style="text-decoration: line-through; color: #999; font-size: 0.8em;">S/ ${parseFloat(product.price).toFixed(2)}</span>`
+        : `S / ${parseFloat(product.price).toFixed(2)} `;
       document.getElementById('qvPrice').innerHTML = priceHtml;
 
       document.getElementById('qvDescription').textContent = product.description || 'Sin descripción disponible.';
-      document.getElementById('qvFullDetails').href = `product-detail.html?id=${product.id}`;
+      document.getElementById('qvFullDetails').href = `product - detail.html ? id = ${product.id} `;
     }
   } catch (error) {
     console.error('Error loading quick view:', error);
@@ -1216,7 +1258,7 @@ window.addToCartFromQuickView = function () {
   // For quick view, we redirect to PDP to ensure size selection is handled correctly
   // or if we had a size selector here we could add directly.
   // Given the "Winning" goal, redirecting is safer UX than adding without size.
-  window.location.href = `product-detail.html?id=${window.currentQuickViewProduct.id}`;
+  window.location.href = `product - detail.html ? id = ${window.currentQuickViewProduct.id} `;
 };
 
 // Close modal on outside click

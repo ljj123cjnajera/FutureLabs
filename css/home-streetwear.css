@@ -1,6 +1,35 @@
 /* 🏙️ Streetwear Home Edition - Premium Overhaul v2.0 */
 
 /* ============================================
+   0. GLOBAL LAYOUT & STRUCTURE (STRICT GRID)
+   ============================================ */
+:root {
+    --spacing-4xl: 8rem;
+    /* Strict Vertical Rhythm */
+    --container-width: 1400px;
+}
+
+.section {
+    margin-bottom: var(--spacing-4xl);
+    position: relative;
+    width: 100%;
+}
+
+.container {
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: 0 2rem;
+    /* Ensure padding is consistent */
+}
+
+/* Override fluid container to align left edge but flow right */
+.fluid-container {
+    max-width: 100% !important;
+    padding-left: max(2rem, calc((100vw - var(--container-width)) / 2 + 2rem)) !important;
+    padding-right: 0 !important;
+}
+
+/* ============================================
    1. HERO SECTION - FULL IMPACT
    ============================================ */
 .hero {
@@ -95,6 +124,8 @@
     position: relative;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     white-space: nowrap;
+    margin-bottom: var(--spacing-4xl);
+    /* Strict Rhythm */
 }
 
 .marquee-content {
@@ -318,6 +349,126 @@ footer .copyright {
     color: var(--gray-600);
     text-transform: uppercase;
     letter-spacing: 0.1em;
+}
+
+
+/* ============================================
+   9. NEWSLETTER - BRUTALIST FULL WIDTH
+   ============================================ */
+.newsletter-section {
+    background-color: var(--black);
+    color: var(--white);
+    padding: var(--spacing-4xl) 0;
+    margin-bottom: 0 !important;
+    /* Last section before footer */
+    border-top: 2px solid var(--white);
+    border-bottom: 10px solid var(--black);
+    /* Connect to footer */
+    text-align: center;
+}
+
+.newsletter-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.newsletter-section h2 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 900;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    text-transform: uppercase;
+    margin-bottom: var(--spacing-sm);
+    line-height: 1;
+}
+
+.newsletter-section p {
+    font-size: 1.2rem;
+    color: var(--gray-400);
+    margin-bottom: var(--spacing-xl);
+}
+
+.newsletter-form {
+    display: flex;
+    gap: var(--spacing-md);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.newsletter-input {
+    flex: 1;
+    background: transparent;
+    border: 3px solid var(--white);
+    color: var(--white);
+    padding: 1rem 1.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 0;
+    transition: all 0.3s ease;
+}
+
+.newsletter-input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--accent);
+}
+
+.newsletter-btn {
+    background: var(--white);
+    color: var(--black);
+    border: 3px solid var(--white);
+    padding: 1rem 3rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 1.1rem;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.newsletter-btn:hover {
+    background: var(--accent);
+    color: var(--white);
+    border-color: var(--accent);
+    transform: translateY(-2px);
+}
+
+/* ============================================
+   10. PRELOADER CURTAIN
+   ============================================ */
+#preloader {
+    position: fixed;
+    inset: 0;
+    background: var(--black);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.8s cubic-bezier(0.7, 0, 0.3, 1);
+}
+
+.loader-content {
+    text-align: center;
+}
+
+.loader-logo {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 900;
+    font-size: 4rem;
+    color: var(--white);
+    text-transform: uppercase;
+    letter-spacing: -0.05em;
+    clip-path: inset(0 0 100% 0);
+    animation: revealText 1s cubic-bezier(0.7, 0, 0.3, 1) forwards 0.2s;
+}
+
+@keyframes revealText {
+    to {
+        clip-path: inset(0 0 0 0);
+    }
+}
+
+body.loaded #preloader {
+    transform: translateY(-100%);
 }
 
 
