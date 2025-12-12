@@ -149,9 +149,25 @@ async function loadCheckout() {
             console.log('No se pudieron cargar direcciones guardadas:', error);
         }
 
+        if (window.couponsManager) {
+            window.couponsManager.setCartContext(couponItems, baseSubtotal);
+            window.couponsManager.context = 'checkout';
+        }
+
         // Renderizar paso 1
         renderStep(1);
         renderOrderSummary();
+
+        // Inicializar Cupones si existe el contenedor (usualmente en renderOrderSummary o un sidebar)
+        // En este paso, nos aseguramos que si el OrderSummary tiene el div de cupones, se renderice.
+        // Pero renderStep(1) -> renderOrderSummary() -> inyecta el HTML. 
+        // ASI QUE debemos llamar a renderCouponInfo() DESPUES de renderOrderSummary()
+        setTimeout(() => {
+            if (window.renderCouponInfo && document.getElementById('couponSection')) {
+                window.renderCouponInfo('couponSection');
+            }
+        }, 500);
+
 
         // Mostrar navegación
         const navigation = document.getElementById('checkoutNavigation');
@@ -912,103 +928,113 @@ function validatePaymentForm() {
 }
 
 // Renderizar resumen del pedido
+// Renderizar Resumen del Pedido
+// Renderizar Resumen del Pedido
 function renderOrderSummary() {
-    if (!cartData) return;
+    const container = document.getElementById('orderSummary');
+    if (!container) return;
 
+    // Calcular totales
     const subtotal = Number(cartData.subtotal ?? cartData.total ?? 0);
-    const selectedOption = shippingOptions[selectedShippingOption] || shippingOptions.standard;
-    const shippingAmount = Number(cartData.shipping ?? selectedOption.amount ?? 0);
-    const couponDiscount = Number(discount || 0);
-    const pointsDiscount = Number(loyaltyPointsDiscount || 0);
-    const totalBeforePoints = Math.max(subtotal + shippingAmount - couponDiscount, 0);
-    const totalDue = Math.max(totalBeforePoints - pointsDiscount, 0);
+    const shippingPrice = Number(cartData.shipping ?? shippingOptions[selectedShippingOption]?.amount ?? 0);
 
-    const summaryHTML = `
-        <div class="order-summary">
-            <h3>Resumen del Pedido</h3>
-            <div class="summary-items">
-                ${cartData.items.map(item => `
-                    <div class="summary-item">
-                        <img src="${item.image_url}" alt="${item.name}">
-                        <div class="summary-item-info">
-                            <div class="summary-item-name">${item.name}</div>
-                            <div class="summary-item-price">S/ ${parseFloat(item.price).toFixed(2)} x ${item.quantity}</div>
+    // Obtener descuento del gestor de cupones si existe, sino usar variable local
+    const discountAmount = window.couponsManager ? window.couponsManager.getDiscount() : (discount || 0);
+
+    // Calcular total final
+    const total = Math.max(0, subtotal + shippingPrice - discountAmount - loyaltyPointsDiscount);
+
+    // Actualizar total en cartData para referencias
+    cartData.total = total;
+
+    container.innerHTML = `
+        <h3>Resumen del Pedido</h3>
+        <div class="order-summary-items">
+            ${cartData.items.map(item => `
+                <div class="summary-item">
+                    <img src="${item.image_url || 'https://via.placeholder.com/60'}" alt="${item.name}">
+                    <div>
+                        <div class="summary-item-title">${item.name}</div>
+                        <div class="summary-item-meta">
+                            Cant: ${item.quantity} | Talla: ${item.size || 'N/A'}
+                        </div>
+                        <div class="summary-item-price">
+                             S/ ${Number(item.price).toFixed(2)}
                         </div>
                     </div>
-                `).join('')}
+                </div>
+            `).join('')}
+        </div>
+        
+        <div class="order-summary-totals">
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <span>S/ ${subtotal.toFixed(2)}</span>
             </div>
-            <div id="checkoutCouponSection"></div>
-            ${availableLoyaltyPoints > 0 ? `
-            <div class="loyalty-section" style="padding: 15px; background: #f8f9fa; border-radius: 8px; margin: 20px 0;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <div>
-                        <strong><i class="fas fa-gift"></i> Tus Puntos</strong>
-                        <p style="margin: 5px 0 0 0; color: #666; font-size: 14px;">
-                            ${availableLoyaltyPoints} puntos disponibles (${(availableLoyaltyPoints / 10).toFixed(1)} S/ de descuento)
-                        </p>
-                    </div>
-                    ${loyaltyPointsUsed === 0 ? `
-                    <button class="btn btn-outline" onclick="useLoyaltyPoints()" style="padding: 8px 16px; font-size: 14px;">
-                        <i class="fas fa-star"></i> Usar Puntos
-                    </button>
-                    ` : `
-                    <div>
-                        <strong style="color: #10b981;">-${loyaltyPointsUsed} puntos</strong>
-                        <button class="btn btn-sm" onclick="removeLoyaltyPoints()" style="padding: 4px 8px; font-size: 12px; margin-left: 10px;">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    `}
-                </div>
-                ${pointsDiscount > 0 ? `
-                <div class="summary-row" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #ddd;">
-                    <span>Descuento por Puntos</span>
-                    <span style="color: #10b981;">-S/ ${pointsDiscount.toFixed(2)}</span>
-                </div>
-                ` : ''}
+            <div class="summary-row">
+                <span>Envío (${shippingOptions[selectedShippingOption]?.label || 'Estándar'})</span>
+                <span>S/ ${shippingPrice.toFixed(2)}</span>
+            </div>
+            
+            ${discountAmount > 0 ? `
+            <div class="summary-row discount">
+                <span>Descuento (Cupón)</span>
+                <span>- S/ ${discountAmount.toFixed(2)}</span>
             </div>
             ` : ''}
-            <div class="summary-totals">
-                <div class="summary-row">
-                    <span>Subtotal</span>
-                    <span>${checkoutCurrencyFormatter.format(subtotal)}</span>
-                </div>
-                <div class="summary-row">
-                    <span>Envío (${selectedOption.label})</span>
-                    <span>${checkoutCurrencyFormatter.format(shippingAmount)}</span>
-                </div>
-                ${couponDiscount > 0 ? `
-                <div class="summary-row">
-                    <span>Descuento Cupón</span>
-                    <span>- ${checkoutCurrencyFormatter.format(couponDiscount)}</span>
-                </div>
-                ` : ''}
-                ${pointsDiscount > 0 ? `
-                <div class="summary-row">
-                    <span>Descuento Puntos</span>
-                    <span style="color: #10b981;">- ${checkoutCurrencyFormatter.format(pointsDiscount)}</span>
-                </div>
-                ` : ''}
-                <div class="summary-row total">
-                    <span>Total</span>
-                    <span>${checkoutCurrencyFormatter.format(totalDue)}</span>
-                </div>
+
+            ${loyaltyPointsDiscount > 0 ? `
+            <div class="summary-row discount">
+                <span>Puntos Canjeados</span>
+                <span>- S/ ${loyaltyPointsDiscount.toFixed(2)}</span>
+            </div>
+            ` : ''}
+
+            <div class="summary-divider"></div>
+            <div class="summary-row total">
+                <span>Total</span>
+                <span>S/ ${total.toFixed(2)}</span>
             </div>
         </div>
+
+        <!-- Puntos de Fidelidad (Solo si hay disponibles) -->
+        ${availableLoyaltyPoints > 0 ? `
+        <div class="loyalty-points-section">
+            <div class="loyalty-points-header">
+                <i class="fas fa-star"></i>
+                <span>Tienes ${availableLoyaltyPoints} puntos</span>
+            </div>
+            ${loyaltyPointsUsed > 0 ? `
+                <button class="btn btn-outline btn-sm btn-block" onclick="removeLoyaltyPoints()">
+                    Dejar de usar mis puntos
+                </button>
+            ` : `
+                <button class="btn btn-outline btn-sm btn-block" onclick="useLoyaltyPoints()">
+                    Usar mis puntos
+                </button>
+            `}
+        </div>
+        ` : ''}
+
+        <!-- Sección de Cupones -->
+        <div id="checkoutCouponSection" style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px;"></div>
     `;
 
-    const summaryContainer = document.getElementById('orderSummary');
-    if (!summaryContainer) return;
-    summaryContainer.innerHTML = summaryHTML;
+    // Montar cupones
     mountCheckoutCoupons();
 }
 
 function mountCheckoutCoupons() {
     if (!window.couponsManager) return;
+
+    // Configurar contexto checkout
     window.couponsManager.context = 'checkout';
     window.couponsManager.containerId = 'checkoutCouponSection';
+
+    // Renderizar
     window.couponsManager.renderCouponForm('checkoutCouponSection');
 
+    // Cargar cupones disponibles si no están cargados
     if (!window.couponsManager.availableCouponsLoaded && !window.couponsManager.availableCouponsLoading) {
         window.couponsManager.loadAvailableCoupons();
     } else {
@@ -1331,7 +1357,7 @@ async function processStripePayment(orderId, amount) {
 
         // Verificar que el pago fue exitoso
         if (paymentIntent.status !== 'succeeded') {
-            throw new Error(`El pago no fue exitoso. Estado: ${paymentIntent.status}`);
+            throw new Error(`El pago no fue exitoso.Estado: ${paymentIntent.status} `);
         }
 
         // Procesar pago en backend para actualizar estado del pedido
@@ -1380,7 +1406,7 @@ async function processMobilePayment(orderId, amount, paymentType = 'yape') {
 
         // Mostrar información del pago
         const paymentData = paymentResponse.data;
-        const message = paymentData.message || `Pago con ${paymentType === 'yape' ? 'Yape' : 'Plin'} registrado. Realiza el pago a ${paymentData.merchant_phone} y espera la confirmación.`;
+        const message = paymentData.message || `Pago con ${paymentType === 'yape' ? 'Yape' : 'Plin'} registrado.Realiza el pago a ${paymentData.merchant_phone} y espera la confirmación.`;
 
         window.notifications.success(message, 10000); // Mostrar por 10 segundos
 
@@ -1474,13 +1500,13 @@ async function loadMobilePaymentInfo(paymentType) {
             if (detailsContainer) {
                 if (accountInfo.available && accountInfo.phone) {
                     detailsContainer.innerHTML = `
-                        <p style="margin: 4px 0; font-size: 14px;">
-                            <strong>Realiza el pago a:</strong> ${accountInfo.phone}
-                        </p>
-                        <p style="margin: 4px 0; font-size: 14px; color: #0c4a6e;">
-                            <i class="fas fa-mobile-alt"></i> Usa este número para realizar la transferencia desde tu app
-                        </p>
-                    `;
+    < p style = "margin: 4px 0; font-size: 14px;" >
+        <strong>Realiza el pago a:</strong> ${accountInfo.phone}
+                        </p >
+    <p style="margin: 4px 0; font-size: 14px; color: #0c4a6e;">
+        <i class="fas fa-mobile-alt"></i> Usa este número para realizar la transferencia desde tu app
+    </p>
+`;
                 } else {
                     detailsContainer.innerHTML = '<p style="color: #dc2626; font-size: 14px;">' + (paymentType === 'yape' ? 'Yape' : 'Plin') + ' no configurado. Contacta con soporte.</p>';
                 }
@@ -1504,10 +1530,10 @@ async function loadBankTransferInfo() {
             const detailsContainer = document.getElementById('bank-account-details');
             if (detailsContainer) {
                 detailsContainer.innerHTML = `
-                    <p style="margin: 4px 0;"><strong>Banco:</strong> ${bankInfo.bank}</p>
-                    <p style="margin: 4px 0;"><strong>Cuenta:</strong> ${bankInfo.account}</p>
+    < p style = "margin: 4px 0;" > <strong>Banco:</strong> ${bankInfo.bank}</p >
+        <p style="margin: 4px 0;"><strong>Cuenta:</strong> ${bankInfo.account}</p>
                     ${bankInfo.cci ? `<p style="margin: 4px 0;"><strong>CCI:</strong> ${bankInfo.cci}</p>` : ''}
-                `;
+`;
             }
         } else {
             const detailsContainer = document.getElementById('bank-account-details');
@@ -1692,14 +1718,14 @@ async function initializeStripeElements() {
             }
 
             cardElementContainer.innerHTML = `
-                <div style="padding: 20px; text-align: center; color: #dc2626;">
+    < div style = "padding: 20px; text-align: center; color: #dc2626;" >
                     <i class="fas fa-exclamation-triangle"></i>
                     <p style="margin: 10px 0 0 0;">${errorMessage}</p>
                     <button onclick="location.reload()" style="margin-top: 10px; padding: 8px 16px; background: #dc2626; color: white; border: none; border-radius: 4px; cursor: pointer;">
                         Recargar Página
                     </button>
-                </div>
-            `;
+                </div >
+    `;
         }
 
         window.notifications?.warning('No se pudo inicializar el formulario de pago. Puedes usar otro método de pago.');
@@ -1734,7 +1760,7 @@ async function useLoyaltyPoints() {
     loyaltyPointsUsed = Math.min(pointsToUse, availableLoyaltyPoints);
     loyaltyPointsDiscount = loyaltyPointsUsed / 10;
 
-    window.notifications.success(`Usando ${loyaltyPointsUsed} puntos (S/ ${loyaltyPointsDiscount.toFixed(2)} de descuento)`);
+    window.notifications.success(`Usando ${loyaltyPointsUsed} puntos(S / ${loyaltyPointsDiscount.toFixed(2)} de descuento)`);
     renderOrderSummary();
 }
 

@@ -7,7 +7,7 @@ class AdminManager {
 
   async init() {
     console.log('🔧 AdminManager init() - Iniciando...');
-    
+
     // Verificar si hay token en localStorage
     const token = localStorage.getItem('auth_token');
     if (!token) {
@@ -35,7 +35,7 @@ class AdminManager {
       window.location.href = 'admin-login.html';
       return;
     }
-    
+
     // Verificar rol
     if (user.role !== 'admin' && user.role !== 'moderator') {
       console.log('❌ Usuario sin permisos de admin:', user.role);
@@ -101,7 +101,9 @@ class AdminManager {
       'hero-slides': 'Hero Slides',
       'banners': 'Banners',
       'benefits': 'Beneficios',
-      'home-sections': 'Secciones del Home'
+      'home-sections': 'Secciones del Home',
+      'coupons': 'Gestión de Cupones',
+      'blog': 'Gestión de Blog'
     };
     document.getElementById('pageTitle').textContent = titles[section] || section;
 
@@ -110,7 +112,7 @@ class AdminManager {
   }
 
   async loadSectionData(section) {
-    switch(section) {
+    switch (section) {
       case 'dashboard':
         await this.loadDashboard();
         break;
@@ -155,6 +157,16 @@ class AdminManager {
           await window.adminHomeContent.loadHomeSections();
         }
         break;
+      case 'coupons':
+        if (window.adminCoupons) {
+          await window.adminCoupons.loadCoupons();
+        }
+        break;
+      case 'blog':
+        if (window.adminBlog) {
+          await window.adminBlog.loadPosts();
+        }
+        break;
     }
   }
 
@@ -162,19 +174,19 @@ class AdminManager {
   async loadDashboard() {
     try {
       const response = await window.api.request('/admin/dashboard/stats');
-      
+
       if (response.success) {
         const { overview, orders_by_status, top_products, sales_by_day, payment_methods } = response.data;
-        
+
         // Actualizar estadísticas
         document.getElementById('totalProducts').textContent = overview.total_products;
         document.getElementById('totalUsers').textContent = overview.total_users;
         document.getElementById('totalOrders').textContent = overview.total_orders;
         document.getElementById('totalSales').textContent = `S/ ${parseFloat(overview.total_sales).toFixed(2)}`;
-        
+
         // Renderizar gráficos
         this.renderCharts(orders_by_status, top_products, sales_by_day, payment_methods);
-        
+
         // Cargar pedidos recientes
         await this.loadRecentOrders();
       }
@@ -183,7 +195,7 @@ class AdminManager {
       window.notifications.error('Error al cargar dashboard');
     }
   }
-  
+
   // Renderizar gráficos con Chart.js
   renderCharts(ordersByStatus, topProducts, salesByDay, paymentMethods) {
     // 1. Ventas de últimos 7 días (Línea)
@@ -208,7 +220,7 @@ class AdminManager {
         }
       });
     }
-    
+
     // 2. Pedidos por estado (Dona)
     const ordersStatusCtx = document.getElementById('ordersStatusChart');
     if (ordersStatusCtx && window.Chart) {
@@ -227,7 +239,7 @@ class AdminManager {
         }
       });
     }
-    
+
     // 3. Top productos (Barras)
     const topProductsCtx = document.getElementById('topProductsChart');
     if (topProductsCtx && window.Chart) {
@@ -248,7 +260,7 @@ class AdminManager {
         }
       });
     }
-    
+
     // 4. Métodos de pago (Pie)
     const paymentMethodsCtx = document.getElementById('paymentMethodsChart');
     if (paymentMethodsCtx && window.Chart) {
@@ -272,13 +284,13 @@ class AdminManager {
   async loadRecentOrders() {
     const tbody = document.getElementById('recentOrdersTable');
     if (!tbody) return;
-    
+
     try {
       const response = await window.api.request('/admin/orders');
-      
+
       if (response.success) {
         const orders = response.data.orders.slice(0, 10);
-        
+
         if (orders.length === 0) {
           tbody.innerHTML = `
             <tr>
@@ -291,7 +303,7 @@ class AdminManager {
           `;
           return;
         }
-        
+
         tbody.innerHTML = orders.map(order => `
           <tr>
             <td>#${order.order_number}</td>
@@ -316,16 +328,16 @@ class AdminManager {
   async loadProducts() {
     const tbody = document.getElementById('productsTable');
     if (!tbody) return;
-    
+
     // Mostrar estado de carga
     tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;"><div class="loading-spinner"></div><p style="margin-top: 10px; color: #666;">Cargando productos...</p></td></tr>';
-    
+
     try {
       const response = await window.api.getProducts();
-      
+
       if (response.success) {
         const products = response.data.products;
-        
+
         if (products.length === 0) {
           tbody.innerHTML = `
             <tr>
@@ -340,14 +352,14 @@ class AdminManager {
           `;
           return;
         }
-        
+
         // Escapar HTML para prevenir XSS
         const escapeHtml = (text) => {
           const div = document.createElement('div');
           div.textContent = text;
           return div.innerHTML;
         };
-        
+
         tbody.innerHTML = products.map(product => `
               <tr>
                 <td>${escapeHtml(product.id.substring(0, 8))}...</td>
@@ -366,7 +378,7 @@ class AdminManager {
                 </td>
               </tr>
         `).join('');
-        
+
         // Cargar categorías en el select del modal
         await this.loadCategoriesForProductModal();
       }
@@ -394,11 +406,11 @@ class AdminManager {
   async loadCategoriesForProductModal() {
     try {
       const response = await window.api.getCategories();
-      
+
       if (response.success) {
         const categories = response.data.categories;
         const select = document.getElementById('productCategory');
-        
+
         select.innerHTML = '<option value="">Seleccionar...</option>' +
           categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
       }
@@ -411,16 +423,16 @@ class AdminManager {
   async loadCategories() {
     const tbody = document.getElementById('categoriesTable');
     if (!tbody) return;
-    
+
     // Mostrar estado de carga
     tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px;"><div class="loading-spinner"></div><p style="margin-top: 10px; color: #666;">Cargando categorías...</p></td></tr>';
-    
+
     try {
       const response = await window.api.getCategories();
-      
+
       if (response.success) {
         const categories = response.data.categories;
-        
+
         if (categories.length === 0) {
           tbody.innerHTML = `
             <tr>
@@ -435,13 +447,13 @@ class AdminManager {
           `;
           return;
         }
-        
+
         const escapeHtml = (text) => {
           const div = document.createElement('div');
           div.textContent = text;
           return div.innerHTML;
         };
-        
+
         tbody.innerHTML = categories.map(category => `
               <tr>
                 <td>${escapeHtml(category.id.substring(0, 8))}...</td>
@@ -484,16 +496,16 @@ class AdminManager {
   async loadOrders() {
     const tbody = document.getElementById('ordersTable');
     if (!tbody) return;
-    
+
     // Mostrar estado de carga
     tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;"><div class="loading-spinner"></div> Cargando pedidos...</td></tr>';
-    
+
     try {
       const response = await window.api.request('/admin/orders');
-      
+
       if (response.success) {
         const orders = response.data.orders;
-        
+
         if (orders.length === 0) {
           tbody.innerHTML = `
             <tr>
@@ -508,13 +520,13 @@ class AdminManager {
           `;
           return;
         }
-        
+
         const escapeHtml = (text) => {
           const div = document.createElement('div');
           div.textContent = text;
           return div.innerHTML;
         };
-        
+
         tbody.innerHTML = orders.map(order => `
           <tr>
             <td>#${escapeHtml(order.order_number || 'N/A')}</td>
@@ -530,7 +542,7 @@ class AdminManager {
             </td>
           </tr>
         `).join('');
-        
+
         // Mostrar toast de éxito
         window.notifications?.success(`Se cargaron ${orders.length} pedido${orders.length !== 1 ? 's' : ''}`);
       }
@@ -559,16 +571,16 @@ class AdminManager {
   async loadUsers() {
     const tbody = document.getElementById('usersTable');
     if (!tbody) return;
-    
+
     // Mostrar estado de carga
     tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;"><div class="loading-spinner"></div> Cargando usuarios...</td></tr>';
-    
+
     try {
       const response = await window.api.request('/admin/users');
-      
+
       if (response.success) {
         const users = response.data.users;
-        
+
         if (users.length === 0) {
           tbody.innerHTML = `
             <tr>
@@ -583,15 +595,15 @@ class AdminManager {
           `;
           return;
         }
-        
+
         // Escapar HTML para prevenir XSS
         const escapeHtml = (text) => {
           const div = document.createElement('div');
           div.textContent = text;
           return div.innerHTML;
         };
-        
-            tbody.innerHTML = users.map(user => `
+
+        tbody.innerHTML = users.map(user => `
               <tr>
                 <td>${user.id.substring(0, 8)}...</td>
                 <td>${user.first_name} ${user.last_name}</td>
@@ -606,7 +618,7 @@ class AdminManager {
                 </td>
               </tr>
             `).join('');
-        
+
         // Mostrar toast de éxito
         window.notifications?.success(`Se cargaron ${users.length} usuario${users.length !== 1 ? 's' : ''}`);
       }
@@ -635,16 +647,16 @@ class AdminManager {
   async loadReviews() {
     const tbody = document.getElementById('reviewsTable');
     if (!tbody) return;
-    
+
     // Mostrar estado de carga
     tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;"><div class="loading-spinner"></div><p style="margin-top: 10px; color: #666;">Cargando reseñas...</p></td></tr>';
-    
+
     try {
       const response = await window.api.request('/admin/reviews');
-      
+
       if (response.success) {
         const reviews = response.data.reviews;
-        
+
         if (reviews.length === 0) {
           tbody.innerHTML = `
             <tr>
@@ -658,8 +670,8 @@ class AdminManager {
           `;
           return;
         }
-        
-            tbody.innerHTML = reviews.map(review => `
+
+        tbody.innerHTML = reviews.map(review => `
               <tr>
                 <td>${review.id.substring(0, 8)}...</td>
                 <td>${review.first_name} ${review.last_name}</td>
@@ -677,7 +689,7 @@ class AdminManager {
                 </td>
               </tr>
             `).join('');
-        
+
         // Mostrar toast de éxito
         window.notifications?.success(`Se cargaron ${reviews.length} reseña${reviews.length !== 1 ? 's' : ''}`);
       }
@@ -769,7 +781,7 @@ function logout() {
   // Limpiar información de localStorage
   localStorage.removeItem('auth_token');
   localStorage.removeItem('admin_user');
-  
+
   // Redirigir a home
   window.location.href = 'index.html';
 }
@@ -787,7 +799,7 @@ function editProduct(productId, event) {
     event.preventDefault();
     event.stopPropagation();
   }
-  
+
   if (window.adminCRUD && window.adminCRUD.editProduct) {
     // Usar setTimeout para asegurar que el evento se complete antes de abrir el modal
     setTimeout(() => {
@@ -800,15 +812,15 @@ function editProduct(productId, event) {
 }
 
 // Funciones globales para pagos
-window.confirmPayment = async function(transactionId) {
+window.confirmPayment = async function (transactionId) {
   if (!confirm('¿Estás seguro de confirmar este pago? Esto marcará el pedido como pagado.')) {
     return;
   }
-  
+
   try {
     window.notifications?.show('Confirmando pago...', 'info');
     const response = await window.api.confirmPayment(transactionId);
-    
+
     if (response.success) {
       window.notifications?.success('Pago confirmado exitosamente');
       // Recargar la lista de pagos
@@ -822,10 +834,10 @@ window.confirmPayment = async function(transactionId) {
   }
 };
 
-window.viewPaymentDetails = async function(transactionId) {
+window.viewPaymentDetails = async function (transactionId) {
   try {
     const response = await window.api.getPaymentTransaction(transactionId);
-    
+
     if (response.success) {
       const transaction = response.data;
       const details = `
@@ -886,7 +898,7 @@ window.viewPaymentDetails = async function(transactionId) {
           ` : ''}
         </div>
       `;
-      
+
       // Crear modal
       const modal = document.createElement('div');
       modal.className = 'modal';
@@ -901,15 +913,15 @@ window.viewPaymentDetails = async function(transactionId) {
         </div>
       `;
       document.body.appendChild(modal);
-      
+
       // Cerrar al hacer clic fuera
       modal.addEventListener('click', (e) => {
         if (e.target === modal) {
           window.closePaymentModal();
         }
       });
-      
-      window.closePaymentModal = function() {
+
+      window.closePaymentModal = function () {
         modal.remove();
       };
     } else {
@@ -978,18 +990,18 @@ async function exportSalesReport() {
   try {
     const startDate = document.getElementById('salesStartDate').value;
     const endDate = document.getElementById('salesEndDate').value;
-    
+
     let url = '/reports/sales?format=csv';
     if (startDate) url += `&start_date=${startDate}`;
     if (endDate) url += `&end_date=${endDate}`;
-    
+
     const token = window.api.token;
     const response = await fetch(window.api.baseURL + url, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
     });
-    
+
     if (response.ok) {
       const blob = await response.blob();
       const downloadUrl = window.URL.createObjectURL(blob);
@@ -1015,7 +1027,7 @@ async function exportProductsReport() {
         'Authorization': `Bearer ${token}`
       }
     });
-    
+
     if (response.ok) {
       const blob = await response.blob();
       const downloadUrl = window.URL.createObjectURL(blob);
@@ -1037,7 +1049,7 @@ async function exportCustomersReport() {
   try {
     const token = window.api.token;
     const response = await window.api.request('/reports/customers');
-    
+
     if (response.success) {
       const data = JSON.stringify(response.data, null, 2);
       const blob = new Blob([data], { type: 'application/json' });

@@ -260,56 +260,49 @@ class HomeManager {
     }
 
     if (!this.categories || this.categories.length === 0) {
-      // Mantener categorías placeholder si no hay categorías
-      container.innerHTML = `
-        <div class="category-card">
-          <div class="category-icon"><i class="fas fa-fire"></i></div>
-          <h3>Lanzamientos</h3>
-          <p>Lo último en hype</p>
+      // Placeholder data for Bento Grid if no API data
+      const placeholders = [
+        { name: 'Jordan', image: 'https://images.unsplash.com/photo-1579338559194-a162d844a5fa?q=80&w=1000&auto=format&fit=crop', description: 'El legado continúa' },
+        { name: 'Nike', image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop', description: 'Just Do It' },
+        { name: 'Yeezy', image: 'https://images.unsplash.com/photo-1582260611295-d2a9391d17cf?q=80&w=1000&auto=format&fit=crop', description: 'Futurismo puro' },
+        { name: 'Adidas', image: 'https://images.unsplash.com/photo-1518002171953-a080ee322801?q=80&w=1000&auto=format&fit=crop', description: 'Three Stripes Life' }
+      ];
+
+      container.innerHTML = placeholders.map(cat => `
+        <div class="category-card" onclick="window.location.href='products.html?search=${cat.name}'">
+          <img class="category-card-bg" src="${cat.image}" alt="${cat.name}">
+          <h3>${cat.name}</h3>
+          <p>${cat.description}</p>
         </div>
-        <div class="category-card">
-          <div class="category-icon"><i class="fas fa-basketball-ball"></i></div>
-          <h3>Jordan Retro</h3>
-          <p>Iconos del deporte</p>
-        </div>
-        <div class="category-card">
-          <div class="category-icon"><i class="fas fa-shoe-prints"></i></div>
-          <h3>Running & Sport</h3>
-          <p>Performance y estilo</p>
-        </div>
-        <div class="category-card">
-          <div class="category-icon"><i class="fas fa-tshirt"></i></div>
-          <h3>Streetwear</h3>
-          <p>Ropa y accesorios</p>
-        </div>
-        <div class="category-card">
-          <div class="category-icon"><i class="fas fa-tags"></i></div>
-          <h3>Sale</h3>
-          <p>Oportunidades únicas</p>
-        </div>
-      `;
+      `).join('');
       return;
     }
 
-    container.innerHTML = this.categories.slice(0, 8).map(category => `
-      <div class="category-card" onclick="window.location.href='products.html?category=${category.slug}'" role="button" tabindex="0" aria-label="Ver productos de ${category.name}">
-        <div class="category-icon">
-          <i class="${this.getCategoryIcon(category.slug)}" aria-hidden="true"></i>
-        </div>
-        <h3>${this.escapeHtml(category.name)}</h3>
-        <p>${this.escapeHtml(category.description || 'Explora esta categoría')}</p>
-      </div>
-    `).join('');
+    container.innerHTML = this.categories.slice(0, 5).map(category => {
+      // Use API image or fallback based on slug
+      const fallbackImage = this.getCategoryFallbackImage(category.slug);
+      const image = category.image_url || fallbackImage;
 
-    // Agregar event listeners para teclado (accesibilidad)
-    container.querySelectorAll('.category-card').forEach(card => {
-      card.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          card.click();
-        }
-      });
-    });
+      return `
+      <div class="category-card" onclick="window.location.href='products.html?category=${category.slug}'" role="button" tabindex="0" aria-label="Ver productos de ${category.name}">
+        <img class="category-card-bg" src="${image}" alt="${category.name}" loading="lazy">
+        <h3>${this.escapeHtml(category.name)}</h3>
+        <p>${this.escapeHtml(category.description || 'Explora esta colección')}</p>
+      </div>
+    `}).join('');
+  }
+
+  getCategoryFallbackImage(slug) {
+    const images = {
+      'jordan': 'https://images.unsplash.com/photo-1695655455806-0568ee234f2d?q=80&w=800', // Jordan 1
+      'nike': 'https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?q=80&w=800', // Nike Dunk
+      'adidas': 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?q=80&w=800', // Adidas Forum
+      'yeezy': 'https://images.unsplash.com/photo-1623940250060-498c8c67924d?q=80&w=800', // Yeezy 700
+      'new-balance': 'https://images.unsplash.com/photo-1656335362192-2bc9051b1824?q=80&w=800',
+      'vans': 'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?q=80&w=800',
+      'converse': 'https://images.unsplash.com/photo-1494496195158-c3becb4f2475?q=80&w=800'
+    };
+    return images[slug] || 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?q=80&w=800'; // Generic Sneaker
   }
 
   escapeHtml(text) {
