@@ -114,20 +114,22 @@ class HomeManager {
         this.featuredProducts = response.data?.products || [];
         this.renderFeaturedProducts();
         window.logger?.debug?.('HOME', `Productos destacados cargados: ${this.featuredProducts.length}`);
+
+        // Add horizontal scroll mouse drag
+        this.enableHorizontalDrag(container);
       } else {
         window.logger?.warn('HOME', 'Respuesta inválida al cargar productos destacados', response);
         this.renderFeaturedProducts(); // Renderizar estado vacío
       }
     } catch (error) {
       window.logger?.error('HOME', 'Error cargando productos destacados', error);
+      // ... error handling ...
       const container = document.getElementById('featuredProductsGrid');
       if (container) {
         container.innerHTML = `
-          <div class="empty-state" style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #ef4444;">
+          <div class="empty-state" style="min-width: 300px; text-align: center; padding: 60px 20px; color: #ef4444;">
             <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 16px; opacity: 0.7;"></i>
             <p style="font-size: 16px; margin: 0; font-weight: 600;">Error al cargar productos destacados</p>
-            <p style="font-size: 14px; margin-top: 8px; opacity: 0.8;">Por favor, intenta recargar la página</p>
-            <button class="btn btn-outline" onclick="window.location.reload()" style="margin-top: 16px;">Recargar página</button>
           </div>
         `;
       }
@@ -148,24 +150,56 @@ class HomeManager {
         this.onSaleProducts = response.data?.products || [];
         this.renderOnSaleProducts();
         window.logger?.debug?.('HOME', `Productos en oferta cargados: ${this.onSaleProducts.length}`);
+
+        // Add horizontal scroll mouse drag
+        this.enableHorizontalDrag(container);
       } else {
         window.logger?.warn('HOME', 'Respuesta inválida al cargar productos en oferta', response);
         this.renderOnSaleProducts(); // Renderizar estado vacío
       }
     } catch (error) {
       window.logger?.error('HOME', 'Error cargando productos en oferta', error);
+      // Error handling...
       const container = document.getElementById('onSaleProductsGrid');
       if (container) {
+        // ... error html ...
         container.innerHTML = `
-          <div class="empty-state" style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #ef4444;">
+          <div class="empty-state" style="min-width: 300px; text-align: center; padding: 60px 20px; color: #ef4444;">
             <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 16px; opacity: 0.7;"></i>
             <p style="font-size: 16px; margin: 0; font-weight: 600;">Error al cargar ofertas especiales</p>
-            <p style="font-size: 14px; margin-top: 8px; opacity: 0.8;">Por favor, intenta recargar la página</p>
-            <button class="btn btn-outline" onclick="window.location.reload()" style="margin-top: 16px;">Recargar página</button>
           </div>
         `;
       }
     }
+  }
+
+  enableHorizontalDrag(container) {
+    if (!container) return;
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    container.addEventListener('mousedown', (e) => {
+      isDown = true;
+      container.classList.add('active'); // Optional: transform cursor
+      startX = e.pageX - container.offsetLeft;
+      scrollLeft = container.scrollLeft;
+    });
+    container.addEventListener('mouseleave', () => {
+      isDown = false;
+      container.classList.remove('active');
+    });
+    container.addEventListener('mouseup', () => {
+      isDown = false;
+      container.classList.remove('active');
+    });
+    container.addEventListener('mousemove', (e) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - container.offsetLeft;
+      const walk = (x - startX) * 2; // Scroll-fast
+      container.scrollLeft = scrollLeft - walk;
+    });
   }
 
   async loadCategories() {
