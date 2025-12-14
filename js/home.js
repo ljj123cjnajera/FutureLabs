@@ -103,6 +103,42 @@ class HomeManager {
     }, 1500);
   }
 
+  initScrollAnimations() {
+    const observerOptions = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.15 // Trigger when 15% of element is visible
+    };
+
+    const observer = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target); // Only animate once
+        }
+      });
+    }, observerOptions);
+
+    // Target elements: Sections, Cards, Titles
+    const elementsToAnimate = document.querySelectorAll('.section-title, .section-description, .category-card, .product-card, .journal-card, .trust-item, .limitless-text');
+
+    elementsToAnimate.forEach((el, index) => {
+      el.classList.add('reveal-on-scroll');
+      // Add staggered delay based on index within its container mostly, 
+      // but for simplicity we can just rely on natural scroll or add delays via JS if needed.
+      // For grids, we can add delay classes.
+      if (el.classList.contains('journal-card') || el.classList.contains('product-card')) {
+        // clean way to get index in parent
+        const indexInParent = Array.from(el.parentNode.children).indexOf(el);
+        if (indexInParent === 1) el.classList.add('reveal-delay-100');
+        if (indexInParent === 2) el.classList.add('reveal-delay-200');
+        if (indexInParent === 3) el.classList.add('reveal-delay-300');
+      }
+
+      observer.observe(el);
+    });
+  }
+
   initSmartPopup() {
     // Don't show if already subscribed or dismissed
     if (localStorage.getItem('newsletterSubscribed') || localStorage.getItem('newsletterDismissed')) return;
@@ -212,6 +248,11 @@ class HomeManager {
       this.renderBenefits();
       this.renderBanners();
       this.renderHomeSections();
+
+      // START ANIMATIONS
+      setTimeout(() => {
+        this.initScrollAnimations();
+      }, 100); // Small delay to ensure DOM is ready
 
       window.logger?.success('HOME', 'Contenido del home renderizado correctamente');
     } catch (error) {
