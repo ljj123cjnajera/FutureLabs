@@ -1083,9 +1083,154 @@ footer .copyright {
         }
     }
 
+
     /* ============================================
-   RESPONSIVE
+   8. TRUST BAR
    ============================================ */
+    .trust-bar {
+        background: var(--white);
+        border-bottom: 1px solid var(--gray-200);
+        padding: var(--spacing-lg) 0;
+    }
+
+    .trust-grid {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: var(--spacing-xl);
+    }
+
+    .trust-item {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .trust-item i {
+        font-size: 1.5rem;
+        color: var(--black);
+    }
+
+    .trust-text {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .trust-title {
+        font-weight: 700;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+    }
+
+    .trust-desc {
+        font-size: 0.8rem;
+        color: var(--gray-500);
+    }
+
+    /* ============================================
+   9. JOURNAL SECTION
+   ============================================ */
+    .journal-section {
+        padding: var(--spacing-4xl) 0;
+        background: var(--gray-50);
+    }
+
+    .section-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: var(--spacing-2xl);
+        border-bottom: 2px solid var(--black);
+        padding-bottom: var(--spacing-md);
+    }
+
+    .journal-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--spacing-xl);
+    }
+
+    .journal-card {
+        background: transparent;
+        transition: transform 0.3s ease;
+    }
+
+    .journal-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .journal-image {
+        height: 250px;
+        overflow: hidden;
+        margin-bottom: var(--spacing-lg);
+        border-radius: var(--radius-sm);
+    }
+
+    .journal-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .journal-card:hover .journal-image img {
+        transform: scale(1.05);
+    }
+
+    .journal-tag {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--gray-500);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: var(--spacing-xs);
+        display: block;
+    }
+
+    .journal-content h3 {
+        font-size: 1.25rem;
+        margin-bottom: var(--spacing-sm);
+        font-weight: 700;
+        line-height: 1.3;
+    }
+
+    .journal-content p {
+        font-size: 0.95rem;
+        color: var(--gray-600);
+        margin-bottom: var(--spacing-md);
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .read-more {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--black);
+        text-decoration: underline;
+        text-underline-offset: 4px;
+    }
+
+    @media (max-width: 768px) {
+        .trust-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .journal-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .section-header-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: var(--spacing-sm);
+        }
+    }
+
     @media (max-width: 1024px) {
         .categories-carousel {
             grid-template-columns: repeat(2, 1fr);
