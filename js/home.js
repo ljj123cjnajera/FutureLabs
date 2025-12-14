@@ -351,29 +351,35 @@ class HomeManager {
       return;
     }
 
-    if (!this.categories || this.categories.length === 0) {
-      // Placeholder data for Bento Grid if no API data
-      const placeholders = [
-        { name: 'Jordan', image: 'https://images.unsplash.com/photo-1579338559194-a162d844a5fa?q=80&w=1000&auto=format&fit=crop', description: 'El legado continúa' },
-        { name: 'Nike', image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop', description: 'Just Do It' },
-        { name: 'Yeezy', image: 'https://images.unsplash.com/photo-1582260611295-d2a9391d17cf?q=80&w=1000&auto=format&fit=crop', description: 'Futurismo puro' },
-        { name: 'Adidas', image: 'https://images.unsplash.com/photo-1518002171953-a080ee322801?q=80&w=1000&auto=format&fit=crop', description: 'Three Stripes Life' }
-      ];
+    // Logic for Bento Grid: We need exactly 5 items to maintain layout integrity.
+    // If we have fewer, we fill with placeholders.
+    // If we have no data at all, we use a full placeholder set.
 
-      container.innerHTML = placeholders.map(cat => `
-        <div class="category-card" onclick="window.location.href='products.html?search=${cat.name}'">
-          <img class="category-card-bg" src="${cat.image}" alt="${cat.name}">
-            <h3>${cat.name}</h3>
-            <p>${cat.description}</p>
-          </div>
-      `).join('');
-      return;
+    let categoriesToRender = [];
+
+    if (this.categories && this.categories.length > 0) {
+      categoriesToRender = [...this.categories];
     }
 
-    container.innerHTML = this.categories.slice(0, 5).map(category => {
+    const placeholderPool = [
+      { name: 'Jordan', image: 'https://images.unsplash.com/photo-1579338559194-a162d844a5fa?q=80&w=1000&auto=format&fit=crop', description: 'El legado continúa', slug: 'jordan' },
+      { name: 'Nike', image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop', description: 'Just Do It', slug: 'nike' },
+      { name: 'Adidas', image: 'https://images.unsplash.com/photo-1518002171953-a080ee322801?q=80&w=1000&auto=format&fit=crop', description: 'Three Stripes Life', slug: 'adidas' },
+      { name: 'Yeezy', image: 'https://images.unsplash.com/photo-1582260611295-d2a9391d17cf?q=80&w=1000&auto=format&fit=crop', description: 'Futurismo puro', slug: 'yeezy' },
+      { name: 'Streetwear', image: 'https://images.unsplash.com/photo-1523398002811-6ce9e490101d?q=80&w=1000&auto=format&fit=crop', description: 'Estilo Urbano', slug: 'streetwear' }
+    ];
+
+    // Check if we need to backfill
+    const targetCount = 5;
+    while (categoriesToRender.length < targetCount) {
+      categoriesToRender.push(placeholderPool[categoriesToRender.length % placeholderPool.length]);
+    }
+
+    // Render exactly first 5
+    container.innerHTML = categoriesToRender.slice(0, targetCount).map(category => {
       // Use API image or fallback based on slug
       const fallbackImage = this.getCategoryFallbackImage(category.slug);
-      const image = category.image_url || fallbackImage;
+      const image = category.image_url || category.image || fallbackImage;
 
       return `
         <div class="category-card" onclick="window.location.href='products.html?category=${category.slug}'" role="button" tabindex="0" aria-label="Ver productos de ${category.name}">
@@ -502,28 +508,29 @@ class HomeManager {
 
     if (!this.homeBenefits.length) {
       container.innerHTML = `
-        < div class="benefit-card benefit-card--empty" >
-          <div class="benefit-content">
-            <h3>Pronto más beneficios</h3>
-            <p>Configura beneficios desde el panel administrativo para mostrarlos aquí.</p>
-          </div>
+      < div class="benefit-card benefit-card--empty" >
+        <div class="benefit-content">
+          <h3>Pronto más beneficios</h3>
+          <p>Configura beneficios desde el panel administrativo para mostrarlos aquí.</p>
+        </div>
         </div >
-        `;
+      </div>
+      `;
       return;
     }
 
     container.innerHTML = this.homeBenefits.map(benefit => {
-      const background = benefit.background_color ? `style = "background:${benefit.background_color};"` : '';
+      const background = benefit.background_color ? `style="background:${benefit.background_color};"` : '';
       const hasImage = Boolean(benefit.image_url);
       const iconMarkup = benefit.icon
-        ? `< span class="benefit-icon" > <i class="${benefit.icon}"></i></span > `
+        ? `<span class="benefit-icon"><i class="${benefit.icon}"></i></span>`
         : '';
       const imageMarkup = hasImage
-        ? `< img src = "${benefit.image_url}" alt = "${benefit.title || 'Benefit'}" onerror = "this.style.display='none'" > `
+        ? `<img src="${benefit.image_url}" alt="${benefit.title || 'Benefit'}" onerror="this.style.display='none'">`
         : '';
 
       return `
-        < article class="benefit-card" ${background}>
+      <article class="benefit-card" ${background}>
           <div class="benefit-image">
             ${imageMarkup || iconMarkup || `<span class="benefit-icon"><i class="fas fa-star"></i></span>`}
           </div>
@@ -531,8 +538,8 @@ class HomeManager {
             <h3>${benefit.title || 'Beneficio especial'}</h3>
             ${benefit.description ? `<p>${benefit.description}</p>` : ''}
           </div>
-        </article >
-        `;
+        </article>
+      `;
     }).join('');
   }
 
@@ -542,11 +549,11 @@ class HomeManager {
 
     if (!this.homeBanners.length) {
       container.innerHTML = `
-        < div class="banner banner--placeholder" >
+      < div class="banner banner--placeholder" >
           <h3>Configura tus banners</h3>
           <p>Los banners que crees en el panel aparecerán automáticamente aquí.</p>
         </div >
-        `;
+      `;
       return;
     }
 
@@ -559,12 +566,12 @@ class HomeManager {
         : '';
       const linkAttr = banner.button_link ? `data - link="${banner.button_link}"` : '';
       return `
-        < article class="banner" ${backgroundStyle || gradientOnly} ${linkAttr}>
-          <h3>${banner.title || 'Banner destacado'}</h3>
+      < article class="banner" ${backgroundStyle || gradientOnly} ${linkAttr}>
+        <h3>${banner.title || 'Banner destacado'}</h3>
           ${banner.description ? `<p>${banner.description}</p>` : ''}
           ${banner.button_text ? `<span class="banner-cta">${banner.button_text}</span>` : ''}
         </article >
-        `;
+      `;
     }).join('');
 
     this.bindBannerClicks(container);
@@ -576,13 +583,13 @@ class HomeManager {
 
     if (!this.homeSections.length) {
       container.innerHTML = `
-        < div class="home-section-card home-section-card--empty" >
-          <div class="home-section-content">
-            <h3>Secciones personalizadas</h3>
-            <p>Crea secciones desde el panel administrativo para destacar colecciones, categorías o campañas especiales.</p>
-          </div>
+      < div class="home-section-card home-section-card--empty" >
+        <div class="home-section-content">
+          <h3>Secciones personalizadas</h3>
+          <p>Crea secciones desde el panel administrativo para destacar colecciones, categorías o campañas especiales.</p>
+        </div>
         </div >
-        `;
+      `;
       return;
     }
 
@@ -596,7 +603,7 @@ class HomeManager {
       const imageUrl = settings.image_url || (category?.image_url ?? null);
 
       return `
-        < article class="home-section-card" data - link="${link}" >
+      <article class="home-section-card" data-link="${link}">
           <div class="home-section-media">
             ${imageUrl ? `<img src="${imageUrl}" alt="${title}" onerror="this.style.display='none'">` : `<div class="home-section-placeholder"><i class="fas fa-layer-group"></i></div>`}
           </div>
@@ -611,7 +618,7 @@ class HomeManager {
             <button type="button" class="btn btn-outline btn-sm" data-link="${link}">${ctaText}</button>
           </div>
         </article >
-        `;
+      `;
     }).join('');
 
     container.querySelectorAll('[data-link]').forEach(element => {
@@ -679,7 +686,7 @@ class HomeManager {
       ${'<i class="fas fa-star"></i>'.repeat(fullStars)}
       ${hasHalfStar ? '<i class="fas fa-star-half-alt"></i>' : ''}
       ${'<i class="far fa-star"></i>'.repeat(emptyStars)}
-      `;
+    `;
   }
 
   getCategoryIcon(slug) {
@@ -798,7 +805,7 @@ class HomeManager {
     modal.setAttribute('aria-modal', 'true');
     modal.style.display = 'flex';
     modal.innerHTML = `
-        < div class="modal-content" style = "max-width: 500px;" >
+      < div class="modal-content" style = "max-width: 500px;" >
         <span class="modal-close" onclick="this.closest('.modal').remove()" aria-label="Cerrar modal de suscripción" tabindex="0" role="button">&times;</span>
         <h2 id="subscriptionModalTitle" style="margin-bottom: 16px;">¡Suscríbete y obtén 10% de descuento!</h2>
         <p style="margin-bottom: 24px; color: #666;">Recibe ofertas exclusivas, novedades y tu código de descuento por email.</p>
@@ -813,7 +820,7 @@ class HomeManager {
           Al suscribirte, aceptas recibir comunicaciones comerciales de FutureLabs.
         </p>
       </div >
-        `;
+      `;
     document.body.appendChild(modal);
 
     // Cerrar al hacer click fuera
@@ -916,7 +923,7 @@ class HomeManager {
     modal.setAttribute('aria-modal', 'true');
     modal.style.display = 'flex';
     modal.innerHTML = `
-        < div class="modal-content" style = "max-width: 600px;" >
+      < div class="modal-content" style = "max-width: 600px;" >
         <span class="modal-close" onclick="this.closest('.modal').remove()" aria-label="Cerrar modal de ayuda" tabindex="0" role="button">&times;</span>
         <h2 id="contactModalTitle" style="margin-bottom: 16px;"><i class="fas fa-comments" aria-hidden="true"></i> ¿Necesitas ayuda?</h2>
         <p style="margin-bottom: 24px; color: #666;">Estamos aquí para ayudarte. Elige cómo prefieres contactarnos:</p>
@@ -935,7 +942,7 @@ class HomeManager {
           El servicio de chat en vivo estará disponible próximamente.
         </p>
       </div >
-        `;
+      `;
     document.body.appendChild(modal);
 
     // Cerrar al hacer click fuera
@@ -979,8 +986,8 @@ class HomeManager {
         const products = response.data.products.slice(0, 4);
 
         flashSection.innerHTML = `
-        < div class="flash-offers-grid" style = "display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 24px;" role = "list" aria - label="Ofertas flash disponibles" >
-          ${products.map((product, index) => {
+      < div class="flash-offers-grid" style = "display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 24px;" role = "list" aria - label="Ofertas flash disponibles" >
+        ${products.map((product, index) => {
           const discount = product.discount_price ?
             Math.round(((product.price - product.discount_price) / product.price) * 100) : 0;
 
@@ -1010,14 +1017,14 @@ class HomeManager {
         }).join('')
           }
           </div >
-        <div style="text-align: center; margin-top: 24px;">
-          <a href="products.html?on_sale=true" class="btn btn-primary">Ver todas las ofertas</a>
-        </div>
-      `;
+      <div style="text-align: center; margin-top: 24px;">
+        <a href="products.html?on_sale=true" class="btn btn-primary">Ver todas las ofertas</a>
+      </div>
+    `;
       } else {
         // Si no hay ofertas, mostrar mensaje mejorado
         flashSection.innerHTML = `
-        < div style = "text-align: center; padding: 40px 20px;" >
+      < div style = "text-align: center; padding: 40px 20px;" >
             <i class="fas fa-fire" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5; color: #ff6b6b;"></i>
             <p style="font-size: 16px; margin: 0; color: #666;">No hay ofertas flash disponibles en este momento</p>
             <p style="font-size: 14px; margin-top: 8px; color: #999;">Suscríbete para ser el primero en enterarte de nuestras próximas promociones</p>
@@ -1025,17 +1032,17 @@ class HomeManager {
               Suscribirme
             </button>
           </div >
-        `;
+      `;
       }
     } catch (error) {
       window.logger?.error('HOME', 'Error cargando flash offers', error);
       flashSection.innerHTML = `
-        < div style = "text-align: center; padding: 40px 20px; color: #999;" >
+      < div style = "text-align: center; padding: 40px 20px; color: #999;" >
           <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
           <p style="font-size: 16px; margin: 0;">Error al cargar ofertas flash</p>
           <a href="products.html?on_sale=true" class="btn btn-outline" style="margin-top: 16px;">Ver ofertas disponibles</a>
         </div >
-        `;
+      `;
     }
   }
 
@@ -1060,12 +1067,12 @@ class HomeManager {
 
       // Renderizar categorías en la columna izquierda
       categoriesColumn.innerHTML = this.categories.slice(0, 8).map((category, index) => `
-        < div class="category-item ${index === 0 ? 'active' : ''}" data - category="${category.slug}" >
+      < div class="category-item ${index === 0 ? 'active' : ''}" data - category="${category.slug}" >
           <span class="category-text">${this.escapeHtml(category.name)}</span>
           <i class="fas fa-chevron-right" aria-hidden="true"></i>
           <div class="active-indicator"></div>
         </div >
-        `).join('');
+      `).join('');
 
       // Renderizar contenido de categorías
       contentColumn.innerHTML = this.categories.slice(0, 8).map((category, index) => {
@@ -1073,7 +1080,7 @@ class HomeManager {
         const subcategories = this.getSubcategoriesForCategory(category);
 
         return `
-        < div class="category-content ${index === 0 ? 'active' : ''}" data - category="${category.slug}" >
+      < div class="category-content ${index === 0 ? 'active' : ''}" data - category="${category.slug}" >
             <div class="content-header">
               <h2>${this.escapeHtml(category.name)}</h2>
               <a href="products.html?category=${category.slug}" class="view-all">Ver todo <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
@@ -1082,7 +1089,7 @@ class HomeManager {
               ${this.renderSubcategoriesGrid(category, subcategories)}
             </div>
           </div >
-        `;
+      `;
       }).join('');
 
       // Reinicializar event listeners del megamenú
@@ -1128,17 +1135,17 @@ class HomeManager {
   renderSubcategoriesGrid(category, subcategories) {
     if (!subcategories || subcategories.length === 0) {
       return `
-        < div class="subcategory-column" >
+      < div class="subcategory-column" >
           <h3>Productos</h3>
           <ul>
             <li><a href="products.html?category=${category.slug}">Ver todos los productos</a></li>
           </ul>
         </div >
-        `;
+      `;
     }
 
     return subcategories.map(sub => `
-        < div class="subcategory-column" >
+      < div class="subcategory-column" >
         <h3>${this.escapeHtml(sub.title)}</h3>
         <ul>
           ${sub.items.map(item => `
@@ -1146,7 +1153,7 @@ class HomeManager {
           `).join('')}
         </ul>
       </div >
-        `).join('');
+      `).join('');
   }
 
   setupMegaMenuListeners() {

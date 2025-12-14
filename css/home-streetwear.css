@@ -116,47 +116,63 @@
 /* ============================================
    2. INFINITE MARQUEE
    ============================================ */
-.marquee-container {
+/* ============================================
+   2. BRAND MARQUEE (PREMIUM LOGO SCROLL)
+   ============================================ */
+.brand-marquee-section {
     background: var(--black);
     color: var(--white);
-    padding: var(--spacing-md) 0;
+    padding: var(--spacing-lg) 0;
     overflow: hidden;
     position: relative;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    white-space: nowrap;
     margin-bottom: var(--spacing-4xl);
-    /* Strict Rhythm */
 }
 
-.marquee-content {
-    display: inline-block;
-    animation: marquee 20s linear infinite;
-    padding-left: 100%;
-    /* Start offset */
+.brand-marquee-track {
+    display: flex;
+    align-items: center;
+    gap: 6rem;
+    white-space: nowrap;
+    animation: marquee-brands 20s linear infinite;
+    width: max-content;
 }
 
-.marquee-content span {
+.brand-item {
     font-family: 'Poppins', sans-serif;
-    font-weight: 800;
-    font-size: 1.5rem;
+    font-weight: 900;
+    font-size: clamp(3rem, 6vw, 5rem);
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-right: 2rem;
+    letter-spacing: -0.05em;
+    opacity: 0.4;
+    transition: all 0.4s ease;
+    cursor: default;
+    user-select: none;
 }
 
-.marquee-content .separator {
-    color: var(--accent);
-    font-size: 1.2rem;
-    vertical-align: middle;
+.brand-item:hover {
+    opacity: 1;
+    transform: scale(1.1);
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
 }
 
-@keyframes marquee {
+.brand-item.stroke-text {
+    color: transparent;
+    -webkit-text-stroke: 2px rgba(255, 255, 255, 0.4);
+}
+
+.brand-item.stroke-text:hover {
+    color: var(--white);
+    -webkit-text-stroke: 0;
+}
+
+@keyframes marquee-brands {
     0% {
         transform: translateX(0);
     }
 
     100% {
-        transform: translateX(-100%);
+        transform: translateX(-50%);
     }
 }
 
@@ -166,7 +182,6 @@
 .fluid-container {
     max-width: 100% !important;
     padding: 0 0 0 var(--spacing-xl) !important;
-    /* Left padding only */
 }
 
 .products-horizontal-scroll {
@@ -175,10 +190,7 @@
     scroll-snap-type: x mandatory;
     gap: var(--spacing-lg);
     padding-bottom: var(--spacing-xl);
-    /* Space for scrollbar or shadow */
     padding-right: var(--spacing-xl);
-
-    /* Hide scrollbar but keep functionality */
     -ms-overflow-style: none;
     /* IE and Edge */
     scrollbar-width: none;
@@ -190,14 +202,145 @@
 }
 
 .products-horizontal-scroll .product-card {
-    min-width: 300px;
-    max-width: 300px;
+    min-width: 320px;
+    max-width: 320px;
     scroll-snap-align: start;
     flex-shrink: 0;
 }
 
 /* ============================================
-   4. BENTO GRID CATEGORIES
+   4. BENTO GRID CATEGORIES (MAGAZINE STYLE)
+   ============================================ */
+.bento-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-auto-rows: 240px;
+    /* Base height for rows */
+    gap: 1.5rem;
+    padding-bottom: 1.5rem;
+}
+
+.category-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0;
+    /* Brutalist sharp edges */
+    cursor: pointer;
+    background: var(--gray-100);
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    border: 1px solid transparent;
+}
+
+.category-card:hover {
+    z-index: 10;
+    transform: translateY(-4px);
+    border-color: var(--black);
+    box-shadow: 8px 8px 0 var(--black);
+}
+
+.category-card-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s ease;
+    filter: grayscale(100%);
+    /* Editorial look */
+}
+
+.category-card:hover .category-card-bg {
+    transform: scale(1.1);
+    filter: grayscale(0%);
+    /* Reveal color on hover */
+}
+
+.category-card h3 {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 1.5rem;
+    margin: 0;
+    color: var(--white);
+    font-size: 2rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 0 var(--black);
+    z-index: 2;
+    pointer-events: none;
+}
+
+.category-card p {
+    display: none;
+    /* Hide description for cleaner visual */
+}
+
+/* Bento Layout Logic */
+/* First item: Big Square */
+.category-card:nth-child(1) {
+    grid-column: span 8;
+    grid-row: span 2;
+}
+
+/* Second item: Tall Column */
+.category-card:nth-child(2) {
+    grid-column: span 4;
+    grid-row: span 2;
+}
+
+/* Third item: Wide Rectangle */
+.category-card:nth-child(3) {
+    grid-column: span 6;
+    grid-row: span 1;
+}
+
+/* Fourth item: Wide Rectangle */
+.category-card:nth-child(4) {
+    grid-column: span 6;
+    grid-row: span 1;
+}
+
+/* Fifth item: Standard */
+.category-card:nth-child(5) {
+    grid-column: span 4;
+    grid-row: span 1;
+}
+
+@media (max-width: 1024px) {
+    .bento-grid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-auto-rows: 200px;
+    }
+
+    .category-card:nth-child(n) {
+        grid-column: span 1;
+        grid-row: span 1;
+    }
+
+    .category-card:nth-child(1) {
+        grid-column: span 2;
+        grid-row: span 2;
+    }
+}
+
+@media (max-width: 768px) {
+    .brand-item {
+        font-size: 3rem;
+        gap: 3rem;
+    }
+
+    .bento-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .category-card:nth-child(1) {
+        grid-column: span 1;
+        grid-row: span 1;
+        height: 300px;
+    }
+}
+
+/* ============================================
+   5. CATEGORIES SECTION
    ============================================ */
 .categories-section {
     padding: var(--spacing-3xl) 0;
@@ -744,3 +887,4 @@ footer .copyright {
             padding-left: 0 !important;
         }
     }
+}
