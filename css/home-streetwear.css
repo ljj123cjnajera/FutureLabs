@@ -1393,3 +1393,88 @@ footer .copyright {
         }
     }
 }
+
+/* ============================================
+   12. MOBILE REFINEMENTS & TOUCH TARGETS
+   ============================================ */
+@media (max-width: 768px) {
+
+    /* Manifesto Adjustments */
+    .manifesto-section {
+        padding: var(--spacing-3xl) var(--spacing-md);
+        min-height: auto;
+    }
+
+    .manifesto-title {
+        font-size: 2.5rem;
+        /* Reduced from 4rem+ */
+        line-height: 1.1;
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .manifesto-text {
+        font-size: 1rem;
+        max-width: 100%;
+        padding: 0 var(--spacing-sm);
+    }
+
+    /* Journal Stacking */
+    .journal-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-2xl);
+    }
+
+    .journal-image {
+        height: 200px;
+        /* Slightly smaller on mobile*/
+    }
+
+    /* Trust Bar Grid */
+    .trust-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        /* 2x2 grid on mobile */
+        gap: var(--spacing-lg);
+    }
+
+    .trust-item {
+        flex-direction: column;
+        text-align: center;
+        min-width: 0;
+    }
+
+    .trust-item i {
+        margin-bottom: var(--spacing-xs);
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+
+    /* Ultra-small screens */
+    .manifesto-title {
+        font-size: 2rem;
+    }
+
+    .section-title {
+        font-size: 1.75rem;
+    }
+
+    .home-hero-slide .hero-title {
+        font-size: 2.5rem;
+    }
+
+    /* Ensure tap targets are large enough */
+    .journal-card a,
+    .product-card a,
+    .btn,
+    .cta-button {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    .header-actions .action-btn {
+        padding: 12px;
+        /* Easier to tap */
+    }
+}
