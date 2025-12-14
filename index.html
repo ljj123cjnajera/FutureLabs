@@ -597,9 +597,36 @@
                 }
             }, 1000);
 
-            console.log('🎉 SneakersShop está listo!');
-        });
+    <!-- NEWSLETTER POPUP MODAL -->
+    <div id="newsletterPopup" class="modal newsletter-popup">
+        <div class="modal-content newsletter-modal-content">
+            <span class="close-modal" onclick="closeNewsletterPopup()">&times;</span>
+            <div class="newsletter-popup-grid">
+                <div class="newsletter-popup-image">
+                    <img src="https://images.unsplash.com/photo-1552346154-21d32810aba3?q=80&w=800" alt="Exclusive Drop">
+                </div>
+                <div class="newsletter-popup-text">
+                    <span class="popup-tag">FUTURE LABS CLUB</span>
+                    <h2>DON'T MISS THE DROP</h2>
+                    <p>Unlock <strong>10% OFF</strong> your first order and get early access to exclusive releases.</p>
+                    <form id="popupNewsletterForm">
+                        <input type="email" placeholder="Enter your email" required>
+                        <button type="submit" class="btn btn-black">UNLOCK ACCESS</button>
+                    </form>
+                    <p class="terms-text">No spam. Unsubscribe anytime.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple internal script to handle modal closing just in case
+        function closeNewsletterPopup() {
+            document.getElementById('newsletterPopup').style.display = 'none';
+            localStorage.setItem('newsletterDismissed', 'true');
+        }
     </script>
+
     <!-- Quick View Modal -->
     <link rel="stylesheet" href="css/quickview.css">
     <div id="quickViewModal" class="quick-view-modal">

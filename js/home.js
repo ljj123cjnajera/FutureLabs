@@ -63,37 +63,86 @@ class HomeManager {
   }
 
   initNewsletter() {
+    this.initSmartPopup();
+
     const form = document.getElementById('newsletterForm');
     if (!form) return;
 
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const btn = form.querySelector('button');
-      const originalText = btn.innerText;
+    form.addEventListener('submit', (e) => this.handleNewsletterSubmit(e, form));
 
-      btn.innerText = 'PROCESANDO...';
-      btn.disabled = true;
+    // Also init footer form
+    const footerForm = document.getElementById('footerNewsletterForm');
+    if (footerForm) {
+      footerForm.addEventListener('submit', (e) => this.handleNewsletterSubmit(e, footerForm));
+    }
+  }
 
-      // Simulate API call
+  handleNewsletterSubmit(e, form) {
+    e.preventDefault();
+    const btn = form.querySelector('button');
+    const originalText = btn.innerText;
+
+    btn.innerText = 'PROCESANDO...';
+    btn.disabled = true;
+
+    setTimeout(() => {
+      btn.innerText = '¡SUSCRITO!';
+      btn.style.background = '#00ff00';
+      btn.style.color = '#000';
+
+      if (window.notifications) window.notifications.success('Te has unido al futuro. Revisa tu email.');
+
+      form.reset();
+      localStorage.setItem('newsletterSubscribed', 'true'); // Prevent popup from showing
+
       setTimeout(() => {
-        btn.innerText = '¡SUSCRITO!';
-        btn.style.background = '#00ff00';
-        btn.style.color = '#000';
-        btn.style.borderColor = '#00ff00';
+        btn.innerText = originalText;
+        btn.disabled = false;
+        btn.style = '';
+      }, 3000);
+    }, 1500);
+  }
 
-        if (window.notifications) {
-          window.notifications.success('Te has unido al futuro. Revisa tu email.');
-        }
+  initSmartPopup() {
+    // Don't show if already subscribed or dismissed
+    if (localStorage.getItem('newsletterSubscribed') || localStorage.getItem('newsletterDismissed')) return;
 
-        form.reset();
+    const popup = document.getElementById('newsletterPopup');
+    if (!popup) return;
 
-        setTimeout(() => {
-          btn.innerText = originalText;
-          btn.disabled = false;
-          btn.style = '';
-        }, 3000);
-      }, 1500);
+    // 1. Scroll Trigger (35% of page)
+    const scrollTrigger = () => {
+      const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+      if (scrollPercent > 35) {
+        this.showPopup(popup);
+        window.removeEventListener('scroll', scrollTrigger);
+      }
+    };
+    window.addEventListener('scroll', scrollTrigger);
+
+    // 2. Exit Intent (Desktop only)
+    document.addEventListener('mouseleave', (e) => {
+      if (e.clientY < 0) {
+        this.showPopup(popup);
+      }
     });
+
+    // Init popup form logic
+    const popupForm = document.getElementById('popupNewsletterForm');
+    if (popupForm) {
+      popupForm.addEventListener('submit', (e) => {
+        this.handleNewsletterSubmit(e, popupForm);
+        setTimeout(() => {
+          popup.style.display = 'none';
+          localStorage.setItem('newsletterSubscribed', 'true');
+        }, 2000);
+      });
+    }
+  }
+
+  showPopup(popup) {
+    if (localStorage.getItem('newsletterDismissed')) return;
+    popup.style.display = 'block';
   }
 
   async loadHomeContent() {
