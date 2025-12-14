@@ -146,6 +146,23 @@ class HomeManager {
   }
 
   async loadHomeContent() {
+    // 0. EMERGENCY HEADER/FOOTER RESTORE
+    const headerContainer = document.getElementById('mainHeader');
+    if (headerContainer && window.Components && window.Components.getHeader) {
+      if (!headerContainer.innerHTML.trim()) {
+        headerContainer.innerHTML = window.Components.getHeader(true, true);
+        window.Components.initHeaderLogic?.();
+      }
+    }
+
+    // Protect Footer from overwrite if it exists (Brutalist footer is static in index.html)
+    const footerContainer = document.getElementById('mainFooter');
+    if (footerContainer && window.Components && window.Components.getFooter) {
+      if (!footerContainer.innerHTML.trim()) {
+        footerContainer.innerHTML = window.Components.getFooter();
+      }
+    }
+
     try {
       window.logger?.info('HOME', 'Cargando contenido del home...');
       const response = await window.api.getHomeContent();
