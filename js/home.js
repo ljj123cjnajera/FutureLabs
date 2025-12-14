@@ -296,22 +296,25 @@ class HomeManager {
 
   renderFeaturedProducts() {
     const container = document.getElementById('featuredProductsGrid');
-    if (!container) return; // Guard clause
+    if (!container) return;
 
-    // Safety check for empty data
-    if (!this.featuredProducts || this.featuredProducts.length === 0) {
-      container.innerHTML = `
-        <div class="empty-state" style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #999;">
-          <i class="fas fa-star" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
-          <p style="font-size: 16px; margin: 0;">No hay productos destacados en este momento</p>
-          <p style="font-size: 14px; margin-top: 8px; opacity: 0.7;">Explora nuestros productos en la sección de catálogo</p>
-        </div>
-      `;
-      return;
+    // Premium Placeholders for "Demo Mode" or Empty State
+    const demoProducts = [
+      { id: 'demo-1', name: 'Air Jordan 1 Retro High OG', price: 789.00, original_price: 900.00, image_url: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?q=80&w=800', slug: 'jordan-1-high', category: 'jordan', is_new: true },
+      { id: 'demo-2', name: 'Nike Dunk Low Retro', price: 459.00, original_price: 0, image_url: 'https://images.unsplash.com/photo-1637844527273-062e08b1a436?q=80&w=800', slug: 'dunk-low', category: 'nike', is_new: false },
+      { id: 'demo-3', name: 'Yeezy Boost 350 V2', price: 1250.00, original_price: 1500.00, image_url: 'https://images.unsplash.com/photo-1582260611295-d2a9391d17cf?q=80&w=800', slug: 'yeezy-350', category: 'yeezy', is_new: true },
+      { id: 'demo-4', name: 'Adidas Forum Low', price: 389.00, original_price: 450.00, image_url: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?q=80&w=800', slug: 'forum-low', category: 'adidas', is_new: false }
+    ];
+
+    let productsToRender = [];
+    if (this.featuredProducts && this.featuredProducts.length > 0) {
+      productsToRender = this.featuredProducts;
+    } else {
+      // Fallback to demo products if API is empty
+      productsToRender = demoProducts;
     }
 
-    container.innerHTML = this.featuredProducts.map(product => this.createProductCard(product)).join('');
-    // window.wishlistManager?.syncToggleButtons?.(container); // Remove optional chaining if casing issues, but safe generally
+    container.innerHTML = productsToRender.map(product => this.createProductCard(product)).join('');
 
     // Ocultar skeleton loader
     if (window.skeletonLoader) {
@@ -321,22 +324,22 @@ class HomeManager {
 
   renderOnSaleProducts() {
     const container = document.getElementById('onSaleProductsGrid');
-    if (!container) return; // Guard clause
+    if (!container) return;
 
-    // Safety check for empty data
-    if (!this.onSaleProducts || this.onSaleProducts.length === 0) {
-      container.innerHTML = `
-        <div class="empty-state" style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #999;">
-          <i class="fas fa-fire" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
-          <p style="font-size: 16px; margin: 0;">No hay ofertas disponibles en este momento</p>
-          <p style="font-size: 14px; margin-top: 8px; opacity: 0.7;">Vuelve pronto para ver nuestras mejores promociones</p>
-        </div>
-      `;
-      return;
+    const demoOffers = [
+      { id: 'demo-offer-1', name: 'Nike Air Max 90', price: 320.00, discount_price: 280.00, original_price: 320.00, image_url: 'https://images.unsplash.com/photo-1556906781-9a412961d28c?q=80&w=800', slug: 'air-max-90', category: 'nike', on_sale: true },
+      { id: 'demo-offer-2', name: 'Adidas Ultraboost', price: 600.00, discount_price: 450.00, original_price: 600.00, image_url: 'https://images.unsplash.com/photo-1587563871167-1ee9c731aef4?q=80&w=800', slug: 'ultraboost', category: 'adidas', on_sale: true },
+      { id: 'demo-offer-3', name: 'Puma RS-X', price: 350.00, discount_price: 299.00, original_price: 350.00, image_url: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?q=80&w=800', slug: 'rs-x', category: 'puma', on_sale: true }
+    ];
+
+    let productsToRender = [];
+    if (this.onSaleProducts && this.onSaleProducts.length > 0) {
+      productsToRender = this.onSaleProducts;
+    } else {
+      productsToRender = demoOffers;
     }
 
-    container.innerHTML = this.onSaleProducts.map(product => this.createProductCard(product)).join('');
-    // window.wishlistManager?.syncToggleButtons?.(container);
+    container.innerHTML = productsToRender.map(product => this.createProductCard(product)).join('');
 
     // Ocultar skeleton loader
     if (window.skeletonLoader) {
