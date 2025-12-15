@@ -55,11 +55,66 @@ class HomeManager {
       this.setupEventListeners();
       this.initNewsletter();
       this.initCountdown();
+      this.initMobileMenu(); // [NEW] Mobile Menu
 
       window.logger?.success('HOME', 'HomeManager inicializado correctamente');
     } catch (error) {
       document.body.classList.add('loaded'); // Ensure loader goes away even on critical init error
       window.logger?.error('HOME', 'Error inicializando HomeManager', error);
+    }
+  }
+
+  // [NEW] Brutalist Mobile Menu Logic
+  initMobileMenu() {
+    // 1. Inject Overlay if missing
+    if (!document.querySelector('.mobile-nav-overlay')) {
+      const overlay = document.createElement('div');
+      overlay.className = 'mobile-nav-overlay';
+      overlay.innerHTML = `
+        <div class="mobile-nav-close">&times;</div>
+        <nav class="mobile-nav-content">
+            <a href="index.html" class="mobile-nav-link">Home</a>
+            <a href="products.html" class="mobile-nav-link">Explore</a>
+            <a href="products.html?filter=new-arrivals" class="mobile-nav-link">New Drops</a>
+            <a href="products.html?category=jordan" class="mobile-nav-link">Jordan</a>
+            <a href="products.html?category=yeezy" class="mobile-nav-link">Yeezy</a>
+            <a href="products.html?filter=sale" class="mobile-nav-link" style="color: var(--accent) !important">Sale</a>
+            <div class="mobile-auth-buttons" style="margin-top: 2rem; display: flex; gap: 1rem;">
+                <a href="login.html" class="btn btn-primary" style="flex:1; text-align:center;">Login</a>
+                <a href="register.html" class="btn" style="flex:1; text-align:center;">Join</a>
+            </div>
+        </nav>
+      `;
+      document.body.appendChild(overlay);
+    }
+
+    // 2. Event Listeners
+    const overlay = document.querySelector('.mobile-nav-overlay');
+    const closeBtn = document.querySelector('.mobile-nav-close');
+
+    // Attempt to find the hamburger icon. It's usually .fa-bars inside .nav-bar or .all-categories
+    // We'll target any .fa-bars in the header area
+    const bars = document.querySelector('.header .fa-bars');
+
+    if (bars) {
+      // Handle click on the icon or its parent
+      const trigger = bars.closest('a') || bars;
+
+      trigger.addEventListener('click', (e) => {
+        if (window.innerWidth <= 768) {
+          e.preventDefault();
+          e.stopPropagation();
+          overlay.classList.add('active');
+          document.body.style.overflow = 'hidden'; // Lock scroll
+        }
+      });
+    }
+
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        overlay.classList.remove('active');
+        document.body.style.overflow = ''; // Unlock scroll
+      });
     }
   }
 
