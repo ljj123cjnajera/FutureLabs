@@ -1767,3 +1767,116 @@ footer .copyright {
         font-size: 2rem;
     }
 }
+
+/* ============================================
+   10. PRODUCT CARDS - BRUTALIST OVERHAUL
+   ============================================ */
+/* Force brutalist style on all product cards specifically within home sections */
+.section .product-card,
+.products-horizontal-scroll .product-card {
+    border: 1px solid var(--black);
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: var(--white);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.section .product-card:hover,
+.products-horizontal-scroll .product-card:hover {
+    transform: translate(-4px, -4px);
+    box-shadow: 6px 6px 0px var(--black) !important;
+}
+
+.product-image-container {
+    border-radius: 0 !important;
+    border-bottom: 2px solid var(--black);
+    background: #f5f5f5;
+    /* Light gray background for transparency */
+}
+
+.product-badges .product-badge {
+    border-radius: 0 !important;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    border: 1px solid var(--black);
+    padding: 0.25rem 0.75rem;
+}
+
+.product-content {
+    padding: 1rem !important;
+    text-align: left;
+}
+
+.product-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 1rem !important;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.product-price-current,
+.product-price-new {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    color: var(--black);
+    font-size: 1.1rem;
+}
+
+.product-btn {
+    border-radius: 0 !important;
+    background: var(--black) !important;
+    color: var(--white) !important;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    padding: 0.8rem 1rem !important;
+    border: 1px solid var(--black) !important;
+    transition: all 0.2s ease;
+}
+
+.product-btn:hover {
+    background: var(--white) !important;
+    color: var(--black) !important;
+}
+
+/* ============================================
+   11. SYSTEM INTEGRITY & OVERRIDES
+   ============================================ */
+/* Ensure no legacy rounded corners leak through */
+* {
+    border-radius: 0 !important;
+    /* AGGRESSIVE BRUTALIST ENFORCEMENT */
+}
+
+/* Exception for circular elements like social icons or specific UI controls if needed */
+.social-links a,
+.slider-arrow,
+.color-swatch {
+    border-radius: 50% !important;
+}
+
+/* Fix Benefits Slider to be Brutalist */
+.benefit-item {
+    border: 1px solid var(--gray-200);
+    padding: 1.5rem;
+    background: var(--white);
+    transition: all 0.3s ease;
+}
+
+.benefit-item:hover {
+    border-color: var(--black);
+    transform: translateY(-2px);
+    box-shadow: 4px 4px 0 var(--black);
+}
+
+.benefit-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: var(--black);
+}
