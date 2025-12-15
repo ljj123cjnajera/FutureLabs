@@ -651,12 +651,14 @@ class HomeManager {
 
     if (!this.homeBenefits.length) {
       container.innerHTML = `
-      < div class="benefit-card benefit-card--empty" >
-        <div class="benefit-content">
-          <h3>Pronto más beneficios</h3>
-          <p>Configura beneficios desde el panel administrativo para mostrarlos aquí.</p>
+      <div class="benefit-card benefit-card--empty">
+        <div class="benefit-icon">
+          <i class="fas fa-cog"></i>
         </div>
-        </div >
+        <div class="benefit-content">
+          <h3>Configura tus beneficios</h3>
+          <p>Los beneficios que crees en el panel aparecerán aquí.</p>
+        </div>
       </div>
       `;
       return;
@@ -881,7 +883,7 @@ class HomeManager {
       const performSearch = () => {
         const query = searchInput.value.trim();
         if (query) {
-          window.location.href = `products.html ? search = ${encodeURIComponent(query)} `;
+          window.location.href = `products.html?search=${encodeURIComponent(query)} `;
         }
       };
 
@@ -948,7 +950,7 @@ class HomeManager {
     modal.setAttribute('aria-modal', 'true');
     modal.style.display = 'flex';
     modal.innerHTML = `
-      < div class="modal-content" style = "max-width: 500px;" >
+      <div class="modal-content" style="max-width: 500px;">
         <span class="modal-close" onclick="this.closest('.modal').remove()" aria-label="Cerrar modal de suscripción" tabindex="0" role="button">&times;</span>
         <h2 id="subscriptionModalTitle" style="margin-bottom: 16px;">¡Suscríbete y obtén 10% de descuento!</h2>
         <p style="margin-bottom: 24px; color: #666;">Recibe ofertas exclusivas, novedades y tu código de descuento por email.</p>
@@ -962,7 +964,7 @@ class HomeManager {
         <p style="margin-top: 16px; font-size: 12px; color: #999; text-align: center;">
           Al suscribirte, aceptas recibir comunicaciones comerciales de FutureLabs.
         </p>
-      </div >
+      </div>
       `;
     document.body.appendChild(modal);
 
@@ -1066,7 +1068,7 @@ class HomeManager {
     modal.setAttribute('aria-modal', 'true');
     modal.style.display = 'flex';
     modal.innerHTML = `
-      < div class="modal-content" style = "max-width: 600px;" >
+      <div class="modal-content" style="max-width: 600px;">
         <span class="modal-close" onclick="this.closest('.modal').remove()" aria-label="Cerrar modal de ayuda" tabindex="0" role="button">&times;</span>
         <h2 id="contactModalTitle" style="margin-bottom: 16px;"><i class="fas fa-comments" aria-hidden="true"></i> ¿Necesitas ayuda?</h2>
         <p style="margin-bottom: 24px; color: #666;">Estamos aquí para ayudarte. Elige cómo prefieres contactarnos:</p>
@@ -1084,7 +1086,7 @@ class HomeManager {
         <p style="margin-top: 24px; font-size: 12px; color: #999; text-align: center;">
           El servicio de chat en vivo estará disponible próximamente.
         </p>
-      </div >
+      </div>
       `;
     document.body.appendChild(modal);
 
@@ -1129,7 +1131,7 @@ class HomeManager {
         const products = response.data.products.slice(0, 4);
 
         flashSection.innerHTML = `
-      < div class="flash-offers-grid" style = "display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 24px;" role = "list" aria - label="Ofertas flash disponibles" >
+      <div class="flash-offers-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 24px;" role="list" aria-label="Ofertas flash disponibles">
         ${products.map((product, index) => {
           const discount = product.discount_price ?
             Math.round(((product.price - product.discount_price) / product.price) * 100) : 0;
@@ -1159,7 +1161,7 @@ class HomeManager {
               `;
         }).join('')
           }
-          </div >
+          </div>
       <div style="text-align: center; margin-top: 24px;">
         <a href="products.html?on_sale=true" class="btn btn-primary">Ver todas las ofertas</a>
       </div>
@@ -1167,24 +1169,24 @@ class HomeManager {
       } else {
         // Si no hay ofertas, mostrar mensaje mejorado
         flashSection.innerHTML = `
-      < div style = "text-align: center; padding: 40px 20px;" >
+      <div style="text-align: center; padding: 40px 20px;">
             <i class="fas fa-fire" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5; color: #ff6b6b;"></i>
             <p style="font-size: 16px; margin: 0; color: #666;">No hay ofertas flash disponibles en este momento</p>
             <p style="font-size: 14px; margin-top: 8px; color: #999;">Suscríbete para ser el primero en enterarte de nuestras próximas promociones</p>
             <button class="btn btn-primary" style="margin-top: 16px;" onclick="document.querySelector('.sticky-footer .cta-button')?.click();">
               Suscribirme
             </button>
-          </div >
+          </div>
       `;
       }
     } catch (error) {
       window.logger?.error('HOME', 'Error cargando flash offers', error);
       flashSection.innerHTML = `
-      < div style = "text-align: center; padding: 40px 20px; color: #999;" >
+      <div style="text-align: center; padding: 40px 20px; color: #999;">
           <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
           <p style="font-size: 16px; margin: 0;">Error al cargar ofertas flash</p>
           <a href="products.html?on_sale=true" class="btn btn-outline" style="margin-top: 16px;">Ver ofertas disponibles</a>
-        </div >
+        </div>
       `;
     }
   }
@@ -1210,11 +1212,11 @@ class HomeManager {
 
       // Renderizar categorías en la columna izquierda
       categoriesColumn.innerHTML = this.categories.slice(0, 8).map((category, index) => `
-      < div class="category-item ${index === 0 ? 'active' : ''}" data - category="${category.slug}" >
+      <div class="category-item ${index === 0 ? 'active' : ''}" data-category="${category.slug}">
           <span class="category-text">${this.escapeHtml(category.name)}</span>
           <i class="fas fa-chevron-right" aria-hidden="true"></i>
           <div class="active-indicator"></div>
-        </div >
+        </div>
       `).join('');
 
       // Renderizar contenido de categorías
@@ -1223,7 +1225,7 @@ class HomeManager {
         const subcategories = this.getSubcategoriesForCategory(category);
 
         return `
-      < div class="category-content ${index === 0 ? 'active' : ''}" data - category="${category.slug}" >
+      <div class="category-content ${index === 0 ? 'active' : ''}" data-category="${category.slug}">
             <div class="content-header">
               <h2>${this.escapeHtml(category.name)}</h2>
               <a href="products.html?category=${category.slug}" class="view-all">Ver todo <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
@@ -1231,7 +1233,7 @@ class HomeManager {
             <div class="subcategories-grid">
               ${this.renderSubcategoriesGrid(category, subcategories)}
             </div>
-          </div >
+          </div>
       `;
       }).join('');
 
@@ -1278,24 +1280,24 @@ class HomeManager {
   renderSubcategoriesGrid(category, subcategories) {
     if (!subcategories || subcategories.length === 0) {
       return `
-      < div class="subcategory-column" >
+      <div class="subcategory-column">
           <h3>Productos</h3>
           <ul>
             <li><a href="products.html?category=${category.slug}">Ver todos los productos</a></li>
           </ul>
-        </div >
+        </div>
       `;
     }
 
     return subcategories.map(sub => `
-      < div class="subcategory-column" >
+      <div class="subcategory-column">
         <h3>${this.escapeHtml(sub.title)}</h3>
         <ul>
           ${sub.items.map(item => `
             <li><a href="products.html?category=${category.slug}&search=${encodeURIComponent(item)}">${this.escapeHtml(item)}</a></li>
           `).join('')}
         </ul>
-      </div >
+      </div>
       `).join('');
   }
 
@@ -1317,7 +1319,7 @@ class HomeManager {
 
         // Agregar active al seleccionado
         newItem.classList.add('active');
-        const content = document.querySelector(`.category - content[data - category="${category}"]`);
+        const content = document.querySelector(`.category-content[data-category="${category}"]`);
         if (content) {
           content.classList.add('active');
         }
@@ -1335,7 +1337,7 @@ class HomeManager {
             categoryContents.forEach(c => c.classList.remove('active'));
 
             this.classList.add('active');
-            const content = document.querySelector(`.category - content[data - category="${category}"]`);
+            const content = document.querySelector(`.category-content[data-category="${category}"]`);
             if (content) {
               content.classList.add('active');
             }
@@ -1399,13 +1401,13 @@ window.openQuickView = async function (productId) {
       document.getElementById('qvBrand').textContent = product.brand || 'Sneakers Shop';
       document.getElementById('qvTitle').textContent = product.name;
 
-      const priceHtml = product.discount_price
-        ? `< span class="text-red-600" > S / ${parseFloat(product.discount_price).toFixed(2)}</span > <span class="original-price" style="text-decoration: line-through; color: #999; font-size: 0.8em;">S/ ${parseFloat(product.price).toFixed(2)}</span>`
-        : `S / ${parseFloat(product.price).toFixed(2)} `;
+      const priceHtml = product.discount_price && product.discount_price < product.price
+        ? `<span class="text-red-600">S/ ${parseFloat(product.discount_price).toFixed(2)}</span> <span class="original-price" style="text-decoration: line-through; color: #999; font-size: 0.8em;">S/ ${parseFloat(product.price).toFixed(2)}</span>`
+        : `<span class="font-bold">S/ ${parseFloat(product.price).toFixed(2)}</span>`;
       document.getElementById('qvPrice').innerHTML = priceHtml;
 
       document.getElementById('qvDescription').textContent = product.description || 'Sin descripción disponible.';
-      document.getElementById('qvFullDetails').href = `product - detail.html ? id = ${product.id} `;
+      document.getElementById('qvFullDetails').href = `product-detail.html?id=${product.id} `;
     }
   } catch (error) {
     console.error('Error loading quick view:', error);
