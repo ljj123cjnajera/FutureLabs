@@ -601,19 +601,6 @@
     </div>
 
     <!-- Scripts del Sistema Integrado -->
-    <!-- Logger debe cargarse primero para estar disponible en todos los scripts -->
-    <!-- Scripts del Sistema Integrado -->
-    <!-- Logger debe cargarse primero para estar disponible en todos los scripts -->
-    <!-- CSS Unificado (Streetwear Standard) -->
-    <link rel="stylesheet" href="css/typography.css?v=3.1">
-    <link rel="stylesheet" href="css/style.css?v=3.1">
-    <link rel="stylesheet" href="css/design-system.css?v=3.1">
-
-    <!-- ... lines 58-81 ... -->
-    <link rel="stylesheet" href="css/home-streetwear.css?v=1.3">
-
-    <!-- ... -->
-
     <script src="js/logger.js?v=3.1"></script>
     <script src="js/api.js?v=3.1"></script>
     <script src="js/auth.js?v=3.1"></script>
@@ -636,80 +623,31 @@
         document.addEventListener('DOMContentLoaded', function () {
             console.log('🚀 Inicializando SneakersShop...');
 
-            // Renderizar header y footer
-            const headerContainer = document.getElementById('mainHeader');
-            const footerContainer = document.getElementById('mainFooter');
-
-            if (headerContainer && window.Components) {
-                headerContainer.innerHTML = window.Components.getHeader(true, true); // true = con barra de búsqueda, true = con navegación
-                window.Components.initHeader();
-                console.log('✅ Header renderizado');
-            }
-
-            if (footerContainer && window.Components) {
-                footerContainer.innerHTML = window.Components.getFooter();
-                console.log('✅ Footer renderizado');
-            }
-
-            // Inicializar contador de carrito
+            // Inicializar contadores y componentes UI
             if (window.Components) {
                 window.Components.initCartCounter();
-                console.log('✅ Contador de carrito inicializado');
-            }
-
-            // Inicializar búsqueda
-            if (window.Components) {
                 window.Components.initSearch();
             }
 
-            // Inicializar modales
-            if (window.modalManager) {
-                console.log('✅ Modal manager inicializado');
+            // Renderizar header y footer si no existen
+            const headerContainer = document.getElementById('mainHeader');
+            if (headerContainer && !headerContainer.children.length && window.Components) {
+                headerContainer.innerHTML = window.Components.getHeader(true, true);
+                window.Components.initHeader();
             }
 
-            // Inicializar autenticación
-            if (window.authManager) {
-                console.log('✅ Auth manager inicializado');
+            const footerContainer = document.getElementById('mainFooter');
+            if (footerContainer && !footerContainer.children.length && window.Components) {
+                footerContainer.innerHTML = window.Components.getFooter();
             }
 
-            // Inicializar API
-            if (window.api) {
-                console.log('✅ API client inicializado');
-            }
-
-            // Inicializar megamenú (después de que homeManager cargue las categorías)
-            // El megamenú se inicializará automáticamente cuando homeManager.loadMegaMenu() se ejecute
-            // Pero también necesitamos inicializar los listeners básicos (abrir/cerrar)
+            // Inicializar megamenú
             setTimeout(() => {
-                if (window.initMegaMenu) {
-                    window.initMegaMenu();
-                }
+                if (window.initMegaMenu) window.initMegaMenu();
             }, 1000);
+        });
 
-    <!-- NEWSLETTER POPUP MODAL -->
-    <div id="newsletterPopup" class="modal newsletter-popup">
-        <div class="modal-content newsletter-modal-content">
-            <span class="close-modal" onclick="closeNewsletterPopup()">&times;</span>
-            <div class="newsletter-popup-grid">
-                <div class="newsletter-popup-image">
-                    <img src="https://images.unsplash.com/photo-1552346154-21d32810aba3?q=80&w=800" alt="Exclusive Drop">
-                </div>
-                <div class="newsletter-popup-text">
-                    <span class="popup-tag">FUTURE LABS CLUB</span>
-                    <h2>DON'T MISS THE DROP</h2>
-                    <p>Unlock <strong>10% OFF</strong> your first order and get early access to exclusive releases.</p>
-                    <form id="popupNewsletterForm">
-                        <input type="email" placeholder="Enter your email" required>
-                        <button type="submit" class="btn btn-black">UNLOCK ACCESS</button>
-                    </form>
-                    <p class="terms-text">No spam. Unsubscribe anytime.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Simple internal script to handle modal closing just in case
+        // Simple newsletter popup logic
         function closeNewsletterPopup() {
             document.getElementById('newsletterPopup').style.display = 'none';
             localStorage.setItem('newsletterDismissed', 'true');
@@ -740,7 +678,6 @@
             </div>
         </div>
     </div>
-
 </body>
 
 </html>
