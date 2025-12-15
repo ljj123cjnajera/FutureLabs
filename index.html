@@ -678,11 +678,11 @@
         }
     </script>
 
-    <!-- Quick View Modal -->
+    <!-- Quick View Modal (Brutalist Harmonized) -->
     <link rel="stylesheet" href="css/quickview.css">
     <div id="quickViewModal" class="quick-view-modal">
-        <div class="quick-view-content">
-            <span class="quick-view-close" onclick="closeQuickView()">&times;</span>
+        <div class="quick-view-content modal-content">
+            <span class="quick-view-close close-modal" onclick="closeQuickView()">&times;</span>
             <div class="quick-view-image">
                 <img id="qvImage" src="" alt="">
             </div>
@@ -692,14 +692,32 @@
                 <div id="qvPrice" class="quick-view-price">$0.00</div>
                 <p id="qvDescription" class="quick-view-description">Description</p>
                 <div class="quick-view-actions">
-                    <button class="quick-view-btn" onclick="addToCartFromQuickView()">
+                    <button class="quick-view-btn product-btn" onclick="addToCartFromQuickView()">
                         Añadir al Carrito
                     </button>
-                    <a id="qvFullDetails" href="#"
-                        style="display: block; text-align: center; margin-top: 15px; color: #666; text-decoration: underline; font-size: 12px;">Ver
+                    <a id="qvFullDetails" href="#" class="link-arrow"
+                        style="display: block; text-align: center; margin-top: 15px; font-size: 0.9rem;">Ver
                         detalles completos</a>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Newsletter Popup (Brutalist) -->
+    <div id="newsletterPopup" class="modal" style="display:none;">
+        <div class="modal-content" style="max-width: 500px; text-align: center; padding: 3rem;">
+            <span class="close-modal" onclick="closeNewsletterPopup()">&times;</span>
+            <h2 style="font-size: 2.5rem; text-transform: uppercase; line-height: 1; margin-bottom: 1rem;">Unlock The
+                Drop</h2>
+            <p style="margin-bottom: 2rem; color: #666;">Únete ahora y obtén 10% OFF en tu primera compra.</p>
+            <form id="popupNewsletterForm" class="newsletter-form" style="flex-direction: column;">
+                <input type="email" placeholder="Tu Email" class="newsletter-input"
+                    style="border: 2px solid #000; color: #000; margin-bottom: 1rem;" required>
+                <button type="submit" class="newsletter-btn"
+                    style="background: #000; color: #fff; width: 100%;">Suscribirme</button>
+            </form>
+            <p style="margin-top: 1rem; font-size: 0.8rem; color: #999; cursor: pointer;"
+                onclick="closeNewsletterPopup()">No gracias, prefiero pagar precio completo.</p>
         </div>
     </div>
 </body>
