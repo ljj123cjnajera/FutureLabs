@@ -9,6 +9,98 @@
     --container-width: 1400px;
 }
 
+--container-width: 1400px;
+}
+
+/* ============================================
+   0.1 HEADER BRUTALIST OVERRIDES
+   ============================================ */
+.header {
+    background: var(--white);
+    border-bottom: 3px solid var(--black);
+    box-shadow: none !important;
+}
+
+.top-bar {
+    padding: 1.5rem 0;
+}
+
+/* Search Bar */
+.search-bar input {
+    border: 2px solid var(--black);
+    border-radius: 0 !important;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    background: var(--gray-100);
+    color: var(--black);
+}
+
+.search-bar input:focus {
+    background: var(--white);
+    box-shadow: 4px 4px 0 var(--black);
+}
+
+.search-btn {
+    border-radius: 0 !important;
+    background: var(--black);
+    color: var(--white);
+    border: 2px solid var(--black);
+    transition: all 0.2s;
+}
+
+.search-btn:hover {
+    background: var(--white);
+    color: var(--black);
+}
+
+/* User Actions */
+.user-actions a {
+    border-radius: 0 !important;
+    border: 2px solid transparent;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--black);
+}
+
+.user-actions a:hover {
+    border: 2px solid var(--black) !important;
+    background: var(--white) !important;
+    box-shadow: 4px 4px 0 var(--black) !important;
+    transform: translate(-2px, -2px);
+}
+
+.cart-count {
+    background: var(--accent);
+    color: var(--black);
+    border: 2px solid var(--black);
+    border-radius: 0 !important;
+    font-weight: 900;
+}
+
+/* Nav Bar */
+.nav-bar {
+    border-top: 2px solid var(--black);
+    padding: 0;
+    background: var(--black);
+}
+
+.nav-bar a {
+    color: var(--white) !important;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 1rem 1.5rem;
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.2s;
+}
+
+.nav-bar a:hover {
+    background: var(--white);
+    color: var(--black) !important;
+}
+
 .section {
     margin-bottom: var(--spacing-4xl);
     position: relative;
