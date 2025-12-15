@@ -507,21 +507,112 @@ footer .copyright {
 /* ============================================
    9. NEWSLETTER - BRUTALIST FULL WIDTH
    ============================================ */
+/* ============================================
+   9. NEWSLETTER - BRUTALIST FULL WIDTH
+   ============================================ */
 .newsletter-section {
     background-color: var(--black);
     color: var(--white);
     padding: var(--spacing-4xl) 0;
     margin-bottom: 0 !important;
-    /* Last section before footer */
-    border-top: 2px solid var(--white);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
     border-bottom: 10px solid var(--black);
-    /* Connect to footer */
     text-align: center;
+    position: relative;
+    overflow: hidden;
 }
 
 .newsletter-content {
-    max-width: 800px;
+    position: relative;
+    z-index: 2;
+    max-width: 600px;
     margin: 0 auto;
+}
+
+.newsletter-section h2 {
+    font-size: clamp(2rem, 5vw, 4rem);
+    text-transform: uppercase;
+    font-weight: 900;
+    margin-bottom: var(--spacing-md);
+    letter-spacing: -0.02em;
+}
+
+.newsletter-section p {
+    color: var(--gray-400);
+    margin-bottom: var(--spacing-xl);
+    font-size: 1.1rem;
+}
+
+.newsletter-form {
+    display: flex;
+    gap: 0;
+    /* Connected inputs */
+    border: 1px solid var(--white);
+    padding: 2px;
+}
+
+.newsletter-input {
+    background: transparent;
+    border: none;
+    color: var(--white);
+    padding: 1rem 1.5rem;
+    width: 100%;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    outline: none;
+}
+
+.newsletter-input::placeholder {
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.newsletter-btn {
+    background: var(--white);
+    color: var(--black);
+    border: none;
+    padding: 1rem 2rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.newsletter-btn:hover {
+    background: var(--accent);
+    color: var(--white);
+}
+
+/* Sticky Footer Fix - Brutalist Bar */
+.sticky-footer {
+    background: var(--accent) !important;
+    border-top: 2px solid var(--black);
+    color: var(--white);
+    border-radius: 0 !important;
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.2) !important;
+    padding: 1rem 0;
+}
+
+.sticky-footer button {
+    border-radius: 0 !important;
+    border: 2px solid var(--black);
+    box-shadow: 4px 4px 0 var(--black);
+    font-weight: 800;
+    text-transform: uppercase;
+    background: var(--black);
+    color: var(--white);
+    transition: transform 0.2s;
+}
+
+.sticky-footer button:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--black);
+}
+
+max-width: 800px;
+margin: 0 auto;
 }
 
 .newsletter-section h2 {
