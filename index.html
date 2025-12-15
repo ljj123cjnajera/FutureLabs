@@ -629,6 +629,24 @@
                 window.Components.initSearch();
             }
 
+            // [NUEVO] Wiring de Botones Hype
+            const notifyBtn = document.querySelector('.notify-btn');
+            if (notifyBtn) {
+                notifyBtn.addEventListener('click', () => {
+                    window.notifications?.success('¡Te avisaremos antes del drop!', 'Notificación Activada');
+                });
+            }
+
+            const lookbookBtn = document.querySelector('.btn-outline-white');
+            if (lookbookBtn) {
+                lookbookBtn.addEventListener('click', () => {
+                    const videoSection = document.querySelector('.video-section');
+                    if (videoSection) videoSection.scrollIntoView({ behavior: 'smooth' });
+                });
+            }
+
+            // Renderizar header y footer si no existen
+
             // Renderizar header y footer si no existen
             const headerContainer = document.getElementById('mainHeader');
             if (headerContainer && !headerContainer.children.length && window.Components) {
