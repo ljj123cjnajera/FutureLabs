@@ -692,28 +692,28 @@ class HomeManager {
 
     if (!this.homeBanners.length) {
       container.innerHTML = `
-      < div class="banner banner--placeholder" >
+      <div class="banner banner--placeholder">
           <h3>Configura tus banners</h3>
           <p>Los banners que crees en el panel aparecerán automáticamente aquí.</p>
-        </div >
+        </div>
       `;
       return;
     }
 
     container.innerHTML = this.homeBanners.slice(0, 3).map(banner => {
       const backgroundStyle = banner.image_url
-        ? `style = "background-image:linear-gradient(135deg, rgba(15,23,42,0.7), rgba(15,23,42,0.25)), url('${banner.image_url}');"`
+        ? `style="background-image:linear-gradient(135deg, rgba(15,23,42,0.7), rgba(15,23,42,0.25)), url('${banner.image_url}');"`
         : '';
       const gradientOnly = !banner.image_url && banner.background_color
-        ? `style = "background:${banner.background_color};"`
+        ? `style="background:${banner.background_color};"`
         : '';
-      const linkAttr = banner.button_link ? `data - link="${banner.button_link}"` : '';
+      const linkAttr = banner.button_link ? `data-link="${banner.button_link}"` : '';
       return `
-      < article class="banner" ${backgroundStyle || gradientOnly} ${linkAttr}>
+      <article class="banner" ${backgroundStyle || gradientOnly} ${linkAttr}>
         <h3>${banner.title || 'Banner destacado'}</h3>
           ${banner.description ? `<p>${banner.description}</p>` : ''}
           ${banner.button_text ? `<span class="banner-cta">${banner.button_text}</span>` : ''}
-        </article >
+        </article>
       `;
     }).join('');
 
@@ -726,12 +726,12 @@ class HomeManager {
 
     if (!this.homeSections.length) {
       container.innerHTML = `
-      < div class="home-section-card home-section-card--empty" >
+      <div class="home-section-card home-section-card--empty">
         <div class="home-section-content">
           <h3>Secciones personalizadas</h3>
           <p>Crea secciones desde el panel administrativo para destacar colecciones, categorías o campañas especiales.</p>
         </div>
-        </div >
+      </div>
       `;
       return;
     }
@@ -742,7 +742,7 @@ class HomeManager {
       const title = section.title || settings.title || (category ? category.name : this.getSectionTypeLabel(section.section_type));
       const description = settings.description || (category ? category.description : '');
       const ctaText = settings.cta_text || 'Ver colección';
-      const link = settings.cta_link || (category ? `products.html ? category = ${category.slug} ` : 'products.html');
+      const link = settings.cta_link || (category ? `products.html?category=${category.slug}` : 'products.html');
       const imageUrl = settings.image_url || (category?.image_url ?? null);
 
       return `
@@ -760,7 +760,7 @@ class HomeManager {
             </div>
             <button type="button" class="btn btn-outline btn-sm" data-link="${link}">${ctaText}</button>
           </div>
-        </article >
+        </article>
       `;
     }).join('');
 
