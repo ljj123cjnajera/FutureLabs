@@ -536,18 +536,15 @@ body.loaded #preloader {
     background: var(--white);
     color: var(--black);
     padding: 1rem 3rem;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    border: none;
-    transition: all 0.3s ease;
+    border: 2px solid var(--white);
+    transition: all 0.2s ease;
     display: inline-block;
-    border-radius: 0;
+    letter-spacing: 0.1em;
 }
 
 .btn-white:hover {
-    background: var(--accent);
-    transform: translateY(-5px);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
 }
 
@@ -1874,7 +1871,8 @@ body.loaded #preloader {
     align-items: center;
     justify-content: center;
     z-index: 2;
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
 }
 
 .video-content {
@@ -1938,8 +1936,30 @@ body.loaded #preloader {
 
 .hashtag {
     color: var(--gray-400);
-    font-weight: 300;
+    font-weight: 900;
     margin-left: 10px;
+    font-size: 1.5rem;
+    letter-spacing: -0.05em;
+}
+
+.link-arrow {
+    background: transparent;
+    color: var(--black);
+    font-weight: 800;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-bottom: 3px solid var(--black);
+    padding-bottom: 5px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.link-arrow:hover {
+    background: var(--black);
+    color: var(--white);
+    padding: 5px 10px;
 }
 
 .social-grid {
