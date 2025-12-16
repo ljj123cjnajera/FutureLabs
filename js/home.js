@@ -1257,9 +1257,30 @@ class HomeManager {
 
   async handleSubscription(email) {
     try {
-      // TODO: Implementar endpoint de suscripción en backend
-      // Por ahora, solo mostrar notificación
-      window.notifications?.success(`¡Te has suscrito con ${email} !Pronto recibirás tu código de descuento del 10 %.`);
+      // Mock Backend Delay
+      const btn = document.querySelector('.newsletter-btn');
+      const originalText = btn ? btn.textContent : 'Suscribirse';
+      if (btn) {
+        btn.textContent = '...';
+        btn.disabled = true;
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 800));
+
+      if (btn) {
+        btn.textContent = '¡LISTO!';
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.disabled = false;
+        }, 2000);
+      }
+
+      // Show Brutalist Notification
+      if (window.notifications) {
+        window.notifications.success('BIENVENIDO AL CLUB', `Código enviado a: ${email}`);
+      } else {
+        alert(`¡Te has suscrito con ${email}! Revisa tu correo.`);
+      }
 
       // Guardar en localStorage para evitar spam
       const subscriptions = JSON.parse(localStorage.getItem('subscriptions') || '[]');
@@ -1378,8 +1399,8 @@ class HomeManager {
                         <span style="font-size: 24px; font-weight: 700;">S/ ${parseFloat(product.price).toFixed(2)}</span>
                       `}
                     </div>
-                    <button class="btn" type="button" aria-label="Ver detalles de ${this.escapeHtml(product.name)}" style="background: white; color: #667eea; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer;" onclick="event.stopPropagation(); window.location.href='product-detail.html?id=${product.id}'">
-                      Ver oferta
+                    <button class="add-to-cart-btn" onclick="event.stopPropagation(); window.cart.add(${product.id || `'${product.id}'`}, 1); window.notifications.success('AÑADIDO', '${product.name} agregado al carrito'); return false;">
+                      <i class="fas fa-plus"></i> AGREGAR
                     </button>
                   </div>
                 </article>

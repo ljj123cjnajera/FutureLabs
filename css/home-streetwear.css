@@ -1492,10 +1492,29 @@ body.loaded #preloader {
     font-weight: 700;
     color: var(--black);
     text-decoration: none;
-    text-transform: uppercase;
-    border-bottom: 2px solid var(--black);
+    transition: transform 0.2s ease;
+    border: 1px solid var(--gray-200);
     align-self: flex-start;
+}
+
+.btn-quick-add {
+    width: 32px;
+    height: 32px;
+    border-radius: 0;
+    background: var(--black);
+    color: var(--white);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
     transition: all 0.2s;
+    font-size: 0.9rem;
+}
+
+.btn-quick-add:hover {
+    background: var(--primary-dark, #000);
+    transform: scale(1.1);
 }
 
 .read-more:hover {

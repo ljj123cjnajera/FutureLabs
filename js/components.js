@@ -465,6 +465,9 @@ class Components {
                 <span class="product-price-current">S/ ${parseFloat(product.price).toFixed(2)}</span>
               `}
             </div>
+            <button class="btn-quick-add" onclick="event.preventDefault(); event.stopPropagation(); window.cartManager?.add(${product.id ? `'${product.id}'` : 'null'}, 1); window.notifications?.success('AÑADIDO', '${product.name.replace(/'/g, "\\'")} al carrito');">
+                <i class="fas fa-plus"></i>
+            </button>
           </div>
 
           <div class="product-size-preview">${sizeText}</div>
