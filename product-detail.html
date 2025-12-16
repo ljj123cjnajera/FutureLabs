@@ -203,128 +203,113 @@
                         }
 
                         container.innerHTML = `
-                <div class="product-detail-layout" style="display: grid; grid-template-columns: 1fr; gap: 4rem; padding-top: 2rem;">
-                    <!-- Gallery Section (Will be customized via CSS to stick) -->
+                <div class="product-detail-layout">
+                    <!-- Left Column: Sticky Gallery -->
                     <div id="productGallery" class="product-gallery-sticky">
-                         <!-- Custom Gallery Implementation -->
-                        <div class="main-image-container" style="margin-bottom: 20px; background: #f5f5f5;">
-                             <img src="${imageUrl}" alt="${product.name}" style="width: 100%; height: auto; display: block;">
-                        </div>
-                        <div class="gallery-thumbs" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
-                            ${galleryImages.map(img => `
-                                <div class="gallery-thumb" style="background:#f5f5f5; cursor: pointer;">
-                                    <img src="${img}" style="width: 100%; display: block;" onclick="document.querySelector('.main-image-container img').src = '${img}'">
-                                </div>
-                            `).join('')}
-                        </div>
+                         <!-- Gallery will be rendered here by product-gallery.js -->
+                         <div class="loading-spinner"></div>
                     </div>
                     
+                    <!-- Right Column: Product Info -->
                     <div class="product-info-detail">
-                        <div class="product-header-group" style="margin-bottom: 2rem;">
+                        <div class="product-header-group">
                             <p class="product-brand" style="font-weight: 800; text-transform: uppercase; color: #666; margin-bottom: 0.5rem; letter-spacing: 0.1em;">${product.brand}</p>
                             <h1 class="product-title-large">${product.name}</h1>
                             
                             <div class="product-meta-row" style="display: flex; align-items: center; gap: 20px; margin-top: 1rem;">
-                                <div class="product-price-large" style="margin-bottom: 0;">S/ ${product.price}</div>
+                                <div class="product-price-large">
+                                    S/ ${product.price}
+                                    ${product.original_price && product.original_price > product.price ?
+                                `<span class="product-price-original">S/ ${product.original_price}</span>` : ''}
+                                </div>
                                 <div class="product-rating-detail">
                                     <span class="stars-detail">★★★★★</span>
-                                    <span class="rating-text-detail">${product.rating || 0}</span>
+                                    <span class="rating-text-detail">(${product.rating_count || 12} reviews)</span>
                                 </div>
                             </div>
                         </div>
                         
                         <div class="product-description-detail" style="font-size: 1.1rem; line-height: 1.6; margin-bottom: 3rem;">
-                            ${product.description || 'Sin descripción disponible'}
+                            ${product.description || 'La máxima expresión del estilo urbano. Diseñados para destacar y construidos para durar.'}
                         </div>
                         
-                        ${product.specifications ? `
-                        <div class="product-specs-detail" style="margin-bottom: 2rem; padding: 1.5rem; background: #f9f9f9; border: 1px solid #eee;">
-                            <h3 style="margin-bottom: 15px; font-weight: 800; text-transform: uppercase; font-size: 0.9rem;">Detalles del Producto</h3>
-                            ${Object.entries(product.specifications).map(([key, value]) => `
-                                <div class="spec-item" style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem;">
-                                    <span class="spec-label" style="font-weight: 600;">${key}:</span>
-                                    <span class="spec-value">${value}</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                        ` : ''}
-                        
-                        <div class="size-selector-container" style="margin-bottom: 2rem;">
-                            <div class="size-selector-header" style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
-                                <span class="size-label" style="font-weight: 800; text-transform: uppercase;">Selecciona tu talla (US Men)</span>
-                                <span class="size-guide-link" onclick="openSizeGuideModal()" style="text-decoration: underline; cursor: pointer;">
-                                    <i class="fas fa-ruler-combined"></i> Guía de tallas
+                        <div class="size-selector-container">
+                            <div class="size-selector-header">
+                                <span class="size-label" style="font-weight: 800; text-transform: uppercase;">SELECCIONA TU TALLA (US)</span>
+                                <span class="size-guide-link" onclick="openSizeGuideModal()">
+                                    <i class="fas fa-ruler-combined"></i> GUÍA DE TALLAS
                                 </span>
                             </div>
-                            <div class="size-selector-grid" id="sizeSelectorGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 10px;">
+                            <div class="size-selector-grid size-grid" id="sizeSelectorGrid">
                                 <!-- Generated by JS -->
                             </div>
-                             <div class="validation-message" id="sizeValidationMsg" style="display:none; color: red; margin-top: 0.5rem;">
-                                <i class="fas fa-exclamation-circle"></i> Por favor selecciona una talla
+                             <div class="validation-message" id="sizeValidationMsg">
+                                <i class="fas fa-exclamation-circle"></i> SELECCIONA UNA TALLA PARA CONTINUAR
                             </div>
                         </div>
 
-                        <div class="product-actions-sticky add-to-cart-sticky">
+                        <div class="product-actions-sticky">
                              <button type="button" class="btn btn-massive" id="addToCartBtn" onclick="addToCart()" ${product.stock_quantity === 0 ? 'disabled' : ''}>
-                                ${product.stock_quantity > 0 ? `AÑADIR AL CARRITO - S/ ${product.price}` : 'AGOTADO'}
+                                ${product.stock_quantity > 0 ? `AÑADIR AL CARRITO` : 'AGOTADO'} <i class="fas fa-arrow-right"></i>
                             </button>
                         </div>
                         
-                        <div class="product-meta-footer" style="margin-top: 3rem; border-top: 2px solid #eee; padding-top: 2rem;">
+                        <div class="product-meta-footer" style="margin-top: 3rem; border-top: 4px solid var(--black); padding-top: 2rem;">
                             <div class="meta-item" style="display: flex; gap: 1rem; margin-bottom: 1rem;">
                                 <i class="fas fa-truck" style="font-size: 1.5rem;"></i>
                                 <div>
-                                    <strong style="text-transform: uppercase;">Envío Gratis</strong>
-                                    <p style="margin:0; color: #666;">En todos los pedidos superiores a S/ 500</p>
+                                    <strong style="text-transform: uppercase; font-weight: 900;">ENVÍO GLOBAL RAPIDO</strong>
+                                    <p style="margin:0; color: #666;">Gratis en pedidos +$200</p>
                                 </div>
                             </div>
                             <div class="meta-item" style="display: flex; gap: 1rem;">
-                                <i class="fas fa-check-shield" style="font-size: 1.5rem;"></i>
+                                <i class="fas fa-check-circle" style="font-size: 1.5rem;"></i>
                                 <div>
-                                    <strong style="text-transform: uppercase;">Garantía de Autenticidad</strong>
-                                    <p style="margin:0; color: #666;">Verificado por nuestros expertos</p>
+                                    <strong style="text-transform: uppercase; font-weight: 900;">100% AUTÉNTICO</strong>
+                                    <p style="margin:0; color: #666;">Verificado por expertos</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- Size Guide Modal (Hidden) -->
-                <div id="sizeGuideModal" class="modal" style="display: none;">
-                    <div class="modal-content">
-                        <span class="close-modal" onclick="closeSizeGuideModal()">&times;</span>
-                        <h2>Guía de Tallas</h2>
-                        <div class="size-guide-tabs">
-                            <div class="size-tab active">Nike / Jordan</div>
-                            <div class="size-tab">Adidas / Yeezy</div>
-                        </div>
-                        <p>Nuestras tallas están en US Men. Usa esta tabla para convertir.</p>
-                        <table class="size-guide-table">
-                            <thead>
-                                <tr>
-                                    <th>US Men</th>
-                                    <th>UK</th>
-                                    <th>EU</th>
-                                    <th>CM</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td>7</td><td>6</td><td>40</td><td>25</td></tr>
-                                <tr><td>7.5</td><td>6.5</td><td>40.5</td><td>25.5</td></tr>
-                                <tr><td>8</td><td>7</td><td>41</td><td>26</td></tr>
-                                <tr><td>8.5</td><td>7.5</td><td>42</td><td>26.5</td></tr>
-                                <tr><td>9</td><td>8</td><td>42.5</td><td>27</td></tr>
-                                <tr><td>9.5</td><td>8.5</td><td>43</td><td>27.5</td></tr>
-                                <tr><td>10</td><td>9</td><td>44</td><td>28</td></tr>
-                                <tr><td>10.5</td><td>9.5</td><td>44.5</td><td>28.5</td></tr>
-                                <tr><td>11</td><td>10</td><td>45</td><td>29</td></tr>
-                                <tr><td>12</td><td>11</td><td>46</td><td>30</td></tr>
-                                <tr><td>13</td><td>12</td><td>47.5</td><td>31</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
             `;
+
+                < !--Size Guide Modal(Hidden)-- >
+                            <div id="sizeGuideModal" class="modal" style="display: none;">
+                                <div class="modal-content">
+                                    <span class="close-modal" onclick="closeSizeGuideModal()">&times;</span>
+                                    <h2>Guía de Tallas</h2>
+                                    <div class="size-guide-tabs">
+                                        <div class="size-tab active">Nike / Jordan</div>
+                                        <div class="size-tab">Adidas / Yeezy</div>
+                                    </div>
+                                    <p>Nuestras tallas están en US Men. Usa esta tabla para convertir.</p>
+                                    <table class="size-guide-table">
+                                        <thead>
+                                            <tr>
+                                                <th>US Men</th>
+                                                <th>UK</th>
+                                                <th>EU</th>
+                                                <th>CM</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr><td>7</td><td>6</td><td>40</td><td>25</td></tr>
+                                            <tr><td>7.5</td><td>6.5</td><td>40.5</td><td>25.5</td></tr>
+                                            <tr><td>8</td><td>7</td><td>41</td><td>26</td></tr>
+                                            <tr><td>8.5</td><td>7.5</td><td>42</td><td>26.5</td></tr>
+                                            <tr><td>9</td><td>8</td><td>42.5</td><td>27</td></tr>
+                                            <tr><td>9.5</td><td>8.5</td><td>43</td><td>27.5</td></tr>
+                                            <tr><td>10</td><td>9</td><td>44</td><td>28</td></tr>
+                                            <tr><td>10.5</td><td>9.5</td><td>44.5</td><td>28.5</td></tr>
+                                            <tr><td>11</td><td>10</td><td>45</td><td>29</td></tr>
+                                            <tr><td>12</td><td>11</td><td>46</td><td>30</td></tr>
+                                            <tr><td>13</td><td>12</td><td>47.5</td><td>31</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        `;
 
                         // Render Size Options Logic
                         renderSizeOptions(product);
@@ -354,21 +339,21 @@
                         }
                     } else {
                         container.innerHTML = `
-                <div style="text-align: center; padding: 100px;">
+                            < div style = "text-align: center; padding: 100px;" >
                     <i class="fas fa-exclamation-triangle fa-3x" style="color: #e74c3c; margin-bottom: 20px;"></i>
                     <h2>Producto no encontrado</h2>
                     <p>El producto que buscas no existe</p>
-                </div>
-            `;
+                </div >
+                            `;
                     }
                 } catch (error) {
                     container.innerHTML = `
-            <div style="text-align: center; padding: 100px;">
+                            < div style = "text-align: center; padding: 100px;" >
                 <i class="fas fa-exclamation-triangle fa-3x" style="color: #e74c3c; margin-bottom: 20px;"></i>
                 <h2>Error al cargar el producto</h2>
                 <p>${error.message}</p>
-            </div>
-        `;
+            </div >
+                            `;
                 }
             }
 
@@ -386,12 +371,12 @@
                     // Simple deterministic "random" for consistent demo per product ID
                     const isOutOfStock = (parseInt(product.id) + parseFloat(size)) % 7 === 0;
                     return `
-                        <button class="size-option ${isOutOfStock ? 'disabled' : ''}" 
-                                onclick="selectSize('${size}', this)" 
-                                ${isOutOfStock ? 'disabled' : ''}>
-                            ${size}
-                        </button>
-                    `;
+                            < button class="size-option ${isOutOfStock ? 'disabled' : ''}"
+                        onclick = "selectSize('${size}', this)" 
+                                ${ isOutOfStock ? 'disabled' : '' }>
+                            ${ size }
+                        </button >
+                            `;
                 }).join('');
             }
 
@@ -458,9 +443,9 @@
                 }
 
                 // Add size to cart item (simulated for now as backend might not expect it yet)
-                window.logger?.info('PRODUCT', `Agregando talla: ${selectedSize}`);
+                window.logger?.info('PRODUCT', `Agregando talla: ${ selectedSize } `);
                 await window.cartManager.add(productId, 1, { size: selectedSize });
-                window.notifications.success(`Agregado: Talla US ${selectedSize}`);
+                window.notifications.success(`Agregado: Talla US ${ selectedSize }`);
             }
 
             // Comprar ahora
