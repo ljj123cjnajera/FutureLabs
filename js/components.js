@@ -105,7 +105,7 @@ class Components {
             </div>
             ${searchBar}
             <div class="user-actions">
-              <a href="#" class="affiliate-link" style="background: rgb(255, 255, 255) !important; background-color: rgb(255, 255, 255) !important; color: rgb(55, 65, 81) !important; border: 1px solid rgb(229, 231, 235) !important; opacity: 1 !important; visibility: visible !important; display: flex !important; padding: 10px 20px !important; border-radius: 8px !important; font-weight: 600 !important; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;"><i class="fas fa-store"></i> Conviértete en Afiliado</a>
+
               <a href="#" class="account-link" id="accountLink" style="background: rgb(255, 255, 255) !important; background-color: rgb(255, 255, 255) !important; color: rgb(55, 65, 81) !important; border: 1px solid rgb(229, 231, 235) !important; opacity: 1 !important; visibility: visible !important; display: flex !important; padding: 10px 20px !important; border-radius: 8px !important; font-weight: 600 !important; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;"><i class="fas fa-user"></i> <span id="accountText">Cuenta</span></a>
               <a href="compare.html" class="cart-icon" id="comparatorLink" style="position: relative;">
                 <i class="fas fa-balance-scale"></i>
@@ -134,8 +134,7 @@ class Components {
 
       // Lista de todos los botones que necesitan fix (sin home-link que fue eliminado)
       const buttonsToFix = [
-        'a.affiliate-link',
-        '.affiliate-link',
+
         'a.account-link',
         '.account-link',
         'a.admin-link',

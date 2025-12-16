@@ -964,8 +964,6 @@ class HomeManager {
     // Chat Button
     this.setupChatButton();
 
-    // Affiliate Banner
-    this.setupAffiliateBanner();
 
     // Flash Offers - Mejorar diseño (llamar después de cargar productos)
     // Se llamará después de cargar productos en oferta
@@ -1163,15 +1161,7 @@ class HomeManager {
     document.addEventListener('keydown', handleEscape);
   }
 
-  setupAffiliateBanner() {
-    const affiliateBtn = document.querySelector('.affiliate-banner .cta-button');
-    if (!affiliateBtn) return;
 
-    affiliateBtn.addEventListener('click', () => {
-      // Redirigir a página de afiliados o mostrar información
-      window.location.href = 'contact.html?subject=affiliate';
-    });
-  }
 
   async setupFlashOffers() {
     // Mejorar la sección de flash offers con productos reales
