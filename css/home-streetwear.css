@@ -10,11 +10,25 @@
 }
 
 /* RESET & CORE */
+html,
 body {
-    margin: 0;
-    padding: 0;
+    margin: 0 !important;
+    padding: 0 !important;
     overflow-x: hidden;
     width: 100%;
+}
+
+/* Ensure no elements push the content down */
+.header,
+#mainHeader,
+.top-bar {
+    margin-top: 0 !important;
+}
+
+/* Force preloader to not take space when hidden */
+body.loaded #preloader {
+    display: none !important;
+    visibility: hidden;
 }
 
 /* ============================================
