@@ -6,8 +6,58 @@ class HomeManager {
     this.categories = [];
     this.heroSlides = [];
     this.homeBenefits = [];
-    this.homeBanners = [];
-    this.homeSections = [];
+
+    // [MOCK] Banners Data
+    this.homeBanners = [
+      {
+        title: 'NEW SEASON',
+        description: 'La nueva colección Streetwear 2024 ya está aquí.',
+        button_text: 'VER COLECCIÓN',
+        button_link: 'products.html?collection=new',
+        image_url: 'https://images.unsplash.com/photo-1517466110309-1847d159074b?auto=format&fit=crop&q=80&w=800'
+      },
+      {
+        title: 'ESSENTIALS',
+        description: 'Básicos elevados para tu rotación diaria.',
+        button_text: 'COMPRAR AHORA',
+        button_link: 'products.html?category=essentials',
+        background_color: 'var(--black)'
+      },
+      {
+        title: 'LIMITED EDITION',
+        description: 'Piezas exclusivas. Una vez que se van, no vuelven.',
+        button_text: 'ACCEDER',
+        button_link: 'products.html?collection=limited',
+        image_url: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&q=80&w=800'
+      }
+    ];
+
+    // [MOCK] Home Sections Data
+    this.homeSections = [
+      {
+        section_type: 'custom',
+        title: 'TRENDING NOW',
+        limit: 4,
+        settings: JSON.stringify({
+          description: 'Lo que todos están buscando hoy.',
+          cta_text: 'VER TODO',
+          cta_link: 'products.html?filter=trending',
+          image_url: 'https://images.unsplash.com/photo-1600269452121-4f2416e55c28?auto=format&fit=crop&q=80&w=800'
+        })
+      },
+      {
+        section_type: 'custom',
+        title: 'STAFF PICKS',
+        limit: 4,
+        settings: JSON.stringify({
+          description: 'Selección personal de nuestro equipo creativo.',
+          cta_text: 'EXPLORAR',
+          cta_link: 'products.html?filter=staff-picks',
+          image_url: 'https://images.unsplash.com/photo-1523395243481-0d315304b2b6?auto=format&fit=crop&q=80&w=800'
+        })
+      }
+    ];
+
     this.init();
   }
 
@@ -495,10 +545,10 @@ class HomeManager {
 
     // Premium Placeholders for "Demo Mode" or Empty State
     const demoProducts = [
-      { id: 'demo-1', name: 'Air Jordan 1 Retro High OG', price: 789.00, original_price: 900.00, image_url: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?q=80&w=800', slug: 'jordan-1-high', category: 'jordan', is_new: true },
-      { id: 'demo-2', name: 'Nike Dunk Low Retro', price: 459.00, original_price: 0, image_url: 'https://images.unsplash.com/photo-1637844527273-062e08b1a436?q=80&w=800', slug: 'dunk-low', category: 'nike', is_new: false },
-      { id: 'demo-3', name: 'Yeezy Boost 350 V2', price: 1250.00, original_price: 1500.00, image_url: 'https://images.unsplash.com/photo-1582260611295-d2a9391d17cf?q=80&w=800', slug: 'yeezy-350', category: 'yeezy', is_new: true },
-      { id: 'demo-4', name: 'Adidas Forum Low', price: 389.00, original_price: 450.00, image_url: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?q=80&w=800', slug: 'forum-low', category: 'adidas', is_new: false }
+      { id: 'demo-1', name: 'Air Jordan 1 High OG "Lost & Found"', price: 899.00, original_price: 1200.00, image_url: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&q=80&w=800', slug: 'jordan-1-lost-found', category: 'jordan', is_new: true },
+      { id: 'demo-2', name: 'Nike Dunk Low "Panda"', price: 449.00, original_price: 600.00, image_url: 'https://images.unsplash.com/photo-1637844527273-218ba489995a?auto=format&fit=crop&q=80&w=800', slug: 'dunk-low-panda', category: 'nike', is_new: true },
+      { id: 'demo-3', name: 'Yeezy Boost 350 V2 "Zebra"', price: 1199.00, original_price: 1500.00, image_url: 'https://images.unsplash.com/photo-1549488344-c7059349b576?auto=format&fit=crop&q=80&w=800', slug: 'yeezy-350-zebra', category: 'yeezy', is_new: true },
+      { id: 'demo-4', name: 'Adidas Forum Low 84', price: 389.00, original_price: 450.00, image_url: 'https://images.unsplash.com/photo-1555274175-75f4056dfd05?auto=format&fit=crop&q=80&w=800', slug: 'adidas-forum-low', category: 'adidas', is_new: false }
     ];
 
     let productsToRender = [];
@@ -522,9 +572,123 @@ class HomeManager {
     if (!container) return;
 
     const demoOffers = [
-      { id: 'demo-offer-1', name: 'Nike Air Max 90', price: 320.00, discount_price: 280.00, original_price: 320.00, image_url: 'https://images.unsplash.com/photo-1556906781-9a412961d28c?q=80&w=800', slug: 'air-max-90', category: 'nike', on_sale: true },
-      { id: 'demo-offer-2', name: 'Adidas Ultraboost', price: 600.00, discount_price: 450.00, original_price: 600.00, image_url: 'https://images.unsplash.com/photo-1587563871167-1ee9c731aef4?q=80&w=800', slug: 'ultraboost', category: 'adidas', on_sale: true },
-      { id: 'demo-offer-3', name: 'Puma RS-X', price: 350.00, discount_price: 299.00, original_price: 350.00, image_url: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?q=80&w=800', slug: 'rs-x', category: 'puma', on_sale: true }
+      { id: 'demo-offer-1', name: 'Nike Air Max 90 "Infrared"', price: 320.00, discount_price: 280.00, original_price: 320.00, image_url: 'https://images.unsplash.com/photo-1556906781-9a412961d28c?auto=format&fit=crop&q=80&w=800', slug: 'air-max-90', category: 'nike', on_sale: true },
+      { id: 'demo-offer-2', name: 'Vans Old Skool Pro', price: 220.00, discount_price: 180.00, original_price: 220.00, image_url: 'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?auto=format&fit=crop&q=80&w=800', slug: 'vans-old-skool', category: 'vans', on_sale: true },
+      { id: 'demo-offer-3', name: 'Converse Chuck 70 High', price: 290.00, discount_price: 240.00, original_price: 290.00, image_url: 'https://images.unsplash.com/photo-1494496195158-c3becb4f2475?auto=format&fit=crop&q=80&w=800', slug: 'chuck-70', category: 'converse', on_sale: true },
+      { id: 'demo-offer-4', name: 'New Balance 550', price: 450.00, discount_price: 390.00, original_price: 450.00, image_url: 'https://images.unsplash.com/photo-1656335362192-2bc9051b1824?auto=format&fit=crop&q=80&w=800', slug: 'nb-550', category: 'new-balance', on_sale: true }
+    ];
+
+    let productsToRender = [];
+    if (this.onSaleProducts && this.onSaleProducts.length > 0) {
+      productsToRender = this.onSaleProducts;
+    } else {
+      productsToRender = demoOffers;
+    }
+
+    container.innerHTML = productsToRender.map(product => this.createProductCard(product)).join('');
+
+    // Ocultar skeleton loader
+    if (window.skeletonLoader) {
+      window.skeletonLoader.hide('onSaleProductsGrid');
+    }
+  }
+
+  enableHorizontalDrag(container) {
+    if (!container) return;
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    container.addEventListener('mousedown', (e) => {
+      isDown = true;
+      container.classList.add('active'); // Optional: transform cursor
+      startX = e.pageX - container.offsetLeft;
+      scrollLeft = container.scrollLeft;
+    });
+    container.addEventListener('mouseleave', () => {
+      isDown = false;
+      container.classList.remove('active');
+    });
+    container.addEventListener('mouseup', () => {
+      isDown = false;
+      container.classList.remove('active');
+    });
+    container.addEventListener('mousemove', (e) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - container.offsetLeft;
+      const walk = (x - startX) * 2; // Scroll-fast
+      container.scrollLeft = scrollLeft - walk;
+    });
+  }
+
+  async loadCategories() {
+    try {
+      // Mostrar skeleton loader
+      const container = document.getElementById('categories');
+      if (container && window.skeletonLoader) {
+        window.skeletonLoader.show('categories', 'categories');
+      }
+
+      const response = await window.api.getCategories();
+      if (response && response.success) {
+        this.categories = response.data?.categories || [];
+        this.renderCategories();
+        this.renderHomeSections();
+        window.logger?.debug?.('HOME', `Categorías cargadas: ${this.categories.length}`);
+      } else {
+        window.logger?.warn('HOME', 'Respuesta inválida al cargar categorías', response);
+        this.renderCategories(); // Renderizar estado vacío o mantener placeholder
+      }
+    } catch (error) {
+      window.logger?.error('HOME', 'Error cargando categorías', error);
+      // Mantener las categorías placeholder si hay error
+      // No mostrar error al usuario ya que tenemos placeholders
+    } finally {
+      // Ocultar skeleton loader
+      if (window.skeletonLoader) {
+        window.skeletonLoader.hide('categories');
+      }
+    }
+  }
+
+  renderFeaturedProducts() {
+    const container = document.getElementById('featuredProductsGrid');
+    if (!container) return;
+
+    // Premium Placeholders for "Demo Mode" or Empty State
+    const demoProducts = [
+      { id: 'demo-1', name: 'Air Jordan 1 High OG "Lost & Found"', price: 899.00, original_price: 1200.00, image_url: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&q=80&w=800', slug: 'jordan-1-lost-found', category: 'jordan', is_new: true },
+      { id: 'demo-2', name: 'Nike Dunk Low "Panda"', price: 449.00, original_price: 600.00, image_url: 'https://images.unsplash.com/photo-1637844527273-218ba489995a?auto=format&fit=crop&q=80&w=800', slug: 'dunk-low-panda', category: 'nike', is_new: true },
+      { id: 'demo-3', name: 'Yeezy Boost 350 V2 "Zebra"', price: 1199.00, original_price: 1500.00, image_url: 'https://images.unsplash.com/photo-1549488344-c7059349b576?auto=format&fit=crop&q=80&w=800', slug: 'yeezy-350-zebra', category: 'yeezy', is_new: true },
+      { id: 'demo-4', name: 'Adidas Forum Low 84', price: 389.00, original_price: 450.00, image_url: 'https://images.unsplash.com/photo-1555274175-75f4056dfd05?auto=format&fit=crop&q=80&w=800', slug: 'adidas-forum-low', category: 'adidas', is_new: false }
+    ];
+
+    let productsToRender = [];
+    if (this.featuredProducts && this.featuredProducts.length > 0) {
+      productsToRender = this.featuredProducts;
+    } else {
+      // Fallback to demo products if API is empty
+      productsToRender = demoProducts;
+    }
+
+    container.innerHTML = productsToRender.map(product => this.createProductCard(product)).join('');
+
+    // Ocultar skeleton loader
+    if (window.skeletonLoader) {
+      window.skeletonLoader.hide('featuredProductsGrid');
+    }
+  }
+
+  renderOnSaleProducts() {
+    const container = document.getElementById('onSaleProductsGrid');
+    if (!container) return;
+
+    const demoOffers = [
+      { id: 'demo-offer-1', name: 'Nike Air Max 90 "Infrared"', price: 320.00, discount_price: 280.00, original_price: 320.00, image_url: 'https://images.unsplash.com/photo-1556906781-9a412961d28c?auto=format&fit=crop&q=80&w=800', slug: 'air-max-90', category: 'nike', on_sale: true },
+      { id: 'demo-offer-2', name: 'Vans Old Skool Pro', price: 220.00, discount_price: 180.00, original_price: 220.00, image_url: 'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?auto=format&fit=crop&q=80&w=800', slug: 'vans-old-skool', category: 'vans', on_sale: true },
+      { id: 'demo-offer-3', name: 'Converse Chuck 70 High', price: 290.00, discount_price: 240.00, original_price: 290.00, image_url: 'https://images.unsplash.com/photo-1494496195158-c3becb4f2475?auto=format&fit=crop&q=80&w=800', slug: 'chuck-70', category: 'converse', on_sale: true },
+      { id: 'demo-offer-4', name: 'New Balance 550', price: 450.00, discount_price: 390.00, original_price: 450.00, image_url: 'https://images.unsplash.com/photo-1656335362192-2bc9051b1824?auto=format&fit=crop&q=80&w=800', slug: 'nb-550', category: 'new-balance', on_sale: true }
     ];
 
     let productsToRender = [];
@@ -620,6 +784,27 @@ class HomeManager {
     dotsContainer.innerHTML = '';
 
     if (!this.heroSlides.length) {
+      // Use Empty State container for error, but for "Missing Data" we inject default slides
+      this.heroSlides = [
+        {
+          image_url: 'https://images.unsplash.com/photo-1556906781-9a412961d28c?auto=format&fit=crop&q=80&w=1920',
+          title: 'URBAN LEGENDS',
+          subtitle: 'ICONIC SILHOUETTES REIMAGINED',
+          button_text: 'SHOP ICONS',
+          button_link: 'products.html?collection=icons'
+        },
+        {
+          image_url: 'https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?auto=format&fit=crop&q=80&w=1920',
+          title: 'SPEED DEFINED',
+          subtitle: 'PERFORMANCE MEETS AESTHETICS',
+          button_text: 'EXPLORE RUNNING',
+          button_link: 'products.html?category=running'
+        }
+      ];
+    }
+
+    // Safety check just in case
+    if (!this.heroSlides.length) {
       slider.classList.remove('has-data');
       if (emptyState) emptyState.style.display = 'flex';
       const prevBtn = slider.querySelector('.slider-arrow.prev');
@@ -705,32 +890,27 @@ class HomeManager {
     if (!container) return;
 
     if (!this.homeBenefits.length) {
-      container.innerHTML = `
-      <div class="benefit-card benefit-card--empty">
-        <div class="benefit-icon">
-          <i class="fas fa-cog"></i>
-        </div>
-        <div class="benefit-content">
-          <h3>Configura tus beneficios</h3>
-          <p>Los beneficios que crees en el panel aparecerán aquí.</p>
-        </div>
-      </div>
-      `;
-      return;
+      // Default Brutalist Benefits
+      this.homeBenefits = [
+        { icon: 'fa-shipping-fast', title: 'GLOBAL SHIPPING', description: 'FAST. SECURE. WORLDWIDE.' },
+        { icon: 'fa-shield-alt', title: 'AUTHENTICITY', description: 'VERIFIED. 100% LEGIT.' },
+        { icon: 'fa-undo', title: 'EASY RETURNS', description: '30 DAYS. NO HASSLE.' },
+        { icon: 'fa-headset', title: '24/7 SUPPORT', description: 'WE GOT YOUR BACK.' }
+      ];
     }
 
     container.innerHTML = this.homeBenefits.map(benefit => {
-      const background = benefit.background_color ? `style="background:${benefit.background_color};"` : '';
+      const background = benefit.background_color ? `style = "background:${benefit.background_color};"` : '';
       const hasImage = Boolean(benefit.image_url);
       const iconMarkup = benefit.icon
-        ? `<span class="benefit-icon"><i class="${benefit.icon}"></i></span>`
+        ? `< span class="benefit-icon" > <i class="${benefit.icon}"></i></span > `
         : '';
       const imageMarkup = hasImage
-        ? `<img src="${benefit.image_url}" alt="${benefit.title || 'Benefit'}" onerror="this.style.display='none'">`
+        ? `< img src = "${benefit.image_url}" alt = "${benefit.title || 'Benefit'}" onerror = "this.style.display='none'" > `
         : '';
 
       return `
-      <article class="benefit-card" ${background}>
+        < article class="benefit-card" ${background}>
           <div class="benefit-image">
             ${imageMarkup || iconMarkup || `<span class="benefit-icon"><i class="fas fa-star"></i></span>`}
           </div>
@@ -738,8 +918,8 @@ class HomeManager {
             <h3>${benefit.title || 'Beneficio especial'}</h3>
             ${benefit.description ? `<p>${benefit.description}</p>` : ''}
           </div>
-        </article>
-      `;
+        </article >
+        `;
     }).join('');
   }
 
@@ -749,29 +929,29 @@ class HomeManager {
 
     if (!this.homeBanners.length) {
       container.innerHTML = `
-      <div class="banner banner--placeholder">
+        < div class="banner banner--placeholder" >
           <h3>Configura tus banners</h3>
           <p>Los banners que crees en el panel aparecerán automáticamente aquí.</p>
-        </div>
-      `;
+        </div >
+        `;
       return;
     }
 
     container.innerHTML = this.homeBanners.slice(0, 3).map(banner => {
       const backgroundStyle = banner.image_url
-        ? `style="background-image:linear-gradient(135deg, rgba(15,23,42,0.7), rgba(15,23,42,0.25)), url('${banner.image_url}');"`
+        ? `style = "background-image:linear-gradient(135deg, rgba(15,23,42,0.7), rgba(15,23,42,0.25)), url('${banner.image_url}');"`
         : '';
       const gradientOnly = !banner.image_url && banner.background_color
-        ? `style="background:${banner.background_color};"`
+        ? `style = "background:${banner.background_color};"`
         : '';
-      const linkAttr = banner.button_link ? `data-link="${banner.button_link}"` : '';
+      const linkAttr = banner.button_link ? `data - link="${banner.button_link}"` : '';
       return `
-      <article class="banner" ${backgroundStyle || gradientOnly} ${linkAttr}>
-        <h3>${banner.title || 'Banner destacado'}</h3>
+        < article class="banner" ${backgroundStyle || gradientOnly} ${linkAttr}>
+          <h3>${banner.title || 'Banner destacado'}</h3>
           ${banner.description ? `<p>${banner.description}</p>` : ''}
           ${banner.button_text ? `<span class="banner-cta">${banner.button_text}</span>` : ''}
-        </article>
-      `;
+        </article >
+        `;
     }).join('');
 
     this.bindBannerClicks(container);
@@ -783,13 +963,13 @@ class HomeManager {
 
     if (!this.homeSections.length) {
       container.innerHTML = `
-      <div class="home-section-card home-section-card--empty">
-        <div class="home-section-content">
-          <h3>Secciones personalizadas</h3>
-          <p>Crea secciones desde el panel administrativo para destacar colecciones, categorías o campañas especiales.</p>
-        </div>
-      </div>
-      `;
+        < div class="home-section-card home-section-card--empty" >
+          <div class="home-section-content">
+            <h3>Secciones personalizadas</h3>
+            <p>Crea secciones desde el panel administrativo para destacar colecciones, categorías o campañas especiales.</p>
+          </div>
+      </div >
+        `;
       return;
     }
 
@@ -799,11 +979,11 @@ class HomeManager {
       const title = section.title || settings.title || (category ? category.name : this.getSectionTypeLabel(section.section_type));
       const description = settings.description || (category ? category.description : '');
       const ctaText = settings.cta_text || 'Ver colección';
-      const link = settings.cta_link || (category ? `products.html?category=${category.slug}` : 'products.html');
+      const link = settings.cta_link || (category ? `products.html ? category = ${category.slug} ` : 'products.html');
       const imageUrl = settings.image_url || (category?.image_url ?? null);
 
       return `
-      <article class="home-section-card" data-link="${link}">
+        < article class="home-section-card" data - link="${link}" >
           <div class="home-section-media">
             ${imageUrl ? `<img src="${imageUrl}" alt="${title}" onerror="this.style.display='none'">` : `<div class="home-section-placeholder"><i class="fas fa-layer-group"></i></div>`}
           </div>
@@ -817,8 +997,8 @@ class HomeManager {
             </div>
             <button type="button" class="btn btn-outline btn-sm" data-link="${link}">${ctaText}</button>
           </div>
-        </article>
-      `;
+        </article >
+        `;
     }).join('');
 
     container.querySelectorAll('[data-link]').forEach(element => {
@@ -886,7 +1066,7 @@ class HomeManager {
       ${'<i class="fas fa-star"></i>'.repeat(fullStars)}
       ${hasHalfStar ? '<i class="fas fa-star-half-alt"></i>' : ''}
       ${'<i class="far fa-star"></i>'.repeat(emptyStars)}
-    `;
+      `;
   }
 
   getCategoryIcon(slug) {
@@ -938,7 +1118,7 @@ class HomeManager {
       const performSearch = () => {
         const query = searchInput.value.trim();
         if (query) {
-          window.location.href = `products.html?search=${encodeURIComponent(query)} `;
+          window.location.href = `products.html ? search = ${encodeURIComponent(query)} `;
         }
       };
 
@@ -1003,7 +1183,7 @@ class HomeManager {
     modal.setAttribute('aria-modal', 'true');
     modal.style.display = 'flex';
     modal.innerHTML = `
-      <div class="modal-content" style="max-width: 500px;">
+        < div class="modal-content" style = "max-width: 500px;" >
         <span class="modal-close" onclick="this.closest('.modal').remove()" aria-label="Cerrar modal de suscripción" tabindex="0" role="button">&times;</span>
         <h2 id="subscriptionModalTitle" style="margin-bottom: 16px;">¡Suscríbete y obtén 10% de descuento!</h2>
         <p style="margin-bottom: 24px; color: #666;">Recibe ofertas exclusivas, novedades y tu código de descuento por email.</p>
@@ -1017,8 +1197,8 @@ class HomeManager {
         <p style="margin-top: 16px; font-size: 12px; color: #999; text-align: center;">
           Al suscribirte, aceptas recibir comunicaciones comerciales de FutureLabs.
         </p>
-      </div>
-      `;
+      </div >
+        `;
     document.body.appendChild(modal);
 
     // Cerrar al hacer click fuera
@@ -1121,7 +1301,7 @@ class HomeManager {
     modal.setAttribute('aria-modal', 'true');
     modal.style.display = 'flex';
     modal.innerHTML = `
-      <div class="modal-content" style="max-width: 600px;">
+        < div class="modal-content" style = "max-width: 600px;" >
         <span class="modal-close" onclick="this.closest('.modal').remove()" aria-label="Cerrar modal de ayuda" tabindex="0" role="button">&times;</span>
         <h2 id="contactModalTitle" style="margin-bottom: 16px;"><i class="fas fa-comments" aria-hidden="true"></i> ¿Necesitas ayuda?</h2>
         <p style="margin-bottom: 24px; color: #666;">Estamos aquí para ayudarte. Elige cómo prefieres contactarnos:</p>
@@ -1139,8 +1319,8 @@ class HomeManager {
         <p style="margin-top: 24px; font-size: 12px; color: #999; text-align: center;">
           El servicio de chat en vivo estará disponible próximamente.
         </p>
-      </div>
-      `;
+      </div >
+        `;
     document.body.appendChild(modal);
 
     // Cerrar al hacer click fuera
@@ -1176,8 +1356,8 @@ class HomeManager {
         const products = response.data.products.slice(0, 4);
 
         flashSection.innerHTML = `
-      <div class="flash-offers-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 24px;" role="list" aria-label="Ofertas flash disponibles">
-        ${products.map((product, index) => {
+        < div class="flash-offers-grid" style = "display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 24px;" role = "list" aria - label="Ofertas flash disponibles" >
+          ${products.map((product, index) => {
           const discount = product.discount_price ?
             Math.round(((product.price - product.discount_price) / product.price) * 100) : 0;
 
@@ -1206,33 +1386,33 @@ class HomeManager {
               `;
         }).join('')
           }
-          </div>
-      <div style="text-align: center; margin-top: 24px;">
-        <a href="products.html?on_sale=true" class="btn btn-primary">Ver todas las ofertas</a>
-      </div>
-    `;
+          </div >
+        <div style="text-align: center; margin-top: 24px;">
+          <a href="products.html?on_sale=true" class="btn btn-primary">Ver todas las ofertas</a>
+        </div>
+      `;
       } else {
         // Si no hay ofertas, mostrar mensaje mejorado
         flashSection.innerHTML = `
-      <div style="text-align: center; padding: 40px 20px;">
+        < div style = "text-align: center; padding: 40px 20px;" >
             <i class="fas fa-fire" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5; color: #ff6b6b;"></i>
             <p style="font-size: 16px; margin: 0; color: #666;">No hay ofertas flash disponibles en este momento</p>
             <p style="font-size: 14px; margin-top: 8px; color: #999;">Suscríbete para ser el primero en enterarte de nuestras próximas promociones</p>
             <button class="btn btn-primary" style="margin-top: 16px;" onclick="document.querySelector('.sticky-footer .cta-button')?.click();">
               Suscribirme
             </button>
-          </div>
-      `;
+          </div >
+        `;
       }
     } catch (error) {
       window.logger?.error('HOME', 'Error cargando flash offers', error);
       flashSection.innerHTML = `
-      <div style="text-align: center; padding: 40px 20px; color: #999;">
+        < div style = "text-align: center; padding: 40px 20px; color: #999;" >
           <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
           <p style="font-size: 16px; margin: 0;">Error al cargar ofertas flash</p>
           <a href="products.html?on_sale=true" class="btn btn-outline" style="margin-top: 16px;">Ver ofertas disponibles</a>
-        </div>
-      `;
+        </div >
+        `;
     }
   }
 
@@ -1257,12 +1437,12 @@ class HomeManager {
 
       // Renderizar categorías en la columna izquierda
       categoriesColumn.innerHTML = this.categories.slice(0, 8).map((category, index) => `
-      <div class="category-item ${index === 0 ? 'active' : ''}" data-category="${category.slug}">
+        < div class="category-item ${index === 0 ? 'active' : ''}" data - category="${category.slug}" >
           <span class="category-text">${this.escapeHtml(category.name)}</span>
           <i class="fas fa-chevron-right" aria-hidden="true"></i>
           <div class="active-indicator"></div>
-        </div>
-      `).join('');
+        </div >
+        `).join('');
 
       // Renderizar contenido de categorías
       contentColumn.innerHTML = this.categories.slice(0, 8).map((category, index) => {
@@ -1270,7 +1450,7 @@ class HomeManager {
         const subcategories = this.getSubcategoriesForCategory(category);
 
         return `
-      <div class="category-content ${index === 0 ? 'active' : ''}" data-category="${category.slug}">
+        < div class="category-content ${index === 0 ? 'active' : ''}" data - category="${category.slug}" >
             <div class="content-header">
               <h2>${this.escapeHtml(category.name)}</h2>
               <a href="products.html?category=${category.slug}" class="view-all">Ver todo <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
@@ -1278,8 +1458,8 @@ class HomeManager {
             <div class="subcategories-grid">
               ${this.renderSubcategoriesGrid(category, subcategories)}
             </div>
-          </div>
-      `;
+          </div >
+        `;
       }).join('');
 
       // Reinicializar event listeners del megamenú
@@ -1325,25 +1505,25 @@ class HomeManager {
   renderSubcategoriesGrid(category, subcategories) {
     if (!subcategories || subcategories.length === 0) {
       return `
-      <div class="subcategory-column">
+        < div class="subcategory-column" >
           <h3>Productos</h3>
           <ul>
             <li><a href="products.html?category=${category.slug}">Ver todos los productos</a></li>
           </ul>
-        </div>
-      `;
+        </div >
+        `;
     }
 
     return subcategories.map(sub => `
-      <div class="subcategory-column">
+        < div class="subcategory-column" >
         <h3>${this.escapeHtml(sub.title)}</h3>
         <ul>
           ${sub.items.map(item => `
             <li><a href="products.html?category=${category.slug}&search=${encodeURIComponent(item)}">${this.escapeHtml(item)}</a></li>
           `).join('')}
         </ul>
-      </div>
-      `).join('');
+      </div >
+        `).join('');
   }
 
   setupMegaMenuListeners() {
@@ -1364,7 +1544,7 @@ class HomeManager {
 
         // Agregar active al seleccionado
         newItem.classList.add('active');
-        const content = document.querySelector(`.category-content[data-category="${category}"]`);
+        const content = document.querySelector(`.category - content[data - category="${category}"]`);
         if (content) {
           content.classList.add('active');
         }
@@ -1382,7 +1562,7 @@ class HomeManager {
             categoryContents.forEach(c => c.classList.remove('active'));
 
             this.classList.add('active');
-            const content = document.querySelector(`.category-content[data-category="${category}"]`);
+            const content = document.querySelector(`.category - content[data - category="${category}"]`);
             if (content) {
               content.classList.add('active');
             }
@@ -1447,12 +1627,12 @@ window.openQuickView = async function (productId) {
       document.getElementById('qvTitle').textContent = product.name;
 
       const priceHtml = product.discount_price && product.discount_price < product.price
-        ? `<span class="text-red-600">S/ ${parseFloat(product.discount_price).toFixed(2)}</span> <span class="original-price" style="text-decoration: line-through; color: #999; font-size: 0.8em;">S/ ${parseFloat(product.price).toFixed(2)}</span>`
-        : `<span class="font-bold">S/ ${parseFloat(product.price).toFixed(2)}</span>`;
+        ? `< span class="text-red-600" > S / ${parseFloat(product.discount_price).toFixed(2)}</span > <span class="original-price" style="text-decoration: line-through; color: #999; font-size: 0.8em;">S/ ${parseFloat(product.price).toFixed(2)}</span>`
+        : `< span class="font-bold" > S / ${parseFloat(product.price).toFixed(2)}</span > `;
       document.getElementById('qvPrice').innerHTML = priceHtml;
 
       document.getElementById('qvDescription').textContent = product.description || 'Sin descripción disponible.';
-      document.getElementById('qvFullDetails').href = `product-detail.html?id=${product.id} `;
+      document.getElementById('qvFullDetails').href = `product - detail.html ? id = ${product.id} `;
     }
   } catch (error) {
     console.error('Error loading quick view:', error);
