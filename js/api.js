@@ -598,6 +598,42 @@ class FutureLabsAPI {
     return this.request(`/blog/admin/${id}`);
   }
 
+  // ========== BÚSQUEDA (AUTOCOMPLETE) ==========
+  async getSearchSuggestions(query) {
+    // Si la API tiene un endpoint específico de sugerencias:
+    // return this.request(`/search/suggestions?q=${encodeURIComponent(query)}`);
+
+    // Por ahora, simulamos sugerencias buscando productos reales
+    try {
+      const response = await this.request(`/products?search=${encodeURIComponent(query)}&limit=5`);
+
+      if (response.success) {
+        // Adaptar respuesta de productos a formato de sugerencias
+        const products = response.data.products || response.data || [];
+        const suggestions = products.map(p => ({
+          type: 'product',
+          id: p.id,
+          name: p.name,
+          slug: p.slug,
+          image_url: p.image_url,
+          price: p.price,
+          discount_price: p.discount_price
+        }));
+
+        return {
+          success: true,
+          data: {
+            suggestions: suggestions
+          }
+        };
+      }
+      return response;
+    } catch (e) {
+      console.error("Error en getSearchSuggestions:", e);
+      return { success: false, message: e.message };
+    }
+  }
+
   async getAllBlogPosts(filters = {}) {
     const query = new URLSearchParams(filters).toString();
     return this.request(`/blog/admin/all?${query}`);
