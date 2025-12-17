@@ -78,7 +78,50 @@ class HomeEngine {
 
     // 4. Reveal
     this.toggleLoader(false);
+
+    // 5. Hype Features (Visuals)
+    this.initHypeFeatures();
+
     console.log('🚀 [HomeEngine] V3 Initialized. Robust Mode: ON');
+  }
+
+  initHypeFeatures() {
+    // Logic for the Drop Countdown
+    this.startCountdown();
+
+    // Marquee Speed Logic (Optional adjustment)
+    const marquee = document.querySelector('.marquee-track');
+    if (marquee) {
+      marquee.style.opacity = 1; // Fade in
+    }
+  }
+
+  startCountdown() {
+    const days = document.getElementById('days');
+    const hours = document.getElementById('hours');
+    const minutes = document.getElementById('minutes');
+    const seconds = document.getElementById('seconds');
+
+    if (!days) return;
+
+    // Set target to 3 days from now (Mock)
+    const targetDate = new Date();
+    targetDate.setDate(targetDate.getDate() + 3);
+
+    setInterval(() => {
+      const now = new Date().getTime();
+      const distance = targetDate - now;
+
+      const d = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const s = Math.floor((distance % (1000 * 60)) / 1000);
+
+      days.innerText = d < 10 ? '0' + d : d;
+      hours.innerText = h < 10 ? '0' + h : h;
+      minutes.innerText = m < 10 ? '0' + m : m;
+      seconds.innerText = s < 10 ? '0' + s : s;
+    }, 1000);
   }
 
   toggleLoader(show) {
