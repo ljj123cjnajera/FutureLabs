@@ -61,6 +61,9 @@ class HomeEngine {
   }
 
   async init() {
+    // 0. Restore Core UI (Header/Footer)
+    this.renderGlobals();
+
     // 1. Initial State
     this.toggleLoader(true);
 
@@ -90,6 +93,104 @@ class HomeEngine {
         setTimeout(() => loader.style.visibility = 'hidden', 500);
       }, 800); // Small delay for cinematic effect
     }
+  }
+
+  // ==========================================
+  // 🧩 GLOBAL COMPONENTS
+  // ==========================================
+  renderGlobals() {
+    // Header
+    const header = document.getElementById('mainHeader');
+    if (header && window.Components) {
+      header.innerHTML = window.Components.getHeader(true, true);
+      window.Components.initHeader();
+      // Initialize Search & Cart Count if available
+      if (window.Components.initSearch) window.Components.initSearch();
+      if (window.Components.initCartCounter) window.Components.initCartCounter();
+    }
+
+    // Footer
+    const footer = document.getElementById('mainFooter');
+    if (footer && window.Components) {
+      footer.innerHTML = window.Components.getFooter();
+    }
+
+    // V3 Mobile Menu Logic (if not in Components)
+    this.setupMobileMenu();
+  }
+
+  // ==========================================
+  // 🧭 NAVIGATION (MegaMenu)
+  // ==========================================
+  setupMobileMenu() {
+    // 1. Mobile Toggle (Hamburger)
+    const menuBtn = document.querySelector('.mobile-menu-btn'); // From Components.getHeader()
+    const mobileMenu = document.getElementById('mobileMenu');
+
+    if (menuBtn && mobileMenu) {
+      menuBtn.addEventListener('click', () => {
+        mobileMenu.classList.add('active');
+      });
+
+      const closeBtn = mobileMenu.querySelector('.close-menu');
+      if (closeBtn) {
+        closeBtn.addEventListener('click', () => mobileMenu.classList.remove('active'));
+      }
+    }
+
+    // 2. MegaMenu (Desktop "Ver Todo" / Categories)
+    this.setupMegaMenu();
+  }
+
+  setupMegaMenu() {
+    const trigger = document.querySelector('.all-categories'); // From Components.getHeader()
+    const megaMenu = document.getElementById('megaMenu');
+    const overlay = document.getElementById('megaMenuOverlay');
+    const closeBtn = document.getElementById('closeMenu');
+
+    if (!trigger || !megaMenu || !overlay) return;
+
+    // Open
+    trigger.addEventListener('click', (e) => {
+      e.preventDefault();
+      megaMenu.classList.add('active');
+      overlay.classList.add('active');
+    });
+
+    // Close
+    const close = () => {
+      megaMenu.classList.remove('active');
+      overlay.classList.remove('active');
+    };
+
+    if (closeBtn) closeBtn.addEventListener('click', close);
+    overlay.addEventListener('click', close);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') close();
+    });
+
+    // Tab Logic (Restored from V2)
+    this.setupMegaMenuTabs();
+  }
+
+  setupMegaMenuTabs() {
+    const items = document.querySelectorAll('.category-item');
+    const contents = document.querySelectorAll('.category-content');
+
+    items.forEach(item => {
+      item.addEventListener('mouseenter', () => { // Hover for desktop
+        const cat = item.getAttribute('data-category');
+
+        // Reset
+        items.forEach(i => i.classList.remove('active'));
+        contents.forEach(c => c.classList.remove('active'));
+
+        // Activate
+        item.classList.add('active');
+        const content = document.querySelector(`.category-content[data-category="${cat}"]`);
+        if (content) content.classList.add('active');
+      });
+    });
   }
 
   // ==========================================
