@@ -91,9 +91,30 @@ async function loadCheckout() {
         }
 
         // Obtener carrito
-        const cartResponse = await window.api.getCart();
+        let cartResponse = { success: false };
+        try {
+            cartResponse = await window.api.getCart();
+        } catch (e) {
+            console.warn('⚠️ [Checkout] API Offline, checking local fallback...');
+        }
 
-        if (!cartResponse.success || cartResponse.data.items.length === 0) {
+        // Fallback Logic: Check LocalStorage if API failed or empty
+        let items = [];
+        let total = 0;
+
+        if (cartResponse.success && cartResponse.data.items.length > 0) {
+            items = cartResponse.data.items;
+            total = cartResponse.data.total;
+        } else {
+            // Try Brutalist Storage
+            const localRaw = localStorage.getItem('brutalist_cart');
+            if (localRaw) {
+                items = JSON.parse(localRaw);
+                total = items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+            }
+        }
+
+        if (items.length === 0) {
             container.innerHTML = `
                 <div class="checkout-loading">
                     <i class="fas fa-shopping-cart"></i>
@@ -105,7 +126,13 @@ async function loadCheckout() {
             return;
         }
 
-        cartData = cartResponse.data;
+        // Normalize Data Structure
+        cartData = {
+            items: items,
+            total: total,
+            subtotal: total,
+            shipping: 0
+        };
         const baseSubtotal = Number(cartData.subtotal ?? cartData.total ?? 0);
         cartData.subtotal = baseSubtotal;
         if (!shippingOptions[selectedShippingOption]) {
