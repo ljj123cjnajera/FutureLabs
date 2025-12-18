@@ -129,62 +129,8 @@ class Components {
     this.ensureVerificationAssets();
 
     // FORZAR VISIBILIDAD DE TODOS LOS BOTONES DEL HEADER
-    function forceAllHeaderButtons() {
-      console.log('🔵 [COMPONENTS] forceAllHeaderButtons() ejecutado');
-
-      // Lista de todos los botones que necesitan fix (sin home-link que fue eliminado)
-      const buttonsToFix = [
-
-        'a.account-link',
-        '.account-link',
-        'a.admin-link',
-        '.admin-link'
-      ];
-
-      buttonsToFix.forEach(selector => {
-        const buttons = document.querySelectorAll(selector);
-        buttons.forEach(button => {
-          if (button) {
-            console.log(`🔵 [COMPONENTS] Aplicando fix a: ${selector}`, button);
-
-            // Eliminar estilos primero
-            button.removeAttribute('style');
-
-            // Aplicar estilos críticos
-            button.style.setProperty('background', 'rgb(255, 255, 255)', 'important');
-            button.style.setProperty('background-color', 'rgb(255, 255, 255)', 'important');
-            button.style.setProperty('color', 'rgb(55, 65, 81)', 'important');
-            button.style.setProperty('opacity', '1', 'important');
-            button.style.setProperty('visibility', 'visible', 'important');
-            button.style.setProperty('display', 'flex', 'important');
-            button.style.setProperty('position', 'relative', 'important');
-            button.style.setProperty('z-index', '1000', 'important');
-            button.style.setProperty('pointer-events', 'auto', 'important');
-
-            // Iconos dentro del botón
-            const icons = button.querySelectorAll('i');
-            icons.forEach(icon => {
-              icon.style.setProperty('color', 'rgb(55, 65, 81)', 'important');
-              icon.style.setProperty('opacity', '1', 'important');
-              icon.style.setProperty('visibility', 'visible', 'important');
-            });
-
-            // Remover clases problemáticas
-            button.classList.remove('btn-ghost', 'btn-outline');
-          }
-        });
-      });
-    }
-
-    // Ejecutar para TODOS los botones
-    forceAllHeaderButtons();
-
-    // Ejecutar inmediatamente y varias veces para asegurar que se apliquen los estilos
-    setTimeout(() => { forceAllHeaderButtons(); }, 0);
-    setTimeout(() => { forceAllHeaderButtons(); }, 50);
-    setTimeout(() => { forceAllHeaderButtons(); }, 100);
-    setTimeout(() => { forceAllHeaderButtons(); }, 300);
-    setTimeout(() => { forceAllHeaderButtons(); }, 500);
+    // Style enforcement delegated to CSS (home-streetwear.css)
+    console.log('🔵 [COMPONENTS] Header initialized (V3 Clean Mode)');
 
     // Manejar botón de cuenta
     const accountLink = document.getElementById('accountLink');

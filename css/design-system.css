@@ -107,15 +107,14 @@
     --spacing-3xl: 4rem;
 
     /* Bordes - 'Boxy' Look */
-    --border-radius-sm: 2px;
-    --border-radius-md: 4px;
-    /* Reducción drástica de redondeo */
-    --border-radius-lg: 6px;
-    --border-radius-xl: 8px;
-    /* Antes era mucho mayor */
-    --border-radius-2xl: 12px;
-    --border-radius-full: 9999px;
-    /* Solo para badges/botones pill */
+    /* Bordes - 'Brutalist' Look (Unified) */
+    --border-radius-sm: 0px;
+    --border-radius-md: 0px;
+    --border-radius-lg: 0px;
+    --border-radius-xl: 0px;
+    --border-radius-2xl: 0px;
+    --border-radius-full: 0px;
+    /* Even badges are square now for consistency */
 
     --border-width: 1px;
     --border: #E5E5EA;
