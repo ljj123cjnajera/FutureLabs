@@ -974,7 +974,7 @@ footer .copyright {
 .newsletter-btn {
     width: 100%;
 }
-}
+
 
 /* ============================================
    10. PRELOADER CURTAIN
@@ -1171,40 +1171,7 @@ body.loaded #preloader {
     margin-bottom: var(--spacing-xs);
 }
 
-/* Tag Cloud */
-.seo-description {
-    text-align: center;
-    max-width: 800px;
-    margin: 0 auto var(--spacing-xl);
-    font-size: 1.1rem;
-    color: var(--gray-600);
-}
-
-.tag-cloud {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--spacing-sm);
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.tag {
-    background: var(--gray-100);
-    color: var(--gray-800);
-    padding: 0.5rem 1rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 0.8rem;
-    border: 1px solid transparent;
-    transition: all 0.2s;
-}
-
-.tag:hover {
-    background: var(--black);
-    color: var(--white);
-    border-color: var(--black);
-}
+/* Tag Cloud (Overriden by Section 15) */
 
 /* Responsive Overrides for new sections */
 @media (max-width: 768px) {
@@ -1220,7 +1187,7 @@ body.loaded #preloader {
 .affiliate-banner h2 {
     font-size: 1.8rem;
 }
-}
+
 
 /* ============================================
    7. FOOTER OVERHAUL
@@ -1745,7 +1712,7 @@ body.loaded #preloader {
         padding-left: 0 !important;
     }
 }
-}
+
 
 /* ============================================
    12. MOBILE REFINEMENTS & TOUCH TARGETS
