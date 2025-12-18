@@ -94,6 +94,70 @@ class HomeEngine {
     if (marquee) {
       marquee.style.opacity = 1; // Fade in
     }
+
+    // Scroll Reveal
+    this.setupScrollReveals();
+
+    // Video Modal
+    this.setupVideoModal();
+  }
+
+  setupScrollReveals() {
+    // 1. Add reveal class to targets
+    const targets = document.querySelectorAll('.section, .hero-section, .brand-marquee, .home-section-card, .next-drop-section, .video-section, .manifesto-section, .social-section');
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          // Optional: Stop observing once revealed
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    targets.forEach(target => {
+      target.classList.add('reveal-on-scroll');
+      observer.observe(target);
+    });
+  }
+
+  setupVideoModal() {
+    const playBtn = document.querySelector('.btn-play');
+    if (!playBtn) return;
+
+    playBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.openVideoModal('https://videos.pexels.com/video-files/3753305/3753305-hd_1920_1080_25fps.mp4');
+    });
+  }
+
+  openVideoModal(videoSrc) {
+    // Create Modal on the fly
+    const modal = document.createElement('div');
+    modal.className = 'video-modal';
+    modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:black;z-index:9999;display:flex;justify-content:center;align-items:center;opacity:0;transition:opacity 0.5s;';
+
+    modal.innerHTML = `
+          <button class="close-video" style="position:absolute;top:20px;right:20px;color:white;font-size:2rem;background:none;border:none;cursor:pointer;">&times;</button>
+          <video controls autoplay style="max-width:90%;max-height:90vh;box-shadow:0 0 50px rgba(255,255,255,0.1);">
+              <source src="${videoSrc}" type="video/mp4">
+          </video>
+      `;
+
+    document.body.appendChild(modal);
+
+    // Animate In
+    requestAnimationFrame(() => modal.style.opacity = '1');
+
+    // Close Logic
+    const close = () => {
+      modal.style.opacity = '0';
+      setTimeout(() => modal.remove(), 500);
+    };
+
+    modal.querySelector('.close-video').onclick = close;
+    modal.onclick = (e) => { if (e.target === modal) close(); };
   }
 
   startCountdown() {

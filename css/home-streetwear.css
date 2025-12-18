@@ -2617,3 +2617,18 @@ body.loaded #preloader {
     transform: translateY(-2px);
     box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
 }
+
+/* ============================================
+   16. SCROLL REVEAL ANIMATIONS
+   ============================================ */
+.reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform, opacity;
+}
+
+.reveal-on-scroll.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
