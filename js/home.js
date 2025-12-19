@@ -402,25 +402,32 @@ class HomeEngine {
     if (!container) return;
 
     container.innerHTML = products.map(p => `
-            <div class="product-card brutalist-card">
-                ${p.badge ? `<div class="product-badge">${p.badge}</div>` : ''}
-                <div class="product-image">
-                    <a href="product-detail.html?id=${p.id}">
-                        <img src="${p.image_url}" alt="${p.name}">
-                    </a>
-                    <button class="quick-add-btn" onclick="window.homeEngine.quickAdd(${p.id}, '${p.name}')">
+            <div class="product-card" onclick="window.location.href='product-detail.html?id=${p.id}'" style="cursor: pointer;">
+                <div class="product-image-container">
+                    ${p.badge ? `<div class="product-badges"><span class="product-badge product-badge-new">${p.badge}</span></div>` : ''}
+                    <img src="${p.image_url}" alt="${p.name}" class="product-image">
+                    <button class="quick-add-btn" onclick="event.stopPropagation(); window.homeEngine.quickAdd(${p.id}, '${p.name}')">
                         <i class="fas fa-plus"></i>
                     </button>
                 </div>
-                <div class="product-info">
-                    <a href="product-detail.html?id=${p.id}" class="product-title">${p.name}</a>
-                    <div class="product-price">
-                        ${p.original_price ? `<span class="price-original">S/ ${p.original_price.toFixed(2)}</span>` : ''}
-                        <span class="price-current">S/ ${p.price.toFixed(2)}</span>
+                <div class="product-info" style="padding: 1rem;">
+                    <h3 style="font-size: 1rem; margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 800;">${p.name}</h3>
+                    <div class="price" style="font-family: inherit; font-size: 1.1rem; font-weight: 700;">
+                        $${p.price.toFixed(2)}
+                        ${p.original_price ? `<span style="text-decoration: line-through; color: #999; font-size: 0.9rem; margin-left: 5px;">$${p.original_price.toFixed(2)}</span>` : ''}
                     </div>
                 </div>
             </div>
         `).join('');
+    <div class="product-info">
+      <a href="product-detail.html?id=${p.id}" class="product-title">${p.name}</a>
+      <div class="product-price">
+        ${p.original_price ? `<span class="price-original">S/ ${p.original_price.toFixed(2)}</span>` : ''}
+        <span class="price-current">S/ ${p.price.toFixed(2)}</span>
+      </div>
+    </div>
+            </div >
+      `).join('');
   }
 
   // ==========================================
@@ -428,7 +435,7 @@ class HomeEngine {
   // ==========================================
   quickAdd(id, name) {
     if (window.cart) window.cart.add(id, 1);
-    if (window.notifications) window.notifications.success('AÑADIDO', `${name} al carrito`);
+    if (window.notifications) window.notifications.success('AÑADIDO', `${ name } al carrito`);
   }
 
   setupNewsletter() {

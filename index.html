@@ -599,20 +599,17 @@
     </div>
 
     <!-- Newsletter Popup (Brutalist) -->
-    <div id="newsletterPopup" class="modal" style="display:none;">
-        <div class="modal-content" style="max-width: 500px; text-align: center; padding: 3rem;">
+    <!-- Newsletter Popup (Brutalist) -->
+    <div id="newsletterPopup" class="newsletter-popup" style="display:none;">
+        <div class="modal-content">
             <span class="close-modal" onclick="closeNewsletterPopup()">&times;</span>
-            <h2 style="font-size: 2.5rem; text-transform: uppercase; line-height: 1; margin-bottom: 1rem;">Unlock The
-                Drop</h2>
-            <p style="margin-bottom: 2rem; color: #666;">Únete ahora y obtén 10% OFF en tu primera compra.</p>
-            <form id="popupNewsletterForm" class="newsletter-form" style="flex-direction: column;">
-                <input type="email" placeholder="Tu Email" class="newsletter-input"
-                    style="border: 2px solid #000; color: #000; margin-bottom: 1rem;" required>
-                <button type="submit" class="newsletter-btn"
-                    style="background: #000; color: #fff; width: 100%;">Suscribirme</button>
+            <h2 class="popup-title">Unlock The Drop</h2>
+            <p class="popup-desc">Únete ahora y obtén 10% OFF en tu primera compra.</p>
+            <form id="popupNewsletterForm" class="popup-form">
+                <input type="email" placeholder="Tu Email" class="popup-input" required>
+                <button type="submit" class="popup-btn">Suscribirme</button>
             </form>
-            <p style="margin-top: 1rem; font-size: 0.8rem; color: #999; cursor: pointer;"
-                onclick="closeNewsletterPopup()">No gracias, prefiero pagar precio completo.</p>
+            <p class="close-link" onclick="closeNewsletterPopup()">No gracias, prefiero pagar precio completo.</p>
         </div>
     </div>
 </body>
