@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,47 +29,36 @@
     <link rel="stylesheet" href="css/components-enhanced.css?v=3.0">
 
     <!-- CSS Específicos de Página -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/cart-page.css?v=2.0">
     <link rel="stylesheet" href="css/coupons.css?v=2.0">
     <link rel="stylesheet" href="css/breadcrumbs.css?v=1.0">
-    </head>
+</head>
+
 <body>
     <!-- Header Dinámico -->
     <header id="mainHeader"></header>
-    
+
     <!-- Breadcrumbs -->
     <nav id="breadcrumbs"></nav>
 
-    <!-- Cart Page -->
+    <!-- 🚀 V3 CART: BRUTALIST ENGINE -->
     <div class="cart-page">
-        <section class="cart-hero">
-            <div class="container">
-                <div class="cart-hero-card">
-                    <span class="cart-hero-eyebrow"><i class="fas fa-shopping-cart"></i> Resumen de compra</span>
-                    <h1 class="cart-hero-title">Mi Carrito</h1>
-                    <p class="cart-hero-description">Revisa tus productos, aplica cupones y conoce cuánto falta para tu envío gratis.</p>
-                    <div class="cart-hero-actions">
-                        <button type="button" class="btn btn-primary btn-sm" onclick="window.location.href='products.html'">
-                            <i class="fas fa-plus"></i> Seguir comprando
-                        </button>
-                        <button type="button" class="btn btn-outline btn-sm" onclick="scrollToSummary()">
-                            <i class="fas fa-receipt"></i> Ver resumen
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </section>
+        <!-- Brutalist Header -->
+        <div class="container"
+            style="margin-top: 4rem; margin-bottom: 2rem; border-bottom: 4px solid var(--black); padding-bottom: 1rem;">
+            <span class="text-uppercase fw-bold" style="letter-spacing: 2px;">YOUR HAUL</span>
+            <h1 style="font-size: 4rem; line-height: 0.9; margin: 0; text-transform: uppercase; font-weight: 900;">CART
+                STATUS</h1>
+        </div>
 
         <div class="container">
-            <div id="cartContainer" class="cart-loader" role="status" aria-live="polite">
-                <div class="loading-state">
-                    <div class="loading-state-content">
-                        <div class="loading-spinner large"></div>
-                        <p>Cargando carrito...</p>
-                    </div>
-                </div>
+            <div id="cartContainer" class="cart-grid-v3" style="min-height: 40vh;">
+                <!-- Loading State (Brutalist) -->
+                <div class="loading-brutalist">LOADING CART...</div>
             </div>
         </div>
     </div>
@@ -80,366 +70,12 @@
     <script src="js/notifications.js"></script>
     <script src="js/skeleton.js"></script>
     <script src="js/modals.js"></script>
-    <script src="js/cart.js"></script>
     <script src="js/coupons.js"></script>
     <script src="js/components.js"></script>
     <script src="js/breadcrumbs.js"></script>
-    
-    <script>
-        (function() {
-            const FREE_SHIPPING_THRESHOLD = 200;
-            let cartItems = [];
-            let cartTotal = 0;
-            let couponListenerRegistered = false;
 
-            document.addEventListener('DOMContentLoaded', async () => {
-                initHeader();
-                await waitForAuth();
-                loadCart();
-            });
-
-            function initHeader() {
-                const headerContainer = document.getElementById('mainHeader');
-                if (headerContainer && window.Components) {
-                    headerContainer.innerHTML = window.Components.getHeader(true, true);
-                    window.Components.initHeader();
-                    window.Components.initSearch();
-                    window.Components.initCartCounter();
-                }
-            }
-
-            function waitForAuth() {
-                return new Promise((resolve) => {
-                    const interval = setInterval(() => {
-                        if (window.authManager && !window.authManager.isInitializing) {
-                            clearInterval(interval);
-                            resolve();
-                        }
-                    }, 100);
-
-                    setTimeout(() => {
-                        clearInterval(interval);
-                        resolve();
-                    }, 5000);
-                });
-            }
-
-            async function loadCart() {
-                const container = document.getElementById('cartContainer');
-                if (!container) return;
-
-                window.loadingState.renderLoading(container, 'Cargando carrito...');
-
-                try {
-                    if (!window.authManager?.isAuthenticated()) {
-                    container.innerHTML = renderAuthRequiredState();
-                        mountCoupons([], 0);
-                        updateSummaryTotals();
-                        return;
-                    }
-
-                    const response = await window.api.getCart();
-                    if (!response?.success) {
-                        throw new Error(response?.message || 'No se pudo cargar el carrito');
-                    }
-
-                    cartItems = response.data?.items || [];
-                    cartTotal = Number(response.data?.total || 0);
-
-                    if (cartItems.length === 0) {
-                        container.innerHTML = renderEmptyCartState();
-                        mountCoupons([], cartTotal);
-                        updateSummaryTotals();
-                        return;
-                    }
-
-                    container.innerHTML = renderCartMarkup(cartItems, cartTotal);
-                    mountCoupons(cartItems, cartTotal);
-                    registerCouponListener();
-                    updateSummaryTotals();
-                } catch (error) {
-                    console.error('Error al cargar el carrito:', error);
-                    container.innerHTML = renderErrorState(error);
-                }
-            }
-
-            function scrollToSummary() {
-                const summary = document.querySelector('.cart-summary');
-                if (summary) {
-                    summary.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                }
-            }
-
-            function renderCartMarkup(items, total) {
-                const remaining = Math.max(0, FREE_SHIPPING_THRESHOLD - total);
-                const progress = Math.min(100, (total / FREE_SHIPPING_THRESHOLD) * 100);
-                const hasFreeShipping = total >= FREE_SHIPPING_THRESHOLD;
-
-                return `
-                    <div class="cart-container">
-                        <div class="cart-items">
-                            <div class="cart-items-header">
-                                <h2><i class="fas fa-box"></i> Productos (${items.length})</h2>
-                                <button type="button" class="btn btn-outline btn-sm" onclick="window.location.href='products.html'"><i class="fas fa-plus"></i> Añadir más</button>
-                            </div>
-                            ${items.map(renderCartItem).join('')}
-                        </div>
-                        <aside class="cart-summary">
-                            <div class="cart-summary-header">
-                                <h2><i class="fas fa-receipt"></i> Resumen</h2>
-                            </div>
-                            ${renderShippingProgressBar(total, remaining, progress, hasFreeShipping)}
-                            <div id="couponSection"></div>
-                            <div class="summary-row">
-                                <span>Subtotal</span>
-                                <span>S/ ${total.toFixed(2)}</span>
-                            </div>
-                            <div class="summary-row">
-                                <span>Envío</span>
-                                <span>Gratis</span>
-                            </div>
-                            <div id="discountRow" class="summary-discount" style="display: none;">
-                                <span class="discount-label">
-                                    <i class="fas fa-tag"></i> Descuento
-                                </span>
-                                <span class="discount-amount" id="discountAmount">-S/ 0.00</span>
-                            </div>
-                            <div class="summary-row">
-                                <span>Total</span>
-                                <span id="finalTotal">S/ ${total.toFixed(2)}</span>
-                            </div>
-                            <button class="checkout-btn" type="button" onclick="checkout()">
-                                <i class="fas fa-lock"></i> Proceder al Pago
-                            </button>
-                            <div class="cart-secure-badge">
-                                <i class="fas fa-shield-check"></i>
-                                Pago 100% seguro y cifrado
-                            </div>
-                        </aside>
-                    </div>
-                `;
-            }
-
-            function renderCartItem(item) {
-                const price = Number(item.price || item.discount_price || 0);
-                return `
-                    <div class="cart-item">
-                        <div class="cart-item-image">
-                            <img src="${item.image_url || 'assets/images/products/placeholder.jpg'}" alt="${item.name}">
-                        </div>
-                        <div class="cart-item-info">
-                            <div class="cart-item-header">
-                                <div>
-                                    <h3>${item.name}</h3>
-                                    ${item.brand ? `<p class="cart-item-brand">${item.brand}</p>` : ''}
-                                </div>
-                                <button class="remove-item" type="button" onclick="removeItem('${item.product_id}')">
-                                    <i class="fas fa-trash"></i> Eliminar
-                                </button>
-                            </div>
-                            <p class="cart-item-price">S/ ${price.toFixed(2)}</p>
-                            <div class="cart-item-actions">
-                                <div class="quantity-controls">
-                                    <button class="quantity-btn" type="button" onclick="updateQuantity('${item.product_id}', ${item.quantity - 1})">-</button>
-                                    <input type="text" class="quantity-input" value="${item.quantity}" readonly>
-                                    <button class="quantity-btn" type="button" onclick="updateQuantity('${item.product_id}', ${item.quantity + 1})">+</button>
-                                </div>
-                                <button class="move-to-wishlist" type="button" onclick="moveToWishlist('${item.product_id}')">
-                                    <i class="fas fa-heart"></i> Guardar
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-
-            function moveToWishlist(productId) {
-                if (!window.wishlistManager) return;
-                window.wishlistManager.add(productId).catch((error) => {
-                    console.error('Error al mover a wishlist:', error);
-                    window.notifications?.error?.('No se pudo guardar el producto en tu wishlist');
-                });
-            }
-
-            function renderShippingProgressBar(total, remaining, progress, hasFreeShipping) {
-                if (hasFreeShipping) {
-                    return `
-                        <div class="shipping-progress-bar shipping-achieved" role="status" aria-live="polite">
-                            <div class="shipping-progress-header">
-                                <i class="fas fa-check-circle"></i>
-                                <span>¡Envío gratis activado!</span>
-                            </div>
-                            <div class="shipping-progress-full">
-                                <div class="shipping-progress-fill" style="width: 100%"></div>
-                            </div>
-                        </div>
-                    `;
-                }
-
-                return `
-                        <div class="shipping-progress-bar">
-                        <div class="shipping-progress-header">
-                            <i class="fas fa-truck"></i>
-                            <span>Te faltan S/ ${remaining.toFixed(2)} para envío gratis</span>
-                        </div>
-                        <div class="shipping-progress-full">
-                            <div class="shipping-progress-fill" style="width: ${progress}%" role="progressbar" aria-label="Progreso hacia envío gratis" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(progress)}"></div>
-                        </div>
-                        <div class="shipping-progress-text">
-                            <span>S/ ${total.toFixed(2)}</span>
-                            <span>S/ ${FREE_SHIPPING_THRESHOLD.toFixed(2)}</span>
-                        </div>
-                    </div>
-                `;
-            }
-
-            function renderAuthRequiredState() {
-                return `
-                    <div class="cart-empty-state">
-                        <i class="fas fa-user-lock"></i>
-                        <h2>Inicia sesión para ver tu carrito</h2>
-                        <p>Accede a tu cuenta para recuperar tus productos guardados.</p>
-                        <div class="cart-empty-actions">
-                            <button class="btn btn-primary btn-sm" type="button" onclick="window.modalManager?.showLogin?.()">
-                                <i class="fas fa-sign-in-alt"></i> Iniciar sesión
-                            </button>
-                            <button class="btn btn-outline btn-sm" type="button" onclick="window.location.href='index.html'">
-                                <i class="fas fa-home"></i> Volver al inicio
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }
-
-            function renderEmptyCartState() {
-                return `
-                    <div class="cart-empty-state">
-                        <i class="fas fa-shopping-cart"></i>
-                        <h2>Tu carrito está vacío</h2>
-                        <p>Empieza a explorar nuestras categorías y agrega tus productos favoritos.</p>
-                        <div class="cart-empty-actions">
-                            <button class="btn btn-primary btn-sm" type="button" onclick="window.location.href='products.html'">
-                                <i class="fas fa-search"></i> Ver productos
-                            </button>
-                            <button class="btn btn-outline btn-sm" type="button" onclick="window.location.href='compare.html'">
-                                <i class="fas fa-balance-scale"></i> Comparar productos
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }
-
-            function renderErrorState(error) {
-                const message = error?.message || 'Ocurrió un error inesperado';
-                return `
-                    <div class="cart-empty-state">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <h2>Error al cargar el carrito</h2>
-                        <p>${message}</p>
-                        <div class="cart-empty-actions">
-                            <button class="btn btn-primary btn-sm" type="button" onclick="loadCart()">
-                                <i class="fas fa-sync"></i> Reintentar
-                            </button>
-                            <button class="btn btn-outline btn-sm" type="button" onclick="window.location.href='index.html'">
-                                <i class="fas fa-home"></i> Volver al inicio
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }
-
-            function mountCoupons(items, total) {
-                const couponItems = items.map((item) => ({
-                    product_id: item.product_id,
-                    category_id: item.category_id,
-                    brand: item.brand
-                }));
-
-                window.couponsManager.setCartContext(couponItems, total);
-                window.couponsManager.init({
-                    context: 'cart',
-                    containerId: 'couponSection'
-                });
-            }
-
-            function registerCouponListener() {
-                if (couponListenerRegistered) return;
-                couponListenerRegistered = true;
-                window.addEventListener('couponUpdated', handleCouponUpdated);
-            }
-
-            function handleCouponUpdated(event) {
-                const detail = event.detail || {};
-                const discount = Number(detail.discount || 0);
-                const totalWithDiscount = Number(
-                    detail.totalWithDiscount || window.couponsManager.calculateNewTotal(cartTotal)
-                );
-
-                const discountRow = document.getElementById('discountRow');
-                const discountAmountEl = document.getElementById('discountAmount');
-                const finalTotalEl = document.getElementById('finalTotal');
-
-                if (discountRow && discountAmountEl) {
-                    if (discount > 0) {
-                        discountRow.style.display = 'flex';
-                        discountAmountEl.textContent = `-S/ ${discount.toFixed(2)}`;
-                    } else {
-                        discountRow.style.display = 'none';
-                    }
-                }
-
-                if (finalTotalEl) {
-                    finalTotalEl.textContent = `S/ ${totalWithDiscount.toFixed(2)}`;
-                }
-            }
-
-            function updateSummaryTotals() {
-                handleCouponUpdated({
-                    detail: {
-                        discount: window.couponsManager.getDiscount(),
-                        coupon: window.couponsManager.getAppliedCoupon(),
-                        total: cartTotal,
-                        totalWithDiscount: window.couponsManager.calculateNewTotal(cartTotal)
-                    }
-                });
-            }
-
-            async function updateQuantity(productId, quantity) {
-                if (quantity < 1) {
-                    await removeItem(productId);
-                    return;
-                }
-
-                await window.cartManager.update(productId, quantity);
-                await loadCart();
-            }
-
-            async function removeItem(productId) {
-                await window.cartManager.remove(productId);
-                await loadCart();
-            }
-
-            function checkout() {
-                window.notifications?.info?.('Redirigiendo al checkout...');
-                setTimeout(() => {
-                    window.location.href = 'checkout.html';
-                }, 600);
-            }
-
-            document.addEventListener('cartUpdated', (event) => {
-                const cartCount = document.querySelector('.cart-count');
-                if (cartCount) {
-                    cartCount.textContent = event.detail.count;
-                }
-            });
-
-            window.updateQuantity = updateQuantity;
-            window.removeItem = removeItem;
-            window.checkout = checkout;
-        })();
-    </script>
+    <!-- V3 Cart Engine -->
+    <script src="js/cart.js"></script>
 </body>
+
 </html>
-
-
-
