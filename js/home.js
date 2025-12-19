@@ -323,7 +323,7 @@ class HomeEngine {
     container.innerHTML = slides.map((slide, index) => `
             <div class="slide ${index === 0 ? 'active' : ''}" style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('${slide.image_url}')">
                 <div class="slide-content">
-                    <span class="slide-eyebrow">FUTURE COLLECTION</span>
+                    <span class="slide-eyebrow">LATEST DROPS</span>
                     <h1>${slide.title}</h1>
                     <p>${slide.subtitle || slide.description || ''}</p>
                     <a href="${slide.link || slide.button_link || 'products.html'}" class="btn btn-primary btn-lg">${slide.cta || slide.button_text || 'SHOP NOW'}</a>
