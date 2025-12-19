@@ -5,7 +5,8 @@
 .product-detail-page {
     background: #fff;
     min-height: calc(100vh - 200px);
-    padding-top: 40px;
+    padding-top: 140px;
+    /* INCREASED from 40px to 140px for V3 Header */
     padding-bottom: 40px;
 }
 
