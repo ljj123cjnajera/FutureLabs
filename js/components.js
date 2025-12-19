@@ -3,72 +3,73 @@
 class Components {
   static getFooter() {
     return `
-      <!-- Footer -->
+      <!-- Footer (Brutalist) -->
       <footer class="footer">
         <div class="container">
-          <div class="footer-content">
-            <div class="footer-column">
-              <h3>Sobre SneakersShop</h3>
-              <ul>
-                <li><a href="about.html">Quiénes somos</a></li>
-                <li><a href="blog.html">Blog</a></li>
-                <li><a href="contact.html">Trabaja con nosotros</a></li>
-              </ul>
+            <div class="footer-grid">
+                <!-- Brand / Bio -->
+                <div class="footer-col footer-brand">
+                    <div class="footer-logo">FUTURE LABS</div>
+                    <p class="footer-bio">
+                        Laboratory of style. Curating the future of streetwear with exclusive drops from Nike, Jordan, Yeezy and more. 
+                        <br><br>
+                        EST. 2024 — WORLDWIDE
+                    </p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-tiktok"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+
+                <!-- Links 1 -->
+                <div class="footer-col">
+                    <h3>SHOP</h3>
+                    <ul>
+                        <li><a href="products.html?filter=new">New Arrivals</a></li>
+                        <li><a href="products.html?filter=best">Best Sellers</a></li>
+                        <li><a href="products.html?filter=upcoming">Upcoming Drops</a></li>
+                        <li><a href="products.html?cat=sale">Archived Sale</a></li>
+                    </ul>
+                </div>
+
+                <!-- Links 2 -->
+                <div class="footer-col">
+                    <h3>SUPPORT</h3>
+                    <ul>
+                        <li><a href="orders.html">Track Order</a></li>
+                        <li><a href="faq.html">FAQs</a></li>
+                        <li><a href="returns.html">Returns & Exchange</a></li>
+                        <li><a href="contact.html">Contact Us</a></li>
+                    </ul>
+                </div>
+
+                <!-- Newsletter -->
+                <div class="footer-col footer-newsletter">
+                    <h3>STAY IN THE KNOW</h3>
+                    <p style="color: #999; margin-bottom: 1rem; font-size: 0.9rem;">Subscribe for exclusive access to drops and events.</p>
+                    <div class="input-group">
+                        <input type="email" placeholder="ENTER YOUR EMAIL">
+                        <button>→</button>
+                    </div>
+                    <div class="payment-methods">
+                        <span class="payment-method">VISA</span>
+                        <span class="payment-method">MC</span>
+                        <span class="payment-method">AMEX</span>
+                        <span class="payment-method">YAPE</span>
+                    </div>
+                </div>
             </div>
-            <div class="footer-column">
-              <h3>Servicio al Cliente</h3>
-              <ul>
-                <li><a href="contact.html">Contacto</a></li>
-                <li><a href="faq.html">Preguntas Frecuentes</a></li>
-                <li><a href="orders.html">Estado de mi pedido</a></li>
-                <li><a href="products.html">Guías de compra</a></li>
-              </ul>
+
+            <div class="footer-bottom">
+                <p>&copy; ${new Date().getFullYear()} FUTURE LABS. ALL RIGHTS RESERVED.</p>
+                <div class="footer-meta">
+                    <a href="privacy.html">PRIVACY</a>
+                    <a href="terms.html">TERMS</a>
+                    <a href="sitemap.html">SITEMAP</a>
+                </div>
             </div>
-            <div class="footer-column">
-              <h3>Políticas</h3>
-              <ul>
-                <li><a href="terms.html">Términos y Condiciones</a></li>
-                <li><a href="privacy.html">Políticas de Privacidad</a></li>
-                <li><a href="warranty.html">Garantías</a></li>
-                <li><a href="returns.html">Devoluciones</a></li>
-              </ul>
-            </div>
-            <div class="footer-column">
-              <h3>Mi Cuenta</h3>
-              <ul>
-                <li><a href="profile.html">Mi Perfil</a></li>
-                <li><a href="orders.html">Mis Pedidos</a></li>
-                <li><a href="wishlist.html">Mi Wishlist</a></li>
-                <li><a href="cart.html">Mi Carrito</a></li>
-              </ul>
-            </div>
-          </div>
-          <div class="footer-bottom">
-            <div class="payment-section">
-              <p>Métodos de pago seguros</p>
-              <div class="payment-methods">
-                <div class="payment-method">Visa</div>
-                <div class="payment-method">MasterCard</div>
-                <div class="payment-method">Amex</div>
-                <div class="payment-method">PagoEfectivo</div>
-                <div class="payment-method">Yape</div>
-                <div class="payment-method">Plin</div>
-              </div>
-            </div>
-            <div class="social-section">
-              <p>Síguenos</p>
-              <div class="social-icons">
-                <a href="https://facebook.com" target="_blank"><i class="fab fa-facebook"></i></a>
-                <a href="https://instagram.com" target="_blank"><i class="fab fa-instagram"></i></a>
-                <a href="https://twitter.com" target="_blank"><i class="fab fa-twitter"></i></a>
-                <a href="https://youtube.com" target="_blank"><i class="fab fa-youtube"></i></a>
-                <a href="https://tiktok.com" target="_blank"><i class="fab fa-tiktok"></i></a>
-              </div>
-            </div>
-          </div>
-          <div class="copyright">
-            <p>&copy; ${new Date().getFullYear()} SneakersShop. Todos los derechos reservados.</p>
-          </div>
         </div>
       </footer>
     `;
