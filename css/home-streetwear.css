@@ -157,10 +157,14 @@ body.loaded #preloader {
 /* ============================================
    1. HERO SECTION - FULL IMPACT
    ============================================ */
+/* ============================================
+   1. HERO SECTION - FULL IMPACT
+   ============================================ */
 .hero {
     margin-bottom: 0;
     /* Remove margin to connect with marquee */
-    padding-top: 0;
+    padding-top: 40px;
+    /* Added spacing from header */
     position: relative;
     height: 85vh;
     min-height: 600px;

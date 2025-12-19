@@ -9,9 +9,9 @@ class Components {
             <div class="footer-grid">
                 <!-- Brand / Bio -->
                 <div class="footer-col footer-brand">
-                    <div class="footer-logo">FUTURE LABS</div>
+                    <div class="footer-logo">SNEAKERS SHOP</div>
                     <p class="footer-bio">
-                        Laboratory of style. Curating the future of streetwear with exclusive drops from Nike, Jordan, Yeezy and more. 
+                        The ultimate destination for hype. Curating the best sneakers from Nike, Jordan, Yeezy and more. 
                         <br><br>
                         EST. 2024 — WORLDWIDE
                     </p>
@@ -63,7 +63,7 @@ class Components {
             </div>
 
             <div class="footer-bottom">
-                <p>&copy; ${new Date().getFullYear()} FUTURE LABS. ALL RIGHTS RESERVED.</p>
+                <p>&copy; ${new Date().getFullYear()} SNEAKERS SHOP. ALL RIGHTS RESERVED.</p>
                 <div class="footer-meta">
                     <a href="privacy.html">PRIVACY</a>
                     <a href="terms.html">TERMS</a>
@@ -78,7 +78,7 @@ class Components {
   static getHeader(showSearch = true, showNav = true) {
     const searchBar = showSearch ? `
             <div class="search-bar">
-              <input type="text" placeholder="Buscar en SneakersShop..." id="searchInput">
+              <input type="text" placeholder="SEARCH SNEAKERS SHOP..." id="searchInput">
               <button class="search-btn" onclick="performSearch()"><i class="fas fa-search"></i></button>
               <div id="searchSuggestions" class="search-suggestions" style="display: none;"></div>
             </div>
@@ -97,17 +97,19 @@ class Components {
     ` : '';
 
     return `
-      <!-- Header -->
+      <!-- Header (Brutalist) -->
       <header class="header">
         <div class="container">
           <div class="top-bar ${!showSearch && !showNav ? 'header-simple' : ''}">
-            <div class="logo" onclick="window.location.href='index.html'">
+            <!-- Logo Image Restored -->
+            <div class="logo" onclick="window.location.href='index.html'" style="cursor: pointer;">
               <img src="assets/images/logo-clean.png" alt="SneakersShop" style="height: 60px; max-width: 200px; object-fit: contain;">
             </div>
+            
             ${searchBar}
+            
             <div class="user-actions">
-
-              <a href="#" class="account-link" id="accountLink" style="background: rgb(255, 255, 255) !important; background-color: rgb(255, 255, 255) !important; color: rgb(55, 65, 81) !important; border: 1px solid rgb(229, 231, 235) !important; opacity: 1 !important; visibility: visible !important; display: flex !important; padding: 10px 20px !important; border-radius: 8px !important; font-weight: 600 !important; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;"><i class="fas fa-user"></i> <span id="accountText">Cuenta</span></a>
+              <a href="#" class="account-link" id="accountLink"><i class="fas fa-user"></i> <span id="accountText">ACCOUNT</span></a>
               <a href="compare.html" class="cart-icon" id="comparatorLink" style="position: relative;">
                 <i class="fas fa-balance-scale"></i>
                 <span class="cart-count" id="comparator-count" style="display: none;">0</span>
@@ -376,7 +378,7 @@ class Components {
 
 
     return `
-      <div class="product-card" onclick="window.location.href='product-detail.html?id=${product.id}'">
+      < div class="product-card" onclick = "window.location.href='product-detail.html?id=${product.id}'" >
         <div class="product-image-container">
           <img src="${product.image_url || 'assets/images/products/placeholder.jpg'}" 
                class="product-image"
@@ -422,9 +424,9 @@ class Components {
           <button class="product-btn" onclick="event.stopPropagation(); window.cartManager?.add('${product.id}', 1)">
             AGREGAR AL CARRITO
           </button>
-        </div>
-      </div>
-    `;
+        </div >
+      </div >
+      `;
   }
 }
 
@@ -443,10 +445,10 @@ function performSearch() {
     if (window.searchAutocomplete && typeof window.searchAutocomplete.executeSearch === 'function') {
       window.searchAutocomplete.executeSearch(query);
     } else {
-      window.location.href = `products.html?search=${encodeURIComponent(query)}`;
+      window.location.href = `products.html ? search = ${encodeURIComponent(query)} `;
     }
   } else {
-    window.location.href = `products.html?search=${encodeURIComponent(query)}`;
+    window.location.href = `products.html ? search = ${encodeURIComponent(query)} `;
   }
 }
 
@@ -461,10 +463,10 @@ function performSearchWithQuery(query) {
     if (window.searchAutocomplete && typeof window.searchAutocomplete.executeSearch === 'function') {
       window.searchAutocomplete.executeSearch(query);
     } else {
-      window.location.href = `products.html?search=${encodeURIComponent(query)}`;
+      window.location.href = `products.html ? search = ${encodeURIComponent(query)} `;
     }
   } else {
-    window.location.href = `products.html?search=${encodeURIComponent(query)}`;
+    window.location.href = `products.html ? search = ${encodeURIComponent(query)} `;
   }
 }
 
