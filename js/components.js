@@ -236,265 +236,176 @@ class Components {
     this.ensureWishlistAssets();
     this.ensureVerificationAssets();
     this.updateCartCount();
-  }
-    // Style enforcement delegated to CSS (home-streetwear.css)
-    console.log('🔵 [COMPONENTS] Header initialized (V3 Clean Mode)');
 
-  // Manejar botón de cuenta (Inside initHeader logic moved or cleared)
-  // Actually, `initHeader` ended at line 239.
-  // The code below line 239 is ORPHANED inside the class body.
-  // We should probably move the account handling INSIDE initHeader or delete it if redundant.
-
-  // Moving account handling logic INTO initHeader if needed, or simply deleting the orphan block.
-  // Let's check if the orphan block has valid logic we want.
-  // It handles auth state visuals. We should likely append it to initHeader.
-
-  const accountLink = document.getElementById('accountLink');
-  if(accountLink) {
-    // Simple auth check logic could go here
-  }
-}
-
-if (accountLink && accountText) {
-  // Función para habilitar el botón
-  const enableButton = () => {
-    accountLink.style.pointerEvents = 'auto';
-    accountLink.style.opacity = '1';
-  };
-
-  // Función para deshabilitar el botón
-  const disableButton = () => {
-    accountLink.style.pointerEvents = 'none';
-    accountLink.style.opacity = '0.5';
-  };
-
-  // Deshabilitar el botón mientras está inicializando
-  disableButton();
-
-  // Verificar periódicamente si la inicialización se completó
-  const checkInitialization = setInterval(() => {
-    if (window.authManager && !window.authManager.isInitializing) {
-      clearInterval(checkInitialization);
-      enableButton();
-      console.log('✅ Botón "Cuenta" habilitado');
-    }
-  }, 100);
-
-  accountLink.addEventListener('click', function (e) {
-    e.preventDefault();
-
-    // Verificar si está inicializando
-    if (window.authManager && window.authManager.isInitializing) {
-      console.log('⏳ AuthManager está inicializando, esperando...');
-      return;
-    }
-
-    if (window.authManager && window.authManager.isAuthenticated()) {
-      window.location.href = 'profile.html';
-    } else {
-      if (window.modalManager) {
-        window.modalManager.showLogin();
-      }
-    }
-  });
-
-  // Actualizar texto del botón si está autenticado
-  if (window.authManager && window.authManager.isAuthenticated()) {
-    accountText.textContent = 'Mi Cuenta';
-  }
-
-  // Escuchar cambios en el estado de autenticación
-  document.addEventListener('authStateChanged', async () => {
-    if (window.authManager && window.authManager.isAuthenticated()) {
-      accountText.textContent = 'Mi Cuenta';
-
-      // Verificar si es admin y mostrar botón de admin
-      try {
-        const user = await window.authManager.getCurrentUser();
-        if (user && (user.role === 'admin' || user.role === 'moderator')) {
-          this.showAdminButton();
-        } else {
-          this.hideAdminButton();
-        }
-      } catch (error) {
-        console.error('Error checking user role:', error);
-      }
-    } else {
-      accountText.textContent = 'Cuenta';
-      this.hideAdminButton();
-    }
-  });
-
-  // Verificar si ya hay usuario admin al inicializar
-  setTimeout(async () => {
-    await this.checkAndShowAdminButton();
-  }, 500);
-}
+    // Check admin status
+    setTimeout(async () => {
+      await this.checkAndShowAdminButton();
+    }, 1000);
   }
 
   static async showAdminButton() {
-  // Verificar si el botón ya existe
-  if (document.getElementById('adminButton')) {
-    return;
+    // Verificar si el botón ya existe
+    if (document.getElementById('adminButton')) {
+      return;
+    }
+
+    const userActions = document.querySelector('.header-actions'); // Updated selector for V3
+    if (!userActions) return;
+
+    // Crear botón de admin
+    const adminButton = document.createElement('a');
+    adminButton.href = 'admin.html';
+    adminButton.className = 'action-btn';
+    adminButton.id = 'adminButton';
+    adminButton.innerHTML = '<i class="fas fa-cog"></i> <span>Admin</span>';
+    adminButton.style.cssText = 'color: var(--accent); font-weight: 800;';
+
+    // Insertar antes del botón de cuenta
+    const accountLink = document.getElementById('accountLink');
+    if (accountLink && accountLink.parentNode) {
+      userActions.insertBefore(adminButton, accountLink);
+    }
   }
-
-  const userActions = document.querySelector('.user-actions');
-  if (!userActions) return;
-
-  // Crear botón de admin
-  const adminButton = document.createElement('a');
-  adminButton.href = 'admin.html';
-  adminButton.className = 'admin-link';
-  adminButton.id = 'adminButton';
-  adminButton.innerHTML = '<i class="fas fa-cog"></i> Admin';
-  adminButton.style.cssText = 'color: #667eea; font-weight: 600;';
-
-  // Insertar antes del botón de cuenta
-  const accountLink = document.getElementById('accountLink');
-  if (accountLink && accountLink.parentNode) {
-    userActions.insertBefore(adminButton, accountLink);
-  }
-}
 
   static hideAdminButton() {
-  const adminButton = document.getElementById('adminButton');
-  if (adminButton) {
-    adminButton.remove();
+    const adminButton = document.getElementById('adminButton');
+    if (adminButton) {
+      adminButton.remove();
+    }
   }
-}
 
   static async checkAndShowAdminButton() {
-  try {
-    if (window.authManager && window.authManager.isAuthenticated()) {
-      const user = await window.authManager.getCurrentUser();
-      if (user && (user.role === 'admin' || user.role === 'moderator')) {
-        this.showAdminButton();
+    try {
+      if (window.authManager && window.authManager.isAuthenticated()) {
+        const user = await window.authManager.getCurrentUser();
+        if (user && (user.role === 'admin' || user.role === 'moderator')) {
+          this.showAdminButton();
+        }
       }
+    } catch (error) {
+      console.error('Error checking admin status:', error);
     }
-  } catch (error) {
-    console.error('Error checking admin status:', error);
   }
-}
 
   static initSearch() {
-  this.ensureAutocompleteAssets();
-}
+    this.ensureAutocompleteAssets();
+  }
 
   static ensureWishlistAssets() {
-  if (typeof document === 'undefined') return;
+    if (typeof document === 'undefined') return;
 
-  const syncIfReady = () => {
-    if (window.wishlistManager && typeof window.wishlistManager.syncToggleButtons === 'function') {
-      window.wishlistManager.syncToggleButtons(document);
+    const syncIfReady = () => {
+      if (window.wishlistManager && typeof window.wishlistManager.syncToggleButtons === 'function') {
+        window.wishlistManager.syncToggleButtons(document);
+      }
+    };
+
+    if (window.wishlistManager) {
+      syncIfReady();
+      return;
     }
-  };
 
-  if (window.wishlistManager) {
-    syncIfReady();
-    return;
-  }
-
-  if (document.querySelector('script[data-wishlist-script]')) {
-    document.querySelector('script[data-wishlist-script]').addEventListener('load', () => syncIfReady(), { once: true });
-    return;
-  }
-
-  const script = document.createElement('script');
-  script.src = 'js/wishlist.js';
-  script.defer = true;
-  script.setAttribute('data-wishlist-script', 'true');
-  script.onload = () => syncIfReady();
-  document.body.appendChild(script);
-}
-
-  static ensureVerificationAssets() {
-  if (typeof document === 'undefined') return;
-
-  if (window.verificationManager) {
-    return;
-  }
-
-  if (document.querySelector('script[data-verification-script]')) {
-    document
-      .querySelector('script[data-verification-script]')
-      .addEventListener('load', () => {
-        console.log('🔵 [COMPONENTS] verification assets loaded (existing)');
-      }, { once: true });
-    return;
-  }
-
-  const script = document.createElement('script');
-  script.src = 'js/verification.js';
-  script.defer = true;
-  script.setAttribute('data-verification-script', 'true');
-  document.body.appendChild(script);
-}
-
-  static ensureAutocompleteAssets() {
-  if (typeof document === 'undefined') return;
-
-  if (!document.querySelector('link[data-autocomplete-style]')) {
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = 'css/autocomplete.css?v=1.0';
-    link.setAttribute('data-autocomplete-style', 'true');
-    document.head.appendChild(link);
-  }
-
-  const initialize = () => {
-    if (window.searchAutocomplete && typeof window.searchAutocomplete.init === 'function') {
-      window.searchAutocomplete.init();
-    } else if (typeof window.initializeAutocomplete === 'function') {
-      window.initializeAutocomplete();
+    if (document.querySelector('script[data-wishlist-script]')) {
+      document.querySelector('script[data-wishlist-script]').addEventListener('load', () => syncIfReady(), { once: true });
+      return;
     }
-  };
 
-  if (window.searchAutocomplete || typeof window.initializeAutocomplete === 'function') {
-    initialize();
-    return;
-  }
-
-  if (!document.querySelector('script[data-autocomplete-script]')) {
     const script = document.createElement('script');
-    script.src = 'js/autocomplete.js';
+    script.src = 'js/wishlist.js';
     script.defer = true;
-    script.setAttribute('data-autocomplete-script', 'true');
-    script.onload = () => initialize();
+    script.setAttribute('data-wishlist-script', 'true');
+    script.onload = () => syncIfReady();
     document.body.appendChild(script);
   }
-}
+
+  static ensureVerificationAssets() {
+    if (typeof document === 'undefined') return;
+
+    if (window.verificationManager) {
+      return;
+    }
+
+    if (document.querySelector('script[data-verification-script]')) {
+      document
+        .querySelector('script[data-verification-script]')
+        .addEventListener('load', () => {
+          console.log('🔵 [COMPONENTS] verification assets loaded (existing)');
+        }, { once: true });
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = 'js/verification.js';
+    script.defer = true;
+    script.setAttribute('data-verification-script', 'true');
+    document.body.appendChild(script);
+  }
+
+  static ensureAutocompleteAssets() {
+    if (typeof document === 'undefined') return;
+
+    if (!document.querySelector('link[data-autocomplete-style]')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'css/autocomplete.css?v=1.0';
+      link.setAttribute('data-autocomplete-style', 'true');
+      document.head.appendChild(link);
+    }
+
+    const initialize = () => {
+      if (window.searchAutocomplete && typeof window.searchAutocomplete.init === 'function') {
+        window.searchAutocomplete.init();
+      } else if (typeof window.initializeAutocomplete === 'function') {
+        window.initializeAutocomplete();
+      }
+    };
+
+    if (window.searchAutocomplete || typeof window.initializeAutocomplete === 'function') {
+      initialize();
+      return;
+    }
+
+    if (!document.querySelector('script[data-autocomplete-script]')) {
+      const script = document.createElement('script');
+      script.src = 'js/autocomplete.js';
+      script.defer = true;
+      script.setAttribute('data-autocomplete-script', 'true');
+      script.onload = () => initialize();
+      document.body.appendChild(script);
+    }
+  }
 
   static initCartCounter() {
-  // Actualizar contador de carrito
-  document.addEventListener('cartUpdated', (e) => {
-    const cartCount = document.querySelector('.cart-count');
-    if (cartCount) {
-      cartCount.textContent = e.detail.count;
-    }
-  });
-}
+    // Actualizar contador de carrito
+    document.addEventListener('cartUpdated', (e) => {
+      const cartCount = document.querySelector('.cart-count');
+      if (cartCount) {
+        cartCount.textContent = e.detail.count;
+      }
+    });
+  }
 
   static getProductCard(product) {
-  const discount = product.discount_price ?
-    Math.round(((product.price - product.discount_price) / product.price) * 100) : 0;
+    const discount = product.discount_price ?
+      Math.round(((product.price - product.discount_price) / product.price) * 100) : 0;
 
-  // Mock sizes logic (preserved from Home for consistency, ideally should come from API)
-  // Tallas Disponibles might be a string or array in 'specifications'
-  let sizeText = 'US 7 • 8 • 9 • 10 • 11';
-  try {
-    let specs = product.specifications;
-    if (typeof specs === 'string') specs = JSON.parse(specs);
-    if (specs && specs['Tallas Disponibles']) {
-      const sizes = Array.isArray(specs['Tallas Disponibles'])
-        ? specs['Tallas Disponibles']
-        : specs['Tallas Disponibles'].split(',');
-      sizeText = sizes.slice(0, 5).join(' • ');
-    }
-  } catch (e) { }
+    // Mock sizes logic (preserved from Home for consistency, ideally should come from API)
+    // Tallas Disponibles might be a string or array in 'specifications'
+    let sizeText = 'US 7 • 8 • 9 • 10 • 11';
+    try {
+      let specs = product.specifications;
+      if (typeof specs === 'string') specs = JSON.parse(specs);
+      if (specs && specs['Tallas Disponibles']) {
+        const sizes = Array.isArray(specs['Tallas Disponibles'])
+          ? specs['Tallas Disponibles']
+          : specs['Tallas Disponibles'].split(',');
+        sizeText = sizes.slice(0, 5).join(' • ');
+      }
+    } catch (e) { }
 
 
-  return `
-      < div class="product-card" onclick = "window.location.href='product-detail.html?id=${product.id}'" >
+    return `
+      <div class="product-card" onclick="window.location.href='product-detail.html?id=${product.id}'">
         <div class="product-image-container">
           <img src="${product.image_url || 'assets/images/products/placeholder.jpg'}" 
                class="product-image"
@@ -540,10 +451,10 @@ if (accountLink && accountText) {
           <button class="product-btn" onclick="event.stopPropagation(); window.cartManager?.add('${product.id}', 1)">
             AGREGAR AL CARRITO
           </button>
-        </div >
-      </div >
+        </div>
+      </div>
       `;
-}
+  }
 }
 
 // Función de búsqueda global
@@ -561,10 +472,10 @@ function performSearch() {
     if (window.searchAutocomplete && typeof window.searchAutocomplete.executeSearch === 'function') {
       window.searchAutocomplete.executeSearch(query);
     } else {
-      window.location.href = `products.html ? search = ${encodeURIComponent(query)} `;
+      window.location.href = `products.html?search=${encodeURIComponent(query)}`;
     }
   } else {
-    window.location.href = `products.html ? search = ${encodeURIComponent(query)} `;
+    window.location.href = `products.html?search=${encodeURIComponent(query)}`;
   }
 }
 
@@ -579,14 +490,12 @@ function performSearchWithQuery(query) {
     if (window.searchAutocomplete && typeof window.searchAutocomplete.executeSearch === 'function') {
       window.searchAutocomplete.executeSearch(query);
     } else {
-      window.location.href = `products.html ? search = ${encodeURIComponent(query)} `;
+      window.location.href = `products.html?search=${encodeURIComponent(query)}`;
     }
   } else {
-    window.location.href = `products.html ? search = ${encodeURIComponent(query)} `;
+    window.location.href = `products.html?search=${encodeURIComponent(query)}`;
   }
 }
 
 // Hacer disponible globalmente
 window.Components = Components;
-
-
