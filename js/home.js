@@ -419,15 +419,6 @@ class HomeEngine {
                 </div>
             </div>
         `).join('');
-    <div class="product-info">
-      <a href="product-detail.html?id=${p.id}" class="product-title">${p.name}</a>
-      <div class="product-price">
-        ${p.original_price ? `<span class="price-original">S/ ${p.original_price.toFixed(2)}</span>` : ''}
-        <span class="price-current">S/ ${p.price.toFixed(2)}</span>
-      </div>
-    </div>
-            </div >
-      `).join('');
   }
 
   // ==========================================
@@ -435,7 +426,7 @@ class HomeEngine {
   // ==========================================
   quickAdd(id, name) {
     if (window.cart) window.cart.add(id, 1);
-    if (window.notifications) window.notifications.success('AÑADIDO', `${ name } al carrito`);
+    if (window.notifications) window.notifications.success('AÑADIDO', `${name} al carrito`);
   }
 
   setupNewsletter() {
