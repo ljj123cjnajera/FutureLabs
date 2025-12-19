@@ -56,7 +56,9 @@ body.loaded #preloader {
 }
 
 .logo-img {
-    height: 50px;
+    height: 70px;
+    /* Increased from 50px */
+    width: auto;
     object-fit: contain;
     display: block;
 }
@@ -239,17 +241,18 @@ body.loaded #preloader {
 /* ============================================
    1. HERO SECTION - FULL IMPACT
    ============================================ */
-/* ============================================
-   1. HERO SECTION - FULL IMPACT
-   ============================================ */
 .hero {
     margin-bottom: 0;
     /* Remove margin to connect with marquee */
-    padding-top: 40px;
-    /* Added spacing from header */
+    padding-top: 180px;
+    /* INCREASED from 40px to 180px to clear the header */
     position: relative;
-    height: 85vh;
-    min-height: 600px;
+    height: 90vh;
+    /* Increased height to compensate for padding */
+    min-height: 700px;
+    margin-top: -100px;
+    /* Negative margin to pull background up if needed, but safer to just PAD it */
+    margin-top: 0;
 }
 
 .hero .container {
