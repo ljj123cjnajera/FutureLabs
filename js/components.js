@@ -207,6 +207,33 @@ class Components {
             </nav>
             ` : ''}
         </div>
+
+        <!-- MOBILE MENU OVERLAY (Added for V3) -->
+        <div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="window.MobileMenu.toggle()"></div>
+        <div class="mobile-menu-sidebar" id="mobileMenu">
+            <div class="mobile-menu-header">
+                <h3>SNEAKERS SHOP</h3>
+                <button class="close-menu-btn" onclick="window.MobileMenu.toggle()">×</button>
+            </div>
+            <div class="mobile-menu-content">
+                <div class="mobile-search">
+                    <input type="text" placeholder="SEARCH...">
+                    <button>GO</button>
+                </div>
+                <ul class="mobile-nav-list">
+                    <li><a href="products.html">New Arrivals 🔥</a></li>
+                    <li><a href="products.html?category=jordan">Jordan</a></li>
+                    <li><a href="products.html?category=yeezy">Yeezy</a></li>
+                    <li><a href="products.html?category=nike">Nike</a></li>
+                    <li><a href="products.html?category=adidas">Adidas</a></li>
+                    <li><a href="products.html?filter=sale">Sale</a></li>
+                </ul>
+                <div class="mobile-auth-links">
+                    <a href="login.html">Login</a>
+                    <a href="register.html">Register</a>
+                </div>
+            </div>
+        </div>
       </header>
     `;
   }
@@ -499,3 +526,25 @@ function performSearchWithQuery(query) {
 
 // Hacer disponible globalmente
 window.Components = Components;
+
+// Mobile Menu Logic (V3)
+window.MobileMenu = {
+  toggle: function () {
+    const menu = document.getElementById('mobileMenu');
+    const overlay = document.getElementById('mobileMenuOverlay');
+
+    if (menu && overlay) {
+      menu.classList.toggle('active');
+      overlay.classList.toggle('active');
+
+      // Prevent body scroll
+      if (menu.classList.contains('active')) {
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = '';
+      }
+    } else {
+      console.error('Mobile Menu element not found');
+    }
+  }
+};
