@@ -489,17 +489,20 @@ body.loaded #preloader {
 /* ============================================
    2. BRAND MARQUEE (PREMIUM LOGO SCROLL)
    ============================================ */
-.brand-marquee-section {
+/* ============================================
+   2. BRAND MARQUEE (PREMIUM LOGO SCROLL)
+   ============================================ */
+.brand-marquee {
     background: var(--black);
     color: var(--white);
     padding: var(--spacing-lg) 0;
     overflow: hidden;
     position: relative;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 4px solid var(--black);
     margin-bottom: var(--spacing-4xl);
 }
 
-.brand-marquee-track {
+.marquee-track {
     display: flex;
     align-items: center;
     gap: 6rem;
@@ -518,22 +521,15 @@ body.loaded #preloader {
     transition: all 0.4s ease;
     cursor: default;
     user-select: none;
+    -webkit-text-stroke: 2px rgba(255, 255, 255, 0.2);
+    color: transparent;
 }
 
 .brand-item:hover {
     opacity: 1;
-    transform: scale(1.1);
-    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-}
-
-.brand-item.stroke-text {
-    color: transparent;
-    -webkit-text-stroke: 2px rgba(255, 255, 255, 0.4);
-}
-
-.brand-item.stroke-text:hover {
     color: var(--white);
     -webkit-text-stroke: 0;
+    transform: scale(1.05);
 }
 
 @keyframes marquee-brands {
@@ -547,8 +543,104 @@ body.loaded #preloader {
 }
 
 /* ============================================
-   3. HORIZONTAL SCROLL SLIDERS
+   3. JOURNAL SECTION (BLOG PREVIEW)
    ============================================ */
+.journal-section {
+    padding: var(--spacing-4xl) 0;
+    background: var(--white);
+    border-top: 4px solid var(--black);
+}
+
+.journal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.journal-card {
+    border: 3px solid var(--black);
+    background: var(--white);
+    transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.journal-card:hover {
+    transform: translate(-6px, -6px);
+    box-shadow: 12px 12px 0 var(--black);
+}
+
+.journal-image {
+    height: 240px;
+    position: relative;
+    border-bottom: 3px solid var(--black);
+    overflow: hidden;
+}
+
+.journal-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s;
+}
+
+.journal-card:hover .journal-image img {
+    transform: scale(1.1);
+}
+
+.journal-content {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.journal-tag {
+    font-weight: 800;
+    font-size: 0.8rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+}
+
+.journal-content h3 {
+    font-size: 1.5rem;
+    font-weight: 900;
+    margin: 0 0 12px;
+    line-height: 1.1;
+    text-transform: uppercase;
+}
+
+.journal-content p {
+    font-size: 1rem;
+    color: var(--gray-600);
+    margin: 0 0 20px;
+    line-height: 1.5;
+}
+
+.read-more {
+    margin-top: auto;
+    font-weight: 800;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--black);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.read-more::after {
+    content: '→';
+    font-size: 1.2rem;
+    transition: transform 0.2s;
+}
+
+.read-more:hover::after {
+    transform: translateX(4px);
+}
+
 .fluid-container {
     max-width: 100% !important;
     padding: 0 0 0 var(--spacing-xl) !important;
