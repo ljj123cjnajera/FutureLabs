@@ -86,48 +86,54 @@ class Components {
 
     const navBar = showNav ? `
           <nav class="nav-bar">
-            <a href="products.html" class="all-categories"><i class="fas fa-bars"></i> Ver Todo</a>
-            <a href="products.html?filter=new-arrivals"><i class="fas fa-fire"></i> New Arrivals</a>
-            <a href="products.html?category=jordan"><i class="fas fa-basketball-ball"></i> Jordan</a>
-            <a href="products.html?category=yeezy"><i class="fas fa-wind"></i> Yeezy</a>
-            <a href="products.html?category=nike"><i class="fas fa-check"></i> Nike</a>
-            <a href="products.html?category=adidas"><i class="fas fa-bars"></i> Adidas</a>
-            <a href="products.html?filter=sale"><i class="fas fa-tag"></i> Sale</a>
+            <div class="container nav-container">
+                <a href="products.html" class="all-categories"><i class="fas fa-bars"></i> VIEW ALL</a>
+                <a href="products.html?filter=new-arrivals"><i class="fas fa-fire"></i> NEW ARRIVALS</a>
+                <a href="products.html?category=jordan"><i class="fas fa-basketball-ball"></i> JORDAN</a>
+                <a href="products.html?category=yeezy"><i class="fas fa-wind"></i> YEEZY</a>
+                <a href="products.html?category=nike"><i class="fas fa-check"></i> NIKE</a>
+                <a href="products.html?category=adidas"><i class="fas fa-bars"></i> ADIDAS</a>
+                <a href="products.html?filter=sale"><i class="fas fa-tag"></i> SALE</a>
+            </div>
           </nav>
     ` : '';
 
     return `
-      <!-- Header (Brutalist) -->
+      <!-- Header (Brutalist V3) -->
       <header class="header">
-        <div class="container">
-          <div class="top-bar ${!showSearch && !showNav ? 'header-simple' : ''}">
-            <!-- Logo Image Restored -->
-            <div class="logo" onclick="window.location.href='index.html'" style="cursor: pointer;">
-              <img src="assets/images/logo-clean.png" alt="SneakersShop" style="height: 60px; max-width: 200px; object-fit: contain;">
+        <div class="top-bar-wrapper">
+            <div class="container top-bar-container">
+                <!-- Logo -->
+                <div class="logo">
+                    <a href="index.html">
+                        <img src="assets/images/logo-clean.png" alt="Sneakers Shop" class="logo-img">
+                    </a>
+                </div>
+                
+                ${searchBar}
+                
+                <div class="user-actions">
+                    <a href="#" class="account-link" id="accountLink">
+                        <i class="fas fa-user"></i> <span class="hide-mobile">ACCOUNT</span>
+                    </a>
+                    <a href="compare.html" class="icon-link" id="comparatorLink">
+                        <i class="fas fa-balance-scale"></i>
+                        <span class="badge-count" id="comparator-count" style="display: none;">0</span>
+                    </a>
+                    <a href="cart.html" class="icon-link">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="badge-count cart-count">0</span>
+                    </a>
+                </div>
             </div>
-            
-            ${searchBar}
-            
-            <div class="user-actions">
-              <a href="#" class="account-link" id="accountLink"><i class="fas fa-user"></i> <span id="accountText">ACCOUNT</span></a>
-              <a href="compare.html" class="cart-icon" id="comparatorLink" style="position: relative;">
-                <i class="fas fa-balance-scale"></i>
-                <span class="cart-count" id="comparator-count" style="display: none;">0</span>
-              </a>
-              <a href="#" class="cart-icon" onclick="window.location.href='cart.html'">
-                <i class="fas fa-shopping-cart"></i>
-                <span class="cart-count">0</span>
-              </a>
-            </div>
-          </div>
-          ${navBar}
         </div>
+        ${navBar}
       </header>
     `;
   }
 
   static initHeader() {
-    console.log('🔵 [COMPONENTS] initHeader() ejecutado');
+    console.log('🔵 [COMPONENTS] initHeader() executed');
     this.ensureWishlistAssets();
     this.ensureVerificationAssets();
 

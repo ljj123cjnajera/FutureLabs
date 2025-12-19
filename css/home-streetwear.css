@@ -36,95 +36,177 @@ body.loaded #preloader {
    ============================================ */
 .header {
     background: var(--white);
-    border-bottom: 3px solid var(--black);
-    box-shadow: none !important;
-    margin-top: 0 !important;
-    padding-top: 0 !important;
+    border-bottom: 4px solid var(--black);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
-.top-bar {
-    padding: 0.5rem 0;
-    /* Reduced from 1.5rem */
-    background: var(--black);
-    /* Ensure it is black if missing */
-    color: var(--white);
-    margin-bottom: 0 !important;
+.top-bar-wrapper {
+    background: var(--white);
+    padding: 1rem 0;
+    border-bottom: 2px solid var(--black);
+}
+
+.top-bar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+}
+
+.logo-img {
+    height: 50px;
+    object-fit: contain;
+    display: block;
 }
 
 /* Search Bar */
+.search-bar {
+    flex: 1;
+    max-width: 600px;
+    display: flex;
+    position: relative;
+}
+
 .search-bar input {
-    border: 2px solid var(--black);
-    border-radius: 0 !important;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 600;
+    width: 100%;
+    padding: 12px 16px;
+    border: 3px solid var(--black);
+    border-right: none;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
     text-transform: uppercase;
-    background: var(--gray-100);
+    border-radius: 0;
+    background: var(--white);
     color: var(--black);
 }
 
 .search-bar input:focus {
-    background: var(--white);
-    box-shadow: 4px 4px 0 var(--black);
+    outline: none;
+    background: var(--gray-50);
 }
 
 .search-btn {
-    border-radius: 0 !important;
+    padding: 0 24px;
     background: var(--black);
     color: var(--white);
-    border: 2px solid var(--black);
+    border: 3px solid var(--black);
+    cursor: pointer;
     transition: all 0.2s;
+    border-radius: 0;
 }
 
 .search-btn:hover {
-    background: var(--white);
+    background: var(--accent);
     color: var(--black);
 }
 
 /* User Actions */
-.user-actions a {
-    border-radius: 0 !important;
-    border: 2px solid transparent;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: var(--black);
+.user-actions {
+    display: flex;
+    gap: 12px;
 }
 
-.user-actions a:hover {
-    border: 2px solid var(--black) !important;
-    background: var(--white) !important;
-    box-shadow: 4px 4px 0 var(--black) !important;
+.account-link,
+.icon-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: 3px solid var(--black);
+    color: var(--black);
+    font-weight: 800;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.2s;
+    background: var(--white);
+    font-size: 0.9rem;
+}
+
+.account-link:hover,
+.icon-link:hover {
+    background: var(--black);
+    color: var(--white);
+    box-shadow: 4px 4px 0 var(--accent);
     transform: translate(-2px, -2px);
 }
 
-.cart-count {
-    background: var(--accent);
-    color: var(--black);
-    border: 2px solid var(--black);
-    border-radius: 0 !important;
-    font-weight: 900;
+.badge-count {
+    background: var(--error);
+    color: var(--white);
+    font-size: 0.75rem;
+    padding: 2px 6px;
+    border: 1px solid var(--black);
+    border-radius: 0;
+    min-width: 20px;
+    text-align: center;
 }
 
 /* Nav Bar */
 .nav-bar {
-    border-top: 2px solid var(--black);
-    padding: 0;
     background: var(--black);
+    padding: 0;
+}
+
+.nav-container {
+    display: flex;
+    justify-content: center;
+    gap: 0;
 }
 
 .nav-bar a {
-    color: var(--white) !important;
+    color: var(--white);
     font-family: 'Poppins', sans-serif;
     font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    padding: 1rem 1.5rem;
+    padding: 14px 24px;
+    text-decoration: none;
     border-right: 1px solid rgba(255, 255, 255, 0.2);
     transition: all 0.2s;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+}
+
+.nav-bar a:first-child {
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .nav-bar a:hover {
     background: var(--white);
-    color: var(--black) !important;
+    color: var(--black);
+}
+
+.nav-bar a i {
+    margin-right: 6px;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .hide-mobile {
+        display: none;
+    }
+
+    .nav-container {
+        overflow-x: auto;
+        justify-content: flex-start;
+    }
+
+    .logo-img {
+        height: 40px;
+    }
+
+    .top-bar-container {
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .search-bar {
+        order: 3;
+        min-width: 100%;
+        margin-top: 10px;
+    }
 }
 
 .section {
