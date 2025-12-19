@@ -76,314 +76,417 @@ class Components {
   }
 
   static getHeader(showSearch = true, showNav = true) {
-    const searchBar = showSearch ? `
-            <div class="search-bar">
-              <input type="text" placeholder="SEARCH SNEAKERS SHOP..." id="searchInput">
-              <button class="search-btn" onclick="performSearch()"><i class="fas fa-search"></i></button>
-              <div id="searchSuggestions" class="search-suggestions" style="display: none;"></div>
+    // 1. ANNOUNCEMENT BAR TICKER
+    const announcementBar = `
+        <div class="announcement-bar">
+            <div class="announcement-content" id="announcementText">
+                FREE SHIPPING ON ORDERS OVER $150 ✈️
             </div>
-    ` : '';
+        </div>
+    `;
 
-    const navBar = showNav ? `
-          <nav class="nav-bar">
-            <div class="container nav-container">
-                <a href="products.html" class="all-categories"><i class="fas fa-bars"></i> VIEW ALL</a>
-                <a href="products.html?filter=new-arrivals"><i class="fas fa-fire"></i> NEW ARRIVALS</a>
-                <a href="products.html?category=jordan"><i class="fas fa-basketball-ball"></i> JORDAN</a>
-                <a href="products.html?category=yeezy"><i class="fas fa-wind"></i> YEEZY</a>
-                <a href="products.html?category=nike"><i class="fas fa-check"></i> NIKE</a>
-                <a href="products.html?category=adidas"><i class="fas fa-bars"></i> ADIDAS</a>
-                <a href="products.html?filter=sale"><i class="fas fa-tag"></i> SALE</a>
-            </div>
-          </nav>
-    ` : '';
-
-    return `
-      <!-- Header (Brutalist V3) -->
-      <header class="header">
-        <div class="top-bar-wrapper">
-            <div class="container top-bar-container">
-                <!-- Logo -->
-                <div class="logo">
-                    <a href="index.html">
-                        <img src="assets/images/logo-clean.png" alt="Sneakers Shop" class="logo-img">
-                    </a>
+    // 2. MEGA MENU DATA (Ideally this comes from a config, simplistic here for MVP)
+    const megaMenuHTML = `
+        <div class="mega-menu-dropdown">
+            <div class="mega-menu-container">
+                <div class="mega-column">
+                    <h4>Collections</h4>
+                    <ul>
+                        <li><a href="products.html?filter=new-arrivals">New Arrivals 🔥</a></li>
+                        <li><a href="products.html?filter=best-sellers">Best Sellers</a></li>
+                        <li><a href="products.html?collection=limited">Limited Editions</a></li>
+                        <li><a href="products.html?collection=essentials">Essentials</a></li>
+                    </ul>
                 </div>
-                
-                ${searchBar}
-                
-                <div class="user-actions">
-                    <a href="#" class="account-link" id="accountLink">
-                        <i class="fas fa-user"></i> <span class="hide-mobile">ACCOUNT</span>
-                    </a>
-                    <a href="compare.html" class="icon-link" id="comparatorLink">
-                        <i class="fas fa-balance-scale"></i>
-                        <span class="badge-count" id="comparator-count" style="display: none;">0</span>
-                    </a>
-                    <a href="cart.html" class="icon-link">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span class="badge-count cart-count">0</span>
-                    </a>
+                <div class="mega-column">
+                    <h4>Brands</h4>
+                    <ul>
+                        <li><a href="products.html?category=jordan">Air Jordan</a></li>
+                        <li><a href="products.html?category=yeezy">Yeezy</a></li>
+                        <li><a href="products.html?category=nike">Nike</a></li>
+                        <li><a href="products.html?category=adidas">Adidas</a></li>
+                    </ul>
+                </div>
+                <div class="mega-column">
+                    <h4>Categories</h4>
+                    <ul>
+                        <li><a href="products.html?type=high-top">High Tops</a></li>
+                        <li><a href="products.html?type=low-top">Low Tops</a></li>
+                        <li><a href="products.html?type=running">Running</a></li>
+                        <li><a href="products.html?type=slides">Slides</a></li>
+                    </ul>
+                </div>
+                <div class="mega-column">
+                    <div class="mega-promo">
+                        <img src="https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&q=80&w=600" alt="Promo">
+                        <div class="promo-content">
+                            <h5>JUST DROPPED</h5>
+                            <a href="products.html?filter=new" class="promo-btn">SHOP NOW</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        ${navBar}
+    `;
+
+    return `
+      <header class="header-v3-wrapper">
+        ${announcementBar}
+        
+        <div class="header-v3">
+            <!-- MAIN ROW -->
+            <div class="header-main-row">
+                <div class="header-mobile-toggle" onclick="window.MobileMenu.toggle()">
+                    <i class="fas fa-bars"></i>
+                </div>
+
+                <div class="header-logo">
+                    <a href="index.html">
+                        <img src="assets/images/logo-clean.png" alt="Sneakers Shop">
+                    </a>
+                </div>
+
+                ${showSearch ? `
+                <div class="header-search">
+                    <div class="search-input-wrapper">
+                        <input type="text" placeholder="SEARCH FOR DROPS..." id="searchInput">
+                        <button class="search-icon-btn" onclick="performSearch()">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    <div id="searchSuggestions" class="search-suggestions" style="display: none;"></div>
+                </div>
+                ` : ''}
+
+                <div class="header-actions">
+                    <a href="#" class="action-btn" id="accountLink">
+                        <i class="far fa-user"></i>
+                        <span>Account</span>
+                    </a>
+                    <a href="wishlist.html" class="action-btn">
+                        <i class="far fa-heart"></i>
+                        <span>Saved</span>
+                    </a>
+                    <a href="cart.html" class="action-btn">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span>Cart</span>
+                        <span class="action-badge cart-count">0</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- NAV ROW (DESKTOP) -->
+            ${showNav ? `
+            <nav class="header-nav" id="desktopNav">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="products.html" class="nav-link">NEW ARRIVALS</a>
+                        <!-- Mega Menu Injection -->
+                        ${megaMenuHTML}
+                    </li>
+                    <li class="nav-item">
+                        <a href="products.html?category=jordan" class="nav-link">JORDAN</a>
+                        ${megaMenuHTML}
+                    </li>
+                    <li class="nav-item">
+                        <a href="products.html?category=yeezy" class="nav-link">YEEZY</a>
+                        ${megaMenuHTML}
+                    </li>
+                    <li class="nav-item">
+                        <a href="products.html?category=nike" class="nav-link">NIKE</a>
+                        ${megaMenuHTML}
+                    </li>
+                    <li class="nav-item">
+                        <a href="products.html?category=adidas" class="nav-link">ADIDAS</a>
+                        ${megaMenuHTML}
+                    </li>
+                    <li class="nav-item">
+                        <a href="products.html?filter=sale" class="nav-link" style="color: var(--accent);">SALE</a>
+                    </li>
+                </ul>
+            </nav>
+            ` : ''}
+        </div>
       </header>
     `;
   }
 
   static initHeader() {
     console.log('🔵 [COMPONENTS] initHeader() executed');
+
+    // Ticker Animation Logic
+    const messages = [
+      "FREE SHIPPING ON ORDERS OVER $150 ✈️",
+      "NEW JORDAN DROP THIS FRIDAY 🔥",
+      "JOIN THE CLUB & GET 10% OFF 👟"
+    ];
+    let msgIndex = 0;
+    const ticker = document.getElementById('announcementText');
+    if (ticker) {
+      setInterval(() => {
+        msgIndex = (msgIndex + 1) % messages.length;
+        ticker.style.opacity = 0;
+        setTimeout(() => {
+          ticker.innerText = messages[msgIndex];
+          ticker.style.opacity = 1;
+        }, 500);
+      }, 4000);
+    }
+
     this.ensureWishlistAssets();
     this.ensureVerificationAssets();
-
-    // FORZAR VISIBILIDAD DE TODOS LOS BOTONES DEL HEADER
-    // Style enforcement delegated to CSS (home-streetwear.css)
-    console.log('🔵 [COMPONENTS] Header initialized (V3 Clean Mode)');
-
-    // Manejar botón de cuenta
-    const accountLink = document.getElementById('accountLink');
-    const accountText = document.getElementById('accountText');
-
-    if (accountLink && accountText) {
-      // Función para habilitar el botón
-      const enableButton = () => {
-        accountLink.style.pointerEvents = 'auto';
-        accountLink.style.opacity = '1';
-      };
-
-      // Función para deshabilitar el botón
-      const disableButton = () => {
-        accountLink.style.pointerEvents = 'none';
-        accountLink.style.opacity = '0.5';
-      };
-
-      // Deshabilitar el botón mientras está inicializando
-      disableButton();
-
-      // Verificar periódicamente si la inicialización se completó
-      const checkInitialization = setInterval(() => {
-        if (window.authManager && !window.authManager.isInitializing) {
-          clearInterval(checkInitialization);
-          enableButton();
-          console.log('✅ Botón "Cuenta" habilitado');
-        }
-      }, 100);
-
-      accountLink.addEventListener('click', function (e) {
-        e.preventDefault();
-
-        // Verificar si está inicializando
-        if (window.authManager && window.authManager.isInitializing) {
-          console.log('⏳ AuthManager está inicializando, esperando...');
-          return;
-        }
-
-        if (window.authManager && window.authManager.isAuthenticated()) {
-          window.location.href = 'profile.html';
-        } else {
-          if (window.modalManager) {
-            window.modalManager.showLogin();
-          }
-        }
-      });
-
-      // Actualizar texto del botón si está autenticado
-      if (window.authManager && window.authManager.isAuthenticated()) {
-        accountText.textContent = 'Mi Cuenta';
-      }
-
-      // Escuchar cambios en el estado de autenticación
-      document.addEventListener('authStateChanged', async () => {
-        if (window.authManager && window.authManager.isAuthenticated()) {
-          accountText.textContent = 'Mi Cuenta';
-
-          // Verificar si es admin y mostrar botón de admin
-          try {
-            const user = await window.authManager.getCurrentUser();
-            if (user && (user.role === 'admin' || user.role === 'moderator')) {
-              this.showAdminButton();
-            } else {
-              this.hideAdminButton();
-            }
-          } catch (error) {
-            console.error('Error checking user role:', error);
-          }
-        } else {
-          accountText.textContent = 'Cuenta';
-          this.hideAdminButton();
-        }
-      });
-
-      // Verificar si ya hay usuario admin al inicializar
-      setTimeout(async () => {
-        await this.checkAndShowAdminButton();
-      }, 500);
-    }
+    this.updateCartCount();
   }
+    this.ensureWishlistAssets();
+this.ensureVerificationAssets();
 
-  static async showAdminButton() {
-    // Verificar si el botón ya existe
-    if (document.getElementById('adminButton')) {
+// FORZAR VISIBILIDAD DE TODOS LOS BOTONES DEL HEADER
+// Style enforcement delegated to CSS (home-streetwear.css)
+console.log('🔵 [COMPONENTS] Header initialized (V3 Clean Mode)');
+
+// Manejar botón de cuenta
+const accountLink = document.getElementById('accountLink');
+const accountText = document.getElementById('accountText');
+
+if (accountLink && accountText) {
+  // Función para habilitar el botón
+  const enableButton = () => {
+    accountLink.style.pointerEvents = 'auto';
+    accountLink.style.opacity = '1';
+  };
+
+  // Función para deshabilitar el botón
+  const disableButton = () => {
+    accountLink.style.pointerEvents = 'none';
+    accountLink.style.opacity = '0.5';
+  };
+
+  // Deshabilitar el botón mientras está inicializando
+  disableButton();
+
+  // Verificar periódicamente si la inicialización se completó
+  const checkInitialization = setInterval(() => {
+    if (window.authManager && !window.authManager.isInitializing) {
+      clearInterval(checkInitialization);
+      enableButton();
+      console.log('✅ Botón "Cuenta" habilitado');
+    }
+  }, 100);
+
+  accountLink.addEventListener('click', function (e) {
+    e.preventDefault();
+
+    // Verificar si está inicializando
+    if (window.authManager && window.authManager.isInitializing) {
+      console.log('⏳ AuthManager está inicializando, esperando...');
       return;
     }
 
-    const userActions = document.querySelector('.user-actions');
-    if (!userActions) return;
-
-    // Crear botón de admin
-    const adminButton = document.createElement('a');
-    adminButton.href = 'admin.html';
-    adminButton.className = 'admin-link';
-    adminButton.id = 'adminButton';
-    adminButton.innerHTML = '<i class="fas fa-cog"></i> Admin';
-    adminButton.style.cssText = 'color: #667eea; font-weight: 600;';
-
-    // Insertar antes del botón de cuenta
-    const accountLink = document.getElementById('accountLink');
-    if (accountLink && accountLink.parentNode) {
-      userActions.insertBefore(adminButton, accountLink);
+    if (window.authManager && window.authManager.isAuthenticated()) {
+      window.location.href = 'profile.html';
+    } else {
+      if (window.modalManager) {
+        window.modalManager.showLogin();
+      }
     }
+  });
+
+  // Actualizar texto del botón si está autenticado
+  if (window.authManager && window.authManager.isAuthenticated()) {
+    accountText.textContent = 'Mi Cuenta';
   }
 
-  static hideAdminButton() {
-    const adminButton = document.getElementById('adminButton');
-    if (adminButton) {
-      adminButton.remove();
-    }
-  }
+  // Escuchar cambios en el estado de autenticación
+  document.addEventListener('authStateChanged', async () => {
+    if (window.authManager && window.authManager.isAuthenticated()) {
+      accountText.textContent = 'Mi Cuenta';
 
-  static async checkAndShowAdminButton() {
-    try {
-      if (window.authManager && window.authManager.isAuthenticated()) {
+      // Verificar si es admin y mostrar botón de admin
+      try {
         const user = await window.authManager.getCurrentUser();
         if (user && (user.role === 'admin' || user.role === 'moderator')) {
           this.showAdminButton();
+        } else {
+          this.hideAdminButton();
         }
+      } catch (error) {
+        console.error('Error checking user role:', error);
       }
-    } catch (error) {
-      console.error('Error checking admin status:', error);
+    } else {
+      accountText.textContent = 'Cuenta';
+      this.hideAdminButton();
     }
+  });
+
+  // Verificar si ya hay usuario admin al inicializar
+  setTimeout(async () => {
+    await this.checkAndShowAdminButton();
+  }, 500);
+}
   }
+
+  static async showAdminButton() {
+  // Verificar si el botón ya existe
+  if (document.getElementById('adminButton')) {
+    return;
+  }
+
+  const userActions = document.querySelector('.user-actions');
+  if (!userActions) return;
+
+  // Crear botón de admin
+  const adminButton = document.createElement('a');
+  adminButton.href = 'admin.html';
+  adminButton.className = 'admin-link';
+  adminButton.id = 'adminButton';
+  adminButton.innerHTML = '<i class="fas fa-cog"></i> Admin';
+  adminButton.style.cssText = 'color: #667eea; font-weight: 600;';
+
+  // Insertar antes del botón de cuenta
+  const accountLink = document.getElementById('accountLink');
+  if (accountLink && accountLink.parentNode) {
+    userActions.insertBefore(adminButton, accountLink);
+  }
+}
+
+  static hideAdminButton() {
+  const adminButton = document.getElementById('adminButton');
+  if (adminButton) {
+    adminButton.remove();
+  }
+}
+
+  static async checkAndShowAdminButton() {
+  try {
+    if (window.authManager && window.authManager.isAuthenticated()) {
+      const user = await window.authManager.getCurrentUser();
+      if (user && (user.role === 'admin' || user.role === 'moderator')) {
+        this.showAdminButton();
+      }
+    }
+  } catch (error) {
+    console.error('Error checking admin status:', error);
+  }
+}
 
   static initSearch() {
-    this.ensureAutocompleteAssets();
-  }
+  this.ensureAutocompleteAssets();
+}
 
   static ensureWishlistAssets() {
-    if (typeof document === 'undefined') return;
+  if (typeof document === 'undefined') return;
 
-    const syncIfReady = () => {
-      if (window.wishlistManager && typeof window.wishlistManager.syncToggleButtons === 'function') {
-        window.wishlistManager.syncToggleButtons(document);
-      }
-    };
-
-    if (window.wishlistManager) {
-      syncIfReady();
-      return;
+  const syncIfReady = () => {
+    if (window.wishlistManager && typeof window.wishlistManager.syncToggleButtons === 'function') {
+      window.wishlistManager.syncToggleButtons(document);
     }
+  };
 
-    if (document.querySelector('script[data-wishlist-script]')) {
-      document.querySelector('script[data-wishlist-script]').addEventListener('load', () => syncIfReady(), { once: true });
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.src = 'js/wishlist.js';
-    script.defer = true;
-    script.setAttribute('data-wishlist-script', 'true');
-    script.onload = () => syncIfReady();
-    document.body.appendChild(script);
+  if (window.wishlistManager) {
+    syncIfReady();
+    return;
   }
+
+  if (document.querySelector('script[data-wishlist-script]')) {
+    document.querySelector('script[data-wishlist-script]').addEventListener('load', () => syncIfReady(), { once: true });
+    return;
+  }
+
+  const script = document.createElement('script');
+  script.src = 'js/wishlist.js';
+  script.defer = true;
+  script.setAttribute('data-wishlist-script', 'true');
+  script.onload = () => syncIfReady();
+  document.body.appendChild(script);
+}
 
   static ensureVerificationAssets() {
-    if (typeof document === 'undefined') return;
+  if (typeof document === 'undefined') return;
 
-    if (window.verificationManager) {
-      return;
-    }
-
-    if (document.querySelector('script[data-verification-script]')) {
-      document
-        .querySelector('script[data-verification-script]')
-        .addEventListener('load', () => {
-          console.log('🔵 [COMPONENTS] verification assets loaded (existing)');
-        }, { once: true });
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.src = 'js/verification.js';
-    script.defer = true;
-    script.setAttribute('data-verification-script', 'true');
-    document.body.appendChild(script);
+  if (window.verificationManager) {
+    return;
   }
+
+  if (document.querySelector('script[data-verification-script]')) {
+    document
+      .querySelector('script[data-verification-script]')
+      .addEventListener('load', () => {
+        console.log('🔵 [COMPONENTS] verification assets loaded (existing)');
+      }, { once: true });
+    return;
+  }
+
+  const script = document.createElement('script');
+  script.src = 'js/verification.js';
+  script.defer = true;
+  script.setAttribute('data-verification-script', 'true');
+  document.body.appendChild(script);
+}
 
   static ensureAutocompleteAssets() {
-    if (typeof document === 'undefined') return;
+  if (typeof document === 'undefined') return;
 
-    if (!document.querySelector('link[data-autocomplete-style]')) {
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = 'css/autocomplete.css?v=1.0';
-      link.setAttribute('data-autocomplete-style', 'true');
-      document.head.appendChild(link);
-    }
-
-    const initialize = () => {
-      if (window.searchAutocomplete && typeof window.searchAutocomplete.init === 'function') {
-        window.searchAutocomplete.init();
-      } else if (typeof window.initializeAutocomplete === 'function') {
-        window.initializeAutocomplete();
-      }
-    };
-
-    if (window.searchAutocomplete || typeof window.initializeAutocomplete === 'function') {
-      initialize();
-      return;
-    }
-
-    if (!document.querySelector('script[data-autocomplete-script]')) {
-      const script = document.createElement('script');
-      script.src = 'js/autocomplete.js';
-      script.defer = true;
-      script.setAttribute('data-autocomplete-script', 'true');
-      script.onload = () => initialize();
-      document.body.appendChild(script);
-    }
+  if (!document.querySelector('link[data-autocomplete-style]')) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'css/autocomplete.css?v=1.0';
+    link.setAttribute('data-autocomplete-style', 'true');
+    document.head.appendChild(link);
   }
+
+  const initialize = () => {
+    if (window.searchAutocomplete && typeof window.searchAutocomplete.init === 'function') {
+      window.searchAutocomplete.init();
+    } else if (typeof window.initializeAutocomplete === 'function') {
+      window.initializeAutocomplete();
+    }
+  };
+
+  if (window.searchAutocomplete || typeof window.initializeAutocomplete === 'function') {
+    initialize();
+    return;
+  }
+
+  if (!document.querySelector('script[data-autocomplete-script]')) {
+    const script = document.createElement('script');
+    script.src = 'js/autocomplete.js';
+    script.defer = true;
+    script.setAttribute('data-autocomplete-script', 'true');
+    script.onload = () => initialize();
+    document.body.appendChild(script);
+  }
+}
 
   static initCartCounter() {
-    // Actualizar contador de carrito
-    document.addEventListener('cartUpdated', (e) => {
-      const cartCount = document.querySelector('.cart-count');
-      if (cartCount) {
-        cartCount.textContent = e.detail.count;
-      }
-    });
-  }
+  // Actualizar contador de carrito
+  document.addEventListener('cartUpdated', (e) => {
+    const cartCount = document.querySelector('.cart-count');
+    if (cartCount) {
+      cartCount.textContent = e.detail.count;
+    }
+  });
+}
 
   static getProductCard(product) {
-    const discount = product.discount_price ?
-      Math.round(((product.price - product.discount_price) / product.price) * 100) : 0;
+  const discount = product.discount_price ?
+    Math.round(((product.price - product.discount_price) / product.price) * 100) : 0;
 
-    // Mock sizes logic (preserved from Home for consistency, ideally should come from API)
-    // Tallas Disponibles might be a string or array in 'specifications'
-    let sizeText = 'US 7 • 8 • 9 • 10 • 11';
-    try {
-      let specs = product.specifications;
-      if (typeof specs === 'string') specs = JSON.parse(specs);
-      if (specs && specs['Tallas Disponibles']) {
-        const sizes = Array.isArray(specs['Tallas Disponibles'])
-          ? specs['Tallas Disponibles']
-          : specs['Tallas Disponibles'].split(',');
-        sizeText = sizes.slice(0, 5).join(' • ');
-      }
-    } catch (e) { }
+  // Mock sizes logic (preserved from Home for consistency, ideally should come from API)
+  // Tallas Disponibles might be a string or array in 'specifications'
+  let sizeText = 'US 7 • 8 • 9 • 10 • 11';
+  try {
+    let specs = product.specifications;
+    if (typeof specs === 'string') specs = JSON.parse(specs);
+    if (specs && specs['Tallas Disponibles']) {
+      const sizes = Array.isArray(specs['Tallas Disponibles'])
+        ? specs['Tallas Disponibles']
+        : specs['Tallas Disponibles'].split(',');
+      sizeText = sizes.slice(0, 5).join(' • ');
+    }
+  } catch (e) { }
 
 
-    return `
+  return `
       < div class="product-card" onclick = "window.location.href='product-detail.html?id=${product.id}'" >
         <div class="product-image-container">
           <img src="${product.image_url || 'assets/images/products/placeholder.jpg'}" 
@@ -433,7 +536,7 @@ class Components {
         </div >
       </div >
       `;
-  }
+}
 }
 
 // Función de búsqueda global

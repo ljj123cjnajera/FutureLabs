@@ -1,0 +1,391 @@
+/* ==========================================================================
+   HEADER V3 - PREMIUM FLAGSHIP SYSTEM
+   CodeName: "The Monolith"
+   Style: Brutalist Premium (High Contrast, Sharp Edges, Micro-Interactions)
+   ========================================================================== */
+
+/* 1. ANNOUNCEMENT BAR (TOP TICKER) */
+.announcement-bar {
+    background: var(--black);
+    color: var(--white);
+    padding: 10px 0;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-align: center;
+    position: relative;
+    z-index: 1002;
+    overflow: hidden;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.announcement-content {
+    animation: fadeSlide 4s infinite;
+}
+
+@keyframes fadeSlide {
+
+    0%,
+    20% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    25%,
+    75% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    80%,
+    100% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}
+
+/* 2. MAIN HEADER STRUCTURE */
+.header-v3 {
+    background: var(--white);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 4px solid var(--black);
+    transition: transform 0.3s ease;
+}
+
+.header-main-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background: var(--white);
+    position: relative;
+    z-index: 1001;
+}
+
+/* LOGO */
+.header-logo img {
+    height: 60px;
+    width: auto;
+    display: block;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.header-logo:hover img {
+    transform: scale(1.05) rotate(-2deg);
+}
+
+/* SEARCH BAR (EXPANDING) */
+.header-search {
+    flex: 1;
+    max-width: 600px;
+    margin: 0 4rem;
+    position: relative;
+}
+
+.search-input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.header-search input {
+    width: 100%;
+    height: 50px;
+    background: var(--gray-100);
+    border: 3px solid transparent;
+    border-bottom: 3px solid var(--black);
+    padding: 0 20px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    border-radius: 0;
+}
+
+.header-search input:focus {
+    background: var(--white);
+    border: 3px solid var(--black);
+    box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.1);
+    outline: none;
+}
+
+.search-icon-btn {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 50px;
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.header-search input:focus+.search-icon-btn {
+    transform: rotate(90deg);
+}
+
+/* USER ACTIONS */
+.header-actions {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.action-btn {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: var(--black);
+    font-weight: 800;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    gap: 4px;
+    padding: 8px;
+    transition: all 0.2s;
+}
+
+.action-btn i {
+    font-size: 1.4rem;
+    transition: transform 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.action-btn:hover i {
+    transform: translateY(-4px);
+    color: var(--accent);
+}
+
+.action-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: var(--error);
+    color: var(--white);
+    font-size: 0.7rem;
+    height: 20px;
+    min-width: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--white);
+    border-radius: 50%;
+    font-weight: 900;
+}
+
+/* 3. NAVIGATION & MEGA MENU */
+.header-nav {
+    background: var(--black);
+    position: relative;
+    /* Context for mega menu absolute positioning */
+}
+
+.nav-list {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-item {
+    position: static;
+    /* Allows mega menu to be full width relative to header-nav or header-v3 */
+}
+
+.nav-link {
+    display: block;
+    color: var(--white);
+    padding: 1rem 2rem;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
+    font-size: 0.95rem;
+    position: relative;
+    overflow: hidden;
+    transition: color 0.3s;
+}
+
+/* Hover Effect: Sliding Underline */
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--accent);
+    transform: translateX(-101%);
+    transition: transform 0.3s cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+.nav-item:hover .nav-link::after {
+    transform: translateX(0);
+}
+
+.nav-item:hover .nav-link {
+    color: var(--accent);
+}
+
+/* MEGA MENU DROPDOWN */
+.mega-menu-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: var(--white);
+    border-bottom: 4px solid var(--black);
+    padding: 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-20px);
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    z-index: 999;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+    display: flex;
+}
+
+.nav-item:hover .mega-menu-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.mega-menu-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 300px;
+    gap: 2rem;
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: 3rem 2rem;
+    width: 100%;
+}
+
+.mega-column h4 {
+    font-size: 1.2rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    border-bottom: 3px solid var(--accent);
+    padding-bottom: 10px;
+    display: inline-block;
+}
+
+.mega-column ul {
+    list-style: none;
+    padding: 0;
+}
+
+.mega-column li {
+    margin-bottom: 10px;
+}
+
+.mega-column a {
+    text-decoration: none;
+    color: var(--gray-600);
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mega-column a:hover {
+    color: var(--black);
+    transform: translateX(5px);
+}
+
+.mega-column a:hover::before {
+    content: '→';
+    color: var(--accent);
+    font-weight: 900;
+}
+
+/* PROMO CARD IN MEGA MENU */
+.mega-promo {
+    position: relative;
+    height: 100%;
+    min-height: 250px;
+    background: #000;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+}
+
+.mega-promo img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.7;
+    transition: transform 0.5s;
+}
+
+.mega-promo:hover img {
+    transform: scale(1.1);
+    opacity: 0.5;
+}
+
+.promo-content {
+    position: relative;
+    z-index: 2;
+    padding: 1.5rem;
+    color: var(--white);
+}
+
+.promo-content h5 {
+    font-size: 1.5rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin: 0 0 10px;
+    line-height: 1;
+}
+
+.promo-btn {
+    font-size: 0.8rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    text-decoration: underline;
+    color: var(--accent);
+}
+
+/* MOBILE HEADER (HIDDEN BY DEFAULT) */
+.header-mobile-toggle {
+    display: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+@media (max-width: 1024px) {
+    .header-nav {
+        display: none;
+    }
+
+    /* Hide desktop nav */
+    .header-search {
+        display: none;
+    }
+
+    /* Simplify search on mobile */
+    .header-mobile-toggle {
+        display: block;
+    }
+
+    .header-main-row {
+        padding: 1rem;
+        gap: 1rem;
+    }
+}
