@@ -406,10 +406,43 @@ class HomeEngine {
     });
   }
 
+  initCountdown() {
+    const targetDate = new Date();
+    targetDate.setDate(targetDate.getDate() + 3); // Fake drop in 3 days
+
+    const updateTimer = () => {
+      const now = new Date();
+      const diff = targetDate - now;
+
+      if (diff <= 0) return;
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      const setElement = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.innerText = value.toString().padStart(2, '0');
+      };
+
+      setElement('days', days);
+      setElement('hours', hours);
+      setElement('minutes', minutes);
+      setElement('seconds', seconds);
+    };
+
+    setInterval(updateTimer, 1000);
+    updateTimer();
+  }
+
   // ==========================================
   // 👟 PRODUCTS (Trending & Sale)
   // ==========================================
   async loadProducts() {
+    // Initialize Countdown
+    this.initCountdown();
+
     await this.renderProductGrid('featuredProductsGrid', this.fallbackData.products); // Using fallback for speed/demo
     await this.renderProductGrid('onSaleProductsGrid', this.fallbackData.products.map(p => ({ ...p, price: p.price * 0.8, original_price: p.price, badge: 'SALE' })));
   }
@@ -423,12 +456,22 @@ class HomeEngine {
                 <div class="product-image-container">
                     ${p.badge ? `<div class="product-badges"><span class="product-badge product-badge-new">${p.badge}</span></div>` : ''}
                     <img src="${p.image_url}" alt="${p.name}" class="product-image">
+                    
+                    <div class="product-quick-actions">
+                        <button class="action-btn wishlist-btn" onclick="event.stopPropagation(); window.homeEngine.toggleWishlist(${p.id})">
+                            <i class="far fa-heart"></i>
+                        </button>
+                        <button class="action-btn quick-view-btn" onclick="event.stopPropagation(); window.openQuickView(${p.id})">
+                            <i class="far fa-eye"></i>
+                        </button>
+                    </div>
+
                     <button class="quick-add-btn" onclick="event.stopPropagation(); window.homeEngine.quickAdd(${p.id}, '${p.name}')">
                         <i class="fas fa-plus"></i>
                     </button>
                 </div>
                 <div class="product-info" style="padding: 1rem;">
-                    <h3 style="font-size: 1rem; margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 800;">${p.name}</h3>
+                    <h3 class="product-title" style="font-size: 1rem; margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 800;">${p.name}</h3>
                     <div class="price" style="font-family: inherit; font-size: 1.1rem; font-weight: 700;">
                         $${p.price.toFixed(2)}
                         ${p.original_price ? `<span style="text-decoration: line-through; color: #999; font-size: 0.9rem; margin-left: 5px;">$${p.original_price.toFixed(2)}</span>` : ''}
@@ -444,6 +487,10 @@ class HomeEngine {
   quickAdd(id, name) {
     if (window.cart) window.cart.add(id, 1);
     if (window.notifications) window.notifications.success('AÑADIDO', `${name} al carrito`);
+  }
+
+  toggleWishlist(id) {
+    if (window.notifications) window.notifications.success('WISHLIST', 'Producto guardado');
   }
 
   setupNewsletter() {
