@@ -20,24 +20,24 @@ class HomeEngine {
       banners: [
         {
           id: 'hero-1',
-          title: 'URBAN LEGENDS',
-          subtitle: 'ICONIC SILHOUETTES REIMAGINED',
+          title: 'DEFINING STREETWEAR',
+          subtitle: 'PREMIUM SELECTION. EXCLUSIVE DROPS.',
           image_url: 'https://images.unsplash.com/photo-1556906781-9a412961d28c?auto=format&fit=crop&q=80&w=1920',
-          link: 'products.html?collection=icons',
-          cta: 'SHOP ICONS'
+          link: 'products.html?collection=new',
+          cta: 'SHOP LATEST'
         },
         {
           id: 'hero-2',
-          title: 'SPEED DEFINED',
-          subtitle: 'PERFORMANCE MEETS AESTHETICS',
+          title: 'AIR JORDAN RETRO',
+          subtitle: 'THE LEGACY CONTINUES. AVAILABLE NOW.',
           image_url: 'https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?auto=format&fit=crop&q=80&w=1920',
-          link: 'products.html?category=running',
-          cta: 'EXPLORE RUNNING'
+          link: 'products.html?category=jordan',
+          cta: 'SHOP JORDAN'
         },
         {
           id: 'hero-3',
           title: 'YEEZY SEASON',
-          subtitle: 'THE FUTURE OF FOOTWEAR',
+          subtitle: 'AVANT-GARDE DESIGN FOR THE BOLD.',
           image_url: 'https://images.unsplash.com/photo-1549488344-c7059349b576?auto=format&fit=crop&q=80&w=1920',
           link: 'products.html?category=yeezy',
           cta: 'SHOP YEEZY'
