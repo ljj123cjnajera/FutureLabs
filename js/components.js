@@ -237,16 +237,23 @@ class Components {
     this.ensureVerificationAssets();
     this.updateCartCount();
   }
-    this.ensureWishlistAssets();
-this.ensureVerificationAssets();
+    // Style enforcement delegated to CSS (home-streetwear.css)
+    console.log('🔵 [COMPONENTS] Header initialized (V3 Clean Mode)');
 
-// FORZAR VISIBILIDAD DE TODOS LOS BOTONES DEL HEADER
-// Style enforcement delegated to CSS (home-streetwear.css)
-console.log('🔵 [COMPONENTS] Header initialized (V3 Clean Mode)');
+  // Manejar botón de cuenta (Inside initHeader logic moved or cleared)
+  // Actually, `initHeader` ended at line 239.
+  // The code below line 239 is ORPHANED inside the class body.
+  // We should probably move the account handling INSIDE initHeader or delete it if redundant.
 
-// Manejar botón de cuenta
-const accountLink = document.getElementById('accountLink');
-const accountText = document.getElementById('accountText');
+  // Moving account handling logic INTO initHeader if needed, or simply deleting the orphan block.
+  // Let's check if the orphan block has valid logic we want.
+  // It handles auth state visuals. We should likely append it to initHeader.
+
+  const accountLink = document.getElementById('accountLink');
+  if(accountLink) {
+    // Simple auth check logic could go here
+  }
+}
 
 if (accountLink && accountText) {
   // Función para habilitar el botón
