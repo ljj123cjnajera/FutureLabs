@@ -374,19 +374,36 @@ class HomeEngine {
     }
 
     // Brutalist Grid Render
+    // Brutalist Grid Render (V3)
     container.innerHTML = `
-            <div class="bento-grid">
-                ${categories.map(cat => `
-                    <a href="products.html?category=${cat.slug}" class="bento-item">
-                        <img src="${cat.image || cat.image_url}" alt="${cat.name}">
-                        <div class="bento-overlay">
-                            <h3>${cat.name}</h3>
-                            <span class="btn-arrow"><i class="fas fa-arrow-right"></i></span>
-                        </div>
-                    </a>
-                `).join('')}
-            </div>
-        `;
+        <div class="home-sections-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+            ${categories.map((cat, index) => `
+                <div class="home-section-card ${index === 0 ? 'span-2' : ''}" 
+                     onclick="window.location.href='products.html?category=${cat.slug}'"
+                     style="position: relative; height: 400px; overflow: hidden; border: 2px solid #000; cursor: pointer;">
+                     
+                    <img src="${cat.image || cat.image_url}" alt="${cat.name}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;">
+                    
+                    <div class="section-overlay" style="position: absolute; inset: 0; background: rgba(0,0,0,0.3); display: flex; flex-direction: column; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s;">
+                        <h2 style="color: #fff; font-size: 3rem; font-weight: 900; text-transform: uppercase; margin: 0; text-shadow: 2px 2px 0 #000;">${cat.name}</h2>
+                        <span style="color: #fff; font-weight: 700; border: 2px solid #fff; padding: 0.5rem 1.5rem; margin-top: 1rem; background: #000;">EXPLORE</span>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+
+    // Add Hover Animation via JS
+    container.querySelectorAll('.home-section-card').forEach(card => {
+      card.addEventListener('mouseenter', () => {
+        card.querySelector('.section-overlay').style.opacity = '1';
+        card.querySelector('img').style.transform = 'scale(1.1)';
+      });
+      card.addEventListener('mouseleave', () => {
+        card.querySelector('.section-overlay').style.opacity = '0';
+        card.querySelector('img').style.transform = 'scale(1)';
+      });
+    });
   }
 
   // ==========================================

@@ -26,12 +26,12 @@
 .main-image {
     width: 100%;
     aspect-ratio: 1;
-    border-radius: 0;
+    border-radius: var(--border-radius-lg);
     overflow: hidden;
     margin-bottom: 20px;
-    background: #fff;
-    border: 4px solid #000;
-    box-shadow: 10px 10px 0px #000;
+    background: var(--white);
+    border: 4px solid var(--black);
+    box-shadow: 10px 10px 0px var(--black);
     position: relative;
 }
 
@@ -57,21 +57,22 @@
     border-radius: 0;
     overflow: hidden;
     cursor: pointer;
-    border: 2px solid #000;
+    border: 2px solid var(--black);
     transition: all 0.2s;
-    background: #fff;
-    box-shadow: 4px 4px 0px #000;
+    background: var(--white);
+    box-shadow: 4px 4px 0px var(--black);
 }
 
 .gallery-thumb.active {
-    border-color: #000;
-    box-shadow: 2px 2px 0px #000 inset;
+    border-color: var(--black);
+    box-shadow: 2px 2px 0px var(--black) inset;
     transform: translate(2px, 2px);
 }
 
 .gallery-thumb:hover {
     transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0px #ff0000;
+    box-shadow: 6px 6px 0px var(--accent);
+    /* Red/Accent */
 }
 
 .gallery-thumb img {
@@ -82,33 +83,35 @@
 
 /* Product Info */
 .product-info-detail {
-    background: #fff;
+    background: var(--white);
     border-radius: 0;
     padding: 40px;
-    box-shadow: 12px 12px 0px #000;
-    border: 4px solid #000;
+    box-shadow: 12px 12px 0px var(--black);
+    border: 4px solid var(--black);
 }
 
 .product-brand-detail {
     font-size: 1rem;
-    color: #000;
+    color: var(--black);
     text-transform: uppercase;
     font-weight: 800;
     letter-spacing: 1px;
     margin-bottom: 10px;
-    background: #ffff00;
+    background: var(--warning);
+    /* Yellow */
     display: inline-block;
     padding: 4px 10px;
-    border: 2px solid #000;
+    border: 2px solid var(--black);
 }
 
 .product-title-detail {
     font-size: clamp(2rem, 3vw, 3rem);
     font-weight: 900;
-    color: #000;
+    color: var(--black);
     margin-bottom: 20px;
     line-height: 1;
     text-transform: uppercase;
+    font-family: 'Poppins', sans-serif;
 }
 
 .product-rating-detail {
@@ -117,21 +120,11 @@
     gap: 16px;
     margin-bottom: 30px;
     padding-bottom: 20px;
-    border-bottom: 4px solid #000;
-}
-
-.rating-stars {
-    display: flex;
-    gap: 4px;
-}
-
-.rating-stars i {
-    color: #000;
-    font-size: 1.25rem;
+    border-bottom: 4px solid var(--black);
 }
 
 .rating-text {
-    color: #000;
+    color: var(--black);
     font-weight: 800;
     font-size: 1.1rem;
 }
@@ -140,16 +133,16 @@
 .price-section {
     margin-bottom: 24px;
     padding: 20px;
-    background: #000;
+    background: var(--black);
     border-radius: 0;
-    border: 2px solid #000;
+    border: 2px solid var(--black);
     box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.2);
 }
 
 .price-current {
     font-size: 3rem;
     font-weight: 900;
-    color: #fff;
+    color: var(--white);
     display: flex;
     align-items: baseline;
     gap: 16px;
@@ -158,7 +151,7 @@
 
 .price-old {
     font-size: 1.5rem;
-    color: #aaa;
+    color: var(--gray-400);
     text-decoration: line-through;
     font-weight: 600;
 }
@@ -168,62 +161,48 @@
     align-items: center;
     gap: 5px;
     padding: 6px 12px;
-    background: #ff0000;
-    color: #fff;
+    background: var(--error);
+    color: var(--white);
     border-radius: 0;
     font-size: 1rem;
     font-weight: 800;
     text-transform: uppercase;
-    border: 2px solid #fff;
+    border: 2px solid var(--white);
 }
 
 /* Product Options */
-.product-options {
-    margin-bottom: 30px;
-}
-
-.option-group {
-    margin-bottom: 24px;
-}
-
 .option-label {
     display: block;
     font-weight: 800;
-    color: #000;
+    color: var(--black);
     margin-bottom: 12px;
     font-size: 1rem;
     text-transform: uppercase;
 }
 
-.option-values {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
 .option-value {
     padding: 10px 20px;
-    border: 3px solid #000;
+    border: 3px solid var(--black);
     border-radius: 0;
-    background: #fff;
-    color: #000;
+    background: var(--white);
+    color: var(--black);
     font-weight: 800;
     cursor: pointer;
     transition: all 0.1s;
-    box-shadow: 4px 4px 0px #000;
+    box-shadow: 4px 4px 0px var(--black);
 }
 
 .option-value:hover {
     transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0px #000;
-    background: #ffff00;
+    box-shadow: 6px 6px 0px var(--black);
+    background: var(--warning);
 }
 
 .option-value.selected {
-    background: #000;
-    color: #fff;
-    border-color: #000;
-    box-shadow: 2px 2px 0px #fff inset;
+    background: var(--black);
+    color: var(--white);
+    border-color: var(--black);
+    box-shadow: 2px 2px 0px var(--white) inset;
     transform: translate(2px, 2px);
 }
 
