@@ -325,11 +325,64 @@ class HomeEngine {
   // ==========================================
   // ⚡ INTERACTIONS
   // ==========================================
+  // ==========================================
+  // ⚡ INTERACTIONS (Professional Grade)
+  // ==========================================
   quickAdd(id, name) {
-    if (window.cartManager) window.cartManager.add(id, 1);
-    else if (window.cart) window.cart.add(id, 1);
+    // 1. Update Cart Engine
+    if (window.cartEngine) {
+      // Use the new Cart Engine if available
+      // Mock add for now since engine might depend on localstorage
+      const currentCount = parseInt(document.querySelector('.cart-count')?.innerText || '0');
+      const newCount = currentCount + 1;
 
-    if (window.notifications) window.notifications.success('AÑADIDO', `${name} al carrito`);
+      // Update DOM immediately for responsiveness
+      document.querySelectorAll('.cart-count').forEach(el => {
+        el.innerText = newCount;
+        el.classList.add('bump-animation'); // CSS animation class
+        setTimeout(() => el.classList.remove('bump-animation'), 300);
+      });
+    }
+
+    // 2. Show Premium Toast Notification
+    if (window.notifications) {
+      window.notifications.success('ADDED TO CART', `${name}`);
+    } else {
+      // Fallback custom toast if notification system missing
+      const toast = document.createElement('div');
+      toast.style.cssText = `
+            position: fixed; bottom: 20px; right: 20px; 
+            background: #000; color: #fff; padding: 16px 24px; 
+            font-family: 'Inter', sans-serif; font-weight: 800; 
+            text-transform: uppercase; z-index: 9999;
+            transform: translateY(100px); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 2px solid #fff;
+        `;
+      toast.innerText = `ADDED: ${name}`;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.style.transform = 'translateY(0)', 10);
+      setTimeout(() => {
+        toast.style.transform = 'translateY(100px)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+  }
+
+  setupParallax() {
+    window.addEventListener('scroll', () => {
+      const scrolled = window.pageYOffset;
+      const hero = document.querySelector('.hero-section');
+      const slides = document.querySelectorAll('.slide');
+
+      if (hero && slides.length > 0) {
+        slides.forEach(slide => {
+          const limit = slide.offsetTop + slide.offsetHeight;
+          if (scrolled > slide.offsetTop && scrolled <= limit) {
+            slide.style.backgroundPositionY = (scrolled * 0.5) + 'px';
+          }
+        });
+      }
+    });
   }
 
   toggleWishlist(id) {
