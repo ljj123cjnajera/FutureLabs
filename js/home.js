@@ -67,26 +67,34 @@ class HomeEngine {
   }
 
   async init() {
-    // 0. Render Globals (Header/Footer) first
-    this.renderGlobals();
+    try {
+      // 0. Render Globals (Header/Footer) first
+      this.renderGlobals();
 
-    this.toggleLoader(true);
+      this.toggleLoader(true);
 
-    // 1. Load Content sequence
-    await this.loadHero();
-    await this.loadCategories();
-    await this.loadProducts();
-    await this.loadBrands(); // NEW: Brands Section
+      // 1. Load Content sequence (Parallel execution for speed)
+      await Promise.allSettled([
+        this.loadHero(),
+        this.loadCategories(),
+        this.loadProducts(),
+        this.loadBrands()
+      ]);
 
-    this.setupNewsletter();
-    this.setupQuickAddbox();
+      this.setupNewsletter();
+      this.setupQuickAddbox();
 
-    this.toggleLoader(false);
+      this.toggleLoader(false);
 
-    // 2. Start Visuals
-    this.initHypeFeatures();
+      // 2. Start Visuals
+      this.initHypeFeatures();
 
-    console.log('🚀 [HomeEngine] V3.1 Initialized.');
+      console.log('🚀 [HomeEngine] V3.1 Initialized (Defensive Mode).');
+    } catch (err) {
+      console.error('⚠️ [HomeEngine] Partial Load Error:', err);
+      // Ensure loader is removed even if error occurs
+      this.toggleLoader(false);
+    }
   }
 
   // ==========================================
@@ -391,14 +399,40 @@ class HomeEngine {
   }
 
   setupNewsletter() {
-    const form = document.getElementById('newsletterForm');
-    if (form) {
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const btn = form.querySelector('button');
-        // Animation logic...
-        btn.textContent = 'THANKS!';
-      });
+    // 1. Footer Form
+    const footerForm = document.querySelector('.footer-newsletter .input-group');
+    if (footerForm) {
+      const btn = footerForm.querySelector('button');
+      const input = footerForm.querySelector('input');
+      if (btn) {
+        btn.onclick = () => {
+          if (input && input.value.includes('@')) {
+            btn.innerHTML = '<i class="fas fa-check"></i>';
+            setTimeout(() => btn.innerHTML = 'THANKS!', 1000);
+            localStorage.setItem('newsletter_subscribed', 'true');
+          }
+        };
+      }
+    }
+
+    // 2. Popup Logic (Exit Intent / Time Delay)
+    const popup = document.getElementById('newsletterPopup');
+    if (popup && !localStorage.getItem('newsletter_subscribed')) {
+      setTimeout(() => {
+        popup.style.display = 'flex';
+      }, 5000); // Show after 5 seconds
+
+      const closeBtn = popup.querySelector('.close-modal');
+      const closeLink = popup.querySelector('.close-link');
+
+      const closeAction = () => {
+        popup.style.display = 'none';
+        // Don't show again for this session
+        sessionStorage.setItem('newsletter_dismissed', 'true');
+      };
+
+      if (closeBtn) closeBtn.onclick = closeAction;
+      if (closeLink) closeLink.onclick = closeAction;
     }
   }
 
