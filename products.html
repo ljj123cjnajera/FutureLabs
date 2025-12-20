@@ -12,32 +12,17 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
         <!-- Estilos inline removidos - migrados a products-page.css -->
 
-    <!-- CSS Unificado (Streetwear Standard) -->
-    <link rel="stylesheet" href="css/typography.css?v=3.0">
-    <link rel="stylesheet" href="css/style.css?v=3.0">
-    <link rel="stylesheet" href="css/design-system.css?v=3.0">
-    <link rel="stylesheet" href="css/header-improved.css?v=3.0">
-    <link rel="stylesheet" href="css/footer-improved.css?v=3.0">
-    <link rel="stylesheet" href="css/forms-improved.css?v=3.0">
-    <link rel="stylesheet" href="css/modals-improved.css?v=3.0">
-    <link rel="stylesheet" href="css/loading-states-improved.css?v=3.0">
-    <link rel="stylesheet" href="css/micro-interactions.css?v=3.0">
-    <link rel="stylesheet" href="css/pages-common.css?v=3.0">
-    <link rel="stylesheet" href="css/responsive.css?v=3.0">
-    <link rel="stylesheet" href="css/notifications.css?v=3.0">
-    <link rel="stylesheet" href="css/animations.css?v=3.0">
-    <link rel="stylesheet" href="css/components-enhanced.css?v=3.0">
+    <!-- CSS Unificado (Streetwear Standard V3) -->
+    <link rel="stylesheet" href="css/design-system.css?v=5.0">
+    <link rel="stylesheet" href="css/header-v3.css?v=5.0">
+    <link rel="stylesheet" href="css/home-streetwear.css?v=5.0">
+    <link rel="stylesheet" href="css/product-cards.css?v=5.0">
 
-    <!-- CSS Específicos de Página -->
+    <!-- Utilities -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/products-page.css">
-    <link rel="stylesheet" href="css/product-cards.css?v=2.0">
-    <link rel="stylesheet" href="css/quick-view.css?v=1.0">
-    <link rel="stylesheet" href="css/comparator.css?v=1.0">
-    <link rel="stylesheet" href="css/breadcrumbs.css?v=1.0">
-    <link rel="stylesheet" href="css/recently-viewed.css?v=1.0">
-    <!-- Streetwear Overrides -->
-    <link rel="stylesheet" href="css/products-streetwear.css?v=1.0">
+
+    <!-- Page Specific (Overrides only) -->
+    <link rel="stylesheet" href="css/products-streetwear.css?v=5.0">
 </head>
 
 <body>
@@ -47,115 +32,56 @@
     <!-- Breadcrumbs -->
     <nav id="breadcrumbs"></nav>
 
-    <!-- Products Page -->
+    <!-- 🚀 V3 CATALOG: BRUTALIST ENGINE -->
     <div class="products-page">
-        <div class="container" style="margin-top: 2rem;">
-            <div class="products-hero-card">
-                <span class="products-hero-eyebrow"
-                    style="color: var(--accent); font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1rem; display: block;">
-                    <i class="fas fa-th-large"></i> Catálogo 2024
-                </span>
-                <h1 class="products-hero-title">NUESTRA COLECCIÓN</h1>
-                <p class="products-hero-description">
-                    Explora los últimos lanzamientos, ediciones limitadas y clásicos atemporales. Encuentra tu par
-                    perfecto.
-                </p>
-                <!-- Actions could go here if needed -->
+        <!-- Brutalist Header -->
+        <div class="container"
+            style="margin-top: 4rem; margin-bottom: 2rem; border-bottom: 4px solid var(--black); padding-bottom: 1rem;">
+            <div class="d-flex justify-content-between align-items-end flex-wrap gap-4">
+                <div>
+                    <span class="text-uppercase fw-bold" style="letter-spacing: 2px;">Catalog v3.0</span>
+                    <h1
+                        style="font-size: 4rem; line-height: 0.9; margin: 0; text-transform: uppercase; font-weight: 900;">
+                        ALL ACCESS</h1>
+                </div>
+                <div class="catalog-stats fw-bold">
+                    <span id="productCount">0</span> ITEMS LOADED
+                </div>
             </div>
         </div>
 
         <div class="container">
-            <!-- Filters -->
-            <div class="products-filters">
-                <div class="filters-row" style="display: flex; gap: 20px; flex-wrap: wrap;">
-                    <div class="filter-group" style="flex: 2; min-width: 200px;">
-                        <label><i class="fas fa-search"></i> BUSCAR</label>
-                        <input type="text" id="searchFilter" placeholder="Buscar por nombre..."
-                            style="background: #f9f9f9;">
-                    </div>
-                    <div class="filter-group" style="flex: 1; min-width: 150px;">
-                        <label>CATEGORÍA</label>
-                        <select id="categoryFilter">
-                            <option value="">TODAS</option>
-                        </select>
-                    </div>
-                    <div class="filter-group" style="flex: 1; min-width: 150px;">
-                        <label>MARCA</label>
-                        <select id="brandFilter">
-                            <option value="">TODAS</option>
-                        </select>
-                    </div>
-                    <div class="filter-group" style="flex: 1; min-width: 150px;">
-                        <label>SILUETA</label>
-                        <select id="silhouetteFilter">
-                            <option value="">CUALQUIERA</option>
-                            <option value="High">HIGH</option>
-                            <option value="Mid">MID</option>
-                            <option value="Low">LOW</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>Año</label>
-                        <select id="yearFilter">
-                            <option value="">Todos</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>Talla (US)</label>
-                        <select id="sizeFilter">
-                            <option value="">Todas</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                            <option value="10">10</option>
-                            <option value="11">11</option>
-                            <option value="12">12</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>Precio</label>
-                        <div class="price-range">
-                            <input type="number" id="minPrice" placeholder="Min" min="0">
-                            <span>-</span>
-                            <input type="number" id="maxPrice" placeholder="Max" min="0">
-                        </div>
-                    </div>
-                </div>
-                <div class="filter-actions d-flex gap-md">
-                    <button class="btn btn-outline" onclick="resetFilters()">
-                        <i class="fas fa-redo"></i> Limpiar
-                    </button>
-                    <button class="btn btn-primary" onclick="applyFilters()">
-                        <i class="fas fa-filter"></i> Aplicar Filtros
-                    </button>
-                </div>
-            </div>
-
-            <!-- Toolbar -->
-            <div class="products-header-bar">
-                <div class="products-count" id="productsCount" role="status" aria-live="polite">Cargando...</div>
-                <div class="products-header-actions">
-                    <select class="sort-select" id="sortSelect" onchange="applySort()" aria-label="Ordenar productos">
-                        <option value="name-asc">Nombre A-Z</option>
-                        <option value="name-desc">Nombre Z-A</option>
-                        <option value="price-asc">Precio: Menor a Mayor</option>
-                        <option value="price-desc">Precio: Mayor a Menor</option>
-                        <option value="rating-desc">Mejor valorados</option>
-                        <option value="newest">Más recientes</option>
+            <!-- V3 Controls -->
+            <div class="catalog-controls"
+                style="margin-bottom: 2rem; display: flex; gap: 1rem; border: 2px solid var(--black); padding: 1rem;">
+                <button class="btn-filter" onclick="window.catalogEngine.filter('all')">ALL</button>
+                <button class="btn-filter" onclick="window.catalogEngine.filter('jordan')">JORDAN</button>
+                <button class="btn-filter" onclick="window.catalogEngine.filter('yeezy')">YEEZY</button>
+                <button class="btn-filter" onclick="window.catalogEngine.filter('nike')">NIKE</button>
+                <div style="margin-left: auto;">
+                    <select id="sortSelect" class="brutalist-select" onchange="window.catalogEngine.sort(this.value)">
+                        <option value="newest">LATEST DROP</option>
+                        <option value="price-asc">CHEAPEST</option>
+                        <option value="price-desc">MOST HYPE</option>
                     </select>
                 </div>
             </div>
 
-            <!-- Products Grid -->
-            <div id="productsContainer">
-                <div class="loading">
-                    <div class="loading-spinner"></div>
-                    <p>Cargando productos...</p>
-                </div>
+            <!-- V3 Grid -->
+            <div id="productsContainer" class="product-grid-v3"
+                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem; min-height: 50vh;">
+                <!-- Injected by CatalogEngine -->
+                <div class="loading-brutalist">LOADING DATA...</div>
             </div>
 
-            <!-- Pagination -->
-            <div class="pagination" id="pagination"></div>
+            <!-- Pagination (mock) -->
+            <div class="pagination-brutalist"
+                style="margin-top: 4rem; display: flex; justify-content: center; gap: 1rem;">
+                <button class="btn btn-outline" disabled>PREV</button>
+                <button class="btn btn-black">1</button>
+                <button class="btn btn-outline">2</button>
+                <button class="btn btn-outline">NEXT</button>
+            </div>
         </div>
     </div>
 
@@ -174,20 +100,34 @@
     </section>
 
     <!-- Scripts -->
+    <!-- Footer (Will be injected by JS) -->
+    <footer id="mainFooter"></footer>
+
     <!-- Scripts del Sistema Integrado -->
     <script src="js/api.js"></script>
-    <script src="js/auth.js"></script>
+    <script src="js/components.js"></script> <!-- Vital for Header/Footer -->
     <script src="js/notifications.js"></script>
-    <script src="js/skeleton.js"></script>
-    <script src="js/components.js"></script>
-    <script src="js/comparator.js"></script>
-    <script src="js/modals.js"></script>
     <script src="js/cart.js"></script>
-    <script src="js/recently-viewed.js"></script>
-    <script src="js/quick-view.js"></script>
-    <script src="js/breadcrumbs.js"></script>
 
+    <!-- Catalog Engine -->
     <script src="js/products.js"></script>
+
+    <script>
+        // Init Globals immediately like Home
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.Components) {
+                const header = document.getElementById('mainHeader');
+                if (header && !header.innerHTML.trim()) {
+                    header.innerHTML = window.Components.getHeader(true, true);
+                    if (window.Components.initHeader) window.Components.initHeader();
+                }
+                const footer = document.getElementById('mainFooter');
+                if (footer && !footer.innerHTML.trim()) {
+                    footer.innerHTML = window.Components.getFooter();
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>

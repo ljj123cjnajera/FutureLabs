@@ -94,15 +94,20 @@ body {
 /* ============================================
    3. PRODUCT GRID OVERRIDES
    ============================================ */
+/* ============================================
+   3. PRODUCT GRID OVERRIDES
+   ============================================ */
 .products-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--spacing-lg);
+    /* Match Home Page V3 Grid */
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 24px 0;
 }
 
+/* Ensure no border duplication with global card CSS */
 .product-card {
-    border: 2px solid transparent;
-    transition: all 0.2s ease;
+    /* Styles handled by product-cards.css */
 }
 
 .product-card:hover {

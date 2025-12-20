@@ -54,25 +54,26 @@ class CatalogEngine {
         const container = document.getElementById('productsContainer');
         if (!container) return;
 
-        container.innerHTML = products.map(p => `
-            <div class="product-card brutalist-card">
-                ${p.badge ? `<div class="product-badge">${p.badge}</div>` : ''}
-                <div class="product-image">
-                    <a href="product-detail.html?id=${p.id}">
-                        <img src="${p.image_url}" alt="${p.name}">
-                    </a>
-                    <button class="quick-add-btn" onclick="window.catalogEngine.quickAdd(${p.id}, '${p.name}')">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                </div>
-                <div class="product-info">
-                    <a href="product-detail.html?id=${p.id}" class="product-title">${p.name}</a>
-                    <div class="product-price">
-                        <span class="price-current">S/ ${p.price.toFixed(2)}</span>
+        // Use Global Standard Card Generator
+        if (window.Components && window.Components.getProductCard) {
+            container.innerHTML = products.map(p => window.Components.getProductCard(p)).join('');
+        } else {
+            // Fallback just in case (Brutalist V3 Structure)
+            container.innerHTML = products.map(p => `
+                <div class="product-card">
+                    <div class="product-image-container">
+                        <img src="${p.image_url}" class="product-image" alt="${p.name}">
+                        ${p.badge ? `<div class="product-badges"><span class="product-badge">${p.badge}</span></div>` : ''}
+                    </div>
+                    <div class="product-content">
+                        <span class="product-category">${p.brand}</span>
+                        <h3 class="product-title">${p.name}</h3>
+                        <div class="product-price">S/ ${p.price.toFixed(2)}</div>
+                        <button class="product-add-btn" onclick="window.catalogEngine.quickAdd(${p.id}, '${p.name}')">ADD TO CART</button>
                     </div>
                 </div>
-            </div>
-        `).join('');
+            `).join('');
+        }
     }
 
     // ⚡ INTERACTION LOGIC
