@@ -6,16 +6,16 @@ class Components {
       <!-- Footer (Brutalist) -->
       <footer class="footer">
         <div class="container">
-            <div class="footer-grid">
+            <div class="footer-grid" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 4rem; padding-bottom: 4rem;">
                 <!-- Brand / Bio -->
                 <div class="footer-col footer-brand">
-                    <div class="footer-logo">SNEAKERS SHOP</div>
-                    <p class="footer-bio">
+                    <div class="footer-logo" style="font-size: 2rem; margin-bottom: 1.5rem;">SNEAKERS SHOP</div>
+                    <p class="footer-bio" style="max-width: 300px;">
                         The ultimate destination for hype. Curating the best sneakers from Nike, Jordan, Yeezy and more. 
                         <br><br>
                         EST. 2024 — WORLDWIDE
                     </p>
-                    <div class="social-links">
+                    <div class="social-links" style="margin-top: 2rem;">
                         <a href="#"><i class="fab fa-instagram"></i></a>
                         <a href="#"><i class="fab fa-tiktok"></i></a>
                         <a href="#"><i class="fab fa-twitter"></i></a>
@@ -49,7 +49,7 @@ class Components {
                 <div class="footer-col footer-newsletter">
                     <h3>STAY IN THE KNOW</h3>
                     <p class="newsletter-desc">Subscribe for exclusive access to drops and events.</p>
-                    <div class="input-group">
+                    <div class="input-group" style="margin-top: 1.5rem;">
                         <input type="email" placeholder="ENTER YOUR EMAIL">
                         <button>→</button>
                     </div>
@@ -130,75 +130,55 @@ class Components {
     `;
 
     return `
-      <header class="header-v3-wrapper">
+      <header class="header-v3">
         ${announcementBar}
         
-        <div class="header-v3">
-            <!-- MAIN ROW -->
-            <div class="header-main-row">
-                <div class="header-mobile-toggle" onclick="window.MobileMenu.toggle()">
-                    <i class="fas fa-bars"></i>
-                </div>
+        <div class="header-main-row">
+            <div class="container" style="display: flex; justify-content: space-between; align-items: center; padding: 0;">
+                <!-- LOGO -->
+                <a href="index.html" class="header-logo">
+                    <img src="assets/images/logo.png" alt="SNEAKERS SHOP" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+                    <span style="font-family: 'Poppins', sans-serif; font-weight: 900; font-size: 1.5rem; letter-spacing: -1px; display: none;">SNEAKERS<span style="color: var(--accent);">SHOP</span></span>
+                </a>
 
-                <div class="header-logo">
-                    <a href="index.html">
-                        <img src="assets/images/logo-clean.png" alt="Sneakers Shop">
-                    </a>
-                </div>
-
+                <!-- SEARCH (Desktop) -->
                 ${showSearch ? `
-                <div class="header-search">
+                <div class="header-search desktop-only">
                     <div class="search-input-wrapper">
-                        <input type="text" placeholder="SEARCH FOR DROPS..." id="searchInput">
-                        <button class="search-icon-btn" onclick="performSearch()">
-                            <i class="fas fa-search"></i>
-                        </button>
+                        <input type="text" placeholder="SEARCH DROPS..." id="globalSearchInput" onkeypress="window.Components.handleSearch(event)">
+                        <button class="search-icon-btn"><i class="fas fa-search"></i></button>
                     </div>
-                    <div id="searchSuggestions" class="search-suggestions" style="display: none;"></div>
                 </div>
                 ` : ''}
 
+                <!-- ACTIONS -->
                 <div class="header-actions">
-                    <a href="#" class="action-btn" id="accountLink">
+                    <a href="account.html" class="action-btn">
                         <i class="far fa-user"></i>
-                        <span>Account</span>
+                        <span class="desktop-only">ACCOUNT</span>
                     </a>
                     <a href="wishlist.html" class="action-btn">
                         <i class="far fa-heart"></i>
-                        <span>Saved</span>
+                        <span class="action-badge" id="wishlistCount" style="display: none;">0</span>
+                        <span class="desktop-only">WISHLIST</span>
                     </a>
                     <a href="cart.html" class="action-btn">
                         <i class="fas fa-shopping-bag"></i>
-                        <span>Cart</span>
                         <span class="action-badge cart-count">0</span>
+                        <span class="desktop-only">CART</span>
                     </a>
+                    <button class="header-mobile-toggle mobile-only" onclick="document.getElementById('mobileMenu').classList.add('active')">
+                        <i class="fas fa-bars"></i>
+                    </button>
                 </div>
             </div>
+        </div>
 
-            <!-- NAV ROW (DESKTOP) -->
-            ${showNav ? `
-            <nav class="header-nav" id="desktopNav">
+        <!-- NAVIGATION -->
+        ${showNav ? `
+        <nav class="header-nav desktop-only">
+            <div class="container" style="padding: 0;">
                 <ul class="nav-list">
-                    <li class="nav-item">
-                        <a href="products.html" class="nav-link">NEW ARRIVALS</a>
-                        <!-- Mega Menu Injection -->
-                        ${megaMenuHTML}
-                    </li>
-                    <li class="nav-item">
-                        <a href="products.html?category=jordan" class="nav-link">JORDAN</a>
-                        ${megaMenuHTML}
-                    </li>
-                    <li class="nav-item">
-                        <a href="products.html?category=yeezy" class="nav-link">YEEZY</a>
-                        ${megaMenuHTML}
-                    </li>
-                    <li class="nav-item">
-                        <a href="products.html?category=nike" class="nav-link">NIKE</a>
-                        ${megaMenuHTML}
-                    </li>
-                    <li class="nav-item">
-                        <a href="products.html?category=adidas" class="nav-link">ADIDAS</a>
-                        ${megaMenuHTML}
                     </li>
                     <li class="nav-item">
                         <a href="products.html?filter=sale" class="nav-link" style="color: var(--accent);">SALE</a>
