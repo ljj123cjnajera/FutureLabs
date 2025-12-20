@@ -97,8 +97,9 @@ button {
 }
 
 /* Container */
+/* Container (Standardized to 1400px per Brutalist V3) */
 .container {
-    max-width: 1280px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 0 var(--spacing-lg);
     width: 100%;
