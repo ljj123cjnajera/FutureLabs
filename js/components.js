@@ -48,7 +48,7 @@ class Components {
                 <!-- Newsletter -->
                 <div class="footer-col footer-newsletter">
                     <h3>STAY IN THE KNOW</h3>
-                    <p style="color: #999; margin-bottom: 1rem; font-size: 0.9rem;">Subscribe for exclusive access to drops and events.</p>
+                    <p class="newsletter-desc">Subscribe for exclusive access to drops and events.</p>
                     <div class="input-group">
                         <input type="email" placeholder="ENTER YOUR EMAIL">
                         <button>→</button>

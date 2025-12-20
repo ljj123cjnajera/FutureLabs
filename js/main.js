@@ -1,44 +1,40 @@
-// Main JavaScript for FutureLabs
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize all functionality
+// Main JavaScript for FutureLabs (V3 Compatible)
+document.addEventListener('DOMContentLoaded', function () {
+    // If we are on the Home Page, let HomeEngine take control.
+    if (document.getElementById('homeHero') || document.querySelector('.home-engine-active') || window.location.pathname.endsWith('index.html') || window.location.pathname === '/') {
+        console.log('🏠 Home Page Detected - Deferring to HomeEngine');
+        return;
+    }
+
+    // Initialize all functionality for INNER PAGES ONLY
     initStickyHeader();
     initSearchFunctionality();
     initCartFunctionality();
     initSmoothScrolling();
     initPlaceholderInteractions();
-    
-    // Nota: initSubscriptionBanner y initChatButton ahora se manejan en home.js
-    // para evitar conflictos. Solo inicializar si homeManager no existe.
-    if (!window.homeManager) {
-        initSubscriptionBanner();
-        initChatButton();
-    }
-    
-    // Cargar productos destacados (ahora se maneja en home.js)
-    // loadFeaturedProducts(); // Comentado - se maneja en home.js
-    
-    console.log('FutureLabs - Tu portal al futuro está listo!');
+
+    console.log('FutureLabs - Inner Page Initialized');
 });
 
 // Sticky Header
 function initStickyHeader() {
     const header = document.querySelector('.header');
     let lastScrollY = window.scrollY;
-    
+
     window.addEventListener('scroll', () => {
         if (window.scrollY > 100) {
             header.classList.add('scrolled');
         } else {
             header.classList.remove('scrolled');
         }
-        
+
         // Hide header on scroll down, show on scroll up
         if (window.scrollY > lastScrollY && window.scrollY > 100) {
             header.style.transform = 'translateY(-100%)';
         } else {
             header.style.transform = 'translateY(0)';
         }
-        
+
         lastScrollY = window.scrollY;
     });
 }
@@ -47,19 +43,19 @@ function initStickyHeader() {
 function initSearchFunctionality() {
     const searchInput = document.querySelector('.search-bar input');
     const searchBtn = document.querySelector('.search-btn');
-    
+
     if (!searchInput || !searchBtn) {
         console.log('⚠️ Search elements not found, skipping search initialization');
         return;
     }
-    
+
     searchBtn.addEventListener('click', performSearch);
     searchInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             performSearch();
         }
     });
-    
+
     function performSearch() {
         const query = searchInput.value.trim();
         if (query) {
@@ -74,20 +70,20 @@ function initSearchFunctionality() {
 function initCartFunctionality() {
     const cartIcon = document.querySelector('.cart-icon');
     const cartCount = document.querySelector('.cart-count');
-    
+
     // Escuchar evento de actualización del carrito
     document.addEventListener('cartUpdated', (e) => {
         if (cartCount) {
             cartCount.textContent = e.detail.count;
             cartCount.style.animation = 'bounce 0.5s';
-            
+
             setTimeout(() => {
                 cartCount.style.animation = '';
             }, 500);
         }
     });
-    
-    cartIcon.addEventListener('click', function(e) {
+
+    cartIcon.addEventListener('click', function (e) {
         e.preventDefault();
         if (parseInt(cartCount.textContent) > 0) {
             window.location.href = 'cart.html';
@@ -104,14 +100,14 @@ function initCartFunctionality() {
 // Smooth Scrolling
 function initSmoothScrolling() {
     const links = document.querySelectorAll('a[href^="#"]');
-    
+
     links.forEach(link => {
-        link.addEventListener('click', function(e) {
+        link.addEventListener('click', function (e) {
             e.preventDefault();
-            
+
             const targetId = this.getAttribute('href');
             if (targetId === '#') return;
-            
+
             const targetElement = document.querySelector(targetId);
             if (targetElement) {
                 targetElement.scrollIntoView({
@@ -127,18 +123,18 @@ function initSmoothScrolling() {
 function initPlaceholderInteractions() {
     // Simular interacciones con elementos placeholder
     const placeholders = document.querySelectorAll('.flash-offers-message, .carousel-message');
-    
+
     placeholders.forEach(placeholder => {
         placeholder.style.cursor = 'pointer';
-        placeholder.addEventListener('click', function() {
+        placeholder.addEventListener('click', function () {
             showNotification('¡Pronto tendremos contenido aquí!');
         });
     });
-    
+
     // Efectos hover para tarjetas de categorías
     const categoryCards = document.querySelectorAll('.category-card');
     categoryCards.forEach(card => {
-        card.addEventListener('click', function() {
+        card.addEventListener('click', function () {
             const categoryName = this.querySelector('h3').textContent;
             showNotification(`Explorando: ${categoryName}`);
         });
@@ -148,8 +144,8 @@ function initPlaceholderInteractions() {
 // Subscription Banner
 function initSubscriptionBanner() {
     const subscribeBtn = document.querySelector('.sticky-footer .cta-button');
-    
-    subscribeBtn.addEventListener('click', function() {
+
+    subscribeBtn.addEventListener('click', function () {
         const email = prompt('Ingresa tu email para suscribirte:');
         if (email) {
             showNotification(`¡Te has suscrito con: ${email}! Pronto recibirás tu código de descuento.`);
@@ -161,8 +157,8 @@ function initSubscriptionBanner() {
 // Chat Button
 function initChatButton() {
     const chatBtn = document.querySelector('.chat-button');
-    
-    chatBtn.addEventListener('click', function() {
+
+    chatBtn.addEventListener('click', function () {
         showNotification('¡El servicio de chat estará disponible pronto!');
         // Aquí se integraría con un servicio de chat real
     });
@@ -187,14 +183,14 @@ function showNotification(message) {
         transform: translateX(100%);
         transition: transform 0.3s ease;
     `;
-    
+
     document.body.appendChild(notification);
-    
+
     // Animación de entrada
     setTimeout(() => {
         notification.style.transform = 'translateX(0)';
     }, 100);
-    
+
     // Auto-remover después de 3 segundos
     setTimeout(() => {
         notification.style.transform = 'translateX(100%)';
@@ -237,18 +233,18 @@ function initMegaMenu() {
     const megaMenu = document.getElementById('megaMenu');
     const overlay = document.getElementById('megaMenuOverlay');
     const closeMenu = document.getElementById('closeMenu');
-    
+
     if (!megaMenu || !overlay || !closeMenu) {
         console.warn('⚠️ Mega menu elements not found');
         return;
     }
-    
+
     const categoryItems = document.querySelectorAll('.category-item');
     const categoryContents = document.querySelectorAll('.category-content');
 
     // Abrir menú
     if (menuTrigger) {
-        menuTrigger.addEventListener('click', function(e) {
+        menuTrigger.addEventListener('click', function (e) {
             e.preventDefault();
             openMegaMenu();
         });
@@ -259,7 +255,7 @@ function initMegaMenu() {
     overlay.addEventListener('click', closeMegaMenu);
 
     // Cerrar con ESC
-    document.addEventListener('keydown', function(e) {
+    document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && megaMenu.classList.contains('active')) {
             closeMegaMenu();
         }
@@ -267,13 +263,13 @@ function initMegaMenu() {
 
     // Navegación entre categorías
     categoryItems.forEach(item => {
-        item.addEventListener('click', function() {
+        item.addEventListener('click', function () {
             const category = this.getAttribute('data-category');
-            
+
             // Remover active de todos
             categoryItems.forEach(i => i.classList.remove('active'));
             categoryContents.forEach(c => c.classList.remove('active'));
-            
+
             // Agregar active al seleccionado
             this.classList.add('active');
             document.querySelector(`.category-content[data-category="${category}"]`).classList.add('active');
@@ -283,14 +279,14 @@ function initMegaMenu() {
     // Hover para desktop
     if (window.innerWidth > 768) {
         categoryItems.forEach(item => {
-            item.addEventListener('mouseenter', function() {
+            item.addEventListener('mouseenter', function () {
                 const category = this.getAttribute('data-category');
-                
+
                 // Solo cambiar si no está activo
                 if (!this.classList.contains('active')) {
                     categoryItems.forEach(i => i.classList.remove('active'));
                     categoryContents.forEach(c => c.classList.remove('active'));
-                    
+
                     this.classList.add('active');
                     document.querySelector(`.category-content[data-category="${category}"]`).classList.add('active');
                 }
@@ -315,10 +311,10 @@ function initMegaMenu() {
 async function loadFeaturedProducts() {
     try {
         const response = await window.api.getFeaturedProducts(8);
-        
+
         if (response.success && response.data.products.length > 0) {
             console.log('✅ Productos destacados cargados:', response.data.products.length);
-            
+
             // Aquí puedes renderizar los productos en el HTML
             // Por ejemplo, en un contenedor específico
         }
