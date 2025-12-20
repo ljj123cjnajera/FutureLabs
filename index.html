@@ -112,7 +112,16 @@
     <!-- Hero Slider -->
     <section class="hero-section">
         <div id="heroSlidesContainer" class="hero-slides">
-            <!-- Injected by V3 Engine -->
+            <!-- Static Slide 1 (Critical Rendering Path) -->
+            <div class="slide active"
+                style="background-image: url('https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&q=80&w=1600')">
+                <div class="slide-content">
+                    <span class="slide-subtitle">NEW SEASON</span>
+                    <h1 class="hero-title">JORDAN RETRO <span class="highlight">HIGH</span></h1>
+                    <p>The iconic silhouette returns in OG colorways. Limited stock available.</p>
+                    <a href="products.html" class="btn">SHOP DROP</a>
+                </div>
+            </div>
         </div>
         <div id="heroSliderDots" class="hero-dots"></div>
     </section>
@@ -146,9 +155,40 @@
     <!-- Bento Grid Categories -->
     <section class="container" style="margin-top: 4rem;">
         <h2 class="section-title-brutalist">EXPLORE COLLECTIONS</h2>
-        <div id="homeSectionsContainer">
-            <!-- Injected by V3 Engine -->
-            <div class="loading-skeleton" style="height: 600px; background: #f0f0f0;"></div>
+        <div id="homeSectionsContainer" class="bento-grid">
+            <!-- Static Bento Grid (Critical Rendering Path) -->
+            <a href="products.html?category=jordan" class="bento-item">
+                <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=800"
+                    alt="Jordan">
+                <div class="bento-overlay">
+                    <h3>JORDAN</h3>
+                    <i class="fas fa-arrow-right" style="font-size: 2rem;"></i>
+                </div>
+            </a>
+            <a href="products.html?category=yeezy" class="bento-item">
+                <img src="https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&q=80&w=800"
+                    alt="Yeezy">
+                <div class="bento-overlay">
+                    <h3>YEEZY</h3>
+                    <i class="fas fa-arrow-right" style="font-size: 2rem;"></i>
+                </div>
+            </a>
+            <a href="products.html?category=nike" class="bento-item">
+                <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=800"
+                    alt="Nike">
+                <div class="bento-overlay">
+                    <h3>NIKE</h3>
+                    <i class="fas fa-arrow-right" style="font-size: 1.5rem;"></i>
+                </div>
+            </a>
+            <a href="products.html?category=accessories" class="bento-item">
+                <img src="https://images.unsplash.com/photo-1523398002811-6ce9e490101d?auto=format&fit=crop&q=80&w=800"
+                    alt="Accessories">
+                <div class="bento-overlay">
+                    <h3>ACCESSORIES</h3>
+                    <i class="fas fa-arrow-right" style="font-size: 1.5rem;"></i>
+                </div>
+            </a>
         </div>
     </section>
 

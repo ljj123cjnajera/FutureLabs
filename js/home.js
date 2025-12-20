@@ -148,6 +148,11 @@ class HomeEngine {
   // ==========================================
   async loadHero() {
     const container = document.getElementById('heroSlidesContainer');
+    // If static content exists, don't overwrite it immediately (Hydration)
+    if (container && container.children.length > 0) {
+      console.log('⚡ Hero already rendered (Static). Initializing generic logic only.');
+      return;
+    }
     const dotsContainer = document.getElementById('heroSliderDots');
     if (!container) return;
 
