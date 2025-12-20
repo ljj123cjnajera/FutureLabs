@@ -257,13 +257,16 @@ class HomeEngine {
     }
   }
 
-  // NEW: Slider Renderer for Trending
+  // NEW: Slider Renderer for Trending and Sale
   async renderProductSlider(containerId, products) {
-    const container = document.getElementById('onSaleProductsGrid'); // Reusing this ID for now to avoid HTML mismatch
+    const container = document.getElementById(containerId);
     if (!container) return;
 
-    // Transform grid to slider via style injection if needed, or just standard grid for now.
-    // For V3 Brutalist simplicity, we keep grid but make it 4 columns.
+    // Force horizontal scroll class
+    container.classList.add('products-horizontal-scroll');
+    container.style.display = 'flex';
+
+    // Transform grid to slider via style injection if needed
     if (window.Components && window.Components.getProductCard) {
       container.innerHTML = products.map(p => window.Components.getProductCard(p)).join('');
     }

@@ -437,57 +437,7 @@
     <script src="js/pwa.js?v=4.0"></script>
 
     <script>
-        // Inicializar componentes cuando el DOM esté listo
-        document.addEventListener('DOMContentLoaded', function () {
-            console.log('🚀 Inicializando SneakersShop...');
-
-            // Inicializar contadores y componentes UI
-            if (window.Components) {
-                window.Components.initCartCounter();
-                window.Components.initSearch();
-            }
-
-            // [NUEVO] Wiring de Botones Hype
-            const notifyBtn = document.querySelector('.notify-btn');
-            if (notifyBtn) {
-                notifyBtn.addEventListener('click', () => {
-                    window.notifications?.success('¡Te avisaremos antes del drop!', 'Notificación Activada');
-                });
-            }
-
-            const lookbookBtn = document.querySelector('.btn-outline-white');
-            if (lookbookBtn) {
-                lookbookBtn.addEventListener('click', () => {
-                    const videoSection = document.querySelector('.video-section');
-                    if (videoSection) videoSection.scrollIntoView({ behavior: 'smooth' });
-                });
-            }
-
-            // Renderizar header y footer si no existen
-
-            // Renderizar header y footer si no existen
-            const headerContainer = document.getElementById('mainHeader');
-            if (headerContainer && !headerContainer.children.length && window.Components) {
-                headerContainer.innerHTML = window.Components.getHeader(true, true);
-                window.Components.initHeader();
-            }
-
-            const footerContainer = document.getElementById('mainFooter');
-            if (footerContainer && !footerContainer.children.length && window.Components) {
-                footerContainer.innerHTML = window.Components.getFooter();
-            }
-
-            // Inicializar megamenú
-            setTimeout(() => {
-                if (window.initMegaMenu) window.initMegaMenu();
-            }, 1000);
-        });
-
-        // Simple newsletter popup logic
-        function closeNewsletterPopup() {
-            document.getElementById('newsletterPopup').style.display = 'none';
-            localStorage.setItem('newsletterDismissed', 'true');
-        }
+        // Logic centralized in js/home.js via HomeEngine
     </script>
 
     <!-- Quick View Modal (Brutalist Harmonized) -->
