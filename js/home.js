@@ -106,6 +106,7 @@ class HomeEngine {
     if (header && window.Components) {
       header.innerHTML = window.Components.getHeader(true, true);
       window.Components.initHeader(); // This initializes the ticker and cart count
+      if (window.Components.initCartDrawer) window.Components.initCartDrawer();
 
       // Init other header components if they exist
       if (window.Components.initSearch) window.Components.initSearch();

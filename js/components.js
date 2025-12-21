@@ -157,16 +157,16 @@ class Components {
                         <i class="far fa-user"></i>
                         <span class="desktop-only">ACCOUNT</span>
                     </a>
-                    <a href="wishlist.html" class="action-btn">
+                    <button class="action-btn" onclick="window.location.href='wishlist.html'">
                         <i class="far fa-heart"></i>
                         <span class="action-badge" id="wishlistCount" style="display: none;">0</span>
                         <span class="desktop-only">WISHLIST</span>
-                    </a>
-                    <a href="cart.html" class="action-btn">
+                    </button>
+                    <button class="action-btn" onclick="window.CartDrawer ? window.CartDrawer.open() : window.location.href='cart.html'">
                         <i class="fas fa-shopping-bag"></i>
                         <span class="action-badge cart-count">0</span>
                         <span class="desktop-only">CART</span>
-                    </a>
+                    </button>
                     <button class="header-mobile-toggle mobile-only" onclick="document.getElementById('mobileMenu').classList.add('active')">
                         <i class="fas fa-bars"></i>
                     </button>
@@ -187,36 +187,75 @@ class Components {
                 </ul>
             </nav>
             ` : ''}
+            
+        <!-- CART DRAWER (New Phase 81 Feature) -->
+        <div id="cartDrawerOverlay" class="cart-drawer-overlay" onclick="window.CartDrawer.close()"></div>
+        <div id="cartDrawer" class="cart-drawer">
+            <div class="cart-drawer-header">
+                <h3>YOUR CART (<span class="cart-count">0</span>)</h3>
+                <button class="close-drawer-btn" onclick="window.CartDrawer.close()">×</button>
+            </div>
+            <div class="cart-drawer-items" id="cartDrawerItems">
+                <!-- Items injected here -->
+                <div class="empty-cart-message">
+                    <p>YOUR CART IS EMPTY</p>
+                    <button class="btn btn-black" onclick="window.CartDrawer.close()">START SHOPPING</button>
+                </div>
+            </div>
+            <div class="cart-drawer-footer">
+                <div class="cart-total-row">
+                    <span>TOTAL</span>
+                    <span id="cartDrawerTotal">$0.00</span>
+                </div>
+                <button class="btn btn-black btn-block" onclick="window.location.href='checkout.html'">CHECKOUT</button>
+                <button class="btn btn-outline btn-block" onclick="window.location.href='cart.html'">VIEW CART</button>
+            </div>
         </div>
 
-        <!-- MOBILE MENU OVERLAY (Added for V3) -->
+        <!-- MOBILE MENU OVERLAY (Improved V3) -->
         <div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="window.MobileMenu.toggle()"></div>
         <div class="mobile-menu-sidebar" id="mobileMenu">
             <div class="mobile-menu-header">
-                <h3>SNEAKERS SHOP</h3>
-                <button class="close-menu-btn" onclick="window.MobileMenu.toggle()">×</button>
+                <h3>MENU</h3>
+                <button class="close-menu-btn" onclick="document.getElementById('mobileMenu').classList.remove('active')">×</button>
             </div>
             <div class="mobile-menu-content">
                 <div class="mobile-search">
-                    <input type="text" placeholder="SEARCH...">
-                    <button>GO</button>
+                    <input type="text" placeholder="SEARCH SNEAKERS...">
+                    <button><i class="fas fa-search"></i></button>
                 </div>
                 <ul class="mobile-nav-list">
-                    <li><a href="products.html">New Arrivals 🔥</a></li>
-                    <li><a href="products.html?category=jordan">Jordan</a></li>
-                    <li><a href="products.html?category=yeezy">Yeezy</a></li>
-                    <li><a href="products.html?category=nike">Nike</a></li>
-                    <li><a href="products.html?category=adidas">Adidas</a></li>
-                    <li><a href="products.html?filter=sale">Sale</a></li>
+                    <li><a href="products.html?filter=new">🔥 NEW ARRIVALS</a></li>
+                    <li><a href="products.html?category=jordan">JORDAN</a></li>
+                    <li><a href="products.html?category=yeezy">YEEZY</a></li>
+                    <li><a href="products.html?category=nike">NIKE</a></li>
+                    <li><a href="products.html?category=adidas">ADIDAS</a></li>
+                    <li><a href="products.html?filter=sale" style="color: var(--error);">SALE ARCHIVE</a></li>
                 </ul>
                 <div class="mobile-auth-links">
-                    <a href="login.html">Login</a>
-                    <a href="register.html">Register</a>
+                    <a href="login.html">LOGIN</a>
+                    <a href="register.html">JOIN</a>
                 </div>
             </div>
         </div>
       </header>
     `;
+  }
+
+  // Inject Cart Logic
+  static initCartDrawer() {
+    window.CartDrawer = {
+      open: () => {
+        document.getElementById('cartDrawer').classList.add('active');
+        document.getElementById('cartDrawerOverlay').classList.add('active');
+        document.body.style.overflow = 'hidden';
+      },
+      close: () => {
+        document.getElementById('cartDrawer').classList.remove('active');
+        document.getElementById('cartDrawerOverlay').classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    };
   }
 
   static initHeader() {
