@@ -45,26 +45,23 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
-        <!-- Font Awesome -->
-    <!-- CSS Base - Sistema de Diseño y Estilos Fundamentales -->
-    <!-- MOVED AFTER STYLE.CSS TO OVERRIDE LEGACY -->
-    <!-- CSS de Componentes - Componentes Específicos -->
-    <!-- CSS Premium - Efectos y Animaciones Avanzadas -->
-
-    <!-- CSS Unificado (Streetwear Standard) -->
-    <link rel="stylesheet" href="css/typography.css?v=5.0">
-    <link rel="stylesheet" href="css/style.css?v=5.0">
-    <link rel="stylesheet" href="css/design-system.css?v=5.0">
-
-    <!-- CSS Específicos de Página -->
+        rel="stylesheet">
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <link rel="stylesheet" href="css/product-cards.css?v=5.0">
-    <link rel="stylesheet" href="css/skeleton.css?v=5.0">
+    <!-- CSS Unificado (Streetwear Standard) -->
+    <link rel="stylesheet" href="css/typography.css?v=6.0">
+    <link rel="stylesheet" href="css/style.css?v=6.0">
+    <link rel="stylesheet" href="css/design-system.css?v=6.0">
+
+    <!-- CSS Específicos de Página -->
+    <link rel="stylesheet" href="css/product-cards.css?v=6.0">
+    <link rel="stylesheet" href="css/skeleton.css?v=6.0">
 
     <!-- NEW STREETWEAR OVERHAUL (Primary Source of Truth) -->
-    <link rel="stylesheet" href="css/home-streetwear.css?v=5.0">
-    <link rel="stylesheet" href="css/header-v3.css?v=5.0">
+    <link rel="stylesheet" href="css/home-streetwear.css?v=6.0">
+    <link rel="stylesheet" href="css/header-v3.css?v=6.0">
+
     <!-- JSON-LD Structured Data -->
     <script type="application/ld+json">
     {
@@ -126,7 +123,6 @@
         <div id="heroSliderDots" class="hero-dots"></div>
     </section>
 
-    <!-- Brand Marquee (Static but styled) -->
     <!-- Brand Marquee (Active V3) -->
     <section class="brand-marquee-section">
         <div class="marquee-track">
@@ -270,8 +266,10 @@
             </div>
             <p class="drop-info">"CACTUS JACK" COLLECTION - LIMITED QUANTITIES</p>
             <div class="drop-actions">
-                <button class="btn btn-white notify-btn">GET NOTIFIED</button>
-                <button class="btn btn-outline-white">VIEW LOOKBOOK</button>
+                <button class="btn btn-white notify-btn"
+                    onclick="document.getElementById('newsletterPopup').style.display='flex'">GET NOTIFIED</button>
+                <button class="btn btn-outline-white"
+                    onclick="window.location.href='products.html?collection=cactus-jack'">VIEW LOOKBOOK</button>
             </div>
         </div>
     </section>
@@ -288,7 +286,8 @@
                 <div class="video-content">
                     <h3>STREET CULTURE</h3>
                     <p>DEFINING THE AESTHETIC OF TOMORROW</p>
-                    <a href="#" class="btn-play"><i class="fas fa-play"></i> WATCH FILM</a>
+                    <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" class="btn-play"><i
+                            class="fas fa-play"></i> WATCH FILM</a>
                 </div>
             </div>
         </div>
@@ -312,7 +311,8 @@
         <div class="container fluid-container">
             <div class="section-header-row">
                 <h2 class="section-title">SEEN ON YOU <span class="hashtag">#SNEAKERSSHOP</span></h2>
-                <a href="#" class="link-arrow">Join the Community <i class="fas fa-arrow-right"></i></a>
+                <a href="https://instagram.com" target="_blank" class="link-arrow">Join the Community <i
+                        class="fas fa-arrow-right"></i></a>
             </div>
             <div class="social-grid">
                 <div class="social-item">
@@ -455,22 +455,22 @@
     </div>
 
     <!-- Scripts del Sistema Integrado -->
-    <script src="js/logger.js?v=4.0"></script>
-    <script src="js/api.js?v=4.0"></script>
-    <script src="js/auth.js?v=4.0"></script>
-    <script src="js/verification.js?v=4.0"></script>
-    <script src="js/notifications.js?v=4.0"></script>
-    <script src="js/breadcrumbs.js?v=4.0"></script>
-    <script src="js/skeleton.js?v=4.0"></script>
-    <script src="js/modals.js?v=4.0"></script>
-    <script src="js/cart.js?v=4.0"></script>
-    <script src="js/components.js?v=4.0"></script>
-    <script src="js/home.js?v=4.0"></script>
-    <script src="js/comparator.js?v=4.0"></script>
-    <script src="js/autocomplete.js?v=4.0"></script>
-    <script src="js/carousel.js?v=4.0"></script>
-    <script src="js/main.js?v=4.0"></script>
-    <script src="js/pwa.js?v=4.0"></script>
+    <script src="js/logger.js?v=6.0"></script>
+    <script src="js/api.js?v=6.0"></script>
+    <script src="js/auth.js?v=6.0"></script>
+    <script src="js/verification.js?v=6.0"></script>
+    <script src="js/notifications.js?v=6.0"></script>
+    <script src="js/breadcrumbs.js?v=6.0"></script>
+    <script src="js/skeleton.js?v=6.0"></script>
+    <script src="js/modals.js?v=6.0"></script>
+    <script src="js/cart.js?v=6.0"></script>
+    <script src="js/components.js?v=6.0"></script>
+    <script src="js/home.js?v=6.0"></script>
+    <script src="js/comparator.js?v=6.0"></script>
+    <script src="js/autocomplete.js?v=6.0"></script>
+    <script src="js/carousel.js?v=6.0"></script>
+    <script src="js/main.js?v=6.0"></script>
+    <script src="js/pwa.js?v=6.0"></script>
 
     <script>
         // Logic centralized in js/home.js via HomeEngine
