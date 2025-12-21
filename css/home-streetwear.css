@@ -4,9 +4,25 @@
    0. GLOBAL LAYOUT & STRUCTURE (STRICT GRID)
    ============================================ */
 :root {
-    --spacing-4xl: 8rem;
-    /* Strict Vertical Rhythm */
+    --spacing-4xl: 5rem;
+    /* Reduced from 8rem for better density */
     --container-width: 1400px;
+}
+
+/* HARDENED GRID DEFINITIONS */
+.product-grid-v3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    width: 100%;
+    margin-bottom: var(--spacing-4xl);
+}
+
+/* ENSURE CARDS EXPAND TO FILL ROW */
+.product-grid-v3 .product-card {
+    height: 100%;
+    min-height: 450px;
+    width: 100%;
 }
 
 /* RESET & CORE */
@@ -306,7 +322,23 @@ body.loaded #preloader {
     max-width: 600px;
     margin-bottom: var(--spacing-xl);
     font-weight: 500;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    color: var(--white);
+    /* FIX: Enforce white text */
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    /* FIX: Stronger shadow for legibility */
+}
+
+/* FIX: Hide broken white box artifact (likely partial slider nav) */
+.hero-dots button,
+.slider-arrow {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+#heroSliderDots {
+    bottom: 2rem;
+    z-index: 10;
 }
 
 .slide .btn {

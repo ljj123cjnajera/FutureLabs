@@ -259,13 +259,27 @@ class HomeEngine {
     const container = document.getElementById(containerId);
     if (!container) return;
 
+    // Remove inline styles that might conflict (let CSS control the grid)
+    container.removeAttribute('style');
+    container.classList.add('product-grid-v3');
+
+    // 🛡️ Guard: Empty State
+    if (!products || products.length === 0) {
+      container.innerHTML = `<div class="p-8 text-center text-xl font-bold border-2 border-black">NO PRODUCTS FOUND IN THIS COLLECTION</div>`;
+      return;
+    }
+
     // Use Component's Card Generator for consistency
     if (window.Components && window.Components.getProductCard) {
       container.innerHTML = products.map(p => window.Components.getProductCard(p)).join('');
     } else {
-      // Simple fallback
+      // Fallback
       container.innerHTML = products.map(p => `
-            <div class="product-card"><h3>${p.name}</h3><p>$${p.price}</p></div>
+            <div class="product-card brutalist-fallback">
+                <h3>${p.name}</h3>
+                <p>$${p.price}</p>
+                <button>Add to Cart</button>
+            </div>
         `).join('');
     }
   }
