@@ -532,152 +532,72 @@ let stripe = null;
 let stripeElements = null;
 let stripeCardElement = null;
 
-// Renderizar Paso 2: Método de Pago
+// Renderizar Paso 2: Método de Pago (Brutalist V3)
 function renderPaymentStep() {
     const subtotal = Number(cartData.subtotal ?? cartData.total ?? 0);
     const shippingAmount = Number(cartData.shipping ?? shippingOptions[selectedShippingOption]?.amount ?? 0);
-    const total = Math.max(subtotal + shippingAmount - discount - loyaltyPointsDiscount, 0);
+
+    // Apply Discounts
+    const discountAmount = window.couponsManager ? window.couponsManager.getDiscount() : (discount || 0);
+
+    // Final Calculation
+    const total = Math.max(subtotal + shippingAmount - discountAmount - loyaltyPointsDiscount, 0);
 
     return `
         <div class="checkout-form-section">
-            <h2><i class="fas fa-credit-card"></i> Método de Pago</h2>
+            <h2 class="checkout-section-title">PAYMENT METHOD</h2>
             
-            <div class="payment-methods-grid">
-                <div class="payment-method-card ${selectedPaymentMethod === 'stripe' ? 'selected' : ''}" onclick="selectPaymentMethod('stripe')">
-                    <i class="fab fa-cc-visa"></i>
-                    <div class="method-name">Tarjeta</div>
-                    <div class="method-desc">Visa, Mastercard, Amex</div>
-                </div>
-                
-                <div class="payment-method-card ${selectedPaymentMethod === 'yape' ? 'selected' : ''}" onclick="selectPaymentMethod('yape')">
-                    <i class="fas fa-mobile-alt"></i>
-                    <div class="method-name">Yape</div>
-                    <div class="method-desc">Pago móvil rápido</div>
-                </div>
-                
-                <div class="payment-method-card ${selectedPaymentMethod === 'plin' ? 'selected' : ''}" onclick="selectPaymentMethod('plin')">
-                    <i class="fas fa-mobile-alt"></i>
-                    <div class="method-name">Plin</div>
-                    <div class="method-desc">Pago móvil rápido</div>
-                </div>
-                
-                <div class="payment-method-card ${selectedPaymentMethod === 'bank_transfer' ? 'selected' : ''}" onclick="selectPaymentMethod('bank_transfer')">
-                    <i class="fas fa-university"></i>
-                    <div class="method-name">Transferencia</div>
-                    <div class="method-desc">Bancaria</div>
-                </div>
-                
-                <div class="payment-method-card ${selectedPaymentMethod === 'cash' ? 'selected' : ''}" onclick="selectPaymentMethod('cash')">
-                    <i class="fas fa-money-bill-wave"></i>
-                    <div class="method-name">Efectivo</div>
-                    <div class="method-desc">Pago contra entrega</div>
-                </div>
-            </div>
-            
-            ${selectedPaymentMethod === 'stripe' ? `
-                <div class="payment-details active" id="stripe-payment-details">
-                    <div class="stripe-payment-header">
-                        <h3><i class="fas fa-credit-card"></i> Detalles de la Tarjeta</h3>
-                        <p class="stripe-payment-subtitle">Ingresa la información de tu tarjeta de crédito o débito</p>
-                    </div>
-                    
-                    <div class="stripe-card-container">
-                        <label class="stripe-card-label">
-                            <span>Información de la Tarjeta</span>
-                            <span class="stripe-card-icons">
-                                <i class="fab fa-cc-visa" title="Visa"></i>
-                                <i class="fab fa-cc-mastercard" title="Mastercard"></i>
-                                <i class="fab fa-cc-amex" title="American Express"></i>
-                            </span>
-                        </label>
-                        <div id="stripe-card-element" class="stripe-card-element"></div>
-                        <div id="stripe-card-errors" role="alert" class="stripe-card-errors"></div>
-                        <div class="stripe-security-info">
-                            <i class="fas fa-lock"></i>
-                            <span>Tu información está protegida por Stripe. No almacenamos los datos de tu tarjeta.</span>
+            <div class="payment-methods-grid" style="display: grid; gap: 1rem;">
+                <!-- CREDIT CARD -->
+                <label class="payment-option ${selectedPaymentMethod === 'stripe' ? 'selected' : ''}" onclick="selectPaymentMethod('stripe')">
+                    <input type="radio" name="paymentMethod" value="stripe" ${selectedPaymentMethod === 'stripe' ? 'checked' : ''} style="display:none;">
+                    <div style="flex: 1;">
+                        <div style="display:flex; justify-content:space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <span style="font-weight: 800; text-transform: uppercase;">CREDIT / DEBIT CARD</span>
+                            <i class="fas fa-credit-card"></i>
                         </div>
-                    </div>
-                    
-                    <div class="stripe-payment-info">
-                        <div class="stripe-security-badge">
-                            <i class="fas fa-shield-alt"></i>
-                            <div>
-                                <strong>Pago Seguro</strong>
-                                <p>Tu información está protegida con encriptación SSL de 256 bits</p>
+                        <div style="font-size: 0.85rem; color: #555;">SECURE PAYMENT VIA STRIPE</div>
+                        
+                        ${selectedPaymentMethod === 'stripe' ? `
+                            <div class="stripe-container" style="margin-top: 1rem; border-top: 2px solid #eee; padding-top: 1rem;">
+                                <div id="stripe-card-element" style="border: 2px solid #000; padding: 1rem; background: #fff;"></div>
+                                <div id="stripe-card-errors" role="alert" style="color: red; margin-top: 0.5rem; font-size: 0.85rem; font-weight: 700;"></div>
                             </div>
-                        </div>
-                        <div class="stripe-test-info">
-                            <i class="fas fa-info-circle"></i>
-                            <p><strong>Modo de Prueba:</strong> Usa la tarjeta de prueba <code>4242 4242 4242 4242</code> con cualquier CVV y fecha futura</p>
-                        </div>
+                        ` : ''}
                     </div>
-                </div>
-            ` : selectedPaymentMethod === null ? `
-            ` : selectedPaymentMethod === null ? `
-                <div class="payment-info-box warning">
-                    <p>
-                        <i class="fas fa-info-circle"></i> Por favor, selecciona un método de pago arriba
-                    </p>
-                </div>
-            ` : ''}
+                </label>
+                
+                <!-- YAPE / PLIN -->
+                <label class="payment-option ${selectedPaymentMethod === 'yape' ? 'selected' : ''}" onclick="selectPaymentMethod('yape')">
+                    <input type="radio" name="paymentMethod" value="yape" ${selectedPaymentMethod === 'yape' ? 'checked' : ''} style="display:none;">
+                    <div style="flex: 1;">
+                        <div style="display:flex; justify-content:space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <span style="font-weight: 800; text-transform: uppercase;">YAPE</span>
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <div style="font-size: 0.85rem; color: #555;">INSTANT MOBILE PAYMENT</div>
+                        
+                        ${selectedPaymentMethod === 'yape' ? `
+                           <div style="margin-top: 1rem;">
+                                <label style="display:block; font-weight:700; font-size: 0.8rem; margin-bottom:0.3rem;">PHONE NUMBER</label>
+                                <input type="tel" id="mobile-phone" class="form-input" placeholder="999 999 999">
+                           </div>
+                        ` : ''}
+                    </div>
+                </label>
 
-            
-            ${selectedPaymentMethod === 'yape' || selectedPaymentMethod === 'plin' ? `
-                <div class="payment-details active" id="mobile-payment-details">
-                    <h3>Información de Pago ${selectedPaymentMethod === 'yape' ? 'Yape' : 'Plin'}</h3>
-                    <div class="form-group">
-                        <label for="mobile-phone">Número de teléfono *</label>
-                        <input type="tel" id="mobile-phone" class="form-control" placeholder="Ej: 987654321" pattern="[0-9]{9}" maxlength="9" required>
-                        <small class="form-text">Ingresa tu número de celular asociado a ${selectedPaymentMethod === 'yape' ? 'Yape' : 'Plin'} (9 dígitos, sin espacios)</small>
-                    </div>
-                    <div id="mobile-payment-info" class="payment-info-box info">
-                        <p class="font-bold">
-                            <strong>Total a pagar:</strong> ${checkoutCurrencyFormatter.format(total)}
-                        </p>
-                        <div id="mobile-account-info" class="mt-2">
-                            <p>
-                                <i class="fas fa-spinner fa-spin"></i> Cargando información de cuenta...
-                            </p>
+                <!-- BANK TRANSFER -->
+                <label class="payment-option ${selectedPaymentMethod === 'bank_transfer' ? 'selected' : ''}" onclick="selectPaymentMethod('bank_transfer')">
+                    <input type="radio" name="paymentMethod" value="bank_transfer" ${selectedPaymentMethod === 'bank_transfer' ? 'checked' : ''} style="display:none;">
+                    <div style="flex: 1;">
+                        <div style="display:flex; justify-content:space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <span style="font-weight: 800; text-transform: uppercase;">BANK TRANSFER</span>
+                            <i class="fas fa-university"></i>
                         </div>
-                        <p class="mt-2 text-sm">
-                            <i class="fas fa-info-circle"></i> Realiza el pago desde tu app ${selectedPaymentMethod === 'yape' ? 'Yape' : 'Plin'} y espera la confirmación. Te enviaremos un email con las instrucciones.
-                        </p>
+                        <div style="font-size: 0.85rem; color: #555;">DIRECT DEPOSIT (BCP / INTERBANK)</div>
                     </div>
-                </div>
-            ` : ''}
-            
-            ${selectedPaymentMethod === 'bank_transfer' ? `
-                <div class="payment-details active" id="bank-transfer-details">
-                    <h3>Transferencia Bancaria</h3>
-                    <div id="bank-transfer-info" class="payment-info-box info">
-                        <p class="font-bold">
-                            <strong>Total a pagar:</strong> ${checkoutCurrencyFormatter.format(total)}
-                        </p>
-                        <div id="bank-account-details" class="mt-2">
-                            <p>
-                                <i class="fas fa-spinner fa-spin"></i> Cargando información bancaria...
-                            </p>
-                        </div>
-                        <p class="mt-2 text-sm">
-                            <i class="fas fa-info-circle"></i> Realiza la transferencia y envía el comprobante. Te enviaremos un email con las instrucciones.
-                        </p>
-                    </div>
-                </div>
-            ` : ''}
-            
-            ${selectedPaymentMethod === 'cash' ? `
-                <div class="payment-details active" id="cash-payment-details">
-                    <h3>Pago en Efectivo</h3>
-                    <div class="payment-info-box success">
-                        <p class="font-bold">
-                            <strong>Total a pagar:</strong> ${checkoutCurrencyFormatter.format(total)}
-                        </p>
-                        <p class="mt-2 text-sm">
-                            Pagarás en efectivo al momento de recibir tu pedido. El repartidor aceptará el pago exacto.
-                        </p>
-                    </div>
-                </div>
-            ` : ''}
+                </label>
+            </div>
         </div>
     `;
 }

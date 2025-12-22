@@ -60,7 +60,7 @@ class CatalogEngine {
         } else {
             // Fallback just in case (Brutalist V3 Structure)
             container.innerHTML = products.map(p => `
-                <div class="product-card">
+                <div class="product-card" onclick="window.location.href='product-detail.html?id=${p.id}'">
                     <div class="product-image-container">
                         <img src="${p.image_url}" class="product-image" alt="${p.name}">
                         ${p.badge ? `<div class="product-badges"><span class="product-badge">${p.badge}</span></div>` : ''}
@@ -68,8 +68,15 @@ class CatalogEngine {
                     <div class="product-content">
                         <span class="product-category">${p.brand}</span>
                         <h3 class="product-title">${p.name}</h3>
-                        <div class="product-price">S/ ${p.price.toFixed(2)}</div>
-                        <button class="product-add-btn" onclick="window.catalogEngine.quickAdd(${p.id}, '${p.name}')">ADD TO CART</button>
+                        
+                        <div class="product-price-container">
+                             <span class="product-price-current">S/ ${p.price.toFixed(2)}</span>
+                             <button class="btn-quick-add" onclick="event.stopPropagation(); window.catalogEngine.quickAdd(${p.id}, '${p.name}')">
+                                <i class="fas fa-plus"></i>
+                             </button>
+                        </div>
+                        
+                        <button class="product-btn">ADD TO CART</button>
                     </div>
                 </div>
             `).join('');
