@@ -179,7 +179,10 @@ class Components {
         <nav class="header-nav desktop-only">
             <div class="container" style="padding: 0;">
                 <ul class="nav-list">
-                    <li class="nav-item"><a href="products.html?filter=new" class="nav-link">NEW ARRIVALS</a></li>
+                    <li class="nav-item">
+                        <a href="products.html?filter=new" class="nav-link">NEW ARRIVALS</a>
+                        ${megaMenuHTML}
+                    </li>
                     <li class="nav-item"><a href="products.html?category=jordan" class="nav-link">JORDAN</a></li>
                     <li class="nav-item"><a href="products.html?category=yeezy" class="nav-link">YEEZY</a></li>
                     <li class="nav-item"><a href="products.html?category=nike" class="nav-link">NIKE</a></li>

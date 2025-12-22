@@ -62,47 +62,62 @@ class CartEngine {
     const total = items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
 
     container.innerHTML = `
-            <div class="cart-layout-v3" style="display: grid; grid-template-columns: 1fr 350px; gap: 2rem;">
+            <div class="cart-grid-v3">
                 <!-- Items List -->
-                <div class="cart-items-brutalist">
+                <div class="cart-items-list">
                     ${items.map(item => `
-                        <div class="cart-item-row" style="display: flex; gap: 1rem; border: 2px solid var(--black); padding: 1rem; margin-bottom: 1rem; align-items: center;">
-                            <img src="${item.image_url}" style="width: 100px; height: 100px; object-fit: cover; border: 2px solid var(--black);" alt="${item.name}">
-                            <div style="flex: 1;">
-                                <div style="font-weight: 800; text-transform: uppercase;">${item.brand}</div>
-                                <h3 style="margin: 0; font-size: 1.2rem;">${item.name}</h3>
-                                <div style="margin-top: 0.5rem; font-weight: 700;">S/ ${item.price.toFixed(2)}</div>
+                        <div class="cart-item">
+                            <div class="cart-item-image">
+                                <img src="${item.image_url}" alt="${item.name}">
                             </div>
-                            <div class="qty-controls" style="display: flex; align-items: center; border: 2px solid var(--black);">
-                                <button onclick="window.cartEngine.updateQty(${item.id}, ${item.quantity - 1})" style="width: 32px; height: 32px; background: transparent; border: none; font-weight: 900; cursor: pointer;">-</button>
-                                <span style="font-weight: 800; padding: 0 8px;">${item.quantity}</span>
-                                <button onclick="window.cartEngine.updateQty(${item.id}, ${item.quantity + 1})" style="width: 32px; height: 32px; background: black; color: white; border: none; font-weight: 900; cursor: pointer;">+</button>
+                            
+                            <div class="cart-item-details">
+                                <div class="cart-item-brand">${item.brand || 'Sneakers'}</div>
+                                <h3 class="cart-item-title">${item.name}</h3>
+                                <div class="cart-item-options">Size: ${item.size || 'US 9'}</div>
+                                
+                                <div class="quantity-control">
+                                    <button class="quantity-btn" onclick="window.cartEngine.updateQty(${item.id}, ${item.quantity - 1})">-</button>
+                                    <input type="text" class="quantity-input" value="${item.quantity}" readonly>
+                                    <button class="quantity-btn" onclick="window.cartEngine.updateQty(${item.id}, ${item.quantity + 1})">+</button>
+                                </div>
+                            </div>
+
+                            <div class="cart-item-price-col">
+                                <div class="cart-price">S/ ${(item.price * item.quantity).toFixed(2)}</div>
+                                <button class="btn-remove" onclick="window.cartEngine.updateQty(${item.id}, 0)">
+                                    REMOVE
+                                </button>
                             </div>
                         </div>
                     `).join('')}
                 </div>
 
                 <!-- Summary (Sticky) -->
-                <div class="cart-summary-brutalist" style="border: 4px solid var(--black); padding: 2rem; height: fit-content;">
-                    <h2 style="margin-top: 0; text-transform: uppercase; font-weight: 900; border-bottom: 2px solid var(--black); padding-bottom: 1rem;">Order Summary</h2>
+                <div class="order-summary-box">
+                    <h2 class="summary-title">Order Summary</h2>
                     
-                    <div style="display: flex; justify-content: space-between; margin: 1rem 0; font-weight: 600;">
+                    <div class="summary-row">
                         <span>SUBTOTAL</span>
                         <span>S/ ${total.toFixed(2)}</span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; margin: 1rem 0; font-weight: 600;">
+                    <div class="summary-row">
                         <span>SHIPPING</span>
                         <span>FREE</span>
                     </div>
 
-                    <div style="display: flex; justify-content: space-between; margin: 2rem 0; font-size: 1.5rem; font-weight: 900; border-top: 2px solid var(--black); padding-top: 1rem;">
+                    <div class="summary-total">
                         <span>TOTAL</span>
                         <span>S/ ${total.toFixed(2)}</span>
                     </div>
 
-                    <button class="btn btn-massive" style="width: 100%; display: block; margin-top: 1rem;" onclick="window.location.href='checkout.html'">
-                        CHECKOUT <i class="fas fa-arrow-right"></i>
+                    <button class="btn-checkout" onclick="window.location.href='checkout.html'">
+                        PROCEED TO CHECKOUT
                     </button>
+                    
+                    <div style="margin-top: 2rem; text-align: center; font-size: 0.8rem; color: #666;">
+                        <i class="fas fa-lock"></i> SECURE CHECKOUT
+                    </div>
                 </div>
             </div>
         `;
@@ -110,10 +125,11 @@ class CartEngine {
 
   renderEmpty(container) {
     container.innerHTML = `
-            <div style="text-align: center; padding: 4rem; border: 2px solid var(--black);">
-                <h2 style="font-size: 3rem; text-transform: uppercase; font-weight: 900;">CART EMPTY</h2>
-                <p>YOU NEED SOME HEAT ON YOUR FEET.</p>
-                <a href="products.html" class="btn btn-black" style="margin-top: 1rem; display: inline-block;">GO SHOPPING</a>
+            <div class="empty-cart-state">
+                <i class="fas fa-shopping-cart" style="font-size: 4rem; margin-bottom: 2rem; color: var(--black);"></i>
+                <h2 class="empty-cart-title">YOUR CART IS EMPTY</h2>
+                <p style="font-family: 'Inter', sans-serif; margin-bottom: 2rem;">Looks like you haven't found your grails yet.</p>
+                <a href="products.html" class="btn-continue-shopping">Start Shopping</a>
             </div>
         `;
   }

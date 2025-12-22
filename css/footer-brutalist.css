@@ -1,0 +1,175 @@
+/* ==========================================================================
+   FOOTER BRUTALIST V3 - "THE FOUNDATION"
+   ========================================================================== */
+.footer {
+    background: var(--black);
+    color: var(--white);
+    padding: 80px 0 40px;
+    /* Spacing 4xl -> ~80px */
+    border-top: 5px solid var(--black);
+    /* Should merge if body is white */
+    font-family: 'Poppins', sans-serif;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 2fr;
+    gap: 4rem;
+    margin-bottom: 4rem;
+}
+
+.footer-logo {
+    font-size: 2.5rem;
+    font-weight: 900;
+    margin-bottom: 2rem;
+    letter-spacing: -1px;
+    line-height: 1;
+}
+
+.footer-bio {
+    font-family: 'Inter', sans-serif;
+    color: #ccc;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    max-width: 300px;
+}
+
+.footer h3 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    margin-bottom: 2rem;
+    color: var(--white);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.footer ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer li {
+    margin-bottom: 12px;
+}
+
+.footer a {
+    color: #999;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    display: inline-block;
+}
+
+.footer a:hover {
+    color: var(--white);
+    transform: translateX(5px);
+}
+
+.footer-newsletter {
+    background: #111;
+    padding: 2rem;
+    border: 2px solid var(--white);
+    position: relative;
+}
+
+.footer-newsletter::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 100%;
+    height: 100%;
+    border: 2px solid var(--gray-600);
+    z-index: -1;
+}
+
+.newsletter-desc {
+    color: #ccc;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+}
+
+.footer .input-group {
+    display: flex;
+    border: 2px solid var(--white);
+}
+
+.footer input {
+    background: transparent;
+    border: none;
+    color: var(--white);
+    padding: 12px;
+    width: 100%;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+}
+
+.footer button {
+    background: var(--white);
+    color: var(--black);
+    border: none;
+    padding: 0 20px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.footer button:hover {
+    background: var(--accent);
+}
+
+.footer-bottom {
+    border-top: 2px solid #333;
+    padding-top: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.footer-meta {
+    display: flex;
+    gap: 2rem;
+}
+
+.social-links {
+    margin-top: 2rem;
+    display: flex;
+    gap: 1.5rem;
+}
+
+.social-links a {
+    color: var(--white);
+    font-size: 1.5rem;
+    transition: transform 0.2s;
+}
+
+.social-links a:hover {
+    color: var(--accent);
+    transform: translateY(-5px);
+}
+
+@media (max-width: 1024px) {
+    .footer-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .footer-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 3rem;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        gap: 1.5rem;
+        text-align: center;
+    }
+}

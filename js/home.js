@@ -53,7 +53,14 @@ class HomeEngine {
         { id: 102, name: 'Adidas Yeezy Boost 350 V2 "Zebra"', price: 380.00, image_url: 'https://images.unsplash.com/photo-1549488344-c7059349b576?auto=format&fit=crop&q=80&w=800', badge: 'RESTOCK' },
         { id: 103, name: 'Nike Dunk Low Retro "Panda"', price: 180.00, image_url: 'https://images.unsplash.com/photo-1637844527273-218ba489995a?auto=format&fit=crop&q=80&w=800', badge: 'BESTSELLER' },
         { id: 104, name: 'Travis Scott x AJ1 Low "Olive"', price: 1200.00, image_url: 'https://images.unsplash.com/photo-1584735175315-9d58160926ad?auto=format&fit=crop&q=80&w=800', badge: 'HYPE' },
-        { id: 105, name: 'New Balance 550 "Aimé Leon Dore"', price: 350.00, image_url: 'https://images.unsplash.com/photo-1656335362192-2bc9051b1824?auto=format&fit=crop&q=80&w=800', badge: 'COLLAB' }
+        { id: 105, name: 'New Balance 550 "Aimé Leon Dore"', price: 350.00, image_url: 'https://images.unsplash.com/photo-1656335362192-2bc9051b1824?auto=format&fit=crop&q=80&w=800', badge: 'COLLAB' },
+        { id: 106, name: 'Air Jordan 4 Retro "Military Black"', price: 420.00, image_url: 'https://images.unsplash.com/photo-1695513286047-9d7e56230873?auto=format&fit=crop&q=80&w=800', badge: 'HOT' },
+        { id: 107, name: 'Nike SB Dunk Low "Mummy"', price: 550.00, image_url: 'https://images.unsplash.com/photo-1523398002811-6ce9e490101d?auto=format&fit=crop&q=80&w=800', badge: 'TENDENCIA' },
+        { id: 108, name: 'Yeezy Foam Runner "Sand"', price: 150.00, image_url: 'https://images.unsplash.com/photo-1605218427368-22d7168b4f4c?auto=format&fit=crop&q=80&w=800', badge: 'SUMMER' },
+        { id: 109, name: 'Samba OG "Cloud White"', price: 120.00, image_url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=800', badge: 'CLASSIC' },
+        { id: 110, name: 'Off-White x Nike Air Force 1', price: 1500.00, image_url: 'https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&q=80&w=800', badge: 'MUSEUM' },
+        { id: 111, name: 'Rick Owens Geobasket', price: 980.00, image_url: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&q=80&w=800', badge: 'AVANT' },
+        { id: 112, name: 'Birkenstock Boston Taupe', price: 180.00, image_url: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=800', badge: 'COMFORT' }
       ],
       brands: [
         { name: 'NIKE', logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg' },
