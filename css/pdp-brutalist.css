@@ -1,0 +1,251 @@
+/* ==========================================================================
+   PRODUCT DETAIL PAGE (PDP) - BRUTALIST V3
+   CodeName: "The Monolith"
+   Description: High-impact, sticky gallery layout with massive typography.
+   ========================================================================== */
+
+:root {
+    --pdp-grid-gap: 4rem;
+    --gallery-width: 60%;
+    --info-width: 40%;
+}
+
+/* 1. LAYOUT STRUCTURE */
+.product-detail-page {
+    padding-top: 2rem;
+    padding-bottom: 8rem;
+    background: var(--white);
+}
+
+.product-detail-layout {
+    display: grid;
+    grid-template-columns: var(--gallery-width) var(--info-width);
+    gap: var(--pdp-grid-gap);
+    align-items: start;
+    max-width: var(--container-width);
+    margin: 0 auto;
+}
+
+/* 2. STICKY GALLERY (Left Column) */
+.product-gallery-sticky {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* 2 Column Grid for Desktop */
+    gap: 20px;
+    width: 100%;
+}
+
+.gallery-image-wrapper {
+    width: 100%;
+    aspect-ratio: 4/5;
+    /* Standard Fashion Ratio */
+    background: var(--gray-100);
+    overflow: hidden;
+    cursor: zoom-in;
+    position: relative;
+    border: 2px solid transparent;
+    transition: border-color 0.3s;
+}
+
+.gallery-image-wrapper:hover {
+    border-color: var(--black);
+}
+
+.gallery-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.gallery-image-wrapper:hover .gallery-image {
+    transform: scale(1.03);
+}
+
+/* 3. PRODUCT INFO (Right Column - Sticky) */
+.product-info-detail {
+    position: sticky;
+    top: 120px;
+    /* Offset for Header */
+    padding-right: 20px;
+}
+
+/* 4. TYPOGRAPHY & BRANDING */
+.product-brand {
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    font-size: 1rem;
+    letter-spacing: 2px;
+    margin-bottom: 0.5rem;
+    color: var(--gray-500);
+    text-transform: uppercase;
+}
+
+.product-title-large {
+    font-family: 'Poppins', sans-serif;
+    /* Fallback until font checked */
+    font-weight: 900;
+    font-size: clamp(2.5rem, 4vw, 3.5rem);
+    line-height: 0.95;
+    text-transform: uppercase;
+    color: var(--black);
+    margin-bottom: 1.5rem;
+    letter-spacing: -1px;
+}
+
+.product-price-large {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.8rem;
+    color: var(--black);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.product-price-original {
+    text-decoration: line-through;
+    color: var(--gray-400);
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+/* 5. SELECTORS & ACTIONS */
+.size-selector-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.size-guide-link {
+    text-decoration: underline;
+    cursor: pointer;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    transition: color 0.2s;
+}
+
+.size-guide-link:hover {
+    color: var(--black);
+}
+
+.size-selector-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    gap: 10px;
+    margin-bottom: 2rem;
+}
+
+.size-option {
+    border: 2px solid var(--gray-200);
+    background: transparent;
+    padding: 12px 0;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.size-option:hover:not(.disabled) {
+    border-color: var(--black);
+}
+
+.size-option.selected {
+    background: var(--black);
+    color: var(--white);
+    border-color: var(--black);
+}
+
+.size-option.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    background: var(--gray-100);
+    text-decoration: line-through;
+    border-color: transparent;
+}
+
+/* 6. ACTION BUTTONS */
+.btn-massive {
+    width: 100%;
+    padding: 1.5rem;
+    background: var(--black);
+    color: var(--white);
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.btn-massive:hover {
+    background: var(--accent);
+    /* Assuming variable exists */
+    color: var(--black);
+    transform: translateY(-2px);
+}
+
+.btn-massive:disabled {
+    background: var(--gray-400);
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* 7. META INFO */
+.product-meta-footer {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 3px solid var(--black);
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.meta-item i {
+    font-size: 1.8rem;
+    width: 30px;
+    text-align: center;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+    .product-detail-layout {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .product-info-detail {
+        position: static;
+        /* Unstick on mobile */
+        padding: 0 1rem;
+    }
+
+    .product-gallery-sticky {
+        /* On mobile, maybe a carousel or just stack */
+        display: flex;
+        /* Simplified carousel for now */
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        gap: 0;
+    }
+
+    .gallery-image-wrapper {
+        min-width: 100vw;
+        scroll-snap-align: start;
+        border: none;
+    }
+}
