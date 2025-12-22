@@ -9,337 +9,125 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Font Awesome -->
-    <!-- CSS del Sistema -->
-    <!-- CARGAR STYLE.CSS ANTES DEL FIX PARA EVITAR SOBRESCRITURA -->
+    <!-- CSS Unificado (Streetwear Standard V3) -->
+    <link rel="stylesheet" href="css/home-streetwear.css?v=6.2">
+    <link rel="stylesheet" href="css/header-v3.css?v=6.2">
+    <link rel="stylesheet" href="css/account-brutalist.css?v=1.0">
 
-    <!-- CSS Unificado (Streetwear Standard) -->
-    <link rel="stylesheet" href="css/typography.css?v=3.0">
-    <link rel="stylesheet" href="css/style.css?v=3.0">
-    <link rel="stylesheet" href="css/design-system.css?v=3.0">
-    <link rel="stylesheet" href="css/header-improved.css?v=3.0">
-    <link rel="stylesheet" href="css/footer-improved.css?v=3.0">
-    <link rel="stylesheet" href="css/forms-improved.css?v=3.0">
-    <link rel="stylesheet" href="css/modals-improved.css?v=3.0">
-    <link rel="stylesheet" href="css/loading-states-improved.css?v=3.0">
-    <link rel="stylesheet" href="css/micro-interactions.css?v=3.0">
-    <link rel="stylesheet" href="css/pages-common.css?v=3.0">
-    <link rel="stylesheet" href="css/responsive.css?v=3.0">
-    <link rel="stylesheet" href="css/notifications.css?v=3.0">
-    <link rel="stylesheet" href="css/animations.css?v=3.0">
-    <link rel="stylesheet" href="css/components-enhanced.css?v=3.0">
-
-    <!-- CSS Específicos de Página -->
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
-        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/profile-wishlist-orders.css">
-    <link rel="stylesheet" href="css/animations-enhanced.css">
 </head>
 
 <body>
     <!-- Header Dinámico -->
     <header id="mainHeader"></header>
 
-    <div class="profile-page">
-        <!-- Profile Hero -->
-        <section class="profile-hero">
-            <div class="container">
-                <div class="profile-hero-card">
-                    <div class="profile-hero-meta">
-                        <div class="profile-avatar" id="profileAvatar" aria-hidden="true">
-                            <i class="fas fa-user" aria-hidden="true"></i>
-                        </div>
-                        <div class="profile-info">
-                            <h1 id="profileName" aria-live="polite">Cargando...</h1>
-                            <p id="profileEmail" aria-live="polite">Cargando email...</p>
-                        </div>
-                    </div>
-                    <div class="profile-hero-actions" role="group" aria-label="Acciones rápidas del perfil">
-                        <button type="button" class="btn btn-primary btn-sm" onclick="scrollToSection('orders')"
-                            aria-label="Ver mis pedidos">
-                            <i class="fas fa-shopping-bag" aria-hidden="true"></i> Ver pedidos
-                        </button>
-                        <button type="button" class="btn btn-outline btn-sm"
-                            onclick="window.location.href='wishlist.html'" aria-label="Ver mi wishlist">
-                            <i class="fas fa-heart" aria-hidden="true"></i> Wishlist
-                        </button>
-                        <button type="button" class="btn btn-outline btn-sm" onclick="scrollToSection('security')"
-                            aria-label="Ir a configuración de seguridad">
-                            <i class="fas fa-lock" aria-hidden="true"></i> Seguridad
-                        </button>
-                    </div>
-                </div>
+    <div class="account-container">
+        <!-- SIDEBAR -->
+        <aside class="account-sidebar">
+            <div class="account-user-info">
+                <div class="account-user-name" id="profileName">LOADING...</div>
+                <div class="account-user-email" id="profileEmail">...</div>
             </div>
-        </section>
 
-        <div class="container">
-            <!-- Profile Tabs -->
-            <nav class="profile-tabs" role="tablist" aria-label="Secciones del perfil">
-                <button class="profile-tab active" data-tab="overview" role="tab" aria-selected="true"
-                    aria-controls="overview" id="tab-overview" tabindex="0">
-                    <i class="fas fa-home" aria-hidden="true"></i>
-                    <span>Resumen</span>
+            <nav class="account-nav">
+                <button class="account-nav-btn active" onclick="switchTab('overview')">
+                    <i class="fas fa-th-large"></i> OVERVIEW
                 </button>
-                <button class="profile-tab" data-tab="personal" role="tab" aria-selected="false"
-                    aria-controls="personal" id="tab-personal" tabindex="-1">
-                    <i class="fas fa-user" aria-hidden="true"></i>
-                    <span>Datos Personales</span>
+                <button class="account-nav-btn" onclick="switchTab('orders')">
+                    <i class="fas fa-box"></i> ORDERS
                 </button>
-                <button class="profile-tab" data-tab="addresses" role="tab" aria-selected="false"
-                    aria-controls="addresses" id="tab-addresses" tabindex="-1">
-                    <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
-                    <span>Direcciones</span>
+                <button class="account-nav-btn" onclick="switchTab('addresses')">
+                    <i class="fas fa-map-marker-alt"></i> ADDRESSES
                 </button>
-                <button class="profile-tab" data-tab="security" role="tab" aria-selected="false"
-                    aria-controls="security" id="tab-security" tabindex="-1">
-                    <i class="fas fa-lock" aria-hidden="true"></i>
-                    <span>Seguridad</span>
+                <button class="account-nav-btn" onclick="switchTab('settings')">
+                    <!-- <i class="fas fa-cog"></i> --> SETTINGS
                 </button>
-                <button class="profile-tab" data-tab="points" role="tab" aria-selected="false" aria-controls="points"
-                    id="tab-points" tabindex="-1">
-                    <i class="fas fa-star" aria-hidden="true"></i>
-                    <span>Puntos de Lealtad</span>
+                <button class="account-nav-btn" onclick="window.authManager.logout()"
+                    style="margin-top: 2rem; color: red; border-color: red;">
+                    LOGOUT
                 </button>
             </nav>
+        </aside>
 
-            <!-- Profile Content Sections -->
-            <div class="profile-content-wrapper">
-                <!-- Overview Tab -->
-                <div class="profile-section active" id="overview" data-profile-section="overview" role="tabpanel"
-                    aria-labelledby="tab-overview" aria-live="polite">
-                    <!-- Loyalty Points Overview -->
-                    <div class="loyalty-overview-grid">
-                        <div class="loyalty-points-card">
-                            <div class="loyalty-card-header">
-                                <div class="loyalty-tier-chip" id="loyaltyTierChip">
-                                    <i class="fas fa-medal"></i>
-                                    <span id="loyaltyTierName">Explorador</span>
-                                </div>
-                                <button type="button" class="btn btn-light btn-sm loyalty-redeem-btn"
-                                    id="loyaltyRedeemButton">
-                                    <i class="fas fa-gift"></i> Canjear puntos
-                                </button>
-                            </div>
-                            <div class="loyalty-card-body">
-                                <div class="loyalty-points-group">
-                                    <span class="loyalty-points-label">Puntos disponibles</span>
-                                    <div class="loyalty-points-value" id="loyaltyPointsValue">0</div>
-                                </div>
-                                <div class="loyalty-points-meta">
-                                    <div>
-                                        <span class="loyalty-meta-label">Equivalen a</span>
-                                        <span class="loyalty-meta-value" id="loyaltyPointsEquivalent">S/ 0.00</span>
-                                    </div>
-                                    <div>
-                                        <span class="loyalty-meta-label">Multiplicador actual</span>
-                                        <span class="loyalty-meta-value" id="loyaltyPointsMultiplier">1.0x</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="loyalty-progress">
-                                <div class="loyalty-progress-header">
-                                    <span id="loyaltyProgressLabel">Sigue acumulando para subir de nivel</span>
-                                    <span id="loyaltyProgressPercent">0%</span>
-                                </div>
-                                <div class="loyalty-progress-bar">
-                                    <div class="loyalty-progress-fill" id="loyaltyProgressFill"></div>
-                                </div>
-                            </div>
-                            <div class="loyalty-benefits">
-                                <h3>Beneficios actuales</h3>
-                                <ul id="loyaltyBenefitsList">
-                                    <li><i class="fas fa-check-circle"></i> 1x puntos por cada S/ 1</li>
-                                </ul>
-                            </div>
-                        </div>
+        <!-- CONTENT -->
+        <main class="account-content">
+            <!-- OVERVIEW SECTION -->
+            <section id="overview" class="account-section active">
+                <h1 class="section-title">DASHBOARD</h1>
 
-                        <div class="loyalty-actions-card">
-                            <h3>Cómo ganar más puntos</h3>
-                            <p class="loyalty-next-tier" id="loyaltyNextTierMessage">Realiza tu próxima compra para
-                                desbloquear beneficios.</p>
-                            <ul class="loyalty-actions-list">
-                                <li><i class="fas fa-shopping-bag"></i> Compra en la tienda (+1 punto por S/ 1)</li>
-                                <li><i class="fas fa-star"></i> Deja una reseña verificada (+150 pts)</li>
-                                <li><i class="fas fa-user-friends"></i> Invita a un amigo que compre (+250 pts)</li>
-                                <li><i class="fas fa-bolt"></i> Aprovecha campañas con doble puntos</li>
-                            </ul>
-                            <button type="button" class="btn btn-outline btn-sm" id="loyaltyLearnMoreButton">
-                                <i class="fas fa-info-circle"></i> Ver todas las recompensas
-                            </button>
-                        </div>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <span class="stat-label">TOTAL SPENT</span>
+                        <div class="stat-value" id="totalSpent">S/ 0</div>
                     </div>
-
-                    <!-- Stats Grid -->
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-card-header">
-                                <span class="stat-card-title">Pedidos</span>
-                                <div class="stat-card-icon"
-                                    style="background: rgba(102, 126, 234, 0.1); color: #667eea;">
-                                    <i class="fas fa-shopping-bag"></i>
-                                </div>
-                            </div>
-                            <div class="stat-card-value" id="totalOrders">0</div>
-                            <div class="stat-card-change positive">
-                                <i class="fas fa-arrow-up"></i>
-                                <span>Total de pedidos</span>
-                            </div>
-                        </div>
-
-                        <div class="stat-card">
-                            <div class="stat-card-header">
-                                <span class="stat-card-title">Gastado</span>
-                                <div class="stat-card-icon"
-                                    style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
-                                    <i class="fas fa-money-bill-wave"></i>
-                                </div>
-                            </div>
-                            <div class="stat-card-value" id="totalSpent">S/ 0</div>
-                            <div class="stat-card-change positive">
-                                <i class="fas fa-arrow-up"></i>
-                                <span>Total acumulado</span>
-                            </div>
-                        </div>
-
-                        <div class="stat-card">
-                            <div class="stat-card-header">
-                                <span class="stat-card-title">Wishlist</span>
-                                <div class="stat-card-icon" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
-                                    <i class="fas fa-heart"></i>
-                                </div>
-                            </div>
-                            <div class="stat-card-value" id="wishlistCount">0</div>
-                            <div class="stat-card-change positive">
-                                <i class="fas fa-heart"></i>
-                                <span>Productos favoritos</span>
-                            </div>
-                        </div>
-
-                        <div class="stat-card">
-                            <div class="stat-card-header">
-                                <span class="stat-card-title">Reseñas</span>
-                                <div class="stat-card-icon"
-                                    style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
-                                    <i class="fas fa-star"></i>
-                                </div>
-                            </div>
-                            <div class="stat-card-value" id="reviewsCount">0</div>
-                            <div class="stat-card-change positive">
-                                <i class="fas fa-star"></i>
-                                <span>Reseñas realizadas</span>
-                            </div>
-                        </div>
+                    <div class="stat-box">
+                        <span class="stat-label">ORDERS</span>
+                        <div class="stat-value" id="totalOrders">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">LOYALTY POINTS</span>
+                        <div class="stat-value" id="loyaltyPointsValue">0</div>
                     </div>
                 </div>
 
-                <!-- Personal Data Tab -->
-                <div class="profile-section" id="personal" data-profile-section="personal" role="tabpanel"
-                    aria-labelledby="tab-personal" aria-live="polite" hidden>
-                    <div class="profile-content-section">
-                        <div class="profile-content-section-header">
-                            <h2><i class="fas fa-user"></i> Información Personal</h2>
-                        </div>
-                        <form id="personalDataForm">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label class="form-label">Nombre</label>
-                                    <input type="text" class="form-input" id="firstName" required>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Apellidos</label>
-                                    <input type="text" class="form-input" id="lastName" required>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Email</label>
-                                <input type="email" class="form-input" id="email" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Teléfono</label>
-                                <input type="tel" class="form-input" id="phone">
-                            </div>
-                            <div class="form-actions">
-                                <button type="button" class="btn btn-secondary"
-                                    onclick="cancelEdit('personal')">Cancelar</button>
-                                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-                            </div>
-                        </form>
+                <div style="border: 2px solid var(--black); padding: 2rem; text-align: center;">
+                    <h3 style="font-weight: 800; text-transform: uppercase; margin-bottom: 1rem;">NEED HELP?</h3>
+                    <p style="margin-bottom: 1.5rem;">Contact our support team for any issues with your orders.</p>
+                    <button class="btn-save" onclick="window.location.href='mailto:support@sneakersshop.com'">CONTACT
+                        SUPPORT</button>
+                </div>
+            </section>
+
+            <!-- ORDERS SECTION -->
+            <section id="orders" class="account-section">
+                <h1 class="section-title">MY ORDERS</h1>
+                <div id="ordersList">
+                    <div style="padding: 2rem; border: 2px dashed #ccc; text-align: center;">NO ORDERS YET</div>
+                </div>
+            </section>
+
+            <!-- ADDRESSES SECTION -->
+            <section id="addresses" class="account-section">
+                <h1 class="section-title">ADDRESSES</h1>
+                <div class="brutalist-form">
+                    <div style="padding: 1rem; background: #eee; font-family: monospace;">
+                        TODO: Address Manager
                     </div>
                 </div>
+            </section>
 
-                <!-- Addresses Tab -->
-                <div class="profile-section" id="addresses" data-profile-section="addresses" role="tabpanel"
-                    aria-labelledby="tab-addresses" aria-live="polite" hidden>
-                    <div class="profile-content-section">
-                        <div class="profile-content-section-header">
-                            <h2><i class="fas fa-map-marker-alt"></i> Mis Direcciones</h2>
-                            <button class="btn btn-primary" onclick="openAddressModal()">
-                                <i class="fas fa-plus"></i> Nueva Dirección
-                            </button>
-                        </div>
-                        <div id="addressesList" class="address-list"></div>
+            <!-- SETTINGS SECTION -->
+            <section id="settings" class="account-section">
+                <h1 class="section-title">SETTINGS</h1>
+                <form class="brutalist-form" id="profileForm">
+                    <div class="form-group">
+                        <label>FULL NAME</label>
+                        <input type="text" class="form-input" id="firstName">
                     </div>
-                </div>
-
-                <!-- Security Tab -->
-                <div class="profile-section" id="security" data-profile-section="security" role="tabpanel"
-                    aria-labelledby="tab-security" aria-live="polite" hidden>
-                    <div class="profile-content-section">
-                        <div class="profile-content-section-header">
-                            <h2><i class="fas fa-lock"></i> Seguridad</h2>
-                        </div>
-                        <form id="changePasswordForm">
-                            <div class="form-group">
-                                <label class="form-label">Contraseña Actual</label>
-                                <input type="password" class="form-input" id="currentPassword" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Nueva Contraseña</label>
-                                <input type="password" class="form-input" id="newPassword" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Confirmar Nueva Contraseña</label>
-                                <input type="password" class="form-input" id="confirmPassword" required>
-                            </div>
-                            <div class="form-actions">
-                                <button type="button" class="btn btn-secondary"
-                                    onclick="cancelEdit('security')">Cancelar</button>
-                                <button type="submit" class="btn btn-primary">Cambiar Contraseña</button>
-                            </div>
-                        </form>
-
-                        <!-- Logout Section -->
-                        <div class="profile-content-section"
-                            style="margin-top: 30px; border-top: 1px solid var(--border); padding-top: 30px;">
-                            <div class="profile-content-section-header">
-                                <h3><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</h3>
-                                <p style="color: var(--gray-600); font-size: 0.9rem; margin-top: 8px;">Cierra tu sesión
-                                    de forma segura en este dispositivo</p>
-                            </div>
-                            <button type="button" id="logoutButton" class="btn btn-danger" style="margin-top: 20px;">
-                                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-                            </button>
-                        </div>
+                    <div class="form-group">
+                        <label>EMAIL</label>
+                        <input type="email" class="form-input" id="email" disabled style="background: #eee;">
                     </div>
-                </div>
-
-                <!-- Points Tab -->
-                <div class="profile-section" id="points" data-profile-section="points" role="tabpanel"
-                    aria-labelledby="tab-points" aria-live="polite" hidden>
-                    <div class="profile-content-section">
-                        <div class="profile-content-section-header">
-                            <h2><i class="fas fa-star"></i> Historial de Puntos</h2>
-                        </div>
-                        <div id="loyaltyTransactions" class="loyalty-transactions"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                    <button type="button" class="btn-save">UPDATE PROFILE</button>
+                </form>
+            </section>
+        </main>
     </div>
 
-    <!-- Footer -->
-    <footer id="mainFooter"></footer>
+    <!-- Script for Tab Switching (Inline for simplicity or moved to profile.js) -->
+    <script>
+        function switchTab(tabId) {
+            // Hide all sections
+            document.querySelectorAll('.account-section').forEach(el => el.classList.remove('active'));
+            // Deactivate all nav buttons
+            document.querySelectorAll('.account-nav-btn').forEach(el => el.classList.remove('active'));
+
+            // Show target
+            document.getElementById(tabId).classList.add('active');
+            // Activate button (rough approximation, in real app use event.target or data attr)
+            event.currentTarget.classList.add('active');
+        }
+    </script>
 
     <!-- Address Modal -->
     <div id="addressModal" class="modal">
