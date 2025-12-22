@@ -3076,3 +3076,72 @@ body.loaded #preloader {
     opacity: 1;
     transform: translateY(0);
 }
+
+/* ============================================
+   17. MOBILE HARDENING (FINAL POLISH Phase 83)
+   ============================================ */
+@media (max-width: 768px) {
+
+    /* Hero: Ensure text doesn't overflow or look too small */
+    .hero-title {
+        font-size: 2.5rem !important;
+        line-height: 1.1;
+    }
+
+    .slide p {
+        font-size: 1rem !important;
+        max-width: 90%;
+    }
+
+    /* Bento Grid: More breathing room */
+    .bento-grid {
+        gap: 20px;
+        margin-top: 2rem;
+    }
+
+    .bento-item {
+        min-height: 250px;
+        /* Ensure visibility */
+    }
+
+    /* Product Grids: 2 Columns on Mobile (Standard for commerce) instead of 1 */
+    .product-grid-v3 {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+    }
+
+    /* Adjust Card styling for 2-col layout */
+    .product-info {
+        padding: 10px;
+    }
+
+    .product-title {
+        font-size: 0.9rem;
+    }
+
+    .quick-add-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
+
+    /* Trust Bar: Stack vertically with gap */
+    .trust-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    /* Newsletter: Remove negative margins if any */
+    .newsletter-section {
+        margin-top: 0;
+        padding: 3rem 1rem;
+    }
+
+    /* Sections: Reduce vertical spacing */
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}

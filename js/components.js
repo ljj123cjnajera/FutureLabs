@@ -153,7 +153,22 @@ class Components {
 
                 <!-- ACTIONS -->
                 <div class="header-actions">
-                    <a href="account.html" class="action-btn">
+[
+  {
+    "StartLine": 128,
+    "EndLine": 128,
+    "TargetContent": "                    <a href=\"account.html\" class=\"action-btn\">",
+    "ReplacementContent": "                    <a href=\"profile.html\" class=\"action-btn\">",
+    "AllowMultiple": true
+  },
+  {
+      "StartLine": 208,
+      "EndLine": 208,
+      "TargetContent": "                    <a href=\"sitemap.html\">SITEMAP</a>",
+      "ReplacementContent": "                    <a href=\"#\">SITEMAP</a>",
+      "AllowMultiple": true
+  }
+]
                         <i class="far fa-user"></i>
                         <span class="desktop-only">ACCOUNT</span>
                     </a>

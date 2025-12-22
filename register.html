@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Us | Sneakers Shop</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- CORE STYLES -->
+    <link rel="stylesheet" href="css/home-streetwear.css?v=6.1">
+    <link rel="stylesheet" href="css/header-v3.css?v=6.1">
+
+    <style>
+        .auth-container {
+            max-width: 500px;
+            margin: 8rem auto;
+            padding: 2rem;
+            border: 3px solid var(--black);
+            text-align: center;
+        }
+
+        .auth-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 900;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            text-align: left;
+        }
+
+        .form-label {
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--gray-300);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: var(--black);
+            outline: none;
+            box-shadow: 4px 4px 0 var(--gray-200);
+        }
+
+        .btn-auth {
+            background: var(--black);
+            color: var(--white);
+            border: none;
+            padding: 1.2rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 1rem;
+        }
+
+        .btn-auth:hover {
+            transform: translateY(-2px);
+            box-shadow: 4px 4px 0 var(--accent);
+        }
+
+        .auth-links {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .auth-link {
+            text-decoration: underline;
+            color: var(--gray-600);
+        }
+
+        .auth-link:hover {
+            color: var(--black);
+        }
+    </style>
+</head>
+
+<body>
+    <header id="mainHeader"></header>
+
+    <div class="container">
+        <div class="auth-container">
+            <h1 class="auth-title">Join The Club</h1>
+            <form class="auth-form" id="registerForm">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-input" required placeholder="JUMPMAN JACK">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" class="form-input" required placeholder="TU@EMAIL.COM">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" required placeholder="••••••••">
+                </div>
+
+                <button type="submit" class="btn-auth">Create Account</button>
+            </form>
+
+            <div class="auth-links">
+                <span>Already a member? <a href="login.html" class="auth-link">Sign In</a></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/components.js?v=6.1"></script>
+    <script src="js/auth.js?v=6.1"></script>
+    <script src="js/notifications.js?v=6.1"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.Components) window.Components.initHeader();
+            document.getElementById('registerForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                // Simulate login
+                localStorage.setItem('user_token', 'mock_token_123');
+                window.location.href = 'profile.html';
+            });
+        });
+    </script>
+</body>
+
+</html>
