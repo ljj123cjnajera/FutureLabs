@@ -12,7 +12,7 @@ class ProductGallery {
   init() {
     // Crear lightbox si no existe
     this.createLightbox();
-    
+
     // Event listeners globales
     document.addEventListener('keydown', (e) => {
       if (this.lightbox?.classList.contains('active')) {
@@ -25,7 +25,7 @@ class ProductGallery {
 
   createLightbox() {
     if (document.getElementById('productGalleryLightbox')) return;
-    
+
     const lightboxHTML = `
       <div class="product-gallery-lightbox" id="productGalleryLightbox">
         <button class="product-gallery-lightbox-close" id="galleryLightboxClose">
@@ -43,15 +43,15 @@ class ProductGallery {
         </div>
       </div>
     `;
-    
+
     document.body.insertAdjacentHTML('beforeend', lightboxHTML);
     this.lightbox = document.getElementById('productGalleryLightbox');
-    
+
     // Event listeners
     document.getElementById('galleryLightboxClose').addEventListener('click', () => this.closeLightbox());
     document.getElementById('galleryLightboxPrev').addEventListener('click', () => this.previousImage());
     document.getElementById('galleryLightboxNext').addEventListener('click', () => this.nextImage());
-    
+
     // Cerrar al hacer click en el fondo
     this.lightbox.addEventListener('click', (e) => {
       if (e.target === this.lightbox) {
@@ -60,59 +60,33 @@ class ProductGallery {
     });
   }
 
-  // Renderizar galería con imágenes
   render(images, product = {}) {
     this.images = Array.isArray(images) ? images : [images];
     this.currentIndex = 0;
-    
-    // Si solo hay una imagen, duplicarla para mejor UX
+
+    // Si solo hay una imagen, duplicarla para mejor UX (Grid)
     if (this.images.length === 1) {
-      this.images = [this.images[0], this.images[0], this.images[0]];
+      this.images = [this.images[0], this.images[0], this.images[0], this.images[0]];
     }
-    
+
     const container = document.getElementById(this.containerId);
     if (!container) {
       console.error('Product gallery container not found:', this.containerId);
       return;
     }
-    
+
     this.container = container;
-    
-    const discount = product.discount_price && product.discount_price < product.price
-      ? Math.round(((product.price - product.discount_price) / product.price) * 100)
-      : 0;
-    
-    const html = `
-      <div class="product-gallery">
-        <div class="product-gallery-main" onclick="productGallery.openLightbox(0)">
-          <img src="${this.images[0]}" 
-               alt="${product.name || 'Producto'}" 
-               id="galleryMainImage"
-               onerror="this.onerror=null; this.src='assets/images/products/placeholder.jpg';">
-          <div class="product-gallery-zoom-icon">
-            <i class="fas fa-search-plus"></i>
-          </div>
-          ${discount > 0 ? `<div class="product-gallery-badge">-${discount}%</div>` : ''}
+
+    // Brutalist V3 Grid Render
+    // Outputs direct <div>s to be styled by CSS Grid in pdp-brutalist.css
+    const html = this.images.map((img, index) => `
+        <div class="gallery-image-wrapper" onclick="productGallery.openLightbox(${index})">
+            <img src="${img}" class="gallery-image" alt="${product.name} - View ${index + 1}" loading="lazy">
         </div>
-        
-        ${this.images.length > 1 ? `
-          <div class="product-gallery-thumbnails">
-            ${this.images.map((img, index) => `
-              <div class="product-gallery-thumbnail ${index === 0 ? 'active' : ''}" 
-                   onclick="productGallery.selectImage(${index})"
-                   data-index="${index}">
-                <img src="${img}" 
-                     alt="${product.name || 'Producto'} - Vista ${index + 1}"
-                     onerror="this.onerror=null; this.src='assets/images/products/placeholder.jpg';">
-              </div>
-            `).join('')}
-          </div>
-        ` : ''}
-      </div>
-    `;
-    
+    `).join('');
+
     container.innerHTML = html;
-    
+
     // Guardar referencia global para onclick
     window.productGallery = this;
   }
@@ -120,15 +94,15 @@ class ProductGallery {
   // Seleccionar imagen desde thumbnail
   selectImage(index) {
     if (index < 0 || index >= this.images.length) return;
-    
+
     this.currentIndex = index;
-    
+
     // Actualizar imagen principal
     const mainImage = document.getElementById('galleryMainImage');
     if (mainImage) {
       mainImage.src = this.images[index];
     }
-    
+
     // Actualizar thumbnails activos
     document.querySelectorAll('.product-gallery-thumbnail').forEach((thumb, i) => {
       thumb.classList.toggle('active', i === index);
@@ -140,18 +114,18 @@ class ProductGallery {
     if (index !== null) {
       this.currentIndex = index;
     }
-    
+
     const lightboxImage = document.getElementById('galleryLightboxImage');
     const lightboxCounter = document.getElementById('galleryLightboxCounter');
-    
+
     if (lightboxImage && this.lightbox) {
       lightboxImage.src = this.images[this.currentIndex];
       lightboxImage.alt = `Imagen ${this.currentIndex + 1} de ${this.images.length}`;
-      
+
       if (lightboxCounter) {
         lightboxCounter.textContent = `${this.currentIndex + 1} / ${this.images.length}`;
       }
-      
+
       this.lightbox.classList.add('active');
       document.body.style.overflow = 'hidden';
     }
@@ -181,12 +155,12 @@ class ProductGallery {
   updateLightboxImage() {
     const lightboxImage = document.getElementById('galleryLightboxImage');
     const lightboxCounter = document.getElementById('galleryLightboxCounter');
-    
+
     if (lightboxImage) {
       lightboxImage.src = this.images[this.currentIndex];
       lightboxImage.alt = `Imagen ${this.currentIndex + 1} de ${this.images.length}`;
     }
-    
+
     if (lightboxCounter) {
       lightboxCounter.textContent = `${this.currentIndex + 1} / ${this.images.length}`;
     }
@@ -203,7 +177,7 @@ class ProductGallery {
         baseUrl.replace('300', '303')
       ];
     }
-    
+
     // Si es una imagen real, intentar generar variaciones
     // Esto es solo para demo - en producción deberías tener múltiples imágenes
     return [baseUrl, baseUrl, baseUrl, baseUrl];
