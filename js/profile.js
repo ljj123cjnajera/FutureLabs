@@ -1,73 +1,110 @@
-// Profile Page Logic
-console.log('🔵 [PROFILE] Script js/profile.js loaded');
+// PROFILE ENGINE V3 (Brutalist)
+console.log('⚫ [PROFILE] Brutalist Engine Loaded');
 
-const LOYALTY_POINTS_TO_CURRENCY_RATE = 10;
-const LOYALTY_TIERS = [
-    {
-        id: 'bronze',
-        name: 'Bronce',
-        min: 0,
-        multiplier: 1,
-        icon: 'fas fa-medal',
-        gradient: 'linear-gradient(135deg, #b87333 0%, #d97706 100%)',
-        chipBackground: 'rgba(184, 115, 51, 0.35)',
-        chipColor: '#fff7ed',
-        textColor: '#ffffff',
-        benefits: [
-            '1x puntos por cada S/ 1',
-            'Acceso a campañas especiales'
-        ]
-    },
-    {
-        id: 'silver',
-        name: 'Plata',
-        min: 500,
-        multiplier: 1.25,
-        icon: 'fas fa-trophy',
-        gradient: 'linear-gradient(135deg, #9ca3af 0%, #cbd5f5 100%)',
-        chipBackground: 'rgba(148, 163, 184, 0.35)',
-        chipColor: '#0f172a',
-        textColor: '#0f172a',
-        benefits: [
-            '1.25x puntos por cada S/ 1',
-            'Envío estándar gratis en compras mayores a S/ 250',
-            'Atención prioritaria en soporte'
-        ]
-    },
-    {
-        id: 'gold',
-        name: 'Oro',
-        min: 1200,
-        multiplier: 1.5,
-        icon: 'fas fa-crown',
-        gradient: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
-        chipBackground: 'rgba(251, 191, 36, 0.45)',
-        chipColor: '#78350f',
-        textColor: '#78350f',
-        benefits: [
-            '1.5x puntos por cada S/ 1',
-            'Ofertas exclusivas antes que todos',
-            'Regalo sorpresa cada trimestre'
-        ]
-    },
-    {
-        id: 'platinum',
-        name: 'Platino',
-        min: 2000,
-        multiplier: 2,
-        icon: 'fas fa-gem',
-        gradient: 'linear-gradient(135deg, #4f46e5 0%, #a855f7 100%)',
-        chipBackground: 'rgba(99, 102, 241, 0.4)',
-        chipColor: '#eef2ff',
-        textColor: '#eef2ff',
-        benefits: [
-            '2x puntos por cada S/ 1',
-            'Manager personal de compras',
-            'Eventos privados y primeras unidades',
-            'Envío express gratis'
-        ]
+document.addEventListener('DOMContentLoaded', async () => {
+    // 1. Init Header
+    if (document.getElementById('mainHeader') && window.Components) {
+        document.getElementById('mainHeader').innerHTML = window.Components.getHeader(true, true);
+        window.Components.initHeader();
+        window.Components.initCartCounter();
     }
-];
+
+    // 2. Auth Check
+    if (window.authManager && !window.authManager.isAuthenticated()) {
+        window.location.href = 'index.html';
+        return;
+    }
+
+    // 3. Load Data
+    await loadProfileData();
+    await loadOrders();
+});
+
+// --- CORE FUNCTIONS ---
+
+async function loadProfileData() {
+    try {
+        const user = window.authManager.currentUser || (await window.api.getProfile()).data.user;
+
+        if (user) {
+            // Sidebar Info
+            setIdText('profileName', `${user.first_name} ${user.last_name}`);
+            setIdText('profileEmail', user.email);
+
+            // Dashboard Stats
+            // (Mocking stats if API doesn't provide them directly in user object)
+            // In a real app, these might come from a specific dashboard endpoint
+            setIdText('loyaltyPointsValue', user.points || 0);
+
+            // Settings Form
+            setIdValue('firstName', `${user.first_name} ${user.last_name}`); // Just mapping one field for now
+            setIdValue('email', user.email);
+        }
+    } catch (e) {
+        console.error('Profile Load Error:', e);
+    }
+}
+
+async function loadOrders() {
+    const container = document.getElementById('ordersList');
+    if (!container) return;
+
+    try {
+        const res = await window.api.getOrders();
+        const orders = res.data?.orders || [];
+
+        setIdText('totalOrders', orders.length);
+
+        const totalSpent = orders.reduce((acc, o) => acc + parseFloat(o.total), 0);
+        setIdText('totalSpent', `S/ ${totalSpent.toFixed(2)}`);
+
+        if (orders.length === 0) {
+            container.innerHTML = `<div style="padding: 2rem; border: 2px dashed #000; text-align: center; font-weight: 700;">NO ORDERS FOUND</div>`;
+            return;
+        }
+
+        container.innerHTML = orders.map(order => `
+            <div class="order-item">
+                <div class="order-header">
+                    <span class="order-id">#${order.id}</span>
+                    <span class="order-status">${order.status}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.9rem;">
+                    <span>${new Date(order.created_at).toLocaleDateString()}</span>
+                    <span style="font-weight: 800;">S/ ${parseFloat(order.total).toFixed(2)}</span>
+                </div>
+                <button class="btn-save" style="margin-top: 1rem; font-size: 0.8rem; padding: 0.5rem 1rem;" onclick="alert('View Details Not Implemented')">VIEW DETAILS</button>
+            </div>
+        `).join('');
+
+    } catch (e) {
+        console.error('Orders Load Error:', e);
+        container.innerHTML = `<div style="color: red; font-weight: 700;">ERROR LOADING ORDERS</div>`;
+    }
+}
+
+// --- UTILS ---
+
+function setIdText(id, text) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+}
+
+function setIdValue(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.value = value;
+}
+
+// Global Tab Switcher (Backup if inline fails)
+window.switchTab = function (tabId) {
+    document.querySelectorAll('.account-section').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.account-nav-btn').forEach(el => el.classList.remove('active'));
+
+    document.getElementById(tabId)?.classList.add('active');
+
+    // Highlight button based on click (dirty but works for simple pages)
+    // Ideally passed by 'this' in onclick
+};
 
 const currencyFormatter = new Intl.NumberFormat('es-PE', {
     style: 'currency',
