@@ -257,23 +257,29 @@ body.loaded #preloader {
 /* ============================================
    1. HERO SECTION - FULL IMPACT
    ============================================ */
-.hero {
-    margin-bottom: 0;
-    /* Remove margin to connect with marquee */
-    padding-top: 180px;
-    /* INCREASED from 40px to 180px to clear the header */
+/* ============================================
+   1. HERO SECTION - FULL IMPACT (Fixed Layout)
+   ============================================ */
+.hero-section {
+    /* No margins! */
+    margin: 0;
+    padding: 0;
     position: relative;
-    height: 85vh;
-    /* REDUCED from 90vh to Show content below fold */
-    min-height: 600px;
-    margin-top: 0;
+    height: 90vh;
+    /* Taller impact */
+    min-height: 700px;
+    background: var(--black);
+    /* Fallback */
+    border-bottom: 4px solid var(--black);
+    z-index: 5;
 }
 
-.hero .container {
-    max-width: 100%;
-    padding: 0;
+.hero-slides {
     height: 100%;
+    width: 100%;
+    position: relative;
 }
+
 
 .hero-slider {
     height: 100%;
