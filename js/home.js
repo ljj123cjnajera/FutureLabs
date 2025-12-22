@@ -262,7 +262,7 @@ class HomeEngine {
     if (!container) return;
 
     // Remove inline styles that might conflict (let CSS control the grid)
-    container.removeAttribute('style');
+    // BUT ensure the class exists for grid layout
     container.classList.add('product-grid-v3');
 
     // 🛡️ Guard: Empty State
@@ -271,19 +271,34 @@ class HomeEngine {
       return;
     }
 
+    // Simulate network delay for premium 'Skeleton to Content' transition effect
+    await new Promise(r => setTimeout(r, 600));
+
     // Use Component's Card Generator for consistency
-    if (window.Components && window.Components.getProductCard) {
-      container.innerHTML = products.map(p => window.Components.getProductCard(p)).join('');
-    } else {
-      // Fallback
-      container.innerHTML = products.map(p => `
+    const cardsHTML = window.Components && window.Components.getProductCard
+      ? products.map(p => window.Components.getProductCard(p)).join('')
+      : products.map(p => `
             <div class="product-card brutalist-fallback">
                 <h3>${p.name}</h3>
                 <p>$${p.price}</p>
                 <button>Add to Cart</button>
             </div>
         `).join('');
-    }
+
+    // Fade Out Skeletons -> Fade In Content
+    container.style.opacity = '0';
+    setTimeout(() => {
+      container.innerHTML = cardsHTML;
+      container.style.transition = 'opacity 0.5s ease';
+      container.style.opacity = '1';
+
+      // Re-inject the grid style if CSS is missing (Safety Net)
+      if (getComputedStyle(container).display !== 'grid') {
+        container.style.display = 'grid';
+        container.style.gridTemplateColumns = 'repeat(auto-fill, minmax(280px, 1fr))';
+        container.style.gap = '20px';
+      }
+    }, 200);
   }
 
   // NEW: Slider Renderer for Trending and Sale
