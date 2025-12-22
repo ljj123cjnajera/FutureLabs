@@ -249,11 +249,11 @@ class HomeEngine {
   async loadProducts() {
     this.initCountdown();
 
-    // Featured (Grid)
+    // Trending / Featured (Grid)
     await this.renderProductGrid('featuredProductsGrid', this.fallbackData.products);
 
-    // Trending (Horizontal Slider)
-    await this.renderProductSlider('trendingSlider', this.fallbackData.products);
+    // On Sale (Grid) - Reusing products for now, ideally would filter for 'sale'
+    await this.renderProductGrid('onSaleProductsGrid', this.fallbackData.products.map(p => ({ ...p, discount_price: p.price * 0.8 })));
   }
 
   async renderProductGrid(containerId, products) {
