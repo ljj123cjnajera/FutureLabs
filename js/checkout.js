@@ -332,103 +332,96 @@ function validateCurrentStep() {
     }
 }
 
-// Renderizar Paso 1: Información de Envío
+// Renderizar Paso 1: Información de Envío (Brutalist V3)
 function renderShippingStep() {
     const selectedOption = shippingOptions[selectedShippingOption] ? selectedShippingOption : 'standard';
+
+    // Brutalist Shipping Cards
     const shippingOptionCards = Object.entries(shippingOptions).map(([key, option]) => `
-        <article class="shipping-method-card ${selectedOption === key ? 'is-selected' : ''}" data-shipping-option="${key}">
-            <div class="shipping-method-card-header">
-                <div>
-                    <span class="shipping-method-title">${option.label}</span>
-                    <p class="shipping-method-description">${option.description}</p>
+        <label class="payment-option ${selectedOption === key ? 'selected' : ''}" onclick="selectShippingMethod('${key}')">
+            <input type="radio" name="shippingMethod" value="${key}" ${selectedOption === key ? 'checked' : ''} style="display:none;">
+            <div style="flex: 1;">
+                <div style="display:flex; justify-content:space-between; margin-bottom: 0.5rem;">
+                    <span style="font-weight: 800; text-transform: uppercase;">${option.label}</span>
+                    <span style="font-weight: 800;">${checkoutCurrencyFormatter.format(option.amount)}</span>
                 </div>
-                <div class="shipping-method-price">${checkoutCurrencyFormatter.format(option.amount)}</div>
+                <div style="font-size: 0.85rem; color: #555;">${option.description}</div>
             </div>
-            <div class="shipping-method-meta">
-                <i class="fas fa-shipping-fast"></i>
-                <span>${option.eta}</span>
-            </div>
-        </article>
+        </label>
     `).join('');
 
     return `
         <div class="checkout-form-section">
-            <h2><i class="fas fa-map-marker-alt"></i> Dirección de Envío</h2>
+            <h2 class="checkout-section-title">SHIPPING ADDRESS</h2>
             
             ${savedAddresses.length > 0 ? `
-            <div class="saved-addresses-container">
-                <h3 class="saved-addresses-title">Direcciones Guardadas</h3>
-                <div class="saved-addresses-grid">
+            <div style="margin-bottom: 2rem; border: 2px dashed #000; padding: 1.5rem;">
+                <h3 style="font-weight: 800; text-transform: uppercase; margin-bottom: 1rem;">SAVED ADDRESSES</h3>
+                <div class="saved-addresses-grid" style="display: grid; gap: 1rem;">
                     ${savedAddresses.map(addr => `
-                        <label class="saved-address-label ${selectedAddressId === addr.id ? 'selected' : ''}" onclick="window.selectSavedAddress('${addr.id}')">
-                            <input type="radio" name="savedAddress" value="${addr.id}" ${selectedAddressId === addr.id ? 'checked' : ''} 
-                                   onchange="window.selectSavedAddress('${addr.id}')" style="margin-top: 4px;">
-                            <div style="flex: 1;">
-                                <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 5px;">
-                                    <strong style="text-transform: uppercase;">${addr.label || 'Dirección'}</strong>
-                                    ${addr.is_default ? '<span class="default-badge">POR DEFECTO</span>' : ''}
-                                </div>
-                                <p style="margin: 0; color: #666; font-size: 14px; line-height: 1.5;">
-                                    ${addr.full_name}<br>
-                                    ${addr.address}, ${addr.city}, ${addr.country}<br>
-                                    Tel: ${addr.phone}
+                        <label class="payment-option ${selectedAddressId === addr.id ? 'selected' : ''}" onclick="window.selectSavedAddress('${addr.id}')">
+                            <input type="radio" name="savedAddress" value="${addr.id}" ${selectedAddressId === addr.id ? 'checked' : ''} style="display:none;">
+                            <div>
+                                <strong>${addr.label || 'ADDRESS'}</strong>
+                                <p style="margin: 0; font-size: 0.9rem;">
+                                    ${addr.address}, ${addr.city}
                                 </p>
                             </div>
                         </label>
                     `).join('')}
                 </div>
-                <button type="button" class="btn btn-outline btn-new-address" onclick="window.useNewAddress()">
-                    <i class="fas fa-plus"></i> Usar Nueva Dirección
+                <button type="button" class="btn btn-outline" style="margin-top: 1rem; width: 100%;" onclick="window.useNewAddress()">
+                    + USE NEW ADDRESS
                 </button>
             </div>
             ` : ''}
             
             <div id="shippingFormSection" style="${savedAddresses.length > 0 && selectedAddressId ? 'display: none;' : ''}">
-            <div class="form-group">
-                <label class="form-label required">Nombre Completo</label>
-                <input type="text" class="form-input" id="fullName" placeholder="Juan Pérez" value="${shippingData.fullName ?? ''}" required>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label required">Dirección</label>
-                <input type="text" class="form-input" id="address" placeholder="Av. Principal 123" value="${shippingData.address ?? ''}" required>
-            </div>
-            
-            <div class="form-row">
                 <div class="form-group">
-                    <label class="form-label required">Ciudad</label>
-                    <input type="text" class="form-input" id="city" placeholder="Lima" value="${shippingData.city ?? ''}" required>
+                    <label class="form-label required">FULL NAME</label>
+                    <input type="text" class="form-input" id="fullName" placeholder="JUMPMAN JACK" value="${shippingData.fullName ?? ''}" required>
                 </div>
+                
                 <div class="form-group">
-                    <label class="form-label required">País</label>
-                    <select class="form-select" id="country" required>
-                        <option value="Perú" ${shippingData.country === 'Perú' ? 'selected' : ''}>Perú</option>
-                        <option value="Chile" ${shippingData.country === 'Chile' ? 'selected' : ''}>Chile</option>
-                        <option value="Colombia" ${shippingData.country === 'Colombia' ? 'selected' : ''}>Colombia</option>
-                    </select>
+                    <label class="form-label required">ADDRESS</label>
+                    <input type="text" class="form-input" id="address" placeholder="123 STREET" value="${shippingData.address ?? ''}" required>
                 </div>
-            </div>
-            
-            <div class="form-row">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label required">CITY</label>
+                        <input type="text" class="form-input" id="city" placeholder="LIMA" value="${shippingData.city ?? ''}" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label required">COUNTRY</label>
+                        <select class="form-input" id="country" required>
+                            <option value="Perú" ${shippingData.country === 'Perú' ? 'selected' : ''}>Perú</option>
+                            <option value="Chile" ${shippingData.country === 'Chile' ? 'selected' : ''}>Chile</option>
+                            <option value="Colombia" ${shippingData.country === 'Colombia' ? 'selected' : ''}>Colombia</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">ZIP CODE</label>
+                        <input type="text" class="form-input" id="postalCode" placeholder="15001" value="${shippingData.postalCode ?? ''}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label required">PHONE</label>
+                        <input type="tel" class="form-input" id="phone" placeholder="+51 987 654 321" value="${shippingData.phone ?? ''}" required>
+                    </div>
+                </div>
+                
                 <div class="form-group">
-                    <label class="form-label">Código Postal</label>
-                    <input type="text" class="form-input" id="postalCode" placeholder="15001" value="${shippingData.postalCode ?? ''}">
+                    <label class="form-label required">EMAIL</label>
+                    <input type="email" class="form-input" id="email" placeholder="YOU@EMAIL.COM" value="${shippingData.email ?? ''}" required>
                 </div>
-                <div class="form-group">
-                    <label class="form-label required">Teléfono</label>
-                    <input type="tel" class="form-input" id="phone" placeholder="+51 987 654 321" value="${shippingData.phone ?? ''}" required>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label required">Email</label>
-                <input type="email" class="form-input" id="email" placeholder="juan@example.com" value="${shippingData.email ?? ''}" required>
-            </div>
             </div>
 
-            <div class="shipping-methods">
-                <h3>Opciones de entrega</h3>
-                <div class="shipping-methods-grid">
+            <div class="shipping-methods" style="margin-top: 3rem;">
+                <h3 class="checkout-section-title">DELIVERY METHOD</h3>
+                <div class="payment-options">
                     ${shippingOptionCards}
                 </div>
             </div>
