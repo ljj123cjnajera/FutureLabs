@@ -1488,140 +1488,193 @@ body.loaded #preloader {
     opacity: 0.9;
 }
 
-line-height: 1.6;
-margin-bottom: var(--spacing-xl);
-max-width: 300px;
+/* ============================================
+   15. FOOTER (BRUTALIST V3)
+   ============================================ */
+.footer {
+    background: var(--black);
+    color: var(--white);
+    padding: var(--spacing-4xl) 0 var(--spacing-md);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1.5fr;
+    gap: 4rem;
+    padding-bottom: 4rem;
+}
+
+.footer-logo {
+    font-size: 2rem;
+    font-weight: 900;
+    margin-bottom: 1.5rem;
+    letter-spacing: -1px;
+}
+
+.footer-bio {
+    max-width: 300px;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--gray-400);
 }
 
 .footer-col h3 {
-    font-size: 1rem;
-    color: var(--white);
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: var(--spacing-lg);
-    border-bottom: 2px solid var(--gray-700);
-    padding-bottom: 0.5rem;
-    display: inline-block;
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin-bottom: 2rem;
+    color: var(--gray-500);
 }
 
 .footer-col ul {
     list-style: none;
     padding: 0;
+    margin: 0;
 }
 
-.footer-col ul li {
-    margin-bottom: var(--spacing-sm);
+.footer-col li {
+    margin-bottom: 12px;
 }
 
-.footer-col ul li a {
-    color: var(--gray-300);
-    text-decoration: none;
-    transition: color 0.3s ease;
-    font-size: 0.95rem;
-}
-
-.footer-col ul li a:hover {
+.footer-col a {
     color: var(--white);
-    text-decoration: underline;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: color 0.3s;
 }
 
-/* Newsletter Input */
+.footer-col a:hover {
+    color: var(--accent);
+}
+
 .footer-newsletter .input-group {
     display: flex;
-    border-bottom: 1px solid var(--white);
-    padding-bottom: 0.5rem;
-    margin-bottom: var(--spacing-lg);
+    margin-top: 1.5rem;
+    border: 2px solid var(--white);
 }
 
 .footer-newsletter input {
     background: transparent;
     border: none;
+    padding: 15px;
     color: var(--white);
     width: 100%;
-    outline: none;
     font-family: inherit;
+    font-weight: 700;
+}
+
+.footer-newsletter input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .footer-newsletter button {
-    background: transparent;
+    background: var(--white);
+    color: var(--black);
     border: none;
-    color: var(--white);
+    padding: 0 20px;
     font-size: 1.2rem;
     cursor: pointer;
-    transition: transform 0.3s ease;
+    transition: background 0.3s;
 }
 
 .footer-newsletter button:hover {
-    transform: translateX(5px);
-    color: var(--accent);
+    background: var(--accent);
 }
 
 /* Social & Payment */
 .social-links {
     display: flex;
-    gap: var(--spacing-md);
+    gap: 20px;
+    margin-top: 2rem;
 }
 
 .social-links a {
     color: var(--white);
-    font-size: 1.2rem;
-    transition: color 0.3s ease;
+    font-size: 1.4rem;
+    transition: transform 0.3s ease;
 }
 
 .social-links a:hover {
+    transform: translateY(-5px);
     color: var(--accent);
 }
 
 .payment-methods {
     display: flex;
     gap: 10px;
-    margin-top: var(--spacing-lg);
+    margin-top: 2rem;
     flex-wrap: wrap;
 }
 
 .payment-method {
-    background: var(--white);
-    color: var(--black);
-    padding: 5px 10px;
-    font-size: 0.8rem;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--white);
+    padding: 5px 12px;
+    font-size: 0.7rem;
     font-weight: 800;
     text-transform: uppercase;
-    border: 1px solid var(--gray-500);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 /* Footer Bottom */
 .footer-bottom {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding-top: var(--spacing-xl);
+    padding-top: 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: var(--gray-600);
-    font-size: 0.9rem;
+    color: var(--gray-500);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    font-weight: 600;
 }
 
 .footer-meta {
     display: flex;
-    gap: var(--spacing-md);
+    gap: 2rem;
 }
 
+/* Desktop Fixes */
+@media (min-width: 1025px) {
+    .footer-newsletter {
+        padding-left: 2rem;
+        border-left: 1px solid rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* Responsive Footer */
 @media (max-width: 1024px) {
     .footer-grid {
         grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+    }
+
+    .footer-brand {
+        grid-column: 1 / -1;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 2rem;
+        margin-bottom: 1rem;
     }
 }
 
 @media (max-width: 768px) {
     .footer-grid {
-        grid-template-columns: 1fr;
-        gap: var(--spacing-xl);
+        display: flex;
+        flex-direction: column;
+        gap: 3rem;
     }
 
     .footer-bottom {
         flex-direction: column;
-        gap: var(--spacing-md);
+        gap: 1.5rem;
         text-align: center;
+    }
+
+    .footer-meta {
+        flex-direction: column;
+        gap: 10px;
     }
 }
 

@@ -6,16 +6,16 @@ class Components {
       <!-- Footer (Brutalist) -->
       <footer class="footer">
         <div class="container">
-            <div class="footer-grid" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 4rem; padding-bottom: 4rem;">
+            <div class="footer-grid">
                 <!-- Brand / Bio -->
                 <div class="footer-col footer-brand">
-                    <div class="footer-logo" style="font-size: 2rem; margin-bottom: 1.5rem;">SNEAKERS SHOP</div>
-                    <p class="footer-bio" style="max-width: 300px;">
+                    <div class="footer-logo">SNEAKERS SHOP</div>
+                    <p class="footer-bio">
                         The ultimate destination for hype. Curating the best sneakers from Nike, Jordan, Yeezy and more. 
                         <br><br>
                         EST. 2024 — WORLDWIDE
                     </p>
-                    <div class="social-links" style="margin-top: 2rem;">
+                    <div class="social-links">
                         <a href="#"><i class="fab fa-instagram"></i></a>
                         <a href="#"><i class="fab fa-tiktok"></i></a>
                         <a href="#"><i class="fab fa-twitter"></i></a>
@@ -49,7 +49,7 @@ class Components {
                 <div class="footer-col footer-newsletter">
                     <h3>STAY IN THE KNOW</h3>
                     <p class="newsletter-desc">Subscribe for exclusive access to drops and events.</p>
-                    <div class="input-group" style="margin-top: 1.5rem;">
+                    <div class="input-group">
                         <input type="email" placeholder="ENTER YOUR EMAIL">
                         <button>→</button>
                     </div>
