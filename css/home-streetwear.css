@@ -300,19 +300,48 @@ body.loaded #preloader {
     bottom: 15%;
     left: 50%;
     transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
+.slide-subtitle {
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    font-size: 1.2rem;
+    letter-spacing: 4px;
+    margin-bottom: 1rem;
+    color: var(--white);
+    background: var(--black);
+    padding: 5px 15px;
+    display: inline-block;
+    text-shadow: none;
+    box-shadow: 6px 6px 0 var(--accent);
+    /* Pop of color */
+}
+
+.hero-title,
 .slide h1 {
     font-family: 'Poppins', sans-serif;
     font-weight: 900;
-    font-size: clamp(3rem, 8vw, 6rem);
-    text-transform: uppercase;
+    /* BLACK WEIGHT */
+    font-size: 6rem;
+    /* MASSIVE SIZE */
     line-height: 0.9;
-    margin-bottom: var(--spacing-md);
-    letter-spacing: -0.03em;
+    letter-spacing: -3px;
+    /* TIGHT TRACKING */
+    margin: 0 0 1.5rem 0;
     color: var(--white);
-    /* Cleaner shadow for legsibility without 'cheapness' */
-    text-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+    text-shadow: 4px 4px 0px #000;
+    text-transform: uppercase;
+}
+
+.hero-title .highlight {
+    color: transparent;
+    -webkit-text-stroke: 3px var(--white);
+    position: relative;
+    display: inline-block;
 }
 
 .slide p {

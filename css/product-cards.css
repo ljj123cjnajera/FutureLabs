@@ -246,34 +246,38 @@
     object-fit: cover;
     object-position: center;
     transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    mix-blend-mode: multiply;
+    mix-blend-mode: normal;
+    /* Reset blend mode for clarity */
 }
 
 .product-card:hover .product-image {
-    transform: scale(1.05);
-    /* Slight zoom */
+    transform: scale(1.1) rotate(1deg);
+    /* Slight rotation for edge */
+    filter: contrast(1.1);
+    /* Pop the colors */
 }
 
-/* Badges - Estilo Etiqueta */
+/* Badges - Estilo Etiqueta Hardcore */
 .product-badges {
     position: absolute;
-    top: 12px;
-    left: 12px;
+    top: 0;
+    left: 0;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 0;
     z-index: 2;
 }
 
 .product-badge {
-    padding: 4px 8px;
+    padding: 6px 10px;
     border-radius: 0;
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     font-weight: 900;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    box-shadow: none;
-    border: 1px solid #000;
+    letter-spacing: 0.5px;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 1);
+    border: 3px solid var(--black);
+    margin: 10px 0 0 10px;
 }
 
 .product-badge-new {
