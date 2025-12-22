@@ -131,9 +131,54 @@ class CartEngine {
 
     localStorage.setItem('brutalist_cart', JSON.stringify(cart));
     this.loadCart(); // Re-render
+
+    // Trigger Drawer Update Event
+    document.dispatchEvent(new CustomEvent('cartUpdated', { detail: { count: cart.reduce((a, b) => a + b.quantity, 0) } }));
+  }
+
+  // Add Item Method (Missing in V3 Engine)
+  async add(id, quantity = 1, options = {}) {
+    // 1. Get Current Cart
+    let cart = JSON.parse(localStorage.getItem('brutalist_cart') || '[]');
+
+    // 2. Check if item exists
+    const existing = cart.find(i => i.id == id);
+
+    if (existing) {
+      existing.quantity += quantity;
+    } else {
+      // Mock Fetch Product Data if not provided (Safety)
+      //In real app, we would fetch from API or use the product object passed.
+      // For now, assuming we use the global currentProduct or fetch
+      const product = window.currentProduct || { id, name: 'Product ' + id, price: 199, image_url: 'assets/images/products/placeholder.jpg', brand: 'Brand' };
+
+      cart.push({
+        id: id,
+        name: product.name,
+        price: parseFloat(product.price),
+        quantity: quantity,
+        image_url: product.image_url,
+        brand: product.brand,
+        size: options.size || 'US 9'
+      });
+    }
+
+    // 3. Save
+    localStorage.setItem('brutalist_cart', JSON.stringify(cart));
+
+    // 4. Update UI
+    this.loadCart();
+    document.dispatchEvent(new CustomEvent('cartUpdated', { detail: { count: cart.reduce((a, b) => a + b.quantity, 0) } }));
+
+    // 5. Open Drawer
+    if (window.CartDrawer) window.CartDrawer.open();
+
+    return true;
   }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
   window.cartEngine = new CartEngine();
+  // Alias for backward compatibility with Components.js
+  window.cartManager = window.cartEngine;
 });

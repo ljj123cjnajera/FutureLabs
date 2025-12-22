@@ -428,9 +428,14 @@
                     return;
                 }
 
-                // Add size to cart item (simulated for now as backend might not expect it yet)
+                // Add size to cart item
                 window.logger?.info('PRODUCT', `Agregando talla: ${ selectedSize } `);
+                
+                // Use the new CartEngine (aliased as cartManager)
+                // It will handle: Saving to LocalStorage, Updating UI, Opening Drawer
                 await window.cartManager.add(productId, 1, { size: selectedSize });
+                
+                // Optional: Notification (already handled visually by drawer open, but good for confirmation)
                 window.notifications.success(`Agregado: Talla US ${ selectedSize }`);
             }
 
