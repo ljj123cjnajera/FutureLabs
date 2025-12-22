@@ -1,0 +1,218 @@
+/* ==========================================================================
+   CHECKOUT BRUTALIST V3
+   CodeName: "The Final Step"
+   Description: High-contrast, no-nonsense checkout flow.
+   ========================================================================== */
+
+:root {
+    --checkout-border: 3px solid var(--black);
+    --input-bg: var(--white);
+    --input-focus-border: var(--accent);
+}
+
+/* 1. LAYOUT STRUCTURE */
+.checkout-page {
+    padding-top: 2rem;
+    padding-bottom: 8rem;
+    background: var(--white);
+}
+
+.checkout-container {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 4rem;
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* 2. PROGRESS BAR (Square) */
+.checkout-progress {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: var(--checkout-border);
+    padding-bottom: 1.5rem;
+    margin-bottom: 3rem;
+    max-width: var(--container-width);
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0.4;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.step.active {
+    opacity: 1;
+}
+
+.step-number {
+    background: var(--black);
+    color: var(--white);
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+}
+
+.step.active .step-number {
+    background: var(--accent);
+    /* Yellow usually */
+    color: var(--black);
+}
+
+/* 3. FORMS (Brutalist) */
+.checkout-section-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 900;
+    font-size: 2rem;
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--gray-200);
+    padding-bottom: 0.5rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+}
+
+.form-input {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid var(--gray-400);
+    border-radius: 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    transition: all 0.2s;
+    background: var(--white);
+}
+
+.form-input:focus {
+    border-color: var(--black);
+    outline: none;
+    box-shadow: 4px 4px 0 var(--accent);
+}
+
+/* 4. ORDER SUMMARY (Sticky Right) */
+.order-summary-box {
+    border: var(--checkout-border);
+    padding: 2rem;
+    position: sticky;
+    top: 120px;
+    background: var(--white);
+}
+
+.summary-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 900;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.summary-total {
+    border-top: 2px solid var(--black);
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    font-size: 1.5rem;
+    font-weight: 900;
+}
+
+/* 5. PAYMENT METHODS */
+.payment-options {
+    display: grid;
+    gap: 1rem;
+}
+
+.payment-option {
+    border: 2px solid var(--gray-400);
+    padding: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.2s;
+}
+
+.payment-option:hover,
+.payment-option.selected {
+    border-color: var(--black);
+    background: var(--gray-100);
+}
+
+.payment-option.selected {
+    border-width: 3px;
+    background: var(--white);
+    box-shadow: 4px 4px 0 var(--black);
+}
+
+/* 6. ACTION BUTTONS */
+.btn-checkout {
+    width: 100%;
+    padding: 1.5rem;
+    background: var(--black);
+    color: var(--white);
+    border: none;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 1.2rem;
+    cursor: pointer;
+    margin-top: 2rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-checkout:hover {
+    transform: translateY(-4px);
+    box-shadow: 6px 6px 0 var(--accent);
+    color: var(--accent);
+}
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+    .checkout-container {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+
+    .order-summary-box {
+        position: static;
+        order: -1;
+        /* Show summary first on mobile usually, or keep bottom? Keeping bottom for now or standard flow */
+        order: 2;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+}
