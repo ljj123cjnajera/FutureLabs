@@ -136,9 +136,11 @@ class Components {
         <div class="header-main-row">
             <div class="container" style="display: flex; justify-content: space-between; align-items: center; padding: 0;">
                 <!-- LOGO -->
-                <a href="index.html" class="header-logo">
-                    <img src="assets/images/logo.png" alt="SNEAKERS SHOP" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
-                    <span style="font-family: 'Poppins', sans-serif; font-weight: 900; font-size: 1.5rem; letter-spacing: -1px; display: none;">SNEAKERS<span style="color: var(--accent);">SHOP</span></span>
+                <!-- LOGO (TEXT ONLY - BRUTALIST V3) -->
+                <a href="index.html" class="header-logo" style="text-decoration: none; display: block;">
+                    <span style="font-family: 'Poppins', sans-serif; font-weight: 900; font-size: 1.8rem; letter-spacing: -1px; line-height: 1; color: var(--black); text-transform: uppercase;">
+                        SNEAKERS<span style="color: var(--accent);">SHOP</span>
+                    </span>
                 </a>
 
                 <!-- SEARCH (Desktop) -->
