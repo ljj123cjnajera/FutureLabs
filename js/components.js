@@ -270,238 +270,237 @@ class Components {
         document.body.style.overflow = '';
       }
     };
-  };
-}
+  }
 
   static initSearchOverlay() {
-  window.SearchOverlay = {
-    open: () => {
-      const overlay = document.getElementById('searchOverlay');
-      const input = document.getElementById('largeSearchInput');
-      if (overlay) {
-        overlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
-        if (input) setTimeout(() => input.focus(), 300);
+    window.SearchOverlay = {
+      open: () => {
+        const overlay = document.getElementById('searchOverlay');
+        const input = document.getElementById('largeSearchInput');
+        if (overlay) {
+          overlay.classList.add('active');
+          document.body.style.overflow = 'hidden';
+          if (input) setTimeout(() => input.focus(), 300);
+        }
+      },
+      close: () => {
+        document.getElementById('searchOverlay').classList.remove('active');
+        document.body.style.overflow = '';
+      },
+      search: (term) => {
+        window.location.href = `products.html?search=${encodeURIComponent(term)}`;
       }
-    },
-    close: () => {
-      document.getElementById('searchOverlay').classList.remove('active');
-      document.body.style.overflow = '';
-    },
-    search: (term) => {
-      window.location.href = `products.html?search=${encodeURIComponent(term)}`;
-    }
-  };
+    };
 
-  // Bind Enter Key
-  const input = document.getElementById('largeSearchInput');
-  if (input) {
-    input.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        window.SearchOverlay.search(input.value);
+    // Bind Enter Key
+    const input = document.getElementById('largeSearchInput');
+    if (input) {
+      input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          window.SearchOverlay.search(input.value);
+        }
+      });
+    }
+  }
+
+  static initHeader() {
+    console.log('🔵 [COMPONENTS] initHeader() executed');
+
+    // Ticker Animation Logic
+    const messages = [
+      "FREE SHIPPING ON ORDERS OVER $150 ✈️",
+      "NEW JORDAN DROP THIS FRIDAY 🔥",
+      "JOIN THE CLUB & GET 10% OFF 👟"
+    ];
+    let msgIndex = 0;
+    const ticker = document.getElementById('announcementText');
+    if (ticker) {
+      setInterval(() => {
+        msgIndex = (msgIndex + 1) % messages.length;
+        ticker.style.opacity = 0;
+        setTimeout(() => {
+          ticker.innerText = messages[msgIndex];
+          ticker.style.opacity = 1;
+        }, 500);
+      }, 4000);
+    }
+
+    this.ensureWishlistAssets();
+    this.ensureVerificationAssets();
+    this.updateCartCount();
+
+    // Check admin status
+    setTimeout(async () => {
+      await this.checkAndShowAdminButton();
+    }, 1000);
+  }
+
+  static async showAdminButton() {
+    // Verificar si el botón ya existe
+    if (document.getElementById('adminButton')) {
+      return;
+    }
+
+    const userActions = document.querySelector('.header-actions'); // Updated selector for V3
+    if (!userActions) return;
+
+    // Crear botón de admin
+    const adminButton = document.createElement('a');
+    adminButton.href = 'admin.html';
+    adminButton.className = 'action-btn';
+    adminButton.id = 'adminButton';
+    adminButton.innerHTML = '<i class="fas fa-cog"></i> <span>Admin</span>';
+    adminButton.style.cssText = 'color: var(--accent); font-weight: 800;';
+
+    // Insertar antes del botón de cuenta
+    const accountLink = document.getElementById('accountLink');
+    if (accountLink && accountLink.parentNode) {
+      userActions.insertBefore(adminButton, accountLink);
+    }
+  }
+
+  static hideAdminButton() {
+    const adminButton = document.getElementById('adminButton');
+    if (adminButton) {
+      adminButton.remove();
+    }
+  }
+
+  static async checkAndShowAdminButton() {
+    try {
+      if (window.authManager && window.authManager.isAuthenticated()) {
+        const user = await window.authManager.getCurrentUser();
+        if (user && (user.role === 'admin' || user.role === 'moderator')) {
+          this.showAdminButton();
+        }
+      }
+    } catch (error) {
+      console.error('Error checking admin status:', error);
+    }
+  }
+
+  static initSearch() {
+    this.ensureAutocompleteAssets();
+  }
+
+  static ensureWishlistAssets() {
+    if (typeof document === 'undefined') return;
+
+    const syncIfReady = () => {
+      if (window.wishlistManager && typeof window.wishlistManager.syncToggleButtons === 'function') {
+        window.wishlistManager.syncToggleButtons(document);
+      }
+    };
+
+    if (window.wishlistManager) {
+      syncIfReady();
+      return;
+    }
+
+    if (document.querySelector('script[data-wishlist-script]')) {
+      document.querySelector('script[data-wishlist-script]').addEventListener('load', () => syncIfReady(), { once: true });
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = 'js/wishlist.js';
+    script.defer = true;
+    script.setAttribute('data-wishlist-script', 'true');
+    script.onload = () => syncIfReady();
+    document.body.appendChild(script);
+  }
+
+  static ensureVerificationAssets() {
+    if (typeof document === 'undefined') return;
+
+    if (window.verificationManager) {
+      return;
+    }
+
+    if (document.querySelector('script[data-verification-script]')) {
+      document
+        .querySelector('script[data-verification-script]')
+        .addEventListener('load', () => {
+          console.log('🔵 [COMPONENTS] verification assets loaded (existing)');
+        }, { once: true });
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = 'js/verification.js';
+    script.defer = true;
+    script.setAttribute('data-verification-script', 'true');
+    document.body.appendChild(script);
+  }
+
+  static ensureAutocompleteAssets() {
+    if (typeof document === 'undefined') return;
+
+    if (!document.querySelector('link[data-autocomplete-style]')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'css/autocomplete.css?v=1.0';
+      link.setAttribute('data-autocomplete-style', 'true');
+      document.head.appendChild(link);
+    }
+
+    const initialize = () => {
+      if (window.searchAutocomplete && typeof window.searchAutocomplete.init === 'function') {
+        window.searchAutocomplete.init();
+      } else if (typeof window.initializeAutocomplete === 'function') {
+        window.initializeAutocomplete();
+      }
+      // Additional initializations as per user's instruction
+      if (window.Components.initSearch) window.Components.initSearch();
+      if (window.Components.initSearchOverlay) window.Components.initSearchOverlay();
+      if (window.Components.initCartCounter) window.Components.initCartCounter();
+    };
+
+    if (window.searchAutocomplete || typeof window.initializeAutocomplete === 'function') {
+      initialize();
+      return;
+    }
+
+    if (!document.querySelector('script[data-autocomplete-script]')) {
+      const script = document.createElement('script');
+      script.src = 'js/autocomplete.js';
+      script.defer = true;
+      script.setAttribute('data-autocomplete-script', 'true');
+      script.onload = () => initialize();
+      document.body.appendChild(script);
+    }
+  }
+
+  static initCartCounter() {
+    // Actualizar contador de carrito
+    document.addEventListener('cartUpdated', (e) => {
+      const cartCount = document.querySelector('.cart-count');
+      if (cartCount) {
+        cartCount.textContent = e.detail.count;
       }
     });
   }
-}
-
-  static initHeader() {
-  console.log('🔵 [COMPONENTS] initHeader() executed');
-
-  // Ticker Animation Logic
-  const messages = [
-    "FREE SHIPPING ON ORDERS OVER $150 ✈️",
-    "NEW JORDAN DROP THIS FRIDAY 🔥",
-    "JOIN THE CLUB & GET 10% OFF 👟"
-  ];
-  let msgIndex = 0;
-  const ticker = document.getElementById('announcementText');
-  if (ticker) {
-    setInterval(() => {
-      msgIndex = (msgIndex + 1) % messages.length;
-      ticker.style.opacity = 0;
-      setTimeout(() => {
-        ticker.innerText = messages[msgIndex];
-        ticker.style.opacity = 1;
-      }, 500);
-    }, 4000);
-  }
-
-  this.ensureWishlistAssets();
-  this.ensureVerificationAssets();
-  this.updateCartCount();
-
-  // Check admin status
-  setTimeout(async () => {
-    await this.checkAndShowAdminButton();
-  }, 1000);
-}
-
-  static async showAdminButton() {
-  // Verificar si el botón ya existe
-  if (document.getElementById('adminButton')) {
-    return;
-  }
-
-  const userActions = document.querySelector('.header-actions'); // Updated selector for V3
-  if (!userActions) return;
-
-  // Crear botón de admin
-  const adminButton = document.createElement('a');
-  adminButton.href = 'admin.html';
-  adminButton.className = 'action-btn';
-  adminButton.id = 'adminButton';
-  adminButton.innerHTML = '<i class="fas fa-cog"></i> <span>Admin</span>';
-  adminButton.style.cssText = 'color: var(--accent); font-weight: 800;';
-
-  // Insertar antes del botón de cuenta
-  const accountLink = document.getElementById('accountLink');
-  if (accountLink && accountLink.parentNode) {
-    userActions.insertBefore(adminButton, accountLink);
-  }
-}
-
-  static hideAdminButton() {
-  const adminButton = document.getElementById('adminButton');
-  if (adminButton) {
-    adminButton.remove();
-  }
-}
-
-  static async checkAndShowAdminButton() {
-  try {
-    if (window.authManager && window.authManager.isAuthenticated()) {
-      const user = await window.authManager.getCurrentUser();
-      if (user && (user.role === 'admin' || user.role === 'moderator')) {
-        this.showAdminButton();
-      }
-    }
-  } catch (error) {
-    console.error('Error checking admin status:', error);
-  }
-}
-
-  static initSearch() {
-  this.ensureAutocompleteAssets();
-}
-
-  static ensureWishlistAssets() {
-  if (typeof document === 'undefined') return;
-
-  const syncIfReady = () => {
-    if (window.wishlistManager && typeof window.wishlistManager.syncToggleButtons === 'function') {
-      window.wishlistManager.syncToggleButtons(document);
-    }
-  };
-
-  if (window.wishlistManager) {
-    syncIfReady();
-    return;
-  }
-
-  if (document.querySelector('script[data-wishlist-script]')) {
-    document.querySelector('script[data-wishlist-script]').addEventListener('load', () => syncIfReady(), { once: true });
-    return;
-  }
-
-  const script = document.createElement('script');
-  script.src = 'js/wishlist.js';
-  script.defer = true;
-  script.setAttribute('data-wishlist-script', 'true');
-  script.onload = () => syncIfReady();
-  document.body.appendChild(script);
-}
-
-  static ensureVerificationAssets() {
-  if (typeof document === 'undefined') return;
-
-  if (window.verificationManager) {
-    return;
-  }
-
-  if (document.querySelector('script[data-verification-script]')) {
-    document
-      .querySelector('script[data-verification-script]')
-      .addEventListener('load', () => {
-        console.log('🔵 [COMPONENTS] verification assets loaded (existing)');
-      }, { once: true });
-    return;
-  }
-
-  const script = document.createElement('script');
-  script.src = 'js/verification.js';
-  script.defer = true;
-  script.setAttribute('data-verification-script', 'true');
-  document.body.appendChild(script);
-}
-
-  static ensureAutocompleteAssets() {
-  if (typeof document === 'undefined') return;
-
-  if (!document.querySelector('link[data-autocomplete-style]')) {
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = 'css/autocomplete.css?v=1.0';
-    link.setAttribute('data-autocomplete-style', 'true');
-    document.head.appendChild(link);
-  }
-
-  const initialize = () => {
-    if (window.searchAutocomplete && typeof window.searchAutocomplete.init === 'function') {
-      window.searchAutocomplete.init();
-    } else if (typeof window.initializeAutocomplete === 'function') {
-      window.initializeAutocomplete();
-    }
-    // Additional initializations as per user's instruction
-    if (window.Components.initSearch) window.Components.initSearch();
-    if (window.Components.initSearchOverlay) window.Components.initSearchOverlay();
-    if (window.Components.initCartCounter) window.Components.initCartCounter();
-  };
-
-  if (window.searchAutocomplete || typeof window.initializeAutocomplete === 'function') {
-    initialize();
-    return;
-  }
-
-  if (!document.querySelector('script[data-autocomplete-script]')) {
-    const script = document.createElement('script');
-    script.src = 'js/autocomplete.js';
-    script.defer = true;
-    script.setAttribute('data-autocomplete-script', 'true');
-    script.onload = () => initialize();
-    document.body.appendChild(script);
-  }
-}
-
-  static initCartCounter() {
-  // Actualizar contador de carrito
-  document.addEventListener('cartUpdated', (e) => {
-    const cartCount = document.querySelector('.cart-count');
-    if (cartCount) {
-      cartCount.textContent = e.detail.count;
-    }
-  });
-}
 
   static getProductCard(product) {
-  const discount = product.discount_price ?
-    Math.round(((product.price - product.discount_price) / product.price) * 100) : 0;
+    const discount = product.discount_price ?
+      Math.round(((product.price - product.discount_price) / product.price) * 100) : 0;
 
-  // Mock sizes logic (preserved from Home for consistency, ideally should come from API)
-  // Tallas Disponibles might be a string or array in 'specifications'
-  let sizeText = 'US 7 • 8 • 9 • 10 • 11';
-  try {
-    let specs = product.specifications;
-    if (typeof specs === 'string') specs = JSON.parse(specs);
-    if (specs && specs['Tallas Disponibles']) {
-      const sizes = Array.isArray(specs['Tallas Disponibles'])
-        ? specs['Tallas Disponibles']
-        : specs['Tallas Disponibles'].split(',');
-      sizeText = sizes.slice(0, 5).join(' • ');
-    }
-  } catch (e) { }
+    // Mock sizes logic (preserved from Home for consistency, ideally should come from API)
+    // Tallas Disponibles might be a string or array in 'specifications'
+    let sizeText = 'US 7 • 8 • 9 • 10 • 11';
+    try {
+      let specs = product.specifications;
+      if (typeof specs === 'string') specs = JSON.parse(specs);
+      if (specs && specs['Tallas Disponibles']) {
+        const sizes = Array.isArray(specs['Tallas Disponibles'])
+          ? specs['Tallas Disponibles']
+          : specs['Tallas Disponibles'].split(',');
+        sizeText = sizes.slice(0, 5).join(' • ');
+      }
+    } catch (e) { }
 
 
-  return `
+    return `
       <div class="product-card" onclick="window.location.href='product-detail.html?id=${product.id}'">
         <div class="product-image-container">
           <img src="${product.image_url || 'assets/images/products/placeholder.jpg'}" 
@@ -551,7 +550,7 @@ class Components {
         </div>
       </div>
       `;
-}
+  }
 }
 
 // Función de búsqueda global
