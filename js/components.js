@@ -137,6 +137,8 @@ class Components {
             <div class="container" style="display: flex; justify-content: space-between; align-items: center; padding: 0;">
                 <!-- LOGO -->
                 <a href="index.html" class="header-logo">
+                    <!-- DEV MARKER V2 (JS INJECTED) -->
+                    <div style="position: absolute; top: 0; left: 0; background: red; color: white; font-size: 10px; padding: 2px 4px; font-weight: bold; z-index: 9999;">DEV ACTIVE</div>
                     <img src="assets/images/logo.png" alt="SNEAKERS SHOP" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
                     <span style="font-family: 'Poppins', sans-serif; font-weight: 900; font-size: 1.5rem; letter-spacing: -1px; display: none;">SNEAKERS<span style="color: var(--accent);">SHOP</span></span>
                 </a>
