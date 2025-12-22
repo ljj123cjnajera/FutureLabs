@@ -14,51 +14,52 @@ class HomeEngine {
       newsletterSubscribed: false
     };
 
-    // 🛡️ DATA FALLBACK EXCELLENCE
+    // 🛡️ DATA FALLBACK EXCELLENCE (High Heat Edition)
     this.fallbackData = {
       banners: [
         {
           id: 'hero-1',
-          title: 'DEFINING STREETWEAR',
-          subtitle: 'PREMIUM SELECTION. EXCLUSIVE DROPS.',
-          image_url: 'https://images.unsplash.com/photo-1556906781-9a412961d28c?auto=format&fit=crop&q=80&w=1920',
-          link: 'products.html?collection=new',
-          cta: 'SHOP LATEST'
+          title: 'TRAVIS SCOTT x JUMPMAN',
+          subtitle: 'THE FINAL CHAPTER. OLIVE LOWS AVAILABLE NOW.',
+          image_url: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&q=80&w=1920',
+          link: 'products.html?collection=travis-scott',
+          cta: 'SHOP COLLECTION'
         },
         {
           id: 'hero-2',
-          title: 'AIR JORDAN RETRO',
-          subtitle: 'THE LEGACY CONTINUES. AVAILABLE NOW.',
-          image_url: 'https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?auto=format&fit=crop&q=80&w=1920',
-          link: 'products.html?category=jordan',
-          cta: 'SHOP JORDAN'
+          title: 'YEEZY ARCHIVE',
+          subtitle: 'ICONIC SILHOUETTES RETURN. LIMITED QUANTITIES.',
+          image_url: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&q=80&w=1920',
+          link: 'products.html?category=yeezy',
+          cta: 'ACCESS ARCHIVE'
         },
         {
           id: 'hero-3',
-          title: 'YEEZY SEASON',
-          subtitle: 'AVANT-GARDE DESIGN FOR THE BOLD.',
-          image_url: 'https://images.unsplash.com/photo-1549488344-c7059349b576?auto=format&fit=crop&q=80&w=1920',
-          link: 'products.html?category=yeezy',
-          cta: 'SHOP YEEZY'
+          title: 'NIKE SB DUNK',
+          subtitle: 'SKATE CULTURE MEETS HIGH FASHION.',
+          image_url: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&q=80&w=1920',
+          link: 'products.html?category=nike-sb',
+          cta: 'SHOP DUNKS'
         }
       ],
       categories: [
-        { id: 'cat-1', name: 'JORDAN', slug: 'jordan', image: 'https://images.unsplash.com/photo-1577223625816-7546f13df25d?auto=format&fit=crop&q=80&w=800' },
-        { id: 'cat-2', name: 'YEEZY', slug: 'yeezy', image: 'https://images.unsplash.com/photo-1620332302351-8ca260e35730?auto=format&fit=crop&q=80&w=800' },
-        { id: 'cat-3', name: 'NIKE', slug: 'nike', image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=800' },
-        { id: 'cat-4', name: 'ADIDAS', slug: 'adidas', image: 'https://images.unsplash.com/photo-1518002171953-a080ee321e2f?auto=format&fit=crop&q=80&w=800' }
+        { id: 'cat-1', name: 'JORDAN RETRO', slug: 'jordan', image: 'https://images.unsplash.com/photo-1695513286047-9d7e56230873?auto=format&fit=crop&q=80&w=800' },
+        { id: 'cat-2', name: 'YEEZY SLIDES', slug: 'yeezy', image: 'https://images.unsplash.com/photo-1620332302351-8ca260e35730?auto=format&fit=crop&q=80&w=800' },
+        { id: 'cat-3', name: 'NIKE DUNK', slug: 'nike', image: 'https://images.unsplash.com/photo-1605218427368-22d7168b4f4c?auto=format&fit=crop&q=80&w=800' },
+        { id: 'cat-4', name: 'NEW BALANCE', slug: 'new-balance', image: 'https://images.unsplash.com/photo-1663044522649-6f9202611757?auto=format&fit=crop&q=80&w=800' }
       ],
       products: [
-        { id: 101, name: 'Air Jordan 1 High OG "Lost & Found"', price: 899.00, image_url: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&q=80&w=800', badge: 'HOT' },
-        { id: 102, name: 'Nike Dunk Low "Panda"', price: 449.00, image_url: 'https://images.unsplash.com/photo-1637844527273-218ba489995a?auto=format&fit=crop&q=80&w=800', badge: 'BESTSELLER' },
-        { id: 103, name: 'Yeezy Boost 350 V2 "Zebra"', price: 1199.00, image_url: 'https://images.unsplash.com/photo-1549488344-c7059349b576?auto=format&fit=crop&q=80&w=800', badge: 'LIMITED' },
-        { id: 104, name: 'New Balance 550', price: 549.00, image_url: 'https://images.unsplash.com/photo-1656335362192-2bc9051b1824?auto=format&fit=crop&q=80&w=800', badge: 'NEW' }
+        { id: 101, name: 'Air Jordan 1 High OG "Lost & Found"', price: 450.00, image_url: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&q=80&w=800', badge: 'GRAIL' },
+        { id: 102, name: 'Adidas Yeezy Boost 350 V2 "Zebra"', price: 380.00, image_url: 'https://images.unsplash.com/photo-1549488344-c7059349b576?auto=format&fit=crop&q=80&w=800', badge: 'RESTOCK' },
+        { id: 103, name: 'Nike Dunk Low Retro "Panda"', price: 180.00, image_url: 'https://images.unsplash.com/photo-1637844527273-218ba489995a?auto=format&fit=crop&q=80&w=800', badge: 'BESTSELLER' },
+        { id: 104, name: 'Travis Scott x AJ1 Low "Olive"', price: 1200.00, image_url: 'https://images.unsplash.com/photo-1584735175315-9d58160926ad?auto=format&fit=crop&q=80&w=800', badge: 'HYPE' },
+        { id: 105, name: 'New Balance 550 "Aimé Leon Dore"', price: 350.00, image_url: 'https://images.unsplash.com/photo-1656335362192-2bc9051b1824?auto=format&fit=crop&q=80&w=800', badge: 'COLLAB' }
       ],
       brands: [
         { name: 'NIKE', logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg' },
         { name: 'JORDAN', logo: 'https://upload.wikimedia.org/wikipedia/en/3/37/Jumpman_logo.svg' },
         { name: 'ADIDAS', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/20/Adidas_Logo.svg' },
-        { name: 'YEEZY', logo: 'https://upload.wikimedia.org/wikipedia/commons/f/f1/Yeezy_logo.svg' }, // Placeholder
+        { name: 'YEEZY', logo: 'https://upload.wikimedia.org/wikipedia/commons/f/f1/Yeezy_logo.svg' },
         { name: 'NEW BALANCE', logo: 'https://upload.wikimedia.org/wikipedia/commons/e/ea/New_Balance_logo.svg' }
       ]
     };
