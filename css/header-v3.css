@@ -534,71 +534,217 @@
     }
 }
 
-/* CART DRAWER STYLES (Phase 81) */
-.cart-drawer-overlay {
+/* ============================================
+   PHASE 96: INTERACTIVE CORE HARDENING
+   ============================================ */
+
+/* 1. SEARCH OVERLAY (THE VOID) */
+.search-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    z-index: 2000;
+    background: rgba(0, 0, 0, 0.95);
+    /* Deep Void */
+    backdrop-filter: blur(10px);
+    z-index: 2005;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.3s;
-    backdrop-filter: blur(2px);
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.cart-drawer-overlay.active {
+.search-overlay.active {
     opacity: 1;
     visibility: visible;
 }
 
-.cart-drawer {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 100%;
-    max-width: 400px;
-    height: 100%;
-    background: var(--white);
-    z-index: 2001;
-    transform: translateX(100%);
-    transition: transform 0.3s cubic-bezier(0.77, 0, 0.175, 1);
-    display: flex;
-    flex-direction: column;
-    border-left: 4px solid var(--black);
+.search-close-btn {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    font-size: 3rem;
+    color: var(--white);
+    background: none;
+    border: none;
+    cursor: pointer;
+    line-height: 1;
+    transition: transform 0.3s;
 }
 
-.cart-drawer.active {
-    transform: translateX(0);
+.search-close-btn:hover {
+    transform: rotate(90deg);
+    color: var(--accent);
+}
+
+.search-input-large {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--gray-600);
+    color: transparent;
+    -webkit-text-stroke: 1px var(--white);
+    /* Outline Text */
+    font-family: 'Poppins', sans-serif;
+    font-size: clamp(3rem, 6vw, 5rem);
+    font-weight: 900;
+    padding: 20px;
+    width: 90%;
+    max-width: 1200px;
+    text-align: center;
+    text-transform: uppercase;
+    transition: all 0.3s;
+}
+
+.search-input-large:focus {
+    outline: none;
+    border-bottom-color: var(--accent);
+    color: var(--white);
+    /* Fill on focus */
+    -webkit-text-stroke: 0;
+}
+
+.search-tags {
+    margin-top: 2rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.search-tag {
+    color: var(--gray-400);
+    border: 1px solid var(--gray-600);
+    padding: 10px 20px;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-family: 'Courier New', monospace;
+    transition: all 0.2s;
+}
+
+.search-tag:hover {
+    color: var(--black);
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+/* 2. CART DRAWER (THE RECEIPT) */
+.cart-drawer {
+    /* Existing base styles remain, overriding specifics */
+    background: #fffdf0;
+    /* Receipt Paper Off-White */
+    border-left: none;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+    font-family: 'Courier New', monospace;
+    /* Monospace for receipt look */
 }
 
 .cart-drawer-header {
-    padding: 1.5rem;
-    border-bottom: 3px solid var(--black);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: var(--black);
-    color: var(--white);
+    background: transparent;
+    color: var(--black);
+    border-bottom: 2px dashed var(--black);
+    /* Perforation line */
+    padding: 2rem;
 }
 
 .cart-drawer-header h3 {
-    margin: 0;
-    font-size: 1.25rem;
-    font-weight: 800;
-    text-transform: uppercase;
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    letter-spacing: -1px;
 }
 
 .close-drawer-btn {
-    background: transparent;
-    border: none;
+    color: var(--black);
+}
+
+.cart-item {
+    border-bottom: 1px dashed var(--gray-400);
+    /* Separator */
+    padding: 1.5rem;
+}
+
+.cart-total-row {
+    border-top: 2px dashed var(--black);
+    border-bottom: 2px dashed var(--black);
+    padding: 1.5rem 0;
+    margin-bottom: 2rem;
+    font-size: 1.5rem;
+    font-weight: 900;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* 3. MOBILE MENU (COMMAND CENTER) */
+.mobile-menu-sidebar {
+    background: var(--black);
+    /* Inverted */
+    color: var(--white);
+    width: 100%;
+    /* Full width mobile menu */
+    max-width: 100%;
+}
+
+.mobile-menu-header {
+    border-bottom: 1px solid var(--gray-800);
+}
+
+.mobile-nav-list a {
     color: var(--white);
     font-size: 2rem;
-    cursor: pointer;
-    line-height: 1;
+    /* Massive links */
+    font-family: 'Poppins', sans-serif;
+    font-weight: 900;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--gray-800);
+    opacity: 0;
+    /* For animation */
+    transform: translateY(20px);
+    transition: all 0.3s;
 }
+
+.mobile-menu-sidebar.active .mobile-nav-list a {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Stagger Delays */
+.mobile-menu-sidebar.active .mobile-nav-list li:nth-child(1) a {
+    transition-delay: 0.1s;
+}
+
+.mobile-menu-sidebar.active .mobile-nav-list li:nth-child(2) a {
+    transition-delay: 0.2s;
+}
+
+.mobile-menu-sidebar.active .mobile-nav-list li:nth-child(3) a {
+    transition-delay: 0.3s;
+}
+
+.mobile-menu-sidebar.active .mobile-nav-list li:nth-child(4) a {
+    transition-delay: 0.4s;
+}
+
+.mobile-menu-sidebar.active .mobile-nav-list li:nth-child(5) a {
+    transition-delay: 0.5s;
+}
+
+.mobile-nav-list a:hover {
+    color: transparent;
+    -webkit-text-stroke: 1px var(--white);
+    padding-left: 20px;
+}
+
+.mobile-auth-links a {
+    border-color: var(--white);
+    color: var(--white);
+}
+
+.mobile-auth-links a:nth-child(2) {
+    background: var(--white);
+    color: var(--black);
+}
+
 
 .cart-drawer-items {
     flex: 1;
