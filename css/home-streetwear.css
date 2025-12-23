@@ -1383,21 +1383,223 @@ body.loaded #preloader {
 }
 
 /* ============================================
-   8. BENEFITS & SEO
+   9. TRUST MONITOR (DATA STRIP)
    ============================================ */
-.benefits-slider {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: var(--spacing-xl);
-    padding: var(--spacing-xl) 0;
-    text-align: center;
+.trust-bar {
+    background: var(--black);
+    color: var(--white);
+    padding: 15px 0;
+    border-bottom: 3px solid var(--black);
+    font-family: 'Courier New', Courier, monospace;
+    /* Tech feel */
+    overflow: hidden;
+    position: relative;
+    user-select: none;
 }
 
-.benefit-card {
+.data-track-container {
+    width: 100%;
+    overflow: hidden;
+}
+
+.data-track {
+    display: flex;
+    white-space: nowrap;
+    animation: marquee-data 20s linear infinite;
+    gap: 40px;
+}
+
+.data-point {
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.data-point strong {
+    color: var(--accent);
+    /* Highlight status */
+}
+
+.data-separator {
+    color: var(--gray-600);
+}
+
+@keyframes marquee-data {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+
+/* ============================================
+   10. NEXT DROP (GLITCH & HYPE)
+   ============================================ */
+.next-drop-section {
+    position: relative;
+    height: 80vh;
+    /* Taller */
+    min-height: 600px;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    color: var(--white);
+    border-bottom: 4px solid var(--black);
+}
+
+.drop-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('https://images.unsplash.com/photo-1620799140408-ed5341cd2431?auto=format&fit=crop&q=80&w=1200');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.4;
+    filter: grayscale(100%) contrast(1.2);
+    /* Glitchy visual noise */
+}
+
+.drop-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 900px;
+}
+
+.drop-badge {
+    display: inline-block;
+    background: var(--error);
+    color: var(--white);
+    padding: 5px 15px;
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    transform: skew(-10deg);
+}
+
+/* GLITCH EFFECT */
+.glitch-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 900;
+    font-size: clamp(3rem, 8vw, 7rem);
+    line-height: 0.9;
+    text-transform: uppercase;
+    position: relative;
+    color: var(--white);
+    margin-bottom: 3rem;
+}
+
+.glitch-title::before,
+.glitch-title::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.glitch-title::before {
+    left: 2px;
+    text-shadow: -1px 0 #ff00c1;
+    clip: rect(44px, 450px, 56px, 0);
+    animation: glitch-anim-1 5s infinite linear alternate-reverse;
+}
+
+.glitch-title::after {
+    left: -2px;
+    text-shadow: -1px 0 #00fff9;
+    clip: rect(44px, 450px, 56px, 0);
+    animation: glitch-anim-2 5s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim-1 {
+    0% {
+        clip: rect(20px, 9999px, 10px, 0);
+    }
+
+    100% {
+        clip: rect(80px, 9999px, 90px, 0);
+    }
+}
+
+@keyframes glitch-anim-2 {
+    0% {
+        clip: rect(60px, 9999px, 40px, 0);
+    }
+
+    100% {
+        clip: rect(10px, 9999px, 10px, 0);
+    }
+}
+
+/* DIGITAL CLOCK COUNTDOWN */
+.digital-clock {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    font-family: 'Courier New', monospace;
+    margin-bottom: 3rem;
+}
+
+.timer-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.timer-block span {
+    font-size: clamp(2rem, 5vw, 4rem);
+    font-weight: 700;
+    line-height: 1;
+}
+
+.timer-block label {
+    font-size: 0.8rem;
+    color: var(--gray-400);
+}
+
+.timer-separator {
+    font-size: clamp(2rem, 5vw, 4rem);
+    line-height: 0.8;
+    color: var(--accent);
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0;
+    }
+}
+
+.btn-brutalist {
+    background: var(--white);
+    color: var(--black);
+    border: 3px solid var(--white);
+    padding: 1.2rem 3rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-brutalist:hover {
     background: transparent;
-    padding: var(--spacing-lg);
-    border: 2px solid var(--gray-200);
-    transition: all 0.3s ease;
+    color: var(--white);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+}
+
+transition: all 0.3s ease;
 }
 
 .benefit-card:hover {
