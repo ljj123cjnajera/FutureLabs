@@ -96,6 +96,7 @@ class HomeEngine {
 
       // 2. Start Visuals
       this.initHypeFeatures();
+      this.initScrollAnimations();
 
       console.log('🚀 [HomeEngine] V3.1 Initialized (Defensive Mode).');
     } catch (err) {
@@ -497,6 +498,32 @@ class HomeEngine {
     }
   }
 
+  // 5. Scroll Reveal Animations (Brutalist Fade Up)
+  initScrollAnimations() {
+    const observerOptions = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.1
+    };
+
+    const observer = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target); // Reveal once
+        }
+      });
+    }, observerOptions);
+
+    // Select elements to reveal
+    const elementsToReveal = document.querySelectorAll('.section, .bento-item, .product-card, .brand-item, .journal-card, .trust-bar, .newsletter-section');
+
+    elementsToReveal.forEach((el, index) => {
+      el.classList.add('reveal-on-scroll');
+      el.style.transitionDelay = `${index % 4 * 100}ms`; // Stagger effect
+      observer.observe(el);
+    });
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
