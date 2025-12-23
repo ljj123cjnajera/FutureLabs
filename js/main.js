@@ -322,3 +322,22 @@ async function loadFeaturedProducts() {
         console.error('Error cargando productos destacados:', error);
     }
 }
+// CUSTOM CURSOR LOGIC (Phase 94)
+document.addEventListener('DOMContentLoaded', () => {
+    const cursor = document.querySelector('.cursor-follower');
+
+    if (cursor && window.matchMedia('(pointer: fine)').matches) {
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        // Add hover effect to interactive elements
+        const hoverables = document.querySelectorAll('a, button, .product-card, .bento-item, input, .marquee-tape');
+
+        hoverables.forEach(el => {
+            el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+            el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+        });
+    }
+});
