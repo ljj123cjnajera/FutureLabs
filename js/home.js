@@ -110,18 +110,28 @@ class HomeEngine {
   // 🧩 GLOBAL COMPONENTS
   // ==========================================
   renderGlobals() {
-    // Header
-    const header = document.getElementById('mainHeader');
-    if (header && window.Components) {
-      header.innerHTML = window.Components.getHeader(true, true);
-      window.Components.initHeader(); // This initializes the ticker and cart count
+    // Header - Fix for Double Nesting
+    const headerElement = document.getElementById('mainHeader');
+    if (headerElement && window.Components) {
+      // Use outerHTML to replace the container itself, preventing <header><header>
+      const newHeaderHTML = window.Components.getHeader(true, true);
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = newHeaderHTML;
+
+      // Transfer ID if needed, or rely on .header-v3
+      if (tempDiv.firstElementChild) {
+        tempDiv.firstElementChild.id = 'mainHeader'; // Maintain ID for CSS compatibility
+        headerElement.replaceWith(tempDiv.firstElementChild);
+      }
+
+      window.Components.initHeader();
       if (window.Components.initCartDrawer) window.Components.initCartDrawer();
 
-      // Init other header components if they exist
+      // Init other header components
       if (window.Components.initSearch) window.Components.initSearch();
       if (window.Components.initCartCounter) window.Components.initCartCounter();
     } else {
-      console.error("❌ Critical: Header container or Components class missing.");
+      console.warn("⚠️ Header container missing or Components not ready.");
     }
 
     // Footer
@@ -258,10 +268,11 @@ class HomeEngine {
   async loadProducts() {
     this.initCountdown();
 
-    // Trending / Featured (Grid)
-    await this.renderProductGrid('featuredProductsGrid', this.fallbackData.products);
+    // Trending / Featured (SLIDER) - CORRECTED
+    // Was incorrectly checking as Grid, forcing breaks in layout
+    await this.renderProductSlider('featuredProductsGrid', this.fallbackData.products);
 
-    // On Sale (Grid) - Reusing products for now, ideally would filter for 'sale'
+    // On Sale (Grid) - Remains Grid for variety
     await this.renderProductGrid('onSaleProductsGrid', this.fallbackData.products.map(p => ({ ...p, discount_price: p.price * 0.8 })));
   }
 
@@ -488,7 +499,7 @@ class HomeEngine {
 
   setupVideoModal() {
     // Basic modal logic
-    const playBtn = document.querySelector('.btn-play');
+    const playBtn = document.querySelector('.btn-play, .btn-api'); // Support both
     if (playBtn) {
       playBtn.addEventListener('click', (e) => {
         e.preventDefault();
