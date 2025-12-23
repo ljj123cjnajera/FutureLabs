@@ -3595,3 +3595,80 @@ transition: all 0.3s ease;
             padding: 2rem;
         }
     }
+
+    /* ============================================
+   11. KINETIC MARQUEE TAPE
+   ============================================ */
+    .marquee-tape {
+        background: var(--accent);
+        /* Yellow */
+        color: var(--black);
+        padding: 12px 0;
+        overflow: hidden;
+        white-space: nowrap;
+        border-bottom: 3px solid var(--black);
+        border-top: 3px solid var(--black);
+        transform: rotate(-1deg) scale(1.01);
+        /* Slight tilt for "Sticker" feel */
+        z-index: 5;
+        position: relative;
+        margin-bottom: var(--spacing-3xl);
+    }
+
+    .marquee-content {
+        display: inline-block;
+        animation: marquee-tape-anim 20s linear infinite;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 900;
+        font-size: 1.2rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    .marquee-content span {
+        margin-right: 40px;
+    }
+
+    @keyframes marquee-tape-anim {
+        0% {
+            transform: translateX(0);
+        }
+
+        100% {
+            transform: translateX(-50%);
+        }
+    }
+
+    /* ============================================
+   12. HORIZONTAL PRODUCT SLIDER
+   ============================================ */
+    .products-horizontal-scroll {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        gap: var(--spacing-lg);
+        padding-bottom: var(--spacing-xl);
+        padding-right: var(--spacing-xl);
+        -ms-overflow-style: none;
+        /* IE and Edge */
+        scrollbar-width: none;
+        /* Firefox */
+        cursor: grab;
+    }
+
+    .products-horizontal-scroll::-webkit-scrollbar {
+        display: none;
+    }
+
+    .products-horizontal-scroll .product-card {
+        min-width: 320px;
+        max-width: 320px;
+        scroll-snap-align: start;
+        flex-shrink: 0;
+        margin-bottom: 0;
+        /* Override grid margins */
+    }
+
+    .products-horizontal-scroll:active {
+        cursor: grabbing;
+    }
