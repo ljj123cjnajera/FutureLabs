@@ -977,11 +977,7 @@ body.loaded #preloader {
     }
 }
 
-background-size: cover;
-background-position: center;
-opacity: 0.2;
-z-index: 0;
-pointer-events: none;
+filter: contrast(1.2) brightness(0.8);
 }
 
 .manifesto-content {
@@ -3714,37 +3710,43 @@ transition: all 0.3s ease;
             transform: translateX(-50%);
         }
     }
+}
 
-    /* ============================================
+100% {
+    transform: translateX(-50%);
+}
+}
+
+/* ============================================
    12. HORIZONTAL PRODUCT SLIDER
    ============================================ */
-    .products-horizontal-scroll {
-        display: flex;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        gap: var(--spacing-lg);
-        padding-bottom: var(--spacing-xl);
-        padding-right: var(--spacing-xl);
-        -ms-overflow-style: none;
-        /* IE and Edge */
-        scrollbar-width: none;
-        /* Firefox */
-        cursor: grab;
-    }
+.products-horizontal-scroll {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: var(--spacing-lg);
+    padding-bottom: var(--spacing-xl);
+    padding-right: var(--spacing-xl);
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+    cursor: grab;
+}
 
-    .products-horizontal-scroll::-webkit-scrollbar {
-        display: none;
-    }
+.products-horizontal-scroll::-webkit-scrollbar {
+    display: none;
+}
 
-    .products-horizontal-scroll .product-card {
-        min-width: 320px;
-        max-width: 320px;
-        scroll-snap-align: start;
-        flex-shrink: 0;
-        margin-bottom: 0;
-        /* Override grid margins */
-    }
+.products-horizontal-scroll .product-card {
+    min-width: 320px;
+    max-width: 320px;
+    scroll-snap-align: start;
+    flex-shrink: 0;
+    margin-bottom: 0;
+    /* Override grid margins */
+}
 
-    .products-horizontal-scroll:active {
-        cursor: grabbing;
-    }
+.products-horizontal-scroll:active {
+    cursor: grabbing;
+}
