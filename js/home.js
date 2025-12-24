@@ -86,7 +86,8 @@ class HomeEngine {
         this.loadHero(),
         this.loadCategories(),
         this.loadProducts(),
-        this.loadBrands()
+        this.loadBrands(),
+        this.loadJournal()
       ]);
 
       this.setupNewsletter();
@@ -335,12 +336,84 @@ class HomeEngine {
     }
   }
 
+  // ==========================================
+  // 4. BRAND MARQUEE (SVG UPGRADE)
+  // ==========================================
   async loadBrands() {
-    // Logic for Brands if HTML container existed. 
-    // Current index.html might not have #brandsContainer. 
-    // We will inject it via the brands-section if found.
-    const brandsSection = document.querySelector('.brand-marquee-section');
-    // Assuming CSS handles the marquee, no JS needed unless dynamic.
+    const marqueeTrack = document.querySelector('.marquee-track');
+    if (!marqueeTrack) return;
+
+    // SVG Logos (White, High Quality)
+    const brands = [
+      { name: 'NIKE', src: 'https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg' },
+      { name: 'JORDAN', src: 'https://upload.wikimedia.org/wikipedia/en/3/37/Jumpman_logo.svg' },
+      { name: 'ADIDAS', src: 'https://upload.wikimedia.org/wikipedia/commons/2/20/Adidas_Logo.svg' },
+      { name: 'YEEZY', src: 'https://upload.wikimedia.org/wikipedia/commons/f/f1/Yeezy_logo.svg' },
+      { name: 'NEW BALANCE', src: 'https://upload.wikimedia.org/wikipedia/commons/e/ea/New_Balance_logo.svg' },
+      { name: 'OFF-WHITE', src: 'https://upload.wikimedia.org/wikipedia/commons/1/19/Off-white_logo.svg' },
+      { name: 'SUPREME', src: 'https://upload.wikimedia.org/wikipedia/commons/2/28/Supreme_Logo.svg' },
+      { name: 'NIKE', src: 'https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg' }, // Repeat for loop
+      { name: 'JORDAN', src: 'https://upload.wikimedia.org/wikipedia/en/3/37/Jumpman_logo.svg' }
+    ];
+
+    // Clear text placeholders
+    marqueeTrack.innerHTML = brands.map(b => `
+        <div class="brand-item svg-mode">
+            <img src="${b.src}" alt="${b.name}" loading="lazy">
+        </div>
+    `).join('');
+  }
+
+  // ==========================================
+  // 5. JOURNAL (DYNAMIC INJECTION)
+  // ==========================================
+  async loadJournal() {
+    const container = document.querySelector('.journal-grid');
+    if (!container) return;
+
+    // Fallback Data
+    const posts = [
+      {
+        category: 'RELEASE',
+        title: 'El fin de una era: Yeezy vs Adidas',
+        desc: 'Analizamos el impacto en el mercado de reventa y qué esperar del futuro.',
+        img: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?q=80&w=800',
+        time: '5 MIN READ',
+        url: 'blog-post.html'
+      },
+      {
+        category: 'CULTURE',
+        title: '¿Por qué las J1 High nunca mueren?',
+        desc: 'La historia detrás de la silueta que inició todo en 1985.',
+        img: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?q=80&w=800',
+        time: '3 MIN READ',
+        url: 'blog-post.html'
+      },
+      {
+        category: 'STYLE',
+        title: 'Guía de Estilo: Streetwear Verano 2025',
+        desc: 'Los esenciales que necesitas en tu rotación esta temporada.',
+        img: 'https://images.unsplash.com/photo-1523398002811-6ce9e490101d?q=80&w=800',
+        time: '7 MIN READ',
+        url: 'blog-post.html'
+      }
+    ];
+
+    // Check if static content exists, if so, replace it to ensure dynamic features
+    container.innerHTML = posts.map(post => `
+        <article class="journal-card" onclick="window.location.href='${post.url}'">
+            <div class="journal-image">
+                <img src="${post.img}" alt="${post.title}">
+                <span class="read-time-badge"><i class="far fa-clock"></i> ${post.time}</span>
+            </div>
+            <div class="journal-content">
+                <span class="journal-tag">${post.category}</span>
+                <h3>${post.title}</h3>
+                <p>${post.desc}</p>
+                <a href="${post.url}" class="read-more">PROPAGANDA_V3 <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </article>
+    `).join('');
   }
 
   initCountdown() {
@@ -383,46 +456,23 @@ class HomeEngine {
   // ==========================================
   // ⚡ INTERACTIONS
   // ==========================================
-  // ==========================================
-  // ⚡ INTERACTIONS (Professional Grade)
-  // ==========================================
   quickAdd(id, name) {
     // 1. Update Cart Engine
     if (window.cartEngine) {
-      // Use the new Cart Engine if available
-      // Mock add for now since engine might depend on localstorage
-      const currentCount = parseInt(document.querySelector('.cart-count')?.innerText || '0');
-      const newCount = currentCount + 1;
-
-      // Update DOM immediately for responsiveness
-      document.querySelectorAll('.cart-count').forEach(el => {
-        el.innerText = newCount;
-        el.classList.add('bump-animation'); // CSS animation class
-        setTimeout(() => el.classList.remove('bump-animation'), 300);
-      });
+      // Mock add
     }
 
-    // 2. Show Premium Toast Notification
+    // 2. OPEN CART DRAWER (Interaction Feedback)
+    if (window.CartDrawer) {
+      window.CartDrawer.open();
+    } else if (window.Components && window.Components.initCartDrawer) {
+      window.Components.initCartDrawer();
+      setTimeout(() => window.CartDrawer.open(), 100);
+    }
+
+    // 3. Show Premium Toast Notification
     if (window.notifications) {
       window.notifications.success('ADDED TO CART', `${name}`);
-    } else {
-      // Fallback custom toast if notification system missing
-      const toast = document.createElement('div');
-      toast.style.cssText = `
-            position: fixed; bottom: 20px; right: 20px; 
-            background: #000; color: #fff; padding: 16px 24px; 
-            font-family: 'Inter', sans-serif; font-weight: 800; 
-            text-transform: uppercase; z-index: 9999;
-            transform: translateY(100px); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 2px solid #fff;
-        `;
-      toast.innerText = `ADDED: ${name}`;
-      document.body.appendChild(toast);
-      setTimeout(() => toast.style.transform = 'translateY(0)', 10);
-      setTimeout(() => {
-        toast.style.transform = 'translateY(100px)';
-        setTimeout(() => toast.remove(), 300);
-      }, 3000);
     }
   }
 
