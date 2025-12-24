@@ -1,8 +1,14 @@
 // Main JavaScript for FutureLabs (V3 Compatible)
 document.addEventListener('DOMContentLoaded', function () {
     // If we are on the Home Page, let HomeEngine take control.
-    if (document.getElementById('homeHero') || document.querySelector('.home-engine-active') || window.location.pathname.endsWith('index.html') || window.location.pathname === '/') {
-        console.log('🏠 Home Page Detected - Deferring to HomeEngine');
+    // 🛡️ Conflict Prevention: HomeEngine (home.js) handles Header/Footer/Cart on Index
+    const isHome = document.getElementById('heroSlidesContainer') ||
+        document.querySelector('.hero-section') ||
+        window.location.pathname.endsWith('index.html') ||
+        window.location.pathname === '/';
+
+    if (isHome) {
+        console.log('🏠 Home Page Detected - Main.js standing by (HomeEngine active).');
         return;
     }
 
@@ -13,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initSmoothScrolling();
     initPlaceholderInteractions();
 
-    console.log('FutureLabs - Inner Page Initialized');
+    console.log('🚀 FutureLabs - Inner Page Initialized (Main.js Active)');
 });
 
 // Sticky Header
