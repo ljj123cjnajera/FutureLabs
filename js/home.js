@@ -60,14 +60,21 @@ class HomeEngine {
         { id: 109, name: 'Samba OG "Cloud White"', price: 120.00, image_url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=800', badge: 'CLASSIC' },
         { id: 110, name: 'Off-White x Nike Air Force 1', price: 1500.00, image_url: 'https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&q=80&w=800', badge: 'MUSEUM' },
         { id: 111, name: 'Rick Owens Geobasket', price: 980.00, image_url: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&q=80&w=800', badge: 'AVANT' },
-        { id: 112, name: 'Birkenstock Boston Taupe', price: 180.00, image_url: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=800', badge: 'COMFORT' }
+        { id: 112, name: 'Birkenstock Boston Taupe', price: 180.00, image_url: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=800', badge: 'COMFORT' },
+        // Expanded Data for Phase 104
+        { id: 113, name: 'Jordan 3 Retro "White Cement"', price: 280.00, image_url: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&q=80&w=800', badge: 'RESTOCK' },
+        { id: 114, name: 'Nike Dunk Low "Grey Fog"', price: 160.00, image_url: 'https://images.unsplash.com/photo-1637844527273-218ba489995a?auto=format&fit=crop&q=80&w=800', badge: 'ESSENTIAL' },
+        { id: 115, name: 'New Balance 2002R "Protection Pack"', price: 220.00, image_url: 'https://images.unsplash.com/photo-1620332302351-8ca260e35730?auto=format&fit=crop&q=80&w=800', badge: 'TRENDING' },
+        { id: 116, name: 'Adidas Forum Low 84', price: 110.00, image_url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=800', badge: 'VINTAGE' }
       ],
       brands: [
         { name: 'NIKE', logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg' },
         { name: 'JORDAN', logo: 'https://upload.wikimedia.org/wikipedia/en/3/37/Jumpman_logo.svg' },
         { name: 'ADIDAS', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/20/Adidas_Logo.svg' },
         { name: 'YEEZY', logo: 'https://upload.wikimedia.org/wikipedia/commons/f/f1/Yeezy_logo.svg' },
-        { name: 'NEW BALANCE', logo: 'https://upload.wikimedia.org/wikipedia/commons/e/ea/New_Balance_logo.svg' }
+        { name: 'NEW BALANCE', logo: 'https://upload.wikimedia.org/wikipedia/commons/e/ea/New_Balance_logo.svg' },
+        { name: 'OFF-WHITE', logo: 'https://upload.wikimedia.org/wikipedia/commons/1/19/Off-white_logo.svg' },
+        { name: 'SUPREME', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/28/Supreme_Logo.svg' }
       ]
     };
 

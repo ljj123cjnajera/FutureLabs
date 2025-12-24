@@ -66,6 +66,91 @@ body.loaded #preloader {
     height: var(--spacing-4xl);
 }
 
+/* ============================================
+   0.2 GLITCH & TEXT EFFECTS (Phase 104)
+   ============================================ */
+.glitch-text {
+    position: relative;
+    color: var(--black);
+    mix-blend-mode: normal;
+}
+
+.glitch-text::before,
+.glitch-text::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.glitch-text::before {
+    left: 2px;
+    text-shadow: -1px 0 red;
+    clip: rect(24px, 550px, 90px, 0);
+    animation: glitch-anim-2 3s infinite linear alternate-reverse;
+}
+
+.glitch-text::after {
+    left: -2px;
+    text-shadow: -1px 0 blue;
+    clip: rect(85px, 550px, 140px, 0);
+    animation: glitch-anim 2.5s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim {
+    0% {
+        clip: rect(10px, 9999px, 86px, 0);
+    }
+
+    20% {
+        clip: rect(61px, 9999px, 13px, 0);
+    }
+
+    40% {
+        clip: rect(32px, 9999px, 85px, 0);
+    }
+
+    60% {
+        clip: rect(85px, 9999px, 47px, 0);
+    }
+
+    80% {
+        clip: rect(2px, 9999px, 26px, 0);
+    }
+
+    100% {
+        clip: rect(41px, 9999px, 92px, 0);
+    }
+}
+
+@keyframes glitch-anim-2 {
+    0% {
+        clip: rect(88px, 9999px, 2px, 0);
+    }
+
+    20% {
+        clip: rect(5px, 9999px, 57px, 0);
+    }
+
+    40% {
+        clip: rect(36px, 9999px, 97px, 0);
+    }
+
+    60% {
+        clip: rect(10px, 9999px, 66px, 0);
+    }
+
+    80% {
+        clip: rect(57px, 9999px, 12px, 0);
+    }
+
+    100% {
+        clip: rect(20px, 9999px, 73px, 0);
+    }
+}
+
 .container {
     max-width: var(--container-width);
     margin: 0 auto;
