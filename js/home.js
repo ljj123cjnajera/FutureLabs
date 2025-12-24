@@ -584,6 +584,16 @@ class HomeEngine {
       el.style.transitionDelay = `${index % 4 * 100}ms`; // Stagger effect
       observer.observe(el);
     });
+
+    // 🛡️ FAILSAFE: Force visibility after 2 seconds if observer fails or user turns off JS interactions
+    setTimeout(() => {
+      elementsToReveal.forEach(el => {
+        if (!el.classList.contains('visible')) {
+          el.classList.add('visible');
+          // console.warn('⚠️ Force-revealing element (Failsafe triggered)');
+        }
+      });
+    }, 2000);
   }
 }
 
