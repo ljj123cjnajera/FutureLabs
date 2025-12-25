@@ -78,16 +78,10 @@ async function loadCheckout() {
 
     try {
         // Verificar autenticación
+        // Verificar autenticación (Guest Checkout Allowed)
         if (!window.authManager.isAuthenticated()) {
-            container.innerHTML = `
-                <div class="checkout-loading">
-                    <i class="fas fa-lock"></i>
-                    <h2>Inicia sesión para continuar</h2>
-                    <p>Necesitas estar autenticado para realizar una compra</p>
-                    <button class="btn btn-primary" onclick="window.location.href='index.html'">Ir a Inicio</button>
-                </div>
-            `;
-            return;
+            // Optional: Mostrar banner de login, pero NO bloquear
+            console.log('User not authenticated, proceeding as Guest');
         }
 
         // Obtener carrito

@@ -24,14 +24,32 @@
 
 <body>
     <!-- Header -->
-    <header id="mainHeader"></header>
+    <!-- Checkout Header (Isolation Mode) -->
+    <header class="checkout-header"
+        style="border-bottom: 4px solid var(--black); padding: 20px 0; background: var(--white);">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+            <a href="index.html" class="logo"
+                style="font-family: 'Poppins', sans-serif; font-weight: 900; font-size: 1.5rem; text-decoration: none; color: var(--black); letter-spacing: -1px;">
+                FUTURE<span style="color: var(--gray-400);">LABS</span>
+            </a>
+            <div class="secure-badge"
+                style="display: flex; align-items: center; gap: 8px; color: #27ae60; font-weight: 700; font-family: 'Inter', sans-serif; font-size: 0.9rem;">
+                <i class="fas fa-lock"></i> CHECKOUT SEGURO 256-BIT
+            </div>
+        </div>
+    </header>
 
     <div class="checkout-page">
         <!-- Brutalist Title -->
         <div class="container"
-            style="margin-bottom: 3rem; border-bottom: 4px solid var(--black); padding-bottom: 1rem;">
+            style="margin-bottom: 2rem; border-bottom: 4px solid var(--black); padding-bottom: 1rem;">
             <h1 style="font-size: 3rem; line-height: 1; margin: 0; text-transform: uppercase; font-weight: 900;">SECURE
                 CHECKOUT</h1>
+            <div
+                style="font-family: 'Inter', sans-serif; color: #666; font-size: 0.9rem; margin-top: 0.5rem; display: flex; align-items: center; gap: 10px;">
+                <span><i class="fas fa-shield-alt" style="color: #27ae60;"></i> PAGO ENCRIPTADO</span>
+                <span><i class="fas fa-check-circle" style="color: #27ae60;"></i> GARANTÍA DE SATISFACCIÓN</span>
+            </div>
         </div>
 
         <div class="container">
@@ -96,15 +114,10 @@
     <script src="js/components.js"></script>
 
     <script>
-        // Inicializar header dinámico con barra de búsqueda
+        // Checkout Specific Logic (No Dynamic Header)
         document.addEventListener('DOMContentLoaded', function () {
-            const headerContainer = document.getElementById('mainHeader');
-            if (headerContainer && window.Components) {
-                headerContainer.innerHTML = window.Components.getHeader(true, true);
-                window.Components.initHeader();
-                window.Components.initSearch();
-                window.Components.initCartCounter();
-            }
+            // Isolation Mode: No dynamic header/footer injection for checkout
+            console.log('Secure Checkout Initialized');
         });
 
         function scrollToOrderSummary() {

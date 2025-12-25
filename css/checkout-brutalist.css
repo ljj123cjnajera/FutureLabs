@@ -17,6 +17,11 @@
     background: var(--white);
 }
 
+/* Checkout Header (Isolation) */
+.checkout-header {
+    margin-bottom: 2rem;
+}
+
 .checkout-container {
     display: grid;
     grid-template-columns: 1.5fr 1fr;
