@@ -287,7 +287,7 @@ button {
     background-color: var(--light);
 }
 
-/* FORZAR FONDO BLANCO EN TODOS LOS BOTONES DEL HEADER */
+/* FORZAR FONDO BLANCO EN TODOS LOS BOTONES DEL HEADER -- DISABLED FOR V3 BRUTALIST
 .user-actions a {
     background: var(--white) !important;
     background-color: var(--white) !important;
@@ -317,6 +317,7 @@ button {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
 }
+*/
 
 .cart-icon {
     position: relative;
