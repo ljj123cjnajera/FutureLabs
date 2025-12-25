@@ -397,8 +397,19 @@ class Components {
       }
     };
 
+    // 1. Check if logic is already loaded
     if (window.wishlistManager) {
       syncIfReady();
+      return;
+    }
+
+    // 2. CRITICAL GATE: Only load if there are actual buttons needing it
+    // or if we are explicitly on the wishlist page
+    const hasWishlistButtons = document.querySelector('.action-btn[onclick*="wishlist"], .product-quick-action[onclick*="wishlist"]');
+    const isWishlistPage = window.location.pathname.includes('wishlist.html');
+
+    if (!hasWishlistButtons && !isWishlistPage && !document.getElementById('wishlistGrid')) {
+      // No need to inject script on a page with no wishlist interactions
       return;
     }
 
@@ -417,6 +428,14 @@ class Components {
 
   static ensureVerificationAssets() {
     if (typeof document === 'undefined') return;
+
+    // GATE: Only load on auth pages or if explicit container exists
+    const verificationContainer = document.getElementById('verificationModal');
+    const isAuthPage = window.location.pathname.includes('login.html') || window.location.pathname.includes('register.html');
+
+    if (!verificationContainer && !isAuthPage) {
+      return;
+    }
 
     if (window.verificationManager) {
       return;

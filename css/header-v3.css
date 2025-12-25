@@ -648,39 +648,54 @@
     border-color: var(--accent);
 }
 
-/* 2. CART DRAWER (THE RECEIPT) */
+/* 2. CART DRAWER (BRUTALIST V3 - RECEIPT MODE) */
 .cart-drawer {
-    /* Existing base styles remain, overriding specifics */
     background: #fffdf0;
     /* Receipt Paper Off-White */
-    border-left: none;
-    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+    border-left: 4px solid var(--black);
+    /* Bold Border */
+    box-shadow: -20px 0 50px rgba(0, 0, 0, 0.5);
     font-family: 'Courier New', monospace;
-    /* Monospace for receipt look */
 }
 
 .cart-drawer-header {
-    background: transparent;
-    color: var(--black);
-    border-bottom: 2px dashed var(--black);
-    /* Perforation line */
-    padding: 2rem;
+    background: var(--black);
+    color: var(--white);
+    border-bottom: 4px solid var(--black);
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .cart-drawer-header h3 {
-    font-family: 'Courier New', monospace;
-    font-weight: 700;
+    font-family: 'Poppins', sans-serif;
+    /* Override for Title */
+    font-weight: 900;
     letter-spacing: -1px;
+    font-size: 1.5rem;
+    margin: 0;
+    text-transform: uppercase;
 }
 
 .close-drawer-btn {
-    color: var(--black);
+    color: var(--white);
+    background: transparent;
+    border: none;
+    font-size: 2.5rem;
+    line-height: 0.8;
+    cursor: pointer;
 }
 
 .cart-item {
-    border-bottom: 1px dashed var(--gray-400);
-    /* Separator */
+    border-bottom: 2px dashed var(--black);
+    /* Stronger Dash */
     padding: 1.5rem;
+    background: white;
+    margin: 1rem;
+    border: 2px solid var(--black);
+    /* Card Style for items */
+    box-shadow: 4px 4px 0 var(--black);
 }
 
 .cart-total-row {
