@@ -172,17 +172,20 @@ body.loaded #preloader {
 /* ============================================
    1. HERO SECTION - FULL IMPACT (Fixed Layout)
    ============================================ */
+/* ============================================
+   1. HERO SECTION - FULL IMPACT (Fixed Layout)
+   ============================================ */
 .hero-section {
-    /* No margins! */
     margin: 0;
     padding: 0;
     position: relative;
+    /* Height calculation to fill screen minus expected header height */
     height: 90vh;
-    /* Taller impact */
     min-height: 700px;
     background: var(--black);
-    /* Fallback */
     border-bottom: 4px solid var(--black);
+    overflow: hidden;
+    /* Contain slides */
     z-index: 5;
 }
 
@@ -192,117 +195,144 @@ body.loaded #preloader {
     position: relative;
 }
 
-
-.hero-slider {
-    height: 100%;
-    border-radius: 0;
-    box-shadow: none;
-}
-
 .slide {
+    position: absolute;
+    /* CRITICAL FIX for Overlap */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background-size: cover;
     background-position: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 6s ease;
+    transform: scale(1.1);
+    /* Zoom effect start */
+    z-index: 1;
+}
+
+.slide.active {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+    /* Zoom in effect */
+    z-index: 2;
 }
 
 .slide::before {
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.6) 100%);
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.7) 100%);
+    z-index: 1;
 }
 
 .slide-content {
-    text-align: left;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 var(--spacing-xl);
-    width: 100%;
     position: absolute;
     bottom: 15%;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 10%;
+    /* Left aligned for Brutalist feel */
+    max-width: 800px;
     z-index: 10;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-}
-
-.slide-subtitle {
-    font-family: 'Inter', sans-serif;
-    font-weight: 900;
-    font-size: 1.2rem;
-    letter-spacing: 4px;
-    margin-bottom: 1rem;
     color: var(--white);
-    background: var(--black);
-    padding: 5px 15px;
-    display: inline-block;
-    text-shadow: none;
-    box-shadow: 6px 6px 0 var(--accent);
-    /* Pop of color */
+    text-align: left;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: all 0.8s ease 0.3s;
+    /* Delay for content */
 }
 
-.hero-title,
-.slide h1 {
+.slide.active .slide-content {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.slide-eyebrow {
+    display: inline-block;
+    background: var(--accent);
+    color: var(--black);
+    font-weight: 900;
+    font-size: 1rem;
+    padding: 5px 15px;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.hero-title {
     font-family: 'Poppins', sans-serif;
     font-weight: 900;
-    /* BLACK WEIGHT */
-    font-size: 6rem;
-    /* MASSIVE SIZE */
+    font-size: clamp(3.5rem, 8vw, 7rem);
+    /* Responsive massive text */
     line-height: 0.9;
-    letter-spacing: -3px;
-    /* TIGHT TRACKING */
-    margin: 0 0 1.5rem 0;
-    color: var(--white);
-    text-shadow: 4px 4px 0px #000;
     text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    color: var(--white);
+    text-shadow: 10px 10px 0 rgba(0, 0, 0, 0.5);
+    /* Massive shadow */
 }
 
+/* Specific styling for highlight span if used */
 .hero-title .highlight {
     color: transparent;
-    -webkit-text-stroke: 3px var(--white);
-    position: relative;
-    display: inline-block;
+    -webkit-text-stroke: 2px var(--white);
 }
 
 .slide p {
-    font-size: clamp(1.1rem, 2vw, 1.5rem);
-    max-width: 600px;
-    margin-bottom: var(--spacing-xl);
+    font-size: 1.25rem;
     font-weight: 500;
-    color: var(--white);
-    /* FIX: Enforce white text */
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-    /* FIX: Stronger shadow for legibility */
+    max-width: 600px;
+    margin-bottom: 2.5rem;
+    color: var(--gray-300);
 }
 
-/* FIX: Hide broken white box artifact (likely partial slider nav) */
-.hero-dots button,
-.slider-arrow {
-    background: transparent;
-    border: none;
-    box-shadow: none;
-}
-
-#heroSliderDots {
+/* HERO CONTROLS */
+.hero-dots {
+    position: absolute;
     bottom: 2rem;
-    z-index: 10;
+    right: 2rem;
+    /* Right aligned dots */
+    display: flex;
+    gap: 10px;
+    z-index: 20;
+}
+
+.slider-dot {
+    width: 15px;
+    height: 15px;
+    background: transparent;
+    border: 2px solid var(--white);
+    cursor: pointer;
+    transition: all 0.3s;
+    padding: 0;
+}
+
+.slider-dot.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    transform: scale(1.2);
 }
 
 .slide .btn {
     padding: 1.25rem 3rem;
-    font-size: 1.1rem;
-    letter-spacing: 0.1em;
+    font-size: 1.2rem;
     background: var(--white);
     color: var(--black);
-    border: 3px solid var(--white);
-    border-radius: 0;
+    border: 4px solid var(--white);
+    font-weight: 900;
     text-transform: uppercase;
-    font-weight: 800;
+    transition: all 0.3s;
 }
 
 .slide .btn:hover {
-    background: transparent;
-    color: var(--white);
-    transform: translateY(-4px);
-    box-shadow: 6px 6px 0px var(--accent);
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 10px 10px 0 var(--black);
+    transform: translateY(-5px);
 }
 
 /* ============================================
