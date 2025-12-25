@@ -632,6 +632,16 @@ class HomeEngine {
     });
   }
 
+  // 🛡️ UTILITY: Safe Loader
+  async safeLoad(fn, name) {
+    try {
+      await fn();
+      console.log(`✅ [HomeEngine] ${name} Loaded`);
+    } catch (e) {
+      console.error(`❌ [HomeEngine] ${name} Failed`, e);
+    }
+  }
+
   toggleWishlist(id) {
     if (window.wishlistManager) window.wishlistManager.toggle(id);
     if (window.notifications) window.notifications.success('WISHLIST', 'Producto guardado');
