@@ -459,12 +459,19 @@ class HomeEngine {
     const loader = document.getElementById('preloader');
     if (!loader) return;
     if (show) {
+      loader.style.display = 'flex'; // Ensure it's in logic flow
       loader.style.visibility = 'visible';
-      loader.style.opacity = '1';
+      // Small timeout to allow display change to register before opacity transition
+      requestAnimationFrame(() => {
+        loader.style.opacity = '1';
+      });
     } else {
       setTimeout(() => {
         loader.style.opacity = '0';
-        setTimeout(() => loader.style.visibility = 'hidden', 500);
+        setTimeout(() => {
+          loader.style.visibility = 'hidden';
+          loader.style.display = 'none'; // CRITICAL FIX: Remove from layout
+        }, 500);
       }, 800);
     }
   }
