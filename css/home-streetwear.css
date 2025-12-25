@@ -601,36 +601,42 @@ body.loaded #preloader {
 /* ============================================
    3. JOURNAL SECTION (BLOG PREVIEW)
    ============================================ */
+/* ============================================
+   3. JOURNAL SECTION (BLOG PREVIEW)
+   ============================================ */
 .journal-section {
     padding: var(--spacing-4xl) 0;
     background: var(--white);
     border-top: 5px solid var(--black);
     position: relative;
+    overflow: hidden;
 }
 
 .journal-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 2rem;
+    gap: 3rem;
     margin-top: 3rem;
 }
 
 .journal-card {
     border: 4px solid var(--black);
     background: var(--white);
-    transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
     display: flex;
     flex-direction: column;
     position: relative;
+    height: 100%;
 }
 
 .journal-card:hover {
-    transform: translate(-8px, -8px);
-    box-shadow: 16px 16px 0 var(--black);
+    transform: translate(-10px, -10px);
+    box-shadow: 20px 20px 0 var(--black);
+    z-index: 2;
 }
 
 .journal-image {
-    height: 280px;
+    height: 300px;
     position: relative;
     border-bottom: 4px solid var(--black);
     overflow: hidden;
@@ -640,13 +646,67 @@ body.loaded #preloader {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    filter: grayscale(100%);
+    transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    filter: grayscale(100%) contrast(1.1);
 }
 
 .journal-card:hover .journal-image img {
     transform: scale(1.1);
-    filter: grayscale(0%);
+    filter: grayscale(0%) contrast(1);
+}
+
+.journal-content {
+    padding: 2rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.journal-tag {
+    display: inline-block;
+    background: var(--black);
+    color: var(--white);
+    padding: 4px 8px;
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    font-size: 0.8rem;
+    margin-bottom: 1rem;
+    align-self: flex-start;
+    text-transform: uppercase;
+}
+
+.journal-content h3 {
+    font-size: 1.8rem;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+}
+
+.journal-content p {
+    color: var(--gray-500);
+    margin-bottom: 2rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    flex-grow: 1;
+}
+
+.read-more {
+    font-weight: 900;
+    text-transform: uppercase;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    align-self: flex-start;
+    transition: color 0.2s;
+}
+
+.read-more:hover {
+    color: var(--accent);
+    background: var(--black);
+    color: var(--white);
+    text-decoration: none;
+    padding: 2px 5px;
 }
 
 .journal-content {
@@ -735,34 +795,72 @@ body.loaded #preloader {
 /* ============================================
    4. BENTO GRID CATEGORIES (MAGAZINE STYLE)
    ============================================ */
+/* ============================================
+   4. BENTO GRID CATEGORIES (MAGAZINE STYLE)
+   ============================================ */
 .bento-grid {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
     grid-auto-rows: 240px;
-    /* Base height for rows */
     gap: 1.5rem;
     padding-bottom: 1.5rem;
+    grid-auto-flow: dense;
 }
 
-.category-card {
+.bento-item {
     position: relative;
     overflow: hidden;
     border-radius: 0;
-    /* Brutalist sharp edges */
     cursor: pointer;
     background: var(--gray-100);
     transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
     border: 1px solid transparent;
+    text-decoration: none;
+    /* Ensure link reset */
 }
 
-.category-card:hover {
+/* Mosaic Layout Rules (Desktop) */
+.bento-item:nth-child(1) {
+    grid-column: span 8;
+    grid-row: span 2;
+}
+
+.bento-item:nth-child(2) {
+    grid-column: span 4;
+    grid-row: span 1;
+}
+
+.bento-item:nth-child(3) {
+    grid-column: span 4;
+    grid-row: span 1;
+}
+
+.bento-item:nth-child(4) {
+    grid-column: span 12;
+    grid-row: span 1;
+}
+
+.bento-item:hover {
     z-index: 10;
     transform: translateY(-4px);
     border-color: var(--black);
     box-shadow: 8px 8px 0 var(--black);
 }
 
-.category-card-bg {
+.bento-overlay {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 2rem;
+    z-index: 2;
+}
+
+.bento-item img {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -770,32 +868,38 @@ body.loaded #preloader {
     object-fit: cover;
     transition: transform 0.8s ease;
     filter: grayscale(100%);
-    /* Editorial look */
 }
 
-.category-card:hover .category-card-bg {
+.bento-item:hover img {
     transform: scale(1.1);
     filter: grayscale(0%);
-    /* Reveal color on hover */
 }
 
-.category-card h3 {
-    position: absolute;
-    bottom: 1.5rem;
-    left: 1.5rem;
+.bento-item h3 {
+    position: relative;
     margin: 0;
     color: var(--white);
-    font-size: 2rem;
+    font-size: clamp(1.5rem, 3vw, 3rem);
     font-weight: 900;
     text-transform: uppercase;
     text-shadow: 2px 2px 0 var(--black);
-    z-index: 2;
+    z-index: 3;
     pointer-events: none;
 }
 
-.category-card p {
-    display: none;
-    /* Hide description for cleaner visual */
+.bento-item i {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    color: var(--white);
+    opacity: 0;
+    transform: rotate(-45deg);
+    transition: all 0.3s ease;
+}
+
+.bento-item:hover i {
+    opacity: 1;
+    transform: rotate(0);
 }
 
 /* Bento Layout Logic */
@@ -854,12 +958,18 @@ body.loaded #preloader {
 
     .bento-grid {
         grid-template-columns: 1fr;
+        grid-auto-rows: 200px;
+        /* Smaller height on mobile */
     }
 
-    .category-card:nth-child(1) {
+    .bento-item:nth-child(1),
+    .bento-item:nth-child(2),
+    .bento-item:nth-child(3),
+    .bento-item:nth-child(4) {
         grid-column: span 1;
         grid-row: span 1;
-        height: 300px;
+        height: auto;
+        min-height: 200px;
     }
 }
 

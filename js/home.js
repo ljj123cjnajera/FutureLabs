@@ -269,34 +269,24 @@ class HomeEngine {
     const categories = this.fallbackData.categories;
 
     container.innerHTML = `
-        <div class="home-sections-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+        <div class="bento-grid">
             ${categories.map((cat, index) => `
-                <div class="home-section-card ${index === 0 ? 'span-2' : ''}" 
-                     onclick="window.location.href='products.html?category=${cat.slug}'"
-                     style="position: relative; height: 400px; overflow: hidden; border: 4px solid var(--black); cursor: pointer; box-shadow: 10px 10px 0 var(--black);">
-                     
-                    <img src="${cat.image}" alt="${cat.name}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(0.2, 1, 0.3, 1);">
-                    
-                    <div class="section-overlay" style="position: absolute; inset: 0; background: rgba(0,0,0,0.4); display: flex; flex-direction: column; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s;">
-                        <h2 style="color: #fff; font-size: 3rem; font-weight: 900; text-transform: uppercase; margin: 0; letter-spacing: -2px;">${cat.name}</h2>
-                        <span style="color: var(--black); font-weight: 800; border: none; padding: 10px 20px; margin-top: 20px; background: var(--accent); text-transform: uppercase;">Shop Now</span>
+                <a href="products.html?category=${cat.slug}" class="bento-item">
+                    <img src="${cat.image}" alt="${cat.name}" loading="lazy">
+                    <div class="bento-overlay">
+                        <h3>${cat.name}</h3>
+                        <i class="fas fa-arrow-right"></i>
                     </div>
-                </div>
+                </a>
             `).join('')}
         </div>
     `;
 
+    // Remove legacy listeners as CSS handles hover now
+    // Modern Hover Effect is handled by .bento-item:hover in CSS
+
     // Modern Hover Effect
-    container.querySelectorAll('.home-section-card').forEach(card => {
-      card.addEventListener('mouseenter', () => {
-        card.querySelector('.section-overlay').style.opacity = '1';
-        card.querySelector('img').style.transform = 'scale(1.1)';
-      });
-      card.addEventListener('mouseleave', () => {
-        card.querySelector('.section-overlay').style.opacity = '0';
-        card.querySelector('img').style.transform = 'scale(1)';
-      });
-    });
+
   }
 
   // ==========================================
