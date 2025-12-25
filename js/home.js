@@ -89,8 +89,17 @@ class HomeEngine {
       if (window.Components && window.Components.getHeader) {
         const headerEl = document.getElementById('mainHeader');
         if (headerEl) {
-          headerEl.innerHTML = window.Components.getHeader();
-          // Initialize Header Logic (Search, Menu, Cart)
+          // Use outerHTML/replaceWith to prevent <header><header> nesting
+          const newHeaderHTML = window.Components.getHeader(true, true);
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = newHeaderHTML;
+
+          if (tempDiv.firstElementChild) {
+            tempDiv.firstElementChild.id = 'mainHeader'; // Keep ID for references
+            headerEl.replaceWith(tempDiv.firstElementChild);
+          }
+
+          // Initialize Header Logic
           if (window.Components.initHeader) {
             window.Components.initHeader();
           }
