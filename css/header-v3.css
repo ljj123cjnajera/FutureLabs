@@ -52,10 +52,11 @@
 .header-v3 {
     background: var(--white);
     position: sticky;
-    top: 0;
+    top: 0 !important;
     z-index: 1000;
     border-bottom: 4px solid var(--black);
     transition: transform 0.3s ease;
+    margin-top: 0 !important;
 }
 
 .header-main-row {

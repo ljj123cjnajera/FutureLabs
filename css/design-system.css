@@ -204,6 +204,8 @@ html {
     font-size: 16px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
 }
 
 body {
@@ -216,6 +218,9 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    min-height: 100vh;
 }
 
 h1,
