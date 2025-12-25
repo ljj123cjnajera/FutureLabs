@@ -83,18 +83,27 @@ class HomeEngine {
 
   async init() {
     try {
-      // 0. Render Globals (Header/Footer) first
-      this.renderGlobals();
+      console.log('🚀 HomeEngine Starting...');
 
-      this.toggleLoader(true);
+      // 1. CRITICAL: Inject Standard Header FIRST (matches products.html)
+      if (window.Components && window.Components.getHeader) {
+        const headerEl = document.getElementById('mainHeader');
+        if (headerEl) {
+          headerEl.innerHTML = window.Components.getHeader();
+          // Initialize Header Logic (Search, Menu, Cart)
+          if (window.Components.initHeader) {
+            window.Components.initHeader();
+          }
+        }
+      }
 
-      // 1. Load Content sequence (Parallel execution for speed)
-      await Promise.allSettled([
-        this.loadHero(),
-        this.loadCategories(),
-        this.loadProducts(),
-        this.loadBrands(),
-        this.loadJournal()
+      // 2. Load Content with Failsafes
+      await Promise.all([
+        this.safeLoad(this.loadHero.bind(this), 'Hero Slider'),
+        this.safeLoad(this.loadCategories.bind(this), 'Categories'),
+        this.safeLoad(this.loadProducts.bind(this), 'Products'),
+        this.safeLoad(this.loadBrands.bind(this), 'Brands'),
+        this.safeLoad(this.loadJournal.bind(this), 'Journal')
       ]);
 
       this.setupNewsletter();
