@@ -26,6 +26,50 @@ class CatalogEngine {
     async init() {
         console.log('📦 [CatalogEngine] V3 Initialized');
         await this.loadProducts();
+
+        // 🚀 URL PARAMETER HANDLING
+        this.applyInitialFilters();
+    }
+
+    applyInitialFilters() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const category = urlParams.get('category');
+        const brand = urlParams.get('brand'); // Alias for category often used
+        const filter = urlParams.get('filter'); // e.g. 'new', 'sale'
+        const search = urlParams.get('search');
+
+        if (search) {
+            // If search exists, wait for search engine or simple filter
+            const query = search.toLowerCase();
+            const filtered = this.allProducts.filter(p =>
+                p.name.toLowerCase().includes(query) ||
+                p.brand.toLowerCase().includes(query)
+            );
+            this.render(filtered);
+            // Update UI to show search term
+            const titleEl = document.querySelector('.section-header h2');
+            if (titleEl) titleEl.textContent = `SEARCH: "${search}"`;
+            return;
+        }
+
+        if (category || brand) {
+            const target = (category || brand).toLowerCase();
+            this.filter(target);
+            // Highlight active category in UI if exists
+            return;
+        }
+
+        if (filter) {
+            if (filter === 'new' || filter === 'new-arrivals') {
+                // Mock logic for 'new'
+                const filtered = this.allProducts.filter(p => p.badge === 'NEW' || p.is_new);
+                if (filtered.length > 0) this.render(filtered);
+            }
+            if (filter === 'sale') {
+                const filtered = this.allProducts.filter(p => p.discount_price || p.badge === 'SALE');
+                if (filtered.length > 0) this.render(filtered);
+            }
+        }
     }
 
     async loadProducts() {
