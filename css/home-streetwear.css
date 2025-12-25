@@ -2004,8 +2004,129 @@ transition: all 0.3s ease;
 }
 
 /* ============================================
-   10. NEWSLETTER POPUP
+   11. PRODUCT ENGINE (Flagship Tabs)
    ============================================ */
+.product-engine-section {
+    padding: var(--spacing-4xl) 0;
+    position: relative;
+    border-bottom: 2px solid var(--black);
+}
+
+.engine-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: var(--spacing-2xl);
+    flex-wrap: wrap;
+    gap: var(--spacing-lg);
+}
+
+.engine-tabs {
+    display: flex;
+    gap: 0;
+    border: 2px solid var(--black);
+}
+
+.engine-tab {
+    padding: 1rem 2rem;
+    font-weight: 800;
+    font-size: 1.1rem;
+    background: var(--white);
+    color: var(--black);
+    border: none;
+    cursor: pointer;
+    border-right: 2px solid var(--black);
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    text-transform: uppercase;
+}
+
+.engine-tab:last-child {
+    border-right: none;
+}
+
+.engine-tab:hover {
+    background: #f0f0f0;
+}
+
+.engine-tab.active {
+    background: var(--black);
+    color: var(--white);
+}
+
+.engine-display {
+    min-height: 400px;
+    position: relative;
+}
+
+.engine-loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+    gap: 1rem;
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+}
+
+.spinner-square {
+    width: 40px;
+    height: 40px;
+    background: var(--black);
+    animation: spin 1s infinite ease-in-out;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.product-grid-v3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.product-grid-v3.loaded {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.engine-footer {
+    display: flex;
+    justify-content: center;
+    margin-top: var(--spacing-2xl);
+    padding-top: var(--spacing-xl);
+    border-top: 1px dashed var(--gray-400);
+}
+
+@media (max-width: 768px) {
+    .engine-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .engine-tabs {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .engine-tab {
+        flex: 1;
+        padding: 0.8rem 1rem;
+        font-size: 0.9rem;
+        min-width: 80px;
+    }
+}
+
 /* ============================================
    10. NEWSLETTER POPUP (Brutalist)
    ============================================ */

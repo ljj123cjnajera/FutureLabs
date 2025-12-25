@@ -168,6 +168,39 @@
         </div>
     </div>
 
+    <!-- 🚀 PRODUCT ENGINE: TABBED COLLECTIONS (The "Flagship" Feature) -->
+    <section class="section product-engine-section">
+        <div class="container">
+            <div class="engine-header">
+                <h2 class="section-title-brutalist">SELECT_YOUR_WEAPON //</h2>
+                <div class="engine-tabs">
+                    <button class="engine-tab active" data-tab="nike">NIKE</button>
+                    <button class="engine-tab" data-tab="jordan">JORDAN</button>
+                    <button class="engine-tab" data-tab="yeezy">YEEZY</button>
+                    <button class="engine-tab" data-tab="adidas">ADIDAS</button>
+                </div>
+            </div>
+
+            <div class="engine-display">
+                <!-- Loading State (Initial) -->
+                <div id="engineLoader" class="engine-loader">
+                    <div class="spinner-square"></div>
+                    <p>INITIALIZING DATABASE...</p>
+                </div>
+
+                <!-- Dynamic Grid Container -->
+                <div id="engineGrid" class="product-grid-v3" style="min-height: 400px; display: none;">
+                    <!-- JS will inject cards here -->
+                </div>
+
+                <!-- See All Link -->
+                <div class="engine-footer">
+                    <a href="products.html" id="engineSeeAll" class="link-arrow">VIEW FULL COLLECTION <i
+                            class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
     <!-- CATEOGRIES (BENTO) -->
     <section class="section">
         <div class="container">

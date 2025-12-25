@@ -133,6 +133,7 @@ class HomeEngine {
       this.initHypeFeatures();
       this.initScrollAnimations();
       this.initStickyFooter();
+      this.initTabbedEngine(); // 🚀 New Flagship Feature
 
       console.log('🚀 [HomeEngine] V3.1 Initialized (Defensive Mode).');
     } catch (err) {
@@ -794,6 +795,102 @@ class HomeEngine {
         sticky.appendChild(closeBtn);
       }
     }
+  }
+
+  // 7. Product Engine (Tabbed Collections)
+  initTabbedEngine() {
+    const tabs = document.querySelectorAll('.engine-tab');
+    const grid = document.getElementById('engineGrid');
+    const loader = document.getElementById('engineLoader');
+    const seeAll = document.getElementById('engineSeeAll');
+
+    if (!tabs.length || !grid) return;
+
+    const loadCategory = async (category) => {
+      // 1. UI Loading State
+      grid.style.display = 'none';
+      grid.classList.remove('loaded');
+      if (loader) loader.style.display = 'flex';
+
+      // Update active tab
+      tabs.forEach(t => t.classList.remove('active'));
+      document.querySelector(`.engine-tab[data-tab="${category}"]`)?.classList.add('active');
+
+      try {
+        // 2. Fetch Data (Real API)
+        // Using api.getProducts with category filter
+        const response = await window.api.getProducts({
+          category: category,
+          limit: 4
+        });
+
+        let products = [];
+        if (response && response.success && response.data && response.data.products) {
+          products = response.data.products;
+        } else {
+          // Fallback to internal mock if API fails/returns empty
+          console.warn(`⚠️ API returned no products for ${category}, utilizing fallback.`);
+          products = this.getFallbackProducts(category);
+        }
+
+        // 3. Render
+        if (products.length > 0) {
+          grid.innerHTML = products.map(p => window.Components.getProductCard(p)).join('');
+        } else {
+          grid.innerHTML = `<div class="empty-state">NO WEAPONS FOUND IN SECTOR ${category.toUpperCase()}</div>`;
+        }
+
+        // 4. Update "See All" Link
+        if (seeAll) seeAll.href = `products.html?category=${category}`;
+
+      } catch (err) {
+        console.warn('❌ Engine Error:', err);
+        // Fallback on error
+        const fallbackIds = this.getFallbackProducts(category);
+        grid.innerHTML = fallbackIds.map(p => window.Components.getProductCard(p)).join('');
+      } finally {
+        // 5. Reveal
+        if (loader) loader.style.display = 'none';
+        grid.style.display = 'grid';
+        // Small delay to allow display:grid to apply before opacity transition
+        setTimeout(() => grid.classList.add('loaded'), 50);
+      }
+    };
+
+    // Initialize with first tab (Nike)
+    loadCategory('nike');
+
+    // Event Listeners
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const category = tab.dataset.tab;
+        loadCategory(category);
+      });
+    });
+  }
+
+  // Helper: Mock fallback if API is empty during dev
+  getFallbackProducts(category) {
+    // Return 4 mock items based on category
+    const mockDb = {
+      'nike': [1, 2, 3, 4],
+      'jordan': [5, 6, 7, 8],
+      'yeezy': [9, 10, 11, 12],
+      'adidas': [13, 14, 15, 16]
+    };
+    const ids = mockDb[category] || [1, 2, 3, 4];
+
+    // Hydrate from catalogEngine if available, or generate generic
+    return ids.map(id => {
+      return {
+        id: id,
+        name: `${category.toUpperCase()} PROTOTYPE 00${id}`,
+        price: 299.00,
+        brand: category.toUpperCase(),
+        image_url: 'assets/images/products/placeholder.jpg',
+        is_new: Math.random() > 0.5
+      };
+    });
   }
 
   // 🛡️ FAILSAFE: Force visibility after 2 seconds if observer fails or user turns off JS interactions
