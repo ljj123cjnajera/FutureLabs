@@ -132,6 +132,7 @@ class HomeEngine {
       // 2. Start Visuals
       this.initHypeFeatures();
       this.initScrollAnimations();
+      this.initStickyFooter();
 
       console.log('🚀 [HomeEngine] V3.1 Initialized (Defensive Mode).');
     } catch (err) {
@@ -749,16 +750,60 @@ class HomeEngine {
       el.style.transitionDelay = `${index % 4 * 100}ms`; // Stagger effect
       observer.observe(el);
     });
+  }
 
-    // 🛡️ FAILSAFE: Force visibility after 2 seconds if observer fails or user turns off JS interactions
-    setTimeout(() => {
-      elementsToReveal.forEach(el => {
-        if (!el.classList.contains('visible')) {
-          el.classList.add('visible');
-          // console.warn('⚠️ Force-revealing element (Failsafe triggered)');
-        }
-      });
-    }, 2000);
+  // 6. Sticky Footer Logic (Dismissible)
+  initStickyFooter() {
+    const sticky = document.getElementById('stickyFooter');
+    if (!sticky) return;
+
+    // Check if dismissed in session
+    if (sessionStorage.getItem('stickyDetailDismissed')) {
+      sticky.style.display = 'none';
+      return;
+    }
+
+    // Add close button if not present
+    if (!sticky.querySelector('.close-sticky')) {
+      const closeBtn = document.createElement('button');
+      closeBtn.innerHTML = '&times;';
+      closeBtn.className = 'close-sticky';
+      closeBtn.style.cssText = `
+              position: absolute;
+              right: 1rem;
+              top: 50%;
+              transform: translateY(-50%);
+              background: transparent;
+              border: none;
+              color: var(--white);
+              font-size: 1.5rem;
+              cursor: pointer;
+              font-weight: bold;
+          `;
+      closeBtn.onclick = () => {
+        sticky.style.display = 'none';
+        sessionStorage.setItem('stickyDetailDismissed', 'true');
+      };
+
+      // Ensure container is relative for positioning
+      const container = sticky.querySelector('.container');
+      if (container) {
+        container.style.position = 'relative';
+        container.appendChild(closeBtn);
+      } else {
+        sticky.appendChild(closeBtn);
+      }
+    }
+  }
+
+  // 🛡️ FAILSAFE: Force visibility after 2 seconds if observer fails or user turns off JS interactions
+  forceReveal() {
+    const elementsToReveal = document.querySelectorAll('.section, .bento-item, .product-card, .brand-item, .journal-card, .trust-bar, .newsletter-section');
+    elementsToReveal.forEach(el => {
+      if (!el.classList.contains('visible')) {
+        el.classList.add('visible');
+      }
+    });
   }
 }
 

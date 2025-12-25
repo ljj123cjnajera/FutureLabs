@@ -587,7 +587,7 @@
                 if (window.Components && window.Components.getFooter) {
                     footer.innerHTML = window.Components.getFooter();
                     footer.style.display = 'block';
-                    footer.style.border = '2px solid red'; // DEBUG: VISIBLE BORDER
+                    // footer.style.border = '2px solid red'; // DEBUG REMOVED
                     console.log('✅ Footer injected by Failsafe');
                 } else {
                     console.error('❌ Components.js not loaded!');
