@@ -525,6 +525,55 @@ class HomeEngine {
   // ==========================================
   // ⚡ INTERACTIONS
   // ==========================================
+  // ==========================================
+  // ⚡ INTERACTIONS
+  // ==========================================
+
+  // 0. COUNTDOWN TIMER
+  initCountdown() {
+    const countdownEl = document.getElementById('countDownTimer');
+    if (!countdownEl) return;
+
+    // Set target date to 3 days from now (Simulated Drop)
+    const targetDate = new Date();
+    targetDate.setDate(targetDate.getDate() + 3);
+    targetDate.setHours(20, 0, 0, 0); // 8 PM Launch
+
+    // Store in session to keep consistent while browsing
+    let savedTarget = sessionStorage.getItem('nextDropTime');
+    if (savedTarget) {
+      // use saved
+    } else {
+      sessionStorage.setItem('nextDropTime', targetDate.getTime());
+    }
+
+    // Override for simple demo: Always 2 days 14 hours ahead
+    const updateTimer = () => {
+      const now = new Date().getTime();
+      const distance = (parseInt(savedTarget || targetDate.getTime())) - now;
+
+      if (distance < 0) {
+        countdownEl.innerHTML = "DROPPING NOW";
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      countdownEl.innerHTML = `
+            <div>${days}<small>D</small></div>
+            <div>${hours}<small>H</small></div>
+            <div>${minutes}<small>M</small></div>
+            <div>${seconds}<small>S</small></div>
+        `;
+    };
+
+    setInterval(updateTimer, 1000);
+    updateTimer();
+  }
+
   quickAdd(id, name) {
     // 1. Update Cart Engine
     if (window.cartEngine) {
@@ -543,6 +592,27 @@ class HomeEngine {
     if (window.notifications) {
       window.notifications.success('ADDED TO CART', `${name}`);
     }
+  }
+
+  // NEW: Quick View Binding for Dynamic Content
+  setupQuickAddbox() {
+    // Delegate event to container to handle dynamic buttons
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.btn-quick-view') || e.target.closest('.quick-view-trigger');
+      if (btn) {
+        e.preventDefault();
+        e.stopPropagation();
+        const productId = btn.dataset.id;
+
+        if (window.QuickView) {
+          window.QuickView.open(productId);
+        } else {
+          console.warn('QuickView module not loaded');
+          // Fallback: Redirect
+          window.location.href = `product-detail.html?id=${productId}`;
+        }
+      }
+    });
   }
 
   setupParallax() {
@@ -568,34 +638,50 @@ class HomeEngine {
   }
 
   setupNewsletter() {
-    // 1. Footer Form
-    const footerForm = document.querySelector('.footer-newsletter .input-group');
-    if (footerForm) {
-      const btn = footerForm.querySelector('button');
-      const input = footerForm.querySelector('input');
-      if (btn) {
-        btn.onclick = () => {
-          if (input && input.value.includes('@')) {
-            btn.innerHTML = '<i class="fas fa-check"></i>';
-            setTimeout(() => btn.innerHTML = 'THANKS!', 1000);
-            localStorage.setItem('newsletter_subscribed', 'true');
+    // 1. Footer Form (Intercept ID specific to Index or Generic)
+    const forms = document.querySelectorAll('.footer-newsletter form, #newsletterPopup form');
+
+    forms.forEach(form => {
+      form.onsubmit = (e) => {
+        e.preventDefault();
+        const btn = form.querySelector('button');
+        const originalText = btn ? btn.innerText : 'SUSCRIBIRME';
+
+        if (btn) btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+        setTimeout(() => {
+          if (btn) btn.innerHTML = '<i class="fas fa-check"></i> LISTO';
+          if (window.notifications) window.notifications.success('WELCOME TO THE CLUB', 'Te has suscrito correctamente.');
+
+          // Hide popup if that was it
+          const popup = form.closest('.newsletter-popup');
+          if (popup) {
+            setTimeout(() => {
+              popup.style.opacity = '0';
+              setTimeout(() => popup.style.display = 'none', 500);
+            }, 1000);
           }
-        };
-      }
-    }
+
+          localStorage.setItem('newsletter_subscribed', 'true');
+        }, 1500);
+      };
+    });
 
     // 2. Popup Logic (Exit Intent / Time Delay)
     const popup = document.getElementById('newsletterPopup');
-    if (popup && !localStorage.getItem('newsletter_subscribed')) {
+    if (popup && !localStorage.getItem('newsletter_subscribed') && !sessionStorage.getItem('newsletter_dismissed')) {
       setTimeout(() => {
         popup.style.display = 'flex';
+        // Force reflow for fade in
+        setTimeout(() => popup.classList.add('visible'), 10);
       }, 5000); // Show after 5 seconds
 
       const closeBtn = popup.querySelector('.close-modal');
       const closeLink = popup.querySelector('.close-link');
 
       const closeAction = () => {
-        popup.style.display = 'none';
+        popup.classList.remove('visible');
+        setTimeout(() => popup.style.display = 'none', 500);
         // Don't show again for this session
         sessionStorage.setItem('newsletter_dismissed', 'true');
       };
