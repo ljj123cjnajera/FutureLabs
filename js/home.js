@@ -303,12 +303,40 @@ class HomeEngine {
   async loadProducts() {
     this.initCountdown();
 
-    // Trending / Featured (SLIDER) - CORRECTED
-    // Was incorrectly checking as Grid, forcing breaks in layout
-    await this.renderProductSlider('featuredProductsGrid', this.fallbackData.products);
+    // 🛡️ Get Data (API or Fallback)
+    let products = [];
+    try {
+      if (this.api && this.api.getProducts) {
+        products = await this.api.getProducts();
+      }
+    } catch (e) { console.warn('API Error, using fallback', e); }
 
-    // On Sale (Grid) - Remains Grid for variety
-    await this.renderProductGrid('onSaleProductsGrid', this.fallbackData.products.map(p => ({ ...p, discount_price: p.price * 0.8 })));
+    if (!products || products.length === 0) {
+      products = this.fallbackData.products;
+    }
+
+    // A. TRENDING / FEATURED (Slider)
+    // Filter logic: High Heat, New, or Hype badges
+    const trending = products.filter(p =>
+      ['GRAIL', 'HYPE', 'HOT', 'TRENDING', 'NEW'].includes(p.badge) || p.price > 400
+    ).slice(0, 8); // Top 8 
+
+    await this.renderProductSlider('featuredProductsGrid', trending);
+
+    // B. ON SALE (Grid)
+    // Logic: Products with discount (mocking if needed)
+    let saleProducts = products.filter(p => p.discount_price || p.badge === 'SALE');
+
+    // If no sale products in mock, generate some for demo
+    if (saleProducts.length < 4) {
+      saleProducts = products.slice(4, 12).map(p => ({
+        ...p,
+        discount_price: (p.price * 0.8).toFixed(2), // 20% off
+        badge: 'SALE'
+      }));
+    }
+
+    await this.renderProductGrid('onSaleProductsGrid', saleProducts);
   }
 
   async renderProductGrid(containerId, products) {
@@ -362,7 +390,7 @@ class HomeEngine {
 
     // Force horizontal scroll class
     container.classList.add('products-horizontal-scroll');
-    container.style.display = 'flex';
+    // container.style.display = 'flex'; // Handled by CSS class usually
 
     // Transform grid to slider via style injection if needed
     if (window.Components && window.Components.getProductCard) {
