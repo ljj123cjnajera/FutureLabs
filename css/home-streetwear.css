@@ -2236,6 +2236,71 @@ transition: all 0.3s ease;
     margin-bottom: var(--spacing-sm);
 }
 
+/* ============================================
+   12. TRUST CERTIFICATE (Conversion Driver)
+   ============================================ */
+.trust-certificate-section {
+    padding: var(--spacing-3xl) 0;
+}
+
+.certificate-grid {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 2px solid var(--black);
+    padding: 2rem;
+    background: #f8f8f8;
+}
+
+.cert-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+    justify-content: center;
+}
+
+.cert-item.middle-item {
+    border-left: 2px solid var(--gray-300);
+    border-right: 2px solid var(--gray-300);
+}
+
+.cert-item i {
+    font-size: 2.5rem;
+    color: var(--black);
+}
+
+.cert-text h4 {
+    font-size: 1.1rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.cert-text p {
+    font-size: 0.8rem;
+    color: var(--gray-600);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+@media (max-width: 768px) {
+    .certificate-grid {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2rem;
+    }
+
+    .cert-item {
+        width: 100%;
+        justify-content: flex-start;
+        border: none !important;
+        padding: 0;
+    }
+}
+
 .newsletter-popup-text h2 {
     font-size: 2.5rem;
     line-height: 0.9;

@@ -248,4 +248,23 @@
         scroll-snap-align: start;
         border: none;
     }
+
+    .sticky-mobile-atc {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: var(--white);
+        padding: 1rem;
+        box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
+        z-index: 999;
+        display: block !important;
+        /* Force show on mobile via JS toggle */
+        border-top: 2px solid var(--black);
+    }
+
+    .sticky-mobile-atc .btn-massive {
+        font-size: 1rem;
+        padding: 1rem;
+    }
 }
