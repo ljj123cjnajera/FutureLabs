@@ -55,6 +55,7 @@ body.loaded #preloader {
 
 .section {
     margin-bottom: var(--spacing-4xl);
+    /* Standard Brutalist Gap (~80px) */
     position: relative;
     width: 100%;
     clear: both;

@@ -97,6 +97,15 @@ class HomeEngine {
         }
       }
 
+      // 1.1 CRITICAL: Inject Standard Footer (matches products.html)
+      if (window.Components && window.Components.getFooter) {
+        const footerEl = document.getElementById('mainFooter');
+        if (footerEl) {
+          console.log('🦶 Injecting Brutalist Footer...');
+          footerEl.innerHTML = window.Components.getFooter();
+        }
+      }
+
       // 2. Load Content with Failsafes
       await Promise.all([
         this.safeLoad(this.loadHero.bind(this), 'Hero Slider'),
