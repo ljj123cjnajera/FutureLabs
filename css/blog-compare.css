@@ -76,8 +76,8 @@
     gap: var(--spacing-xs);
     padding: 6px 14px;
     border-radius: var(--border-radius-full);
-    background: rgba(59, 130, 246, 0.15);
-    color: var(--primary);
+    background: var(--info-light);
+    color: var(--info);
     font-weight: 600;
     font-size: 0.875rem;
     margin-bottom: var(--spacing-md);
@@ -89,8 +89,8 @@
     gap: var(--spacing-xs);
     padding: 6px 14px;
     border-radius: var(--border-radius-full);
-    background: rgba(34, 197, 94, 0.15);
-    color: #16a34a;
+    background: var(--success-light);
+    color: var(--success);
     font-weight: 600;
     font-size: 0.875rem;
     margin-bottom: var(--spacing-md);
@@ -162,14 +162,14 @@
     border-radius: var(--border-radius-2xl);
     padding: clamp(var(--spacing-lg), 4vw, var(--spacing-2xl));
     box-shadow: var(--shadow-lg);
-    border: 1px solid rgba(226, 232, 240, 0.9);
+    border: 1px solid var(--border-color);
 }
 
 .blog-card {
     background: white;
     border-radius: var(--border-radius-2xl);
     box-shadow: var(--shadow-md);
-    border: 1px solid rgba(226, 232, 240, 0.9);
+    border: 1px solid var(--border-color);
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -354,7 +354,7 @@
     background: white;
     border-radius: var(--border-radius-2xl);
     box-shadow: var(--shadow-md);
-    border: 1px solid rgba(226, 232, 240, 0.9);
+    border: 1px solid var(--border-color);
     overflow: hidden;
 }
 
@@ -640,7 +640,7 @@
     .blog-grid {
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     }
-    
+
     .compare-grid {
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     }
@@ -650,24 +650,24 @@
     .blog-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .compare-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .compare-table {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
     }
-    
+
     .compare-table table {
         min-width: 600px;
     }
-    
+
     .blog-filters {
         flex-direction: column;
     }
-    
+
     .filter-button {
         width: 100%;
         text-align: center;
@@ -693,19 +693,19 @@
     .blog-card-image {
         height: 200px;
     }
-    
+
     .blog-card-title {
         font-size: 1.25rem;
     }
-    
+
     .compare-product-image {
         height: 180px;
     }
-    
+
     .compare-actions {
         flex-direction: column;
     }
-    
+
     .compare-actions button {
         width: 100%;
     }
@@ -738,5 +738,3 @@
         gap: var(--spacing-sm);
     }
 }
-
-
