@@ -33,12 +33,12 @@ async function ensureDataSeeded() {
     // Check if products table has any data
     const products = await db('products').select('id').limit(1);
     console.log(`📊 Products found: ${products.length}`);
-    
+
     if (products.length === 0) {
       console.log('📦 Products table is empty, running seeds...');
       const { execSync } = require('child_process');
       // Use absolute path to knexfile.js
-      execSync('npx knex seed:run --knexfile=./knexfile.js', { 
+      execSync('npx knex seed:run --knexfile=./knexfile.js', {
         stdio: 'inherit',
         cwd: process.cwd()
       });
@@ -74,7 +74,7 @@ app.use(cors({
   origin: function (origin, callback) {
     // Permite requests sin origen (como mobile apps o curl)
     if (!origin) return callback(null, true);
-    
+
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
@@ -157,6 +157,15 @@ app.use('/uploads', (req, res, next) => {
   res.header('Access-Control-Allow-Headers', 'Content-Type');
   next();
 }, express.static(path.join(__dirname, 'uploads')));
+
+// 🚀 SERVIR FRONTEND EN PRODUCCIÓN (Docker/Railway)
+if (process.env.NODE_ENV === 'production') {
+  console.log('🚀 Configurando servicio de archivos estáticos para Frontend');
+  app.use('/css', express.static(path.join(__dirname, 'css')));
+  app.use('/js', express.static(path.join(__dirname, 'js')));
+  app.use('/assets', express.static(path.join(__dirname, 'assets')));
+  app.use('/', express.static(path.join(__dirname), { index: 'index.html' }));
+}
 
 app.use('/api/auth', authRoutes);
 app.use('/api/verification', verificationRoutes);
