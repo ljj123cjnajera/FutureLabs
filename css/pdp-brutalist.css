@@ -72,7 +72,7 @@
 
 /* 4. TYPOGRAPHY & BRANDING */
 .product-brand {
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-body);
     font-weight: 900;
     font-size: 1rem;
     letter-spacing: 2px;
@@ -82,7 +82,7 @@
 }
 
 .product-title-large {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     /* Fallback until font checked */
     font-weight: 900;
     font-size: clamp(2.5rem, 4vw, 3.5rem);
@@ -94,7 +94,7 @@
 }
 
 .product-price-large {
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-body);
     font-weight: 700;
     font-size: 1.8rem;
     color: var(--black);

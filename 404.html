@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - LOST IN THE HYPE | SneakersShop</title>
+    <meta name="robots" content="noindex, follow">
+
+    <!-- CSS Unificado (Streetwear Standard V7) -->
+    <link rel="stylesheet" href="css/home-streetwear.css?v=7.0-CLEAN">
+    <link rel="stylesheet" href="css/header-v3.css?v=7.0-CLEAN">
+    <link rel="stylesheet" href="css/footer-brutalist.css?v=7.0-CLEAN">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Poppins:wght@900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        .error-container {
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: var(--white);
+            border: 4px solid var(--black);
+            margin: 4rem auto;
+            max-width: 800px;
+            padding: 4rem 2rem;
+            position: relative;
+        }
+
+        .error-code {
+            font-family: var(--font-heading);
+            font-size: clamp(6rem, 20vw, 15rem);
+            line-height: 0.8;
+            font-weight: 900;
+            color: var(--black);
+            text-shadow: 10px 10px 0 var(--gray-200);
+            margin: 0;
+            letter-spacing: -10px;
+        }
+
+        .error-msg {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            text-transform: uppercase;
+            font-weight: 900;
+            background: var(--black);
+            color: var(--white);
+            padding: 0.5rem 2rem;
+            margin-top: -2rem;
+            z-index: 2;
+            transform: rotate(-2deg);
+        }
+
+        .error-desc {
+            font-family: var(--font-body);
+            font-size: 1.2rem;
+            max-width: 500px;
+            margin: 2rem 0;
+            font-weight: 600;
+            color: var(--gray-600);
+        }
+
+        .btn-home {
+            background: var(--accent);
+            color: var(--white);
+            padding: 1rem 3rem;
+            font-family: var(--font-heading);
+            font-weight: 900;
+            text-transform: uppercase;
+            text-decoration: none;
+            font-size: 1.5rem;
+            border: 3px solid var(--black);
+            box-shadow: 6px 6px 0 var(--black);
+            transition: all 0.2s;
+        }
+
+        .btn-home:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 10px 10px 0 var(--black);
+            background: var(--black);
+        }
+    </style>
+</head>
+
+<body>
+    <header id="mainHeader"></header>
+
+    <div class="container">
+        <div class="error-container">
+            <h1 class="error-code">404</h1>
+            <div class="error-msg">Lost in the Hype</div>
+            <p class="error-desc">Parece que esta página fue droppeada o nunca existió. Regresa a la base antes de que
+                se agote todo.</p>
+            <a href="index.html" class="btn-home">Back to Base</a>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/components.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.Components) {
+                window.Components.loadHeader();
+            }
+        });
+    </script>
+</body>
+
+</html>

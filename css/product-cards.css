@@ -1,4 +1,4 @@
-/* 👟 Tarjetas de Productos - Streetwear Edition (V3 Brutalist Standard) */
+/* 👟 Tarjetas de Productos - Streetwear Edition (V7 Brutalist Standard) */
 
 /* Tarjeta de producto base */
 .product-card {
@@ -11,14 +11,12 @@
     flex-direction: column;
     height: 100%;
     border: 2px solid var(--black);
-    /* FORCE BLACK BORDER */
     box-shadow: none;
 }
 
 .product-card:hover {
     transform: translate(-4px, -4px);
     box-shadow: 6px 6px 0px var(--black);
-    /* FORCE HARD SHADOW */
     z-index: 10;
 }
 
@@ -28,8 +26,9 @@
     width: 100%;
     aspect-ratio: 1;
     overflow: hidden;
-    background: #f9f9f9;
+    background: var(--gray-50);
     border-bottom: 2px solid var(--black);
+    transition: border-color 0.2s ease;
 }
 
 .product-image {
@@ -38,13 +37,13 @@
     object-fit: cover;
     object-position: center;
     transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    mix-blend-mode: normal;
 }
 
-/* Image Zoom Effect - Smooth & Premium */
+/* Image Zoom Effect */
 .product-card:hover .product-image {
-    transform: scale(1.1);
-    opacity: 0.95;
-    /* Slight fade for depth */
+    transform: scale(1.1) rotate(1deg);
+    filter: contrast(1.1);
 }
 
 /* Sold Out Overlay */
@@ -64,26 +63,27 @@
     pointer-events: none;
 }
 
-/* Badges - Estilo Etiqueta */
+/* Badges - Estilo Etiqueta Hardcore */
 .product-badges {
     position: absolute;
-    top: 12px;
-    left: 12px;
+    top: 0;
+    left: 0;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 0;
     z-index: 2;
 }
 
 .product-badge {
-    padding: 4px 8px;
+    padding: 6px 10px;
     border-radius: 0;
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     font-weight: 900;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    box-shadow: none;
-    border: 1px solid var(--black);
+    letter-spacing: 0.5px;
+    box-shadow: 4px 4px 0 var(--black);
+    border: 3px solid var(--black);
+    margin: 10px 0 0 10px;
 }
 
 .product-badge-new {
@@ -128,19 +128,19 @@
     color: var(--black);
     font-size: 1rem;
     cursor: pointer;
-    transition: all 0.2s;
-    box-shadow: 2px 2px 0 var(--black);
+    transition: all 0.2s ease;
+    box-shadow: 2px 2px 0px var(--black);
 }
 
 .product-quick-action:hover {
     background: var(--black);
     color: var(--white);
-    transform: translate(-1px, -1px);
-    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.1);
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0px var(--black);
 }
 
-/* Info del Producto */
-.product-info {
+/* Contenido de la tarjeta */
+.product-content {
     padding: 1rem;
     display: flex;
     flex-direction: column;
@@ -168,15 +168,21 @@
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
+    text-transform: uppercase;
 }
 
-.product-price {
+/* Precio */
+.product-price-container {
     margin-top: auto;
     display: flex;
     align-items: baseline;
     gap: 8px;
-    font-size: 1.1rem;
-    font-weight: 700;
+    padding-top: 12px;
+}
+
+.product-price {
+    font-size: 1.25rem;
+    font-weight: 900;
     color: var(--black);
 }
 
@@ -213,190 +219,6 @@
 .product-add-btn:active {
     transform: translateY(0);
     box-shadow: none;
-}
-
-
-.product-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.1);
-    /* Hard shadow */
-    border: 1px solid #000;
-    z-index: 10;
-}
-
-/* Contenedor de imagen */
-.product-image-container {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 1;
-    /* Cuadrado perfecto */
-    overflow: hidden;
-    background: #f9f9f9;
-    border-bottom: 2px solid transparent;
-    transition: border-color 0.2s ease;
-}
-
-.product-card:hover .product-image-container {
-    border-bottom: 2px solid #000;
-}
-
-.product-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    mix-blend-mode: normal;
-    /* Reset blend mode for clarity */
-}
-
-.product-card:hover .product-image {
-    transform: scale(1.1) rotate(1deg);
-    /* Slight rotation for edge */
-    filter: contrast(1.1);
-    /* Pop the colors */
-}
-
-/* Badges - Estilo Etiqueta Hardcore */
-.product-badges {
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-    z-index: 2;
-}
-
-.product-badge {
-    padding: 6px 10px;
-    border-radius: 0;
-    font-size: 0.8rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    box-shadow: 4px 4px 0 rgba(0, 0, 0, 1);
-    border: 3px solid var(--black);
-    margin: 10px 0 0 10px;
-}
-
-.product-badge-new {
-    background: #fff;
-    color: #000;
-}
-
-.product-badge-sale {
-    background: #ff0000;
-    color: #fff;
-    border-color: #ff0000;
-}
-
-/* Acciones rápidas (Quick View / Wishlist) */
-.product-quick-actions {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    z-index: 2;
-    opacity: 0;
-    transform: translateX(10px);
-    transition: opacity 0.2s, transform 0.2s;
-}
-
-.product-card:hover .product-quick-actions {
-    opacity: 1;
-    transform: translateX(0);
-}
-
-.product-quick-action {
-    width: 36px;
-    height: 36px;
-    border-radius: 0;
-    background: #fff;
-    border: 1px solid #000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 2px 2px 0px rgba(0, 0, 0, 1);
-    color: #000;
-}
-
-.product-quick-action:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 4px 4px 0px rgba(0, 0, 0, 1);
-    background: #000;
-    color: #fff;
-}
-
-/* Contenido de la tarjeta */
-.product-content {
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    gap: 4px;
-}
-
-/* Categoría */
-.product-category {
-    font-size: 0.7rem;
-    color: #666;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 700;
-}
-
-/* Título */
-.product-title {
-    font-family: 'Inter', sans-serif;
-    font-size: 1rem;
-    font-weight: 800;
-    color: #000;
-    margin-bottom: 8px;
-    line-height: 1.2;
-    text-transform: uppercase;
-}
-
-/* Precio */
-.product-price-container {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: auto;
-    padding-top: 12px;
-}
-
-.product-price {
-    font-size: 1.25rem;
-    font-weight: 900;
-    color: #000;
-}
-
-.product-price-new {
-    color: #ff0000;
-}
-
-.product-price-old {
-    font-size: 0.9rem;
-    color: #999;
-    text-decoration: line-through;
-    font-weight: 500;
-}
-
-.product-price-current {
-    color: #000;
-}
-
-/* Grid Layout */
-.products-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 24px;
-    padding: 24px 0;
 }
 
 @media (max-width: 768px) {

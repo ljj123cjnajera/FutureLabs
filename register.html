@@ -5,6 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Join Us | Sneakers Shop</title>
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Únete a SneakersShop. Acceso exclusivo a drops, descuentos y envío prioritario.">
+    <meta name="robots" content="index, follow">
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -12,102 +17,14 @@
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- CORE STYLES -->
-    <link rel="stylesheet" href="css/home-streetwear.css?v=6.1">
-    <link rel="stylesheet" href="css/header-v3.css?v=6.1">
-    <link rel="stylesheet" href="css/animations.css">
+    <!-- CORE STYLES (V7) -->
+    <link rel="stylesheet" href="css/home-streetwear.css?v=7.0-CLEAN">
+    <link rel="stylesheet" href="css/header-v3.css?v=7.0-CLEAN">
+    <link rel="stylesheet" href="css/footer-brutalist.css?v=7.0-CLEAN">
+    <link rel="stylesheet" href="css/animations.css?v=7.0-CLEAN">
 
-    <style>
-        .auth-container {
-            max-width: 500px;
-            margin: 8rem auto;
-            padding: 3rem;
-            border: 4px solid var(--black);
-            text-align: center;
-            background: #fff;
-            box-shadow: 12px 12px 0 var(--black);
-            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-
-        .auth-container:hover {
-            transform: translate(-4px, -4px);
-            box-shadow: 16px 16px 0 var(--black);
-        }
-
-        .auth-title {
-            font-family: 'Poppins', sans-serif;
-            font-weight: 900;
-            font-size: 2.5rem;
-            text-transform: uppercase;
-            margin-bottom: 2rem;
-        }
-
-        .auth-form {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .form-group {
-            text-align: left;
-        }
-
-        .form-label {
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 1rem;
-            border: 2px solid var(--gray-300);
-            font-family: 'Inter', sans-serif;
-            font-size: 1rem;
-            transition: all 0.2s;
-        }
-
-        .form-input:focus {
-            border-color: var(--black);
-            outline: none;
-            box-shadow: 4px 4px 0 var(--gray-200);
-        }
-
-        .btn-auth {
-            background: var(--black);
-            color: var(--white);
-            border: none;
-            padding: 1.2rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: transform 0.2s;
-            margin-top: 1rem;
-        }
-
-        .btn-auth:hover {
-            transform: translateY(-2px);
-            box-shadow: 4px 4px 0 var(--accent);
-        }
-
-        .auth-links {
-            margin-top: 2rem;
-            display: flex;
-            justify-content: center;
-            font-size: 0.9rem;
-        }
-
-        .auth-link {
-            text-decoration: underline;
-            color: var(--gray-600);
-        }
-
-        .auth-link:hover {
-            color: var(--black);
-        }
-    </style>
+    <!-- PAGE SPECIFIC -->
+    <link rel="stylesheet" href="css/auth-brutalist.css?v=7.0-CLEAN">
 </head>
 
 <body>
@@ -133,19 +50,20 @@
                 <button type="submit" class="btn-auth">Create Account</button>
             </form>
 
-            <div class="auth-links">
+            <div class="auth-links" style="justify-content: center;">
                 <span>Already a member? <a href="login.html" class="auth-link">Sign In</a></span>
             </div>
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="js/components.js?v=6.1"></script>
-    <script src="js/auth.js?v=6.1"></script>
-    <script src="js/notifications.js?v=6.1"></script>
+    <!-- Scripts (V7) -->
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/components.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            if (window.Components) window.Components.initHeader();
+            if (window.Components) window.Components.loadHeader();
             document.getElementById('registerForm').addEventListener('submit', (e) => {
                 e.preventDefault();
                 // Simulate login
