@@ -18,9 +18,68 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 3. Load Data
     await loadProfileData();
     await loadOrders();
+    await loadLoyaltyData();
 });
 
 // --- CORE FUNCTIONS ---
+async function loadLoyaltyData() {
+    const balanceEl = document.getElementById('loyaltyBalance');
+    const lifetimeEl = document.getElementById('loyaltyLifetime'); // Assuming API sends this or we calculate
+    const historyContainer = document.getElementById('loyaltyHistory');
+
+    if (!balanceEl) return;
+
+    try {
+        // 1. Get Points
+        const pointsRes = await window.api.getLoyaltyPoints();
+        const currentPoints = pointsRes.data?.points || 0;
+
+        balanceEl.textContent = `${currentPoints} PTS`;
+        // For now, mirroring balance as lifetime if API doesn't separate them, or 0 if not available
+        lifetimeEl.textContent = `${currentPoints} PTS`;
+
+        // 2. Get History
+        const historyRes = await window.api.getLoyaltyTransactions();
+        const transactions = historyRes.data?.transactions || [];
+
+        if (transactions.length === 0) {
+            historyContainer.innerHTML = `
+                <div style="padding: 2rem; border: 2px dashed var(--gray-400); text-align: center;">
+                    NO POINTS HISTORY FOUND.<br>
+                    <small>Start shopping to earn rewards.</small>
+                </div>`;
+            return;
+        }
+
+        historyContainer.innerHTML = transactions.map(t => {
+            const isEarned = t.type === 'earned';
+            const color = isEarned ? 'var(--highlight)' : 'var(--gray-300)';
+            const icon = isEarned ? 'fa-arrow-down' : 'fa-arrow-up';
+
+            return `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-bottom: 1px solid var(--gray-300); background: var(--white);">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div style="background: ${color}; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--black);">
+                        <i class="fas ${icon}"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight: 800; font-size: 0.9rem; text-transform: uppercase;">${t.description}</div>
+                        <div style="font-size: 0.8rem; color: var(--gray-600);">${new Date(t.created_at).toLocaleDateString()}</div>
+                    </div>
+                </div>
+                <div style="font-weight: 900; font-size: 1.2rem; color: ${isEarned ? 'var(--black)' : 'var(--gray-500)'};">
+                    ${isEarned ? '+' : '-'}${t.points_change}
+                </div>
+            </div>`;
+        }).join('');
+
+    } catch (e) {
+        console.warn('Loyalty Fetch Error:', e);
+        if (historyContainer) {
+            historyContainer.innerHTML = `<div style="padding: 1rem; background: #ffebee; color: #c62828;">Authentication Error or System Offline</div>`;
+        }
+    }
+}
 
 async function loadProfileData() {
     try {

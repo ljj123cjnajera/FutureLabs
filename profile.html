@@ -42,6 +42,9 @@
                 <button class="account-nav-btn" onclick="switchTab('wishlist')">
                     <i class="fas fa-heart"></i> WISHLIST
                 </button>
+                <button class="account-nav-btn" onclick="switchTab('loyalty')">
+                    <i class="fas fa-medal"></i> LOYALTY
+                </button>
                 <button class="account-nav-btn" onclick="switchTab('settings')">
                     <!-- <i class="fas fa-cog"></i> --> SETTINGS
                 </button>
@@ -96,6 +99,28 @@
                     <div style="padding: 1rem; background: #eee; font-family: monospace;">
                         TODO: Address Manager
                     </div>
+                </div>
+            </section>
+
+            <!-- LOYALTY SECTION (NEW) -->
+            <section id="loyalty" class="account-section">
+                <h1 class="section-title">LOYALTY VAULT</h1>
+                <div class="stats-grid">
+                    <div class="stat-box" style="background: var(--black); color: var(--white);">
+                        <span class="stat-label">CURRENT BALANCE</span>
+                        <div class="stat-value" id="loyaltyBalance">0 PTS</div>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">LIFETIME EARNED</span>
+                        <div class="stat-value" id="loyaltyLifetime">0 PTS</div>
+                    </div>
+                </div>
+
+                <h3
+                    style="margin-top: 2rem; border-bottom: 2px solid var(--black); padding-bottom: 0.5rem; text-transform: uppercase; font-weight: 800;">
+                    Transaction History</h3>
+                <div id="loyaltyHistory" class="loyalty-history-list" style="margin-top: 1rem;">
+                    <div class="loading-brutalist">LOADING HISTORY...</div>
                 </div>
             </section>
 

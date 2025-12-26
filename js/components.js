@@ -155,6 +155,10 @@ class Components {
 
                 <!-- ACTIONS -->
                 <div class="header-actions">
+                    <a href="profile.html?tab=loyalty" class="action-btn" id="headerLoyaltyBadge" style="display: none; border: 1px solid var(--black); background: var(--black); color: var(--white);">
+                        <i class="fas fa-medal"></i>
+                        <span class="desktop-only" id="headerLoyaltyPoints">0 PTS</span>
+                    </a>
                     <a href="profile.html" class="action-btn">
                         <i class="far fa-user"></i>
                         <span class="desktop-only">ACCOUNT</span>
@@ -337,6 +341,7 @@ class Components {
     // Check admin status
     setTimeout(async () => {
       await this.checkAndShowAdminButton();
+      this.initLoyaltyBadge();
     }, 1000);
   }
 
@@ -574,6 +579,25 @@ class Components {
         </div>
       </div>
       `;
+  }
+
+  static async initLoyaltyBadge() {
+    const badge = document.getElementById('headerLoyaltyBadge');
+    const pointsSpan = document.getElementById('headerLoyaltyPoints');
+
+    if (!badge || !window.authManager || !window.authManager.isAuthenticated()) return;
+
+    try {
+      const res = await window.api.getLoyaltyPoints();
+      const points = res.data?.points || 0;
+
+      if (points > 0) {
+        badge.style.display = 'flex';
+        if (pointsSpan) pointsSpan.textContent = `${points} PTS`;
+      }
+    } catch (e) {
+      console.warn('Loyalty Badge Error:', e);
+    }
   }
 }
 

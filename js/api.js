@@ -297,6 +297,23 @@ class FutureLabsAPI {
     return this.request('/auth/me');
   }
 
+  // ========== LOYALTY ==========
+
+  async getLoyaltyPoints() {
+    return this.request('/loyalty/points');
+  }
+
+  async getLoyaltyTransactions(limit = 20) {
+    return this.request(`/loyalty/transactions?limit=${limit}`);
+  }
+
+  async redeemLoyaltyPoints(points) {
+    return this.request('/loyalty/redeem', {
+      method: 'POST',
+      body: JSON.stringify({ points_to_redeem: points })
+    });
+  }
+
   // ========== PRODUCTOS ==========
 
   async getProducts(filters = {}) {
