@@ -7,36 +7,30 @@
     <title>Sobre Nosotros - SneakersShop</title>
 
     <!-- CSS Unificado (Streetwear Standard) -->
-    <link rel="stylesheet" href="css/typography.css?v=3.0">
-    <link rel="stylesheet" href="css/style.css?v=3.0">
-    <link rel="stylesheet" href="css/design-system.css?v=3.0">
-    <link rel="stylesheet" href="css/header-improved.css?v=3.0">
-    <link rel="stylesheet" href="css/footer-improved.css?v=3.0">
-    <link rel="stylesheet" href="css/forms-improved.css?v=3.0">
-    <link rel="stylesheet" href="css/modals-improved.css?v=3.0">
-    <link rel="stylesheet" href="css/loading-states-improved.css?v=3.0">
-    <link rel="stylesheet" href="css/micro-interactions.css?v=3.0">
-    <link rel="stylesheet" href="css/pages-common.css?v=3.0">
-    <link rel="stylesheet" href="css/responsive.css?v=3.0">
-    <link rel="stylesheet" href="css/notifications.css?v=3.0">
-    <link rel="stylesheet" href="css/animations.css?v=3.0">
-    <link rel="stylesheet" href="css/components-enhanced.css?v=3.0">
+    <link rel="stylesheet" href="css/typography.css?v=7.0-CLEAN">
+    <link rel="stylesheet" href="css/design-system.css?v=7.0-CLEAN">
+    <link rel="stylesheet" href="css/header-v3.css?v=7.0-CLEAN">
+    <link rel="stylesheet" href="css/footer-brutalist.css?v=7.0-CLEAN">
+    <link rel="stylesheet" href="css/animations.css?v=7.0-CLEAN">
+    <link rel="stylesheet" href="css/pages-brutalist.css?v=7.0-CLEAN">
+    <link rel="stylesheet" href="css/skeleton.css?v=7.0-CLEAN">
 
     <!-- CSS Específicos de Página -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/quickview.css">
-    </head>
+</head>
 
 <body>
     <header id="mainHeader"></header>
 
-    <main class="about-page info-page">
-        <section class="hero-section about-hero" style="background: #000; color: #fff;">
-            <div class="container hero-content">
-                <span class="hero-eyebrow" style="color: #ff0000; font-weight: 800;">EST. 2025</span>
-                <h1 style="color: #fff; text-transform: uppercase; font-size: 3.5rem;">Definiendo la Cultura en Lima
-                </h1>
-                <p style="color: #ccc;">SneakersShop no es solo una tienda, es el destino definitivo para los amantes
+    <main class="about-page">
+        <!-- Hero Section -->
+        <section class="page-hero">
+            <div class="container">
+                <span class="hero-eyebrow">EST. 2025</span>
+                <h1 class="hero-title">Definiendo la<br>Cultura en Lima</h1>
+                <p class="hero-description">SneakersShop no es solo una tienda, es el destino definitivo para los
+                    amantes
                     del Hype. Traemos los pares más exclusivos y las siluetas que definen la calle.</p>
 
                 <div class="hero-actions">
@@ -48,11 +42,12 @@
             </div>
         </section>
 
-        <section class="content-section about-section">
+        <!-- Mission -->
+        <section class="content-section">
             <div class="container">
-                <div class="mission-vision">
+                <div class="info-grid">
                     <div class="info-card">
-                        <div class="info-card-icon" style="background: #000; color: #fff;">
+                        <div class="info-card-icon">
                             <i class="fas fa-certificate"></i>
                         </div>
                         <h3>100% Legit</h3>
@@ -60,7 +55,7 @@
                             costura y caja.</p>
                     </div>
                     <div class="info-card">
-                        <div class="info-card-icon" style="background: #ff0000; color: #fff;">
+                        <div class="info-card-icon accent">
                             <i class="fas fa-globe-americas"></i>
                         </div>
                         <h3>Para toda Latam</h3>
@@ -71,22 +66,32 @@
             </div>
         </section>
 
-        <section class="content-section about-section">
+        <!-- Values -->
+        <section class="values-section">
             <div class="container">
-                <h2 class="section-title">Why Us?</h2>
-                <div class="values-grid">
-                    <div class="value-card">
-                        <i class="fas fa-bolt"></i>
+                <div class="section-header">
+                    <h2 class="section-title">Why Us?</h2>
+                </div>
+
+                <div class="info-grid" style="margin-top: 0;">
+                    <div class="info-card">
+                        <div class="info-card-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
                         <h3>Speed</h3>
                         <p>Envíos express en Lima Metropolitana. Lo pides hoy, lo estrenas mañana.</p>
                     </div>
-                    <div class="value-card">
-                        <i class="fas fa-star"></i>
+                    <div class="info-card">
+                        <div class="info-card-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
                         <h3>Exclusividad</h3>
                         <p>Acceso a pares de reventa, lanzamientos limitados y colaboraciones únicas.</p>
                     </div>
-                    <div class="value-card">
-                        <i class="fas fa-users"></i>
+                    <div class="info-card">
+                        <div class="info-card-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
                         <h3>Comunidad</h3>
                         <p>Eventos, raffles y contenido para quienes viven y respiran zapatillas.</p>
                     </div>
@@ -97,44 +102,21 @@
 
     <footer id="mainFooter"></footer>
 
-    <!-- Quick View Modal -->
-    <div id="quickViewModal" class="quick-view-modal">
-        <div class="quick-view-content">
-            <span class="quick-view-close" onclick="closeQuickView()">&times;</span>
-            <div class="quick-view-image">
-                <img id="qvImage" src="" alt="">
-            </div>
-            <div class="quick-view-details">
-                <div id="qvBrand" class="quick-view-brand">Brand</div>
-                <h2 id="qvTitle" class="quick-view-title">Product Name</h2>
-                <div id="qvPrice" class="quick-view-price">$0.00</div>
-                <p id="qvDescription" class="quick-view-description">Description</p>
-                <div class="quick-view-actions">
-                    <button class="quick-view-btn" onclick="addToCartFromQuickView()">
-                        Añadir al Carrito
-                    </button>
-                    <a id="qvFullDetails" href="#"
-                        style="display: block; text-align: center; margin-top: 15px; color: #666; text-decoration: underline; font-size: 12px;">Ver
-                        detalles completos</a>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Quick View Modal (Placeholder for JS) -->
+    <div id="quickViewModal"></div>
 
     <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/cart.js"></script>
     <script src="js/components.js"></script>
-    <script src="js/home.js"></script> <!-- Need home.js for QuickView logic or move it to a common file -->
+    <script src="js/home.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            if (window.Components) {
-                document.getElementById('mainHeader').innerHTML = window.Components.getHeader(true, true);
-                window.Components.initHeader();
-                window.Components.initSearch();
-                window.Components.initCartCounter();
-                document.getElementById('mainFooter').innerHTML = window.Components.getFooter();
+            // Force Footer Injection
+            const footer = document.getElementById('mainFooter');
+            if(window.Components && footer) {
+                footer.innerHTML = window.Components.getFooter();
             }
         });
     </script>

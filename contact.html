@@ -7,102 +7,86 @@
     <title>Contacto - SneakersShop</title>
 
     <!-- CSS Unificado (Streetwear Standard) -->
-    <link rel="stylesheet" href="css/typography.css?v=3.0">
-    <link rel="stylesheet" href="css/style.css?v=3.0">
-    <link rel="stylesheet" href="css/design-system.css?v=3.0">
-    <link rel="stylesheet" href="css/header-improved.css?v=3.0">
-    <link rel="stylesheet" href="css/footer-improved.css?v=3.0">
-    <link rel="stylesheet" href="css/forms-improved.css?v=3.0">
-    <link rel="stylesheet" href="css/modals-improved.css?v=3.0">
-    <link rel="stylesheet" href="css/loading-states-improved.css?v=3.0">
-    <link rel="stylesheet" href="css/micro-interactions.css?v=3.0">
-    <link rel="stylesheet" href="css/pages-common.css?v=3.0">
-    <link rel="stylesheet" href="css/responsive.css?v=3.0">
-    <link rel="stylesheet" href="css/notifications.css?v=3.0">
-    <link rel="stylesheet" href="css/animations.css?v=3.0">
-    <link rel="stylesheet" href="css/components-enhanced.css?v=3.0">
+    <link rel="stylesheet" href="css/typography.css?v=7.0-CLEAN">
+    <link rel="stylesheet" href="css/design-system.css?v=7.0-CLEAN">
+    <link rel="stylesheet" href="css/header-v3.css?v=7.0-CLEAN">
+    <link rel="stylesheet" href="css/footer-brutalist.css?v=7.0-CLEAN">
+    <link rel="stylesheet" href="css/animations.css?v=7.0-CLEAN">
+    <link rel="stylesheet" href="css/pages-brutalist.css?v=7.0-CLEAN">
+    <link rel="stylesheet" href="css/skeleton.css?v=7.0-CLEAN">
 
     <!-- CSS Específicos de Página -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/quickview.css">
-    </head>
+</head>
 
 <body>
     <header id="mainHeader"></header>
 
-    <main class="contact-page info-page">
-        <section class="hero-section contact-hero" style="background: #000; color: #fff;">
-            <div class="container hero-content">
-                <span class="hero-eyebrow" style="color: #ff0000; font-weight: 800;">Soporte 24/7</span>
-                <h1 style="color: #fff; text-transform: uppercase;">¿Necesitas ayuda con tu pedido?</h1>
-                <p style="color: #ccc;">Estamos aquí para asegurarnos de que consigas el par perfecto. Escríbenos para
+    <main class="contact-page">
+        <!-- Hero -->
+        <section class="page-hero">
+            <div class="container">
+                <span class="hero-eyebrow">Soporte 24/7</span>
+                <h1 class="hero-title">¿Necesitas ayuda<br>con tu pedido?</h1>
+                <p class="hero-description">Estamos aquí para asegurarnos de que consigas el par perfecto. Escríbenos
+                    para
                     cambios de talla, seguimiento de envíos o dudas sobre drops.</p>
             </div>
         </section>
 
-        <section class="content-section contact-content">
+        <!-- Content -->
+        <section class="content-section">
             <div class="container">
                 <div class="contact-layout">
-                    <section class="contact-info-panel">
-                        <div class="contact-info-grid">
-                            <article class="contact-info-card">
-                                <div class="contact-info-icon" style="background: #000; color: #fff;">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                </div>
-                                <div>
-                                    <h3>Showroom</h3>
-                                    <p>Av. Javier Prado 1234<br>San Isidro, Lima, Perú</p>
-                                    <span class="contact-info-meta">Ven a probarte tus pares favoritos.</span>
-                                </div>
-                            </article>
-
-                            <article class="contact-info-card">
-                                <div class="contact-info-icon" style="background: #000; color: #fff;">
-                                    <i class="fas fa-whatsapp"></i>
-                                </div>
-                                <div>
-                                    <h3>WhatsApp</h3>
-                                    <p>+51 987 654 321</p>
-                                    <span class="contact-info-meta">Respuesta inmediata.</span>
-                                </div>
-                            </article>
-
-                            <article class="contact-info-card">
-                                <div class="contact-info-icon" style="background: #ffa500; color: #fff;">
-                                    <i class="fas fa-box-open"></i>
-                                </div>
-                                <div>
-                                    <h3>Devoluciones</h3>
-                                    <p>returns@sneakersshop.com</p>
-                                    <span class="contact-info-meta">Gestiona tus cambios fácil y rápido.</span>
-                                </div>
-                            </article>
+                    <!-- Info Panel -->
+                    <div class="contact-info-grid">
+                        <div class="info-card">
+                            <div class="info-card-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <h3>Showroom</h3>
+                            <p>Av. Javier Prado 1234<br>San Isidro, Lima, Perú</p>
                         </div>
-                    </section>
 
-                    <aside class="contact-form-panel">
-                        <div class="contact-form-card"
-                            style="box-shadow: 8px 8px 0 rgba(0,0,0,0.1); border: 1px solid #eee;">
+                        <div class="info-card">
+                            <div class="info-card-icon">
+                                <i class="fas fa-whatsapp"></i>
+                            </div>
+                            <h3>WhatsApp</h3>
+                            <p>+51 987 654 321</p>
+                        </div>
+
+                        <div class="info-card">
+                            <div class="info-card-icon accent">
+                                <i class="fas fa-box-open"></i>
+                            </div>
+                            <h3>Devoluciones</h3>
+                            <p>returns@sneakersshop.com</p>
+                        </div>
+                    </div>
+
+                    <!-- Form Panel -->
+                    <div class="contact-form-panel">
+                        <div class="contact-form-card">
                             <h2>Envíanos un mensaje</h2>
                             <form id="contactForm">
                                 <div class="form-group">
                                     <label>Nombre</label>
-                                    <input type="text" required style="border-radius: 0; border: 2px solid #ddd;">
+                                    <input type="text" class="form-control" required>
                                 </div>
                                 <div class="form-group">
                                     <label>Email</label>
-                                    <input type="email" required style="border-radius: 0; border: 2px solid #ddd;">
+                                    <input type="email" class="form-control" required>
                                 </div>
                                 <div class="form-group">
                                     <label>Mensaje</label>
-                                    <textarea rows="4" required
-                                        style="border-radius: 0; border: 2px solid #ddd;"></textarea>
+                                    <textarea class="form-control" rows="4" required></textarea>
                                 </div>
-                                <button type="submit" class="btn btn-primary"
-                                    style="width: 100%; border-radius: 0; background: #000; color: #fff; font-weight: 800; text-transform: uppercase;">Enviar</button>
+                                <button type="submit" class="btn-submit">Enviar Mensaje</button>
                             </form>
                         </div>
-                    </aside>
+                    </div>
                 </div>
             </div>
         </section>
@@ -110,29 +94,8 @@
 
     <footer id="mainFooter"></footer>
 
-    <!-- Quick View Modal (Shared) -->
-    <div id="quickViewModal" class="quick-view-modal">
-        <div class="quick-view-content">
-            <span class="quick-view-close" onclick="closeQuickView()">&times;</span>
-            <div class="quick-view-image">
-                <img id="qvImage" src="" alt="">
-            </div>
-            <div class="quick-view-details">
-                <!-- ... content populated by JS ... -->
-                <!-- Placeholder structure needs to be same as home.js expects -->
-                <div id="qvBrand" class="quick-view-brand"></div>
-                <h2 id="qvTitle" class="quick-view-title"></h2>
-                <div id="qvPrice" class="quick-view-price"></div>
-                <p id="qvDescription" class="quick-view-description"></p>
-                <div class="quick-view-actions">
-                    <button class="quick-view-btn" onclick="addToCartFromQuickView()">Añadir al Carrito</button>
-                    <a id="qvFullDetails" href="#"
-                        style="display: block; text-align: center; margin-top: 15px; color: #666; text-decoration: underline; font-size: 12px;">Ver
-                        detalles completos</a>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Quick View Modal (Placeholder) -->
+    <div id="quickViewModal"></div>
 
     <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
@@ -142,12 +105,10 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            if (window.Components) {
-                document.getElementById('mainHeader').innerHTML = window.Components.getHeader(true, true);
-                window.Components.initHeader();
-                window.Components.initSearch();
-                window.Components.initCartCounter();
-                document.getElementById('mainFooter').innerHTML = window.Components.getFooter();
+            // Force Footer Injection
+            const footer = document.getElementById('mainFooter');
+            if (window.Components && footer) {
+                footer.innerHTML = window.Components.getFooter();
             }
         });
     </script>
