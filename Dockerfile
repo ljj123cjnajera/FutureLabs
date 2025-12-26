@@ -22,7 +22,6 @@ COPY css ./css
 COPY js ./js
 COPY assets ./assets
 COPY manifest.webmanifest ./
-COPY sw.js ./
 COPY robots.txt ./
 COPY sitemap.xml ./
 
