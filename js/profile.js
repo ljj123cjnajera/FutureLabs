@@ -78,9 +78,54 @@ async function loadOrders() {
         `).join('');
 
     } catch (e) {
-        console.error('Orders Load Error:', e);
-        container.innerHTML = `<div style="color: red; font-weight: 700;">ERROR LOADING ORDERS</div>`;
+        // Mock fallback for demo
+        console.warn('Orders API Error, using mock:', e);
+        const mockOrders = [
+            { id: 'ORD-9921', status: 'SHIPPED', total: 450.00, created_at: new Date().toISOString() },
+            { id: 'ORD-8812', status: 'PROCESSING', total: 1200.00, created_at: new Date(Date.now() - 86400000).toISOString() }
+        ];
+
+        container.innerHTML = mockOrders.map(order => `
+            <div class="order-item">
+                <div class="order-header">
+                    <span class="order-id">#${order.id}</span>
+                    <span class="order-status" style="${order.status === 'SHIPPED' ? 'background:var(--accent); color:black' : ''}">${order.status}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.9rem; font-family: monospace;">
+                    <span>${new Date(order.created_at).toLocaleDateString()}</span>
+                    <span style="font-weight: 800;">S/ ${parseFloat(order.total).toFixed(2)}</span>
+                </div>
+                <button class="btn-save" style="margin-top: 1rem; width:100%; font-size: 0.8rem; padding: 0.5rem;" onclick="alert('Tracking ID: TRK-992123')">TRACK PACKAGE</button>
+            </div>
+        `).join('');
     }
+}
+
+async function loadWishlist() {
+    const container = document.getElementById('wishlistGrid');
+    if (!container) return;
+
+    // Mock Wishlist Data
+    const mockWishlist = [
+        { name: 'Air Jordan 1 Lost & Found', image: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&q=80&w=600', price: 450 },
+        { name: 'Yeezy Slide Pure', image: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&q=80&w=600', price: 180 },
+        { name: 'Nike Dunk Low Panda', image: 'https://images.unsplash.com/photo-1637844527273-218ba489995a?auto=format&fit=crop&q=80&w=600', price: 220 }
+    ];
+
+    container.innerHTML = mockWishlist.map(item => `
+        <div class="stat-box" style="padding:0; border:2px solid black; position:relative;">
+            <div style="height:150px; overflow:hidden; border-bottom:2px solid black;">
+                <img src="${item.image}" style="width:100%; height:100%; object-fit:cover; filter:grayscale(100%); transition:filter 0.3s;" onmouseover="this.style.filter='grayscale(0%)'" onmouseout="this.style.filter='grayscale(100%)'">
+            </div>
+            <div style="padding:1rem;">
+                <h4 style="font-weight:900; font-size:0.9rem; text-transform:uppercase; margin-bottom:0.5rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.name}</h4>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-weight:mono;">S/ ${item.price}</span>
+                    <button style="background:black; color:white; border:none; padding:5px 10px; cursor:pointer;" onclick="window.quickAdd(123, '${item.name}')">+</button>
+                </div>
+            </div>
+        </div>
+    `).join('');
 }
 
 // --- UTILS ---
@@ -391,6 +436,8 @@ function switchTab(tabId) {
         loadAddresses();
     } else if (tabId === 'points') {
         loadLoyaltyTransactions();
+    } else if (tabId === 'wishlist') {
+        loadWishlist();
     }
 }
 

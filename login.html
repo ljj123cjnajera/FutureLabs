@@ -15,14 +15,44 @@
     <!-- CORE STYLES -->
     <link rel="stylesheet" href="css/home-streetwear.css?v=6.1">
     <link rel="stylesheet" href="css/header-v3.css?v=6.1">
+    <link rel="stylesheet" href="css/animations.css">
 
     <style>
         .auth-container {
             max-width: 500px;
             margin: 8rem auto;
-            padding: 2rem;
-            border: 3px solid var(--black);
+            padding: 3rem;
+            border: 4px solid var(--black);
             text-align: center;
+            background: #fff;
+            box-shadow: 12px 12px 0 var(--black);
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .auth-container:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 16px 16px 0 var(--black);
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+        }
+
+        .input-shake {
+            animation: shake 0.3s ease-in-out;
+            border-color: var(--error) !important;
         }
 
         .auth-title {

@@ -39,6 +39,9 @@
                 <button class="account-nav-btn" onclick="switchTab('addresses')">
                     <i class="fas fa-map-marker-alt"></i> ADDRESSES
                 </button>
+                <button class="account-nav-btn" onclick="switchTab('wishlist')">
+                    <i class="fas fa-heart"></i> WISHLIST
+                </button>
                 <button class="account-nav-btn" onclick="switchTab('settings')">
                     <!-- <i class="fas fa-cog"></i> --> SETTINGS
                 </button>
@@ -92,6 +95,18 @@
                 <div class="brutalist-form">
                     <div style="padding: 1rem; background: #eee; font-family: monospace;">
                         TODO: Address Manager
+                    </div>
+                </div>
+            </section>
+
+            <!-- WISHLIST SECTION -->
+            <section id="wishlist" class="account-section">
+                <h1 class="section-title">WISHLIST</h1>
+                <div id="wishlistGrid" class="stats-grid"
+                    style="grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));">
+                    <!-- Items injected via JS -->
+                    <div style="grid-column: 1/-1; padding: 2rem; border: 2px dashed #000; text-align: center;">
+                        YOUR WISHLIST IS EMPTY
                     </div>
                 </div>
             </section>

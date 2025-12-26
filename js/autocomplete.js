@@ -1,6 +1,7 @@
 // 🔍 Autocompletado de Búsqueda Mejorado
 class SearchAutocomplete {
-  constructor() {
+  constructor(inputId = 'largeSearchInput') {
+    this.inputId = inputId;
     this.searchInput = null;
     this.suggestionsContainer = null;
     this.currentSuggestions = [];
@@ -19,10 +20,10 @@ class SearchAutocomplete {
     if (this.initialized) return;
 
     // Buscar input de búsqueda
-    this.searchInput = document.getElementById('searchInput');
+    this.searchInput = document.getElementById(this.inputId) || document.getElementById('searchInput');
 
     if (!this.searchInput) {
-      console.log('⏳ SearchAutocomplete: searchInput no encontrado, reintentando...');
+      console.log(`⏳ SearchAutocomplete: Input '${this.inputId}' no encontrado, reintentando...`);
       return;
     }
 

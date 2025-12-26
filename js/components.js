@@ -220,7 +220,7 @@ class Components {
         <!-- SEARCH OVERLAY (New Phase 81 Feature) -->
         <div id="searchOverlay" class="search-overlay">
             <button class="search-close-btn" onclick="window.SearchOverlay.close()">×</button>
-            <div class="search-container-large">
+            <div class="search-container-large search-bar">
                 <input type="text" id="largeSearchInput" class="search-input-large" placeholder="WHAT ARE YOU LOOKING FOR?" autocomplete="off">
                 <div class="search-suggestions">
                     <span class="search-tag" onclick="window.SearchOverlay.search('Jordan')">JORDAN</span>

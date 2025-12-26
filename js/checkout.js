@@ -713,6 +713,20 @@ function renderConfirmationStep() {
             <p style="color: var(--text-secondary); margin-bottom: var(--spacing-lg);">
                 Recibirás un email de confirmación en <strong>${shippingData.email}</strong>
             </p>
+
+            ${!window.authManager?.isAuthenticated() ? `
+            <div style="background: #f8f8f8; border: 2px solid #000; padding: 1.5rem; margin-bottom: 2rem; position: relative; overflow: hidden;">
+                <div style="position: relative; z-index: 2;">
+                    <h3 style="font-weight: 900; text-transform: uppercase; margin-bottom: 0.5rem; font-size: 1.2rem;">Don't Lose Your Order</h3>
+                    <p style="margin-bottom: 1rem; font-size: 0.9rem;">Create an account now to track order <strong>#${orderNumber}</strong> in real-time.</p>
+                    <button class="btn btn-black" onclick="window.location.href='register.html?email=${encodeURIComponent(shippingData.email)}'" style="width: 100%;">
+                        CREATE ACCOUNT FROM ORDER
+                    </button>
+                </div>
+                <!-- Decorative Icon -->
+                <i class="fas fa-user-plus" style="position: absolute; right: -20px; bottom: -20px; font-size: 6rem; opacity: 0.05; z-index: 1;"></i>
+            </div>
+            ` : ''}
             
             <div class="confirmation-actions">
                 <button class="btn btn-outline" onclick="window.location.href='orders.html'">
