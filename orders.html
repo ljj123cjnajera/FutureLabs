@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,59 +8,67 @@
     <!-- Google Fonts - Fuentes Profesionales -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Estilos inline removidos - migrados a CSS externo -->
 
-    <!-- CSS Unificado (Streetwear Standard) -->
-    <link rel="stylesheet" href="css/typography.css?v=3.0">
-    <link rel="stylesheet" href="css/style.css?v=3.0">
-    <link rel="stylesheet" href="css/design-system.css?v=3.0">
-    <link rel="stylesheet" href="css/header-improved.css?v=3.0">
-    <link rel="stylesheet" href="css/footer-improved.css?v=3.0">
-    <link rel="stylesheet" href="css/forms-improved.css?v=3.0">
-    <link rel="stylesheet" href="css/modals-improved.css?v=3.0">
-    <link rel="stylesheet" href="css/loading-states-improved.css?v=3.0">
-    <link rel="stylesheet" href="css/micro-interactions.css?v=3.0">
-    <link rel="stylesheet" href="css/pages-common.css?v=3.0">
-    <link rel="stylesheet" href="css/responsive.css?v=3.0">
-    <link rel="stylesheet" href="css/notifications.css?v=3.0">
-    <link rel="stylesheet" href="css/animations.css?v=3.0">
-    <link rel="stylesheet" href="css/components-enhanced.css?v=3.0">
+    <!-- CSS Unificado (Streetwear Standard V3) -->
+    <link rel="stylesheet" href="css/home-streetwear.css?v=7.0-CLEAN">
+    <link rel="stylesheet" href="css/header-v3.css?v=7.0-CLEAN">
+    <link rel="stylesheet" href="css/account-brutalist.css?v=7.0-CLEAN">
+    <link rel="stylesheet" href="css/footer-brutalist.css?v=7.0-CLEAN">
 
     <!-- CSS Específicos de Página -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/profile-wishlist-orders.css">
-    <link rel="stylesheet" href="css/breadcrumbs.css?v=1.0">
-    <link rel="stylesheet" href="css/order-tracking.css?v=1.0">
-    </head>
+    <link rel="stylesheet" href="css/breadcrumbs.css?v=7.0-CLEAN">
+    <link rel="stylesheet" href="css/order-tracking.css?v=7.0-CLEAN">
+</head>
+
 <body>
-    <!-- Header -->
     <!-- Header Dinámico -->
     <header id="mainHeader"></header>
 
     <!-- Breadcrumbs -->
     <nav id="breadcrumbs"></nav>
 
-    <div class="orders-page">
-        <section class="orders-hero">
-            <div class="container">
-                <div class="orders-hero-card">
-                    <span class="orders-hero-eyebrow"><i class="fas fa-box-open"></i> Historial de pedidos</span>
-                    <h1 class="orders-hero-title">Mis pedidos</h1>
-                    <p class="orders-hero-description">Consulta el estado de tus compras, sigue la entrega y descarga comprobantes cuando quieras.</p>
-                    <div class="orders-hero-actions">
-                        <button type="button" class="btn btn-primary btn-sm" onclick="window.location.href='products.html'">
-                            <i class="fas fa-shopping-bag"></i> Comprar nuevamente
-                        </button>
-                        <button type="button" class="btn btn-outline btn-sm" onclick="window.location.href='profile.html'">
-                            <i class="fas fa-user"></i> Ir al perfil
-                        </button>
-                    </div>
+    <!-- Account Layout (Sidebar + Content) -->
+    <div class="account-container">
+        <!-- SIDEBAR (Shared) -->
+        <aside class="account-sidebar">
+            <div class="account-user-info">
+                <div class="account-user-name" id="profileName">LOADING...</div>
+                <div class="account-user-email" id="profileEmail">...</div>
+            </div>
+
+            <nav class="account-nav">
+                <button class="account-nav-btn" onclick="window.location.href='profile.html'">
+                    <i class="fas fa-th-large"></i> OVERVIEW
+                </button>
+                <button class="account-nav-btn active" onclick="window.location.href='orders.html'">
+                    <i class="fas fa-box"></i> ORDERS
+                </button>
+                <button class="account-nav-btn" onclick="window.location.href='profile.html?tab=addresses'">
+                    <i class="fas fa-map-marker-alt"></i> ADDRESSES
+                </button>
+                <button class="account-nav-btn" onclick="window.location.href='wishlist.html'">
+                    <i class="fas fa-heart"></i> WISHLIST
+                </button>
+                <button class="account-nav-btn" onclick="window.location.href='profile.html?tab=settings'">
+                    SETTINGS
+                </button>
+                <button class="account-nav-btn" onclick="window.authManager.logout()"
+                    style="margin-top: 2rem; color: red; border-color: red;">
+                    LOGOUT
+                </button>
+            </nav>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="account-content">
+            <div class="dashboard-header">
+                <div>
+                    <h1 class="dashboard-title">My Orders</h1>
+                    <p class="dashboard-subtitle">Track your shipments and history.</p>
                 </div>
             </div>
-        </section>
 
-        <div class="container">
             <div id="ordersContainer" role="status" aria-live="polite">
                 <div class="loading-state">
                     <div class="loading-state-content">
@@ -68,7 +77,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
 
     <!-- Scripts -->
@@ -82,9 +91,9 @@
     <script src="js/cart.js"></script>
     <script src="js/components.js"></script>
     <script src="js/breadcrumbs.js"></script>
-    
+
     <script>
-        (function() {
+        (function () {
             const STATUS_CLASSES = {
                 pending: 'status-pending',
                 processing: 'status-processing',
@@ -102,19 +111,26 @@
             };
 
             document.addEventListener('DOMContentLoaded', () => {
-                initHeader();
-                loadOrders();
-            });
-
-            function initHeader() {
-                const headerContainer = document.getElementById('mainHeader');
-                if (headerContainer && window.Components) {
-                    headerContainer.innerHTML = window.Components.getHeader(true, true);
+                // Initialize Header
+                if (window.Components) {
+                    document.getElementById('mainHeader').innerHTML = window.Components.getHeader(true, true);
                     window.Components.initHeader();
                     window.Components.initSearch();
                     window.Components.initCartCounter();
                 }
-            }
+
+                // Load User Info for Sidebar
+                if (window.authManager && window.authManager.isAuthenticated()) {
+                    const user = window.authManager.currentUser;
+                    if (user) {
+                        document.getElementById('profileName').textContent = user.name || 'User';
+                        document.getElementById('profileEmail').textContent = user.email || '';
+                    }
+                }
+
+                loadOrders();
+            });
+
 
             async function loadOrders() {
                 const container = document.getElementById('ordersContainer');
@@ -310,9 +326,5 @@
         })();
     </script>
 </body>
+
 </html>
-
-
-
-
-

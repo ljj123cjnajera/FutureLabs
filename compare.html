@@ -1,35 +1,26 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Comparar Productos - SneakersShop</title>
-    <!-- Estilos inline removidos - migrados a CSS externo -->
 
-    <!-- CSS Unificado (Streetwear Standard) -->
-    <link rel="stylesheet" href="css/typography.css?v=3.0">
-    <link rel="stylesheet" href="css/style.css?v=3.0">
-    <link rel="stylesheet" href="css/design-system.css?v=3.0">
-    <link rel="stylesheet" href="css/header-improved.css?v=3.0">
-    <link rel="stylesheet" href="css/footer-improved.css?v=3.0">
-    <link rel="stylesheet" href="css/forms-improved.css?v=3.0">
-    <link rel="stylesheet" href="css/modals-improved.css?v=3.0">
-    <link rel="stylesheet" href="css/loading-states-improved.css?v=3.0">
-    <link rel="stylesheet" href="css/micro-interactions.css?v=3.0">
-    <link rel="stylesheet" href="css/pages-common.css?v=3.0">
-    <link rel="stylesheet" href="css/responsive.css?v=3.0">
-    <link rel="stylesheet" href="css/notifications.css?v=3.0">
-    <link rel="stylesheet" href="css/animations.css?v=3.0">
-    <link rel="stylesheet" href="css/components-enhanced.css?v=3.0">
+    <!-- CSS Unificado (Streetwear Standard V3) -->
+    <link rel="stylesheet" href="css/home-streetwear.css?v=7.0-CLEAN">
+    <link rel="stylesheet" href="css/header-v3.css?v=7.0-CLEAN">
+    <link rel="stylesheet" href="css/footer-brutalist.css?v=7.0-CLEAN">
+    <link rel="stylesheet" href="css/pages-brutalist.css?v=7.0-CLEAN">
 
     <!-- CSS Específicos de Página -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/comparator.css?v=1.0">
     <link rel="stylesheet" href="css/breadcrumbs.css?v=1.0">
     <link rel="stylesheet" href="css/blog-compare.css">
-    <link rel="stylesheet" href="css/animations-enhanced.css">
+    <link rel="stylesheet" href="css/animations.css?v=7.0-CLEAN">
     <link rel="stylesheet" href="css/product-cards.css">
-    </head>
+</head>
+
 <body>
 
     <!-- Header Dinámico -->
@@ -41,14 +32,19 @@
         <section class="compare-hero">
             <div class="container">
                 <div class="compare-hero-card">
-                    <span class="compare-hero-eyebrow"><i class="fas fa-balance-scale" aria-hidden="true"></i> Analiza antes de comprar</span>
+                    <span class="compare-hero-eyebrow"><i class="fas fa-balance-scale" aria-hidden="true"></i> Analiza
+                        antes de comprar</span>
                     <h1 class="compare-hero-title">Comparar productos</h1>
-                    <p class="compare-hero-description">Selecciona hasta 3 productos y revisa especificaciones, precios y reseñas lado a lado para tomar la mejor decisión.</p>
+                    <p class="compare-hero-description">Selecciona hasta 3 productos y revisa especificaciones, precios
+                        y reseñas lado a lado para tomar la mejor decisión.</p>
                     <div class="compare-hero-actions" role="group" aria-label="Acciones rápidas">
-                        <button type="button" class="btn btn-primary btn-sm" onclick="window.location.href='products.html'" aria-label="Ir a productos para agregar más al comparador">
+                        <button type="button" class="btn btn-primary btn-sm"
+                            onclick="window.location.href='products.html'"
+                            aria-label="Ir a productos para agregar más al comparador">
                             <i class="fas fa-plus" aria-hidden="true"></i> Agregar más productos
                         </button>
-                        <button type="button" class="btn btn-outline btn-sm" onclick="window.location.href='blog.html'" aria-label="Ver consejos del blog">
+                        <button type="button" class="btn btn-outline btn-sm" onclick="window.location.href='blog.html'"
+                            aria-label="Ver consejos del blog">
                             <i class="fas fa-lightbulb" aria-hidden="true"></i> Consejos del blog
                         </button>
                     </div>
@@ -62,14 +58,18 @@
                     <h2>Resumen de comparación</h2>
                     <p>Destaca diferencias clave o comparte tu selección con un clic.</p>
                 </div>
-                <div class="compare-actions" id="compareActions" hidden role="toolbar" aria-label="Acciones de comparación">
-                    <button class="btn btn-outline btn-sm" id="toggleDifferences" aria-pressed="false" aria-label="Alternar mostrar solo diferencias">
+                <div class="compare-actions" id="compareActions" hidden role="toolbar"
+                    aria-label="Acciones de comparación">
+                    <button class="btn btn-outline btn-sm" id="toggleDifferences" aria-pressed="false"
+                        aria-label="Alternar mostrar solo diferencias">
                         <i class="fas fa-adjust" aria-hidden="true"></i> Mostrar solo diferencias
                     </button>
-                    <button class="btn btn-outline btn-sm" id="copyShareLink" aria-label="Copiar enlace para compartir comparación">
+                    <button class="btn btn-outline btn-sm" id="copyShareLink"
+                        aria-label="Copiar enlace para compartir comparación">
                         <i class="fas fa-link" aria-hidden="true"></i> Compartir
                     </button>
-                    <button class="btn btn-outline btn-sm" id="exportComparison" aria-label="Exportar comparación a CSV">
+                    <button class="btn btn-outline btn-sm" id="exportComparison"
+                        aria-label="Exportar comparación a CSV">
                         <i class="fas fa-file-download" aria-hidden="true"></i> Exportar CSV
                     </button>
                     <button class="btn btn-ghost btn-sm" id="clearComparison" aria-label="Vaciar comparador">
@@ -100,7 +100,7 @@
     <script src="js/cart.js"></script>
     <script src="js/comparator.js"></script>
     <script src="js/breadcrumbs.js"></script>
-    
+
     <script>
         (function () {
             const state = {
@@ -349,7 +349,7 @@
                     </div>
                 `;
                 compareContent.setAttribute('aria-busy', 'false');
- 
+
                 compareContent.querySelectorAll('[data-action="compare-add-cart"]').forEach(button => {
                     button.addEventListener('click', () => addToCart(button.dataset.productId));
                 });
@@ -662,6 +662,5 @@
         })();
     </script>
 </body>
+
 </html>
-
-
