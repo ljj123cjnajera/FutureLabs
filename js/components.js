@@ -1,6 +1,24 @@
 // 🧩 Componentes Reutilizables
 // Versión: 2.0 - Sin botón Inicio (eliminado 2024-11-04)
 class Components {
+  static updateCartCount() {
+    try {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const count = cart.reduce((total, item) => total + (item.quantity || 1), 0);
+      document.querySelectorAll('.cart-count').forEach(el => {
+        el.textContent = count;
+        // Optional: Hide badge if 0
+        if (count === 0 && el.classList.contains('action-badge')) {
+          // el.style.display = 'none'; // Maybe? User might prefer seeing '0'
+        } else {
+          el.style.display = 'flex';
+        }
+      });
+    } catch (e) {
+      console.warn('Components: Could not update cart count', e);
+    }
+  }
+
   static getFooter() {
     return `
       <!-- Footer (Brutalist) -->
