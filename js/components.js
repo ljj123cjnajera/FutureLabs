@@ -101,7 +101,19 @@ class Components {
             </div>
         </div>
       </footer>
+      </footer>
     `;
+  }
+
+  static loadHeader(showSearch = true, showNav = true) {
+    const headerElement = document.getElementById('mainHeader');
+    if (headerElement) {
+      headerElement.innerHTML = this.getHeader(showSearch, showNav);
+      this.initLoyaltyBadge();
+      this.updateCartCount();
+    } else {
+      console.warn('Components.loadHeader: #mainHeader element not found');
+    }
   }
 
   static getHeader(showSearch = true, showNav = true) {
