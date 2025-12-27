@@ -409,7 +409,7 @@ class WishlistManager {
 window.wishlistManager = new WishlistManager();
 
 if (window.authManager) {
-    window.authManager.addEventListener('authStateChanged', () => {
+    document.addEventListener('authStateChanged', () => {
         if (window.authManager.isAuthenticated()) {
             window.wishlistManager.init();
         }

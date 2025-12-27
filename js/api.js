@@ -155,7 +155,15 @@ class SneakersAPI {
         }
         // PRODUCTS
         else if (endpoint.includes('/products')) {
-          resolve({ success: true, data: [] });
+          // Return a realistic mock array to prevent .filter error
+          resolve({
+            success: true,
+            data: [
+              { id: 101, name: 'Air Jordan 1 High OG', price: 180, badge: 'HYPE', image: 'assets/products/jordan1.jpg' },
+              { id: 102, name: 'Yeezy Boost 350 V2', price: 230, badge: 'HOT', image: 'assets/products/yeezy350.jpg' },
+              { id: 103, name: 'Nike Dunk Low Retro', price: 110, badge: 'NEW', image: 'assets/products/dunklow.jpg' }
+            ]
+          });
         }
         // DEFAULT
         else {
