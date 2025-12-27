@@ -58,6 +58,82 @@ class AdminManager {
 
     // Cargar datos iniciales
     await this.loadDashboard();
+
+    // Iniciar Gráficos
+    this.renderCharts();
+  }
+
+  renderCharts() {
+    // 1. SALES CHART (Line)
+    const ctxSales = document.getElementById('salesChart');
+    if (ctxSales) {
+      new Chart(ctxSales, {
+        type: 'line',
+        data: {
+          labels: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
+          datasets: [{
+            label: 'Ventas (S/)',
+            data: [1200, 1900, 3000, 5000, 2300, 6000, 8500],
+            borderColor: '#000',
+            backgroundColor: 'rgba(0,0,0,0.1)',
+            tension: 0.4,
+            fill: true
+          }]
+        },
+        options: { responsive: true, plugins: { legend: { display: false } } }
+      });
+    }
+
+    // 2. ORDER STATUS (Doughnut)
+    const ctxStatus = document.getElementById('ordersStatusChart');
+    if (ctxStatus) {
+      new Chart(ctxStatus, {
+        type: 'doughnut',
+        data: {
+          labels: ['Pendiente', 'Procesando', 'Enviado', 'Entregado'],
+          datasets: [{
+            data: [12, 19, 3, 5],
+            backgroundColor: ['#ff9800', '#2196f3', '#9c27b0', '#4caf50'],
+            borderWidth: 0
+          }]
+        },
+        options: { responsive: true, cutout: '70%' }
+      });
+    }
+
+    // 3. TOP PRODUCTS (Bar)
+    const ctxProducts = document.getElementById('topProductsChart');
+    if (ctxProducts) {
+      new Chart(ctxProducts, {
+        type: 'bar',
+        data: {
+          labels: ['Jordan 1', 'Yeezy 350', 'Nike Dunk', 'Adidas Forum', 'NB 550'],
+          datasets: [{
+            label: 'Unidades',
+            data: [65, 59, 80, 81, 56],
+            backgroundColor: '#000',
+            borderRadius: 4
+          }]
+        },
+        options: { responsive: true, scales: { y: { beginAtZero: true } } }
+      });
+    }
+
+    // 4. PAYMENTS (Pie)
+    const ctxPayments = document.getElementById('paymentMethodsChart');
+    if (ctxPayments) {
+      new Chart(ctxPayments, {
+        type: 'pie',
+        data: {
+          labels: ['Tarjeta', 'PayPal', 'Yape/Plin'],
+          datasets: [{
+            data: [300, 50, 100],
+            backgroundColor: ['#333', '#00457C', '#D500F9'],
+            borderWidth: 0
+          }]
+        }
+      });
+    }
   }
 
   updateUserInfo(user) {
