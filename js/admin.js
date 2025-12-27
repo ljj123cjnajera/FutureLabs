@@ -64,10 +64,12 @@ class AdminManager {
   }
 
   renderCharts() {
+    this.charts = {};
+
     // 1. SALES CHART (Line)
     const ctxSales = document.getElementById('salesChart');
     if (ctxSales) {
-      new Chart(ctxSales, {
+      this.charts.sales = new Chart(ctxSales, {
         type: 'line',
         data: {
           labels: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
@@ -87,7 +89,7 @@ class AdminManager {
     // 2. ORDER STATUS (Doughnut)
     const ctxStatus = document.getElementById('ordersStatusChart');
     if (ctxStatus) {
-      new Chart(ctxStatus, {
+      this.charts.status = new Chart(ctxStatus, {
         type: 'doughnut',
         data: {
           labels: ['Pendiente', 'Procesando', 'Enviado', 'Entregado'],
@@ -122,7 +124,7 @@ class AdminManager {
     // 4. PAYMENTS (Pie)
     const ctxPayments = document.getElementById('paymentMethodsChart');
     if (ctxPayments) {
-      new Chart(ctxPayments, {
+      this.charts.payments = new Chart(ctxPayments, {
         type: 'pie',
         data: {
           labels: ['Tarjeta', 'PayPal', 'Yape/Plin'],
@@ -134,6 +136,52 @@ class AdminManager {
         }
       });
     }
+
+    // 🚀 Start Simulation
+    this.simulateLiveActivity();
+  }
+
+  simulateLiveActivity() {
+    console.log('📡 Starting Live Dashboard Simulation...');
+
+    // Simulate Random Sales Updates every 3 seconds
+    setInterval(() => {
+      if (!this.charts.sales) return;
+
+      const currentData = this.charts.sales.data.datasets[0].data;
+      // Bump the last day's sales slightly
+      const lastIndex = currentData.length - 1;
+      const randomSale = Math.floor(Math.random() * 500) + 50;
+
+      currentData[lastIndex] += randomSale;
+      this.charts.sales.update();
+
+      // Update Stats Card
+      const todaySalesEl = document.querySelector('.metric-card:first-child .metric-value');
+      if (todaySalesEl) {
+        const currentTotal = parseInt(todaySalesEl.textContent.replace('S/ ', '').replace(',', '')) || 0;
+        todaySalesEl.textContent = `S/ ${(currentTotal + randomSale).toLocaleString()}`;
+      }
+    }, 5000);
+
+    // Simulate Order Status Updates
+    setInterval(() => {
+      if (!this.charts.status) return;
+
+      const data = this.charts.status.data.datasets[0].data;
+      // Move "Procesando" to "Enviado" or new "Pendiente"
+      const action = Math.random() > 0.5 ? 'new_order' : 'ship_order';
+
+      if (action === 'new_order') {
+        data[0]++; // Pendiente
+      } else {
+        if (data[1] > 0) {
+          data[1]--; // Procesando
+          data[2]++; // Enviado
+        }
+      }
+      this.charts.status.update();
+    }, 8000);
   }
 
   updateUserInfo(user) {
