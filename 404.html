@@ -107,8 +107,11 @@
     <script src="js/auth.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            if (window.Components) {
-                window.Components.loadHeader();
+            // Header V7 Injection
+            const headerContainer = document.getElementById('mainHeader');
+            if (headerContainer && window.Components && window.Components.getHeader) {
+                headerContainer.outerHTML = window.Components.getHeader(false, false); // Minimal header for 404
+                window.Components.initHeader();
             }
         });
     </script>
