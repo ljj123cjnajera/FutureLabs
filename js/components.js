@@ -1,5 +1,16 @@
 // 🧩 Componentes Reutilizables
-// Versión: 2.0 - Sin botón Inicio (eliminado 2024-11-04)
+// Versión: 2.1 - Includes Global Auth Guard
+window.handleAuthRedirect = function (event, destination) {
+  if (event) event.preventDefault();
+  const token = localStorage.getItem('auth_token');
+  if (token) {
+    window.location.href = destination;
+  } else {
+    console.log('🔒 Guest user detected, redirecting to login...');
+    window.location.href = `login.html?returnUrl=${encodeURIComponent(destination)}`;
+  }
+};
+
 class Components {
   static updateCartCount() {
     try {
