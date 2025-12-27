@@ -155,11 +155,11 @@ class Components {
 
                 <!-- ACTIONS -->
                 <div class="header-actions">
-                    <a href="profile.html?tab=loyalty" class="action-btn" id="headerLoyaltyBadge" style="display: none; border: 1px solid var(--black); background: var(--black); color: var(--white);">
+                    <a href="#" onclick="window.handleAuthRedirect(event, 'profile.html?tab=loyalty')" class="action-btn" id="headerLoyaltyBadge" style="display: none; border: 1px solid var(--black); background: var(--black); color: var(--white);">
                         <i class="fas fa-medal"></i>
                         <span class="desktop-only" id="headerLoyaltyPoints">0 PTS</span>
                     </a>
-                    <a href="profile.html" class="action-btn">
+                    <a href="#" onclick="window.handleAuthRedirect(event, 'profile.html')" class="action-btn">
                         <i class="far fa-user"></i>
                         <span class="desktop-only">ACCOUNT</span>
                     </a>
