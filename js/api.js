@@ -124,11 +124,11 @@ window.loadingState = (() => {
     }
   };
 })();
-class FutureLabsAPI {
+class SneakersAPI {
   constructor() {
-    // Cambiado a localhost para desarrollo local con datos actualizados
-    // this.baseURL = 'http://localhost:3000/api';
-    this.baseURL = 'https://futurelabs-production.up.railway.app/api';
+    // Configuración de API (Sneakers Shop)
+    this.baseURL = 'http://localhost:3000/api';
+    // Legacy/Wrong Project: this.baseURL = 'https://futurelabs-production.up.railway.app/api';
     this.token = localStorage.getItem('auth_token');
   }
 
@@ -1136,8 +1136,8 @@ class FutureLabsAPI {
   }
 }
 
-// Crear instancia global
-window.api = new FutureLabsAPI();
+// 🚀 Initialize API Client
+window.api = new SneakersAPI();
 
 // Inicializar con token si existe
 if (window.api.token) {

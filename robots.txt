@@ -6,4 +6,4 @@ Disallow: /checkout
 Disallow: /profile
 Disallow: /my-account
 
-Sitemap: https://futurelabs-production.up.railway.app/sitemap.xml
+Sitemap: /sitemap.xml

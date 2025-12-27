@@ -209,14 +209,14 @@
                         // Si la URL no comienza con http/https, verificar si es relativa o necesita el protocolo
                         if (imageUrl && !imageUrl.startsWith('http://') && !imageUrl.startsWith('https://') && !imageUrl.startsWith('/')) {
                             // Si es una URL del backend sin protocolo, agregar https://
-                            if (imageUrl.includes('railway.app') || imageUrl.includes('futurelabs')) {
-                                imageUrl = `https://${imageUrl}`;
+                            if (imageUrl.startsWith('/')) {
+                                // Assuming local or relative path
+                                // Ensure it's treated correctly if needed
+                            } else if (imageUrl.startsWith('http')) {
+                                // already good
+                            } else {
+                                // Fallback or fix malformed
                             }
-                        }
-
-                        // Si es una URL relativa que empieza con /uploads, convertir a URL completa del backend
-                        if (imageUrl.startsWith('/uploads/')) {
-                            imageUrl = `https://futurelabs-production.up.railway.app${imageUrl}`;
                         }
 
                         console.log('Product image URL:', imageUrl);
@@ -359,13 +359,14 @@
                         const diff = cutoff - now;
                         const hours = Math.floor(diff / 1000 / 60 / 60);
                         const minutes = Math.floor((diff / 1000 / 60) % 60);
-            // We can inject a script to animate this or just leave it static on load (user likely won't stare for minutes)
-            // Let's make it static but realistic for the "snapshot" feel, updating via CSS or simple JS loop is overkill for now unless requested
-            // Actually, static might look broken if they refresh. Let's just set the text content in the template.
-            // Using a helper function updateTimer would be better, but inline logic works for MVP pressure.
+                        // We can inject a script to animate this or just leave it static on load (user likely won't stare for minutes)
+                        // Let's make it static but realistic for the "snapshot" feel, updating via CSS or simple JS loop is overkill for now unless requested
+                        // Actually, static might look broken if they refresh. Let's just set the text content in the template.
+                        // Using a helper function updateTimer would be better, but inline logic works for MVP pressure.
 
 
-                < !--Size Guide Modal(Hidden)-- >
+                        // Size Guide Modal logic moved to HTML body
+                        const sizeGuideModalHTML = `
                             <div id="sizeGuideModal" class="modal" style="display: none;">
                                 <div class="modal-content">
                                     <span class="close-modal" onclick="closeSizeGuideModal()">&times;</span>
@@ -401,6 +402,10 @@
                                 </div>
                             </div>
                         `;
+                        // Inject if not exists
+                        if (!document.getElementById('sizeGuideModal')) {
+                            document.body.insertAdjacentHTML('beforeend', sizeGuideModalHTML);
+                        }
 
                         // Render Size Options Logic
                         renderSizeOptions(product);
@@ -460,8 +465,8 @@
                     return `
                             < button class="size-option ${isOutOfStock ? 'disabled' : ''}"
                         onclick = "selectSize('${size}', this)" 
-                                ${ isOutOfStock ? 'disabled' : '' }>
-                            ${ size }
+                                ${isOutOfStock ? 'disabled' : ''}>
+                            ${size}
                         </button >
                             `;
                 }).join('');
@@ -530,14 +535,14 @@
                 }
 
                 // Add size to cart item
-                window.logger?.info('PRODUCT', `Agregando talla: ${ selectedSize } `);
-                
+                window.logger?.info('PRODUCT', `Agregando talla: ${selectedSize} `);
+
                 // Use the new CartEngine (aliased as cartManager)
                 // It will handle: Saving to LocalStorage, Updating UI, Opening Drawer
                 await window.cartManager.add(productId, 1, { size: selectedSize });
-                
+
                 // Optional: Notification (already handled visually by drawer open, but good for confirmation)
-                window.notifications.success(`Agregado: Talla US ${ selectedSize }`);
+                window.notifications.success(`Agregado: Talla US ${selectedSize}`);
             }
 
             // Comprar ahora

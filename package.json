@@ -1,7 +1,7 @@
 {
-  "name": "futurelabs-sneakers-shop",
+  "name": "sneakers-shop",
   "version": "2.0.0",
-  "description": "Sneakers Shop - E-commerce Fullstack",
+  "description": "Premium Streetwear & Sneakers E-commerce",
   "scripts": {
     "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
     "start:backend": "cd backend && npm start",
