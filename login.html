@@ -63,14 +63,38 @@
         document.addEventListener('DOMContentLoaded', () => {
             if (window.Components) window.Components.loadHeader();
 
-            // Simple Auth Mock
             const form = document.getElementById('loginForm');
             if (form) {
-                form.addEventListener('submit', (e) => {
+                form.addEventListener('submit', async (e) => {
                     e.preventDefault();
-                    // Simulate login
-                    localStorage.setItem('user_token', 'mock_token_123');
-                    window.location.href = 'profile.html';
+
+                    const btn = form.querySelector('.btn-auth');
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing In...';
+                    btn.disabled = true;
+
+                    const email = form.querySelector('input[type="email"]').value;
+                    const password = form.querySelector('input[type="password"]').value;
+
+                    // Get return URL if present
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const returnUrl = urlParams.get('returnUrl') || 'profile.html';
+
+                    if (window.authManager) {
+                        const success = await window.authManager.login(email, password);
+                        if (success) {
+                            // AuthManager handles notifications and token storage
+                            setTimeout(() => {
+                                window.location.href = returnUrl;
+                            }, 1000); // Short delay to see success
+                        } else {
+                            btn.innerHTML = originalText;
+                            btn.disabled = false;
+                        }
+                    } else {
+                        console.error('AuthManager not loaded');
+                        btn.innerHTML = 'System Error';
+                    }
                 });
             }
         });
