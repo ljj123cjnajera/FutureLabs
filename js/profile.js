@@ -118,7 +118,13 @@ async function loadOrders() {
         setIdText('totalSpent', `S/ ${totalSpent.toFixed(2)}`);
 
         if (orders.length === 0) {
-            container.innerHTML = `<div style="padding: 2rem; border: 2px dashed #000; text-align: center; font-weight: 700;">NO ORDERS FOUND</div>`;
+            container.innerHTML = `
+                <div style="padding: 4rem 2rem; border: 2px dashed var(--black); text-align: center; background: var(--gray-100);">
+                    <i class="fas fa-box-open" style="font-size: 3rem; margin-bottom: 1rem; color: var(--gray-400);"></i>
+                    <h3 style="font-weight: 900; text-transform: uppercase;">NO ARCHIVED ORDERS</h3>
+                    <p style="margin-bottom: 2rem;">Secure your first pair to start building your history.</p>
+                    <a href="products.html" class="btn btn-primary">START SHOPPING</a>
+                </div>`;
             return;
         }
 
@@ -170,6 +176,18 @@ async function loadWishlist() {
         { name: 'Yeezy Slide Pure', image: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&q=80&w=600', price: 180 },
         { name: 'Nike Dunk Low Panda', image: 'https://images.unsplash.com/photo-1637844527273-218ba489995a?auto=format&fit=crop&q=80&w=600', price: 220 }
     ];
+
+    if (!mockWishlist || mockWishlist.length === 0) {
+        container.innerHTML = `
+            <div style="grid-column: 1 / -1; padding: 4rem 2rem; border: 2px dashed var(--black); text-align: center; background: var(--gray-100);">
+                <i class="far fa-heart" style="font-size: 3rem; margin-bottom: 1rem; color: var(--gray-400);"></i>
+                <h3 style="font-weight: 900; text-transform: uppercase;">YOUR ROTATION IS EMPTY</h3>
+                <p style="margin-bottom: 2rem;">Save items here to track price drops and restocks.</p>
+                <a href="products.html" class="btn btn-primary">EXPLORE CATALOG</a>
+            </div>
+        `;
+        return;
+    }
 
     container.innerHTML = mockWishlist.map(item => `
         <div class="stat-box" style="padding:0; border:2px solid black; position:relative;">

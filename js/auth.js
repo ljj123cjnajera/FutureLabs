@@ -14,11 +14,11 @@ class AuthManager {
   async init() {
     console.log('🔧 AuthManager init() - Iniciando...');
     this.isInitializing = true;
-    
+
     // Verificar si hay token guardado
     const token = localStorage.getItem('auth_token');
     console.log('🔑 Token en localStorage:', token ? token.substring(0, 20) + '...' : 'No hay token');
-    
+
     if (token) {
       try {
         // Esperar a que window.api esté disponible
@@ -33,12 +33,12 @@ class AuthManager {
             }, 100);
           });
         }
-        
+
         console.log('✅ window.api está disponible');
         // Actualizar token en el API client
         window.api.setToken(token);
         console.log('💾 Token actualizado en API client');
-        
+
         const user = await this.getCurrentUser();
         if (user) {
           this.currentUser = user;
@@ -55,7 +55,7 @@ class AuthManager {
       } catch (error) {
         console.error('❌ Error al cargar usuario:', error);
         this.currentUser = null;
-        
+
         if (error.status === 401 || error.status === 403) {
           console.log('❌ Token inválido/expirado, limpiando credenciales');
           window.api.setToken(null);
@@ -63,7 +63,7 @@ class AuthManager {
         } else {
           console.warn('⚠️ Manteniendo token para reintentar más tarde');
         }
-        
+
         // Disparar evento de cambio de estado
         document.dispatchEvent(new Event('authStateChanged'));
       }
@@ -73,7 +73,7 @@ class AuthManager {
       // Disparar evento de cambio de estado
       document.dispatchEvent(new Event('authStateChanged'));
     }
-    
+
     // Marcar como inicializado
     this.isInitializing = false;
     console.log('✅ AuthManager inicializado completamente');
@@ -82,39 +82,51 @@ class AuthManager {
   async login(email, password) {
     try {
       console.log('🔐 AuthManager.login() - Iniciando con:', email);
+
+      // 🛡️ Form Guards
+      if (!email || !password) {
+        throw new Error('Por favor, completa todos los campos.');
+      }
+      if (!email.includes('@')) {
+        throw new Error('Ingresa un correo electrónico válido.');
+      }
+      if (password.length < 6) {
+        throw new Error('La contraseña debe tener al menos 6 caracteres.');
+      }
+
       const response = await window.api.login(email, password);
       console.log('📥 Respuesta del servidor:', response);
-      
+
       if (response.success) {
         this.currentUser = response.data.user;
         console.log('✅ Usuario autenticado:', this.currentUser.email);
-        
+
         // Guardar token usando el método del API client
         window.api.setToken(response.data.token);
         console.log('💾 Token guardado en API client');
-        
+
         // Verificar que el token se guardó correctamente
         const savedToken = localStorage.getItem('auth_token');
         console.log('🔍 Token verificado en localStorage:', savedToken ? savedToken.substring(0, 20) + '...' : 'NO ENCONTRADO');
-        
+
         // Disparar evento de cambio de estado
         document.dispatchEvent(new Event('authStateChanged'));
         console.log('🎉 Evento authStateChanged disparado');
-        
+
         this.showNotification('Login exitoso', 'success');
         console.log('✅ Login completado exitosamente');
         return true;
       }
-      
+
       console.log('❌ Login fallido:', response.message);
       return false;
     } catch (error) {
       console.error('❌ Error en login:', error);
-      
+
       // Verificar si el error es porque el email no está verificado
       if (error.message && error.message.includes('verifica tu email')) {
         this.showNotification(error.message + ' Por favor, ingresa el código de verificación.', 'warning');
-        
+
         // Mostrar modal de verificación
         if (window.verificationManager) {
           window.verificationManager.showModal(email);
@@ -122,7 +134,7 @@ class AuthManager {
       } else {
         this.showNotification('Error al iniciar sesión: ' + error.message, 'error');
       }
-      
+
       return false;
     }
   }
@@ -132,44 +144,44 @@ class AuthManager {
       console.log('📝 AuthManager.register() - Iniciando con:', userData.email);
       const response = await window.api.register(userData);
       console.log('📥 Respuesta del servidor:', response);
-      
+
       if (response.success) {
         console.log('✅ Usuario registrado:', userData.email);
-        
+
         // Si requiere verificación de email, mostrar modal
         if (response.data.requires_verification) {
           console.log('✉️ Usuario necesita verificar email');
-          
+
           // Cerrar modal de registro
           if (window.modals && window.modals.hideRegisterModal) {
             window.modals.hideRegisterModal();
           }
-          
+
           // Mostrar modal de verificación directamente
           // (Ya no mostramos el código en alert, el modal tiene su propio input)
           if (window.verificationManager) {
             await window.verificationManager.showModal(userData.email);
           }
-          
+
           this.showNotification(response.message, 'success');
           return true;
         }
-        
+
         // Si no requiere verificación (login antiguo)
         this.currentUser = response.data.user;
         window.api.setToken(response.data.token);
-        
+
         const savedToken = localStorage.getItem('auth_token');
         console.log('🔍 Token verificado en localStorage:', savedToken ? savedToken.substring(0, 20) + '...' : 'NO ENCONTRADO');
-        
+
         document.dispatchEvent(new Event('authStateChanged'));
         console.log('🎉 Evento authStateChanged disparado');
-        
+
         this.showNotification('Registro exitoso', 'success');
         console.log('✅ Registro completado exitosamente');
         return true;
       }
-      
+
       console.log('❌ Registro fallido:', response.message);
       return false;
     } catch (error) {
@@ -182,32 +194,32 @@ class AuthManager {
   async logout() {
     try {
       console.log('🔐 AuthManager.logout() - Iniciando...');
-      
+
       // Llamar al backend para cerrar sesión
       if (window.api && window.api.token) {
         console.log('📤 Enviando petición de logout al backend...');
         await window.api.logout();
         console.log('✅ Respuesta del backend recibida');
       }
-      
+
       // Limpiar estado local
       this.currentUser = null;
       console.log('🧹 currentUser limpiado');
-      
+
       // Eliminar token usando el método del API client
       if (window.api) {
         window.api.setToken(null);
         console.log('🧹 Token eliminado del API client');
       }
-      
+
       // Eliminar token de localStorage directamente
       localStorage.removeItem('auth_token');
       console.log('🧹 Token eliminado de localStorage');
-      
+
       // Disparar evento de cambio de estado
       document.dispatchEvent(new Event('authStateChanged'));
       console.log('🎉 Evento authStateChanged disparado');
-      
+
       this.showNotification('Sesión cerrada', 'info');
       console.log('✅ Logout completado exitosamente');
       return true;
@@ -229,16 +241,16 @@ class AuthManager {
     try {
       console.log('🔍 Llamando a getCurrentUser...');
       console.log('🔑 Token actual:', window.api.token ? window.api.token.substring(0, 20) + '...' : 'No hay token');
-      
+
       const response = await window.api.getCurrentUser();
       console.log('📥 Respuesta de getCurrentUser:', response);
-      
+
       if (response.success) {
         this.currentUser = response.data.user;
         console.log('✅ Usuario obtenido:', this.currentUser.email);
         return this.currentUser;
       }
-      
+
       console.log('❌ getCurrentUser falló:', response.message);
       return null;
     } catch (error) {
@@ -253,7 +265,7 @@ class AuthManager {
       console.log('⏳ isAuthenticated: Inicializando, retornando false');
       return false;
     }
-    
+
     const authenticated = this.currentUser !== null;
     console.log('🔍 isAuthenticated:', authenticated, 'currentUser:', this.currentUser);
     return authenticated;
