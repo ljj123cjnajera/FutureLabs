@@ -67,7 +67,7 @@ class Components {
                 <div class="footer-col">
                     <h3>SUPPORT</h3>
                     <ul>
-                        <li><a href="orders.html">Track Order</a></li>
+                        <li><a href="profile.html?tab=orders">Track Order</a></li>
                         <li><a href="faq.html">FAQs</a></li>
                         <li><a href="returns.html">Returns & Exchange</a></li>
                         <li><a href="contact.html">Contact Us</a></li>
@@ -204,7 +204,7 @@ class Components {
                         <i class="far fa-user"></i>
                         <span class="desktop-only">ACCOUNT</span>
                     </a>
-                    <button class="action-btn" onclick="window.location.href='wishlist.html'">
+                    <button class="action-btn" onclick="window.location.href='profile.html?tab=wishlist'">
                         <i class="far fa-heart"></i>
                         <span class="action-badge" id="wishlistCount" style="display: none;">0</span>
                         <span class="desktop-only">WISHLIST</span>
@@ -452,7 +452,7 @@ class Components {
     // 2. CRITICAL GATE: Only load if there are actual buttons needing it
     // or if we are explicitly on the wishlist page
     const hasWishlistButtons = document.querySelector('.action-btn[onclick*="wishlist"], .product-quick-action[onclick*="wishlist"]');
-    const isWishlistPage = window.location.pathname.includes('wishlist.html');
+    const isWishlistPage = window.location.pathname.includes('profile.html') && window.location.search.includes('tab=wishlist');
 
     if (!hasWishlistButtons && !isWishlistPage && !document.getElementById('wishlistGrid')) {
       // No need to inject script on a page with no wishlist interactions

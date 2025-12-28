@@ -182,8 +182,7 @@ npm start
 - `/profile.html` - Perfil de usuario
 - `/cart.html` - Carrito de compras
 - `/checkout.html` - Proceso de pago
-- `/orders.html` - Historial de pedidos
-- `/wishlist.html` - Lista de deseos
+
 
 ### Administración
 - `/admin-login.html` - Login de administrador
