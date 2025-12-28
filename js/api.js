@@ -747,9 +747,7 @@ class SneakersAPI {
   }
 
   // ===== SEARCH =====
-  async getSearchSuggestions(query) {
-    return this.request(`/search/suggestions?q=${encodeURIComponent(query)}`);
-  }
+
 
   async advancedSearch(params) {
     const query = new URLSearchParams(params).toString();
