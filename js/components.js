@@ -79,7 +79,7 @@ class Components {
                     <h3>STAY IN THE KNOW</h3>
                     <p class="newsletter-desc">Subscribe for exclusive access to drops and events.</p>
                     <div class="input-group">
-                        <input type="email" placeholder="ENTER YOUR EMAIL">
+                        <input type="email" id="jsFooterEmail" name="email" autocomplete="email" placeholder="ENTER YOUR EMAIL">
                         <button>→</button>
                     </div>
                     <div class="payment-methods">

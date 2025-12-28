@@ -543,7 +543,8 @@
             <h2>Únete al Futuro</h2>
             <p>Recibe acceso anticipado a drops exclusivos y contenido secreto.</p>
             <form class="newsletter-form" id="newsletterForm">
-                <input type="email" class="newsletter-input" placeholder="TU@EMAIL.COM" required>
+                <input type="email" id="footerNewsletterEmail" name="email" autocomplete="email"
+                    class="newsletter-input" placeholder="TU@EMAIL.COM" required>
                 <button type="submit" class="newsletter-btn">Suscribirse</button>
             </form>
         </div>
@@ -628,8 +629,8 @@
             <h2 class="popup-title">Unlock The Drop</h2>
             <p class="popup-desc">Únete ahora y obtén 10% OFF en tu primera compra.</p>
             <form id="popupNewsletterForm" class="popup-form">
-                <input type="email" id="newsletterEmail" name="email" placeholder="Tu Email" class="popup-input"
-                    required>
+                <input type="email" id="newsletterEmail" name="email" autocomplete="email" placeholder="Tu Email"
+                    class="popup-input" required>
                 <button type="submit" class="popup-btn">Suscribirme</button>
             </form>
             <p class="close-link" onclick="closeNewsletterPopup()">No gracias, prefiero pagar precio completo.</p>
