@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadProfileData();
     await loadOrders();
     await loadLoyaltyData();
+    await loadAddresses();
 });
 
 // --- CORE FUNCTIONS ---
@@ -138,7 +139,7 @@ async function loadOrders() {
                     <span>${new Date(order.created_at).toLocaleDateString()}</span>
                     <span style="font-weight: 800;">S/ ${parseFloat(order.total).toFixed(2)}</span>
                 </div>
-                <button class="btn-save" style="margin-top: 1rem; font-size: 0.8rem; padding: 0.5rem 1rem;" onclick="alert('View Details Not Implemented')">VIEW DETAILS</button>
+                <button class="btn-save" style="margin-top: 1rem; font-size: 0.8rem; padding: 0.5rem 1rem;" onclick="window.location.href='order-success.html?id=${order.id}'">VIEW RECEIPT</button>
             </div>
         `).join('');
 
@@ -947,5 +948,84 @@ window.scrollToSection = function (sectionId) {
     const target = document.querySelector(`[data-profile-section='${sectionId}']`) || document.getElementById(sectionId);
     if (target) {
         target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+};
+
+// --- ADDRESS MANAGER ---
+async function loadAddresses() {
+    const list = document.getElementById('addressList');
+    if (!list) return;
+
+    try {
+        const res = await window.api.getAddresses();
+        const addresses = res.data?.addresses || res.data || [];
+
+        if (addresses.length === 0) {
+            list.innerHTML = `
+                <div style="grid-column: 1/-1; padding: 2rem; border: 2px dashed #ccc; text-align: center;">
+                    NO SAVED ADDRESSES
+                </div>
+            `;
+            return;
+        }
+
+        list.innerHTML = addresses.map(addr => `
+            <div class="address-card" style="border: 1px solid #ddd; padding: 1rem; position: relative;">
+                ${addr.is_default ? '<span class="badge" style="background:black; color:white; padding:2px 6px; font-size:0.7rem;">DEFAULT</span>' : ''}
+                <div style="font-weight: 800; margin-top: 0.5rem;">${addr.first_name} ${addr.last_name}</div>
+                <div>${addr.street_address}</div>
+                <div>${addr.city}, ${addr.postal_code}</div>
+                <div>${addr.country}</div>
+                <div style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">${addr.phone_number}</div>
+                
+                <button onclick="deleteAddress('${addr.id}')" style="margin-top: 1rem; background: none; border: none; color: red; font-size: 0.8rem; cursor: pointer; text-decoration: underline;">REMOVE</button>
+            </div>
+        `).join('');
+
+    } catch (e) {
+        console.error('Address Load Error:', e);
+        list.innerHTML = 'Error loading addresses.';
+    }
+}
+
+window.toggleAddressForm = function () {
+    const el = document.getElementById('addressFormContainer');
+    if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+};
+
+window.handleSaveAddress = async function (e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    const originalText = btn.textContent;
+    btn.textContent = 'SAVING...';
+    btn.disabled = true;
+
+    try {
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData);
+
+        await window.api.createAddress(data);
+
+        // Reset and Reload
+        e.target.reset();
+        toggleAddressForm();
+        loadAddresses();
+
+    } catch (err) {
+        alert('Failed to save address: ' + err.message);
+    } finally {
+        btn.textContent = originalText;
+        btn.disabled = false;
+    }
+};
+
+window.deleteAddress = async function (id) {
+    if (!confirm('Are you sure you want to delete this address?')) return;
+
+    try {
+        await window.api.deleteAddress(id);
+        loadAddresses();
+    } catch (e) {
+        alert('Could not delete address');
     }
 };

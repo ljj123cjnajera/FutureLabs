@@ -95,9 +95,61 @@
             <!-- ADDRESSES SECTION -->
             <section id="addresses" class="account-section">
                 <h1 class="section-title">ADDRESSES</h1>
-                <div class="brutalist-form">
-                    <div style="padding: 1rem; background: #eee; font-family: monospace;">
-                        TODO: Address Manager
+                <div class="address-manager">
+                    <!-- Address List (Injected) -->
+                    <div id="addressList" class="address-grid">
+                        <div class="loading-brutalist">LOADING ADDRESSES...</div>
+                    </div>
+
+                    <!-- Add Address Button -->
+                    <button class="btn btn-outline" style="margin-top: 2rem;" onclick="toggleAddressForm()">+ ADD NEW
+                        ADDRESS</button>
+
+                    <!-- Add Address Form (Hidden by default) -->
+                    <div id="addressFormContainer" class="brutalist-form"
+                        style="display: none; margin-top: 2rem; border-top: 2px solid var(--black); padding-top: 2rem;">
+                        <h3 class="section-subtitle">NEW SHIPPING ADDRESS</h3>
+                        <form id="newAddressForm" onsubmit="handleSaveAddress(event)">
+                            <div class="form-row">
+                                <div class="form-group half">
+                                    <label>FIRST NAME</label>
+                                    <input type="text" name="first_name" class="form-input" required>
+                                </div>
+                                <div class="form-group half">
+                                    <label>LAST NAME</label>
+                                    <input type="text" name="last_name" class="form-input" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>STREET ADDRESS</label>
+                                <input type="text" name="street_address" class="form-input" required>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group half">
+                                    <label>CITY</label>
+                                    <input type="text" name="city" class="form-input" required>
+                                </div>
+                                <div class="form-group half">
+                                    <label>ZIP CODE</label>
+                                    <input type="text" name="postal_code" class="form-input" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group half">
+                                    <label>COUNTRY</label>
+                                    <input type="text" name="country" class="form-input" value="Peru" required>
+                                </div>
+                                <div class="form-group half">
+                                    <label>PHONE</label>
+                                    <input type="tel" name="phone_number" class="form-input" required>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-outline"
+                                    onclick="toggleAddressForm()">CANCEL</button>
+                                <button type="submit" class="btn btn-black">SAVE ADDRESS</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </section>
