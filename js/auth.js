@@ -260,15 +260,12 @@ class AuthManager {
   }
 
   isAuthenticated() {
-    // No permitir autenticación mientras está inicializando
-    if (this.isInitializing) {
-      console.log('⏳ isAuthenticated: Inicializando, retornando false');
-      return false;
-    }
+    // Optimistic check: If we have a token, we are effectively authenticated 
+    // (or at least attempting to be). This prevents race conditions on page load.
+    if (this.token) return true;
 
-    const authenticated = this.currentUser !== null;
-    console.log('🔍 isAuthenticated:', authenticated, 'currentUser:', this.currentUser);
-    return authenticated;
+    // Fallback to current user check
+    return this.currentUser !== null;
   }
 
   isAdmin() {
