@@ -1705,8 +1705,7 @@ footer .copyright {
     box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
 }
 
-transition: all 0.3s ease;
-}
+
 
 .benefit-card:hover {
     border-color: var(--black);
@@ -2255,14 +2254,14 @@ transition: all 0.3s ease;
 }
 
 .modal-content {
-    background-color: var(--white);
+    background-color: #ffffff;
     width: 90%;
     max-width: 500px;
     padding: 3rem;
     position: relative;
-    border: 3px solid var(--black);
+    border: 3px solid #000000;
     text-align: center;
-    box-shadow: 10px 10px 0 var(--black);
+    box-shadow: 10px 10px 0 #000000;
 }
 
 .popup-title {
@@ -2271,11 +2270,12 @@ transition: all 0.3s ease;
     line-height: 0.9;
     margin-bottom: 1rem;
     font-weight: 900;
+    color: #000000;
 }
 
 .popup-desc {
     margin-bottom: 2rem;
-    color: var(--gray-600);
+    color: #444444;
 }
 
 .popup-form {
@@ -3963,10 +3963,7 @@ transition: all 0.3s ease;
 }
 }
 
-100% {
-    transform: translateX(-50%);
-}
-}
+
 
 /* ============================================
    12. HORIZONTAL PRODUCT SLIDER
