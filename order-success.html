@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmed | Sneakers Shop</title>
+    <meta name="robots" content="noindex, nofollow">
+
+    <!-- CSS (V7 System) -->
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* SUCCESS PAGE SPECIFIC STYLES */
+        .success-container {
+            max-width: 600px;
+            margin: 8rem auto 4rem;
+            text-align: center;
+            padding: 0 1rem;
+        }
+
+        .success-icon-wrapper {
+            margin-bottom: 2rem;
+            animation: bounceIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .success-icon {
+            font-size: 5rem;
+            color: var(--black);
+        }
+
+        .order-id-badge {
+            display: inline-block;
+            background: var(--gray-100);
+            border: 1px solid var(--black);
+            padding: 0.5rem 1.5rem;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            margin: 1.5rem 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .success-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 3rem;
+        }
+
+        @keyframes bounceIn {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            60% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- HEADER (Injected) -->
+    <div id="mainHeader"></div>
+
+    <main class="success-container">
+        <div class="success-icon-wrapper">
+            <i class="fas fa-check-circle success-icon"></i>
+        </div>
+
+        <h1 style="font-size: 3rem; line-height: 1; margin-bottom: 1rem; text-transform: uppercase;">
+            Order Confirmed
+        </h1>
+
+        <p style="font-size: 1.2rem; color: var(--gray-600); max-width: 400px; margin: 0 auto;">
+            Thank you for your purchase. We've sent a confirmation email to <span id="customerEmail"
+                style="font-weight: 700;">your email</span>.
+        </p>
+
+        <div id="orderIdContainer" style="display: none;">
+            <div class="order-id-badge" id="orderIdDisplay">LOADING...</div>
+        </div>
+
+        <div class="success-actions">
+            <a href="index.html" class="btn btn-outline">RETURN HOME</a>
+            <a href="profile.html?tab=orders" class="btn btn-black">VIEW ORDER</a>
+        </div>
+    </main>
+
+    <!-- FOOTER (Injected) -->
+    <div id="mainFooter"></div>
+
+    <!-- SCRIPTS -->
+    <script src="js/design-system.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/home.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // 1. Load Components
+            if (window.Components) {
+                window.Components.loadHeader(false, false); // Minimal header
+
+                // Lazy load footer using HomeEngine logic if available, or simple inject
+                const footer = document.getElementById('mainFooter');
+                if (footer && window.HomeEngine) {
+                    // Using HomeEngine's footer generator if accessible, else manual
+                    // For now, simpler:
+                    footer.innerHTML = `
+                        <div style="background:var(--black); color:var(--white); padding:3rem 1rem; text-align:center; margin-top:4rem;">
+                            <h4 style="margin-bottom:1rem;">SNEAKERS SHOP</h4>
+                            <p style="opacity:0.6; font-size:0.9rem;">&copy; 2025 ALL RIGHTS RESERVED.</p>
+                        </div>
+                     `;
+                }
+            }
+
+            // 2. Get Order ID
+            const params = new URLSearchParams(window.location.search);
+            const orderId = params.get('id');
+            const email = params.get('email');
+
+            if (orderId) {
+                const badge = document.getElementById('orderIdDisplay');
+                const container = document.getElementById('orderIdContainer');
+                if (badge && container) {
+                    badge.textContent = `ORDER #${orderId.toUpperCase()}`;
+                    container.style.display = 'block';
+                }
+            }
+
+            if (email) {
+                const el = document.getElementById('customerEmail');
+                if (el) el.textContent = email;
+            } else if (window.authManager && window.authManager.currentUser) {
+                const el = document.getElementById('customerEmail');
+                if (el) el.textContent = window.authManager.currentUser.email;
+            }
+        });
+    </script>
+</body>
+
+</html>
