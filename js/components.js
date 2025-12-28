@@ -706,3 +706,17 @@ window.MobileMenu = {
     }
   }
 };
+
+// Global Auth Redirect Helper
+window.handleAuthRedirect = function (event, targetUrl) {
+  if (event) event.preventDefault();
+
+  // Check if AuthManager is available and authenticated
+  if (window.authManager && window.authManager.isAuthenticated()) {
+    window.location.href = targetUrl || 'profile.html';
+  } else {
+    // Save target for redirect after login
+    localStorage.setItem('redirect_after_login', targetUrl || 'profile.html');
+    window.location.href = 'login.html';
+  }
+};
