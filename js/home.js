@@ -378,17 +378,33 @@ class HomeEngine {
 
   }
 
+  startCountdown() {
+    // Placeholder for countdown logic if needed in V1
+    const timerElement = document.getElementById('dropTimer');
+    if (timerElement) {
+      timerElement.textContent = "02D 14H 30M";
+    }
+  }
+
   // ==========================================
   // 3. PRODUCTS (Grid & Slider)
   // ==========================================
   async loadProducts() {
-    this.initCountdown();
+    this.startCountdown(); // use simple startCountdown
 
     // 🛡️ Get Data (API or Fallback)
     let products = [];
     try {
       if (this.api && this.api.getProducts) {
-        products = await this.api.getProducts();
+        const response = await this.api.getProducts();
+        // Handle { success: true, data: [...] } or direct array [...]
+        if (Array.isArray(response)) {
+          products = response;
+        } else if (response && Array.isArray(response.data)) {
+          products = response.data;
+        } else if (response && response.products && Array.isArray(response.products)) {
+          products = response.products;
+        }
       }
     } catch (e) { console.warn('API Error, using fallback', e); }
 
