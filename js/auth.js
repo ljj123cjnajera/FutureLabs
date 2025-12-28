@@ -2,8 +2,12 @@
 class AuthManager {
   constructor() {
     this.currentUser = null;
-    this.isInitializing = true; // Estado de inicialización
-    // Esperar a que el DOM esté listo antes de inicializar
+    this.isInitializing = true;
+
+    // ⚡ CRITICAL: Read token immediately to prevent "flicker" redirects
+    this.token = localStorage.getItem('auth_token');
+
+    // Esperar a que el DOM esté listo antes de inicializar lógica compleja
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => this.init());
     } else {
