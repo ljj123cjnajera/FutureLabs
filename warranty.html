@@ -234,58 +234,7 @@
     <script src="js/cart.js"></script>
     <script src="js/components.js"></script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const headerContainer = document.getElementById('mainHeader');
-            if (headerContainer && window.Components) {
-                headerContainer.innerHTML = window.Components.getHeader(true, true);
-                window.Components.initHeader();
-                window.Components.initSearch();
-                window.Components.initCartCounter();
-            }
-
-            const footerContainer = document.getElementById('mainFooter');
-            if (footerContainer && window.Components) {
-                footerContainer.innerHTML = window.Components.getFooter();
-            }
-
-            const tocLinks = Array.from(document.querySelectorAll('.legal-toc a[href^="#"]'));
-            const sections = tocLinks
-                .map(link => document.querySelector(link.getAttribute('href')))
-                .filter(Boolean);
-
-            tocLinks.forEach(link => {
-                link.addEventListener('click', event => {
-                    const targetId = link.getAttribute('href');
-                    const target = document.querySelector(targetId);
-                    if (!target) return;
-
-                    event.preventDefault();
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-                    tocLinks.forEach(item => item.classList.remove('is-active'));
-                    link.classList.add('is-active');
-                });
-            });
-
-            if (sections.length) {
-                const observer = new IntersectionObserver(entries => {
-                    entries.forEach(entry => {
-                        if (!entry.isIntersecting) return;
-                        const activeId = entry.target.getAttribute('id');
-                        tocLinks.forEach(link => {
-                            const href = link.getAttribute('href').replace('#', '');
-                            link.classList.toggle('is-active', href === activeId);
-                        });
-                    });
-                }, {
-                    rootMargin: '-45% 0px -45% 0px'
-                });
-
-                sections.forEach(section => observer.observe(section));
-            }
-        });
-    </script>
+    <script src="js/legal.js"></script>
 </body>
 
 </html>

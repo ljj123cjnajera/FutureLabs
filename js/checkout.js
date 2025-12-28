@@ -392,4 +392,12 @@ class CheckoutManager {
 // Init
 document.addEventListener('DOMContentLoaded', () => {
     window.checkoutManager = new CheckoutManager();
+    console.log('Secure Checkout Initialized');
 });
+
+window.scrollToOrderSummary = function () {
+    const summary = document.getElementById('orderSummary');
+    if (summary) {
+        summary.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+};

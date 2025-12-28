@@ -18,75 +18,7 @@
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <style>
-        .error-container {
-            min-height: 80vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            background: var(--white);
-            border: 4px solid var(--black);
-            margin: 4rem auto;
-            max-width: 800px;
-            padding: 4rem 2rem;
-            position: relative;
-        }
-
-        .error-code {
-            font-family: var(--font-heading);
-            font-size: clamp(6rem, 20vw, 15rem);
-            line-height: 0.8;
-            font-weight: 900;
-            color: var(--black);
-            text-shadow: 10px 10px 0 var(--gray-200);
-            margin: 0;
-            letter-spacing: -10px;
-        }
-
-        .error-msg {
-            font-family: var(--font-heading);
-            font-size: 2rem;
-            text-transform: uppercase;
-            font-weight: 900;
-            background: var(--black);
-            color: var(--white);
-            padding: 0.5rem 2rem;
-            margin-top: -2rem;
-            z-index: 2;
-            transform: rotate(-2deg);
-        }
-
-        .error-desc {
-            font-family: var(--font-body);
-            font-size: 1.2rem;
-            max-width: 500px;
-            margin: 2rem 0;
-            font-weight: 600;
-            color: var(--gray-600);
-        }
-
-        .btn-home {
-            background: var(--accent);
-            color: var(--white);
-            padding: 1rem 3rem;
-            font-family: var(--font-heading);
-            font-weight: 900;
-            text-transform: uppercase;
-            text-decoration: none;
-            font-size: 1.5rem;
-            border: 3px solid var(--black);
-            box-shadow: 6px 6px 0 var(--black);
-            transition: all 0.2s;
-        }
-
-        .btn-home:hover {
-            transform: translate(-4px, -4px);
-            box-shadow: 10px 10px 0 var(--black);
-            background: var(--black);
-        }
-    </style>
+    <link rel="stylesheet" href="css/404.css">
 </head>
 
 <body>
@@ -105,16 +37,7 @@
     <!-- Scripts -->
     <script src="js/components.js"></script>
     <script src="js/auth.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Header V7 Injection
-            const headerContainer = document.getElementById('mainHeader');
-            if (headerContainer && window.Components && window.Components.getHeader) {
-                headerContainer.outerHTML = window.Components.getHeader(false, false); // Minimal header for 404
-                window.Components.initHeader();
-            }
-        });
-    </script>
+    <script src="js/404.js"></script>
 </body>
 
 </html>

@@ -584,18 +584,7 @@
     <!-- Legacy / Fallback (Only if absolutely needed, kept for safety but moved last) -->
     <!-- <script src="js/main.js?v=6.3"></script> -->
 
-    <script>
-        // FAILSAFE: Force Footer Injection immediately if waiting for Engine fails
-        document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                const footer = document.getElementById('mainFooter');
-                if (footer && footer.innerHTML.trim() === '' && window.Components) {
-                    console.warn('⚠️ Force Injecting Footer (Failsafe)');
-                    footer.innerHTML = window.Components.getFooter();
-                }
-            }, 500);
-        });
-    </script>
+
 
     <!-- Quick View Modal (Brutalist Harmonized) -->
     <link rel="stylesheet" href="css/quickview.css">
@@ -638,27 +627,7 @@
     </div>
     <script src="js/quick-view.js" defer></script>
 
-    <script>
-        // CRITICAL FAILSAFE: Force Footer Rendering
-        window.addEventListener('load', () => {
-            const footer = document.getElementById('mainFooter');
 
-            // Check if footer is empty or hidden
-            if (footer && (!footer.innerHTML.trim() || footer.offsetHeight < 10)) {
-                console.error('🚨 Footer missing/empty. Force injecting...');
-
-                if (window.Components && window.Components.getFooter) {
-                    footer.innerHTML = window.Components.getFooter();
-                    footer.style.display = 'block';
-                    // footer.style.border = '2px solid red'; // DEBUG REMOVED
-                    console.log('✅ Footer injected by Failsafe');
-                } else {
-                    console.error('❌ Components.js not loaded!');
-                    footer.innerHTML = '<div style="background:black; color:white; padding:2rem;">EMERGENCY FOOTER: RELOAD PAGE</div>';
-                }
-            }
-        });
-    </script>
 </body>
 
 </html>

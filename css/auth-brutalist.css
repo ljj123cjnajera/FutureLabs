@@ -135,3 +135,22 @@
         box-shadow: 8px 8px 0 var(--black);
     }
 }
+
+/* Admin Variant (High Visibility) */
+.auth-container.admin-variant {
+    border-color: var(--highlight);
+    box-shadow: 12px 12px 0 var(--highlight);
+}
+
+.auth-container.admin-variant:hover {
+    box-shadow: 16px 16px 0 var(--highlight);
+}
+
+.auth-container.admin-variant .btn-auth {
+    background: var(--highlight);
+    color: var(--black);
+}
+
+.auth-container.admin-variant .btn-auth:hover {
+    box-shadow: 4px 4px 0 var(--black);
+}

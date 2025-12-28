@@ -25,6 +25,20 @@ class CatalogEngine {
 
     async init() {
         console.log('📦 [CatalogEngine] V3 Initialized');
+
+        // Init Globals immediately
+        if (window.Components) {
+            const header = document.getElementById('mainHeader');
+            if (header && !header.innerHTML.trim()) {
+                header.innerHTML = window.Components.getHeader(true, true);
+                if (window.Components.initHeader) window.Components.initHeader();
+            }
+            const footer = document.getElementById('mainFooter');
+            if (footer && !footer.innerHTML.trim()) {
+                footer.innerHTML = window.Components.getFooter();
+            }
+        }
+
         await this.loadProducts();
 
         // 🚀 URL PARAMETER HANDLING

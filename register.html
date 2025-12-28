@@ -61,17 +61,7 @@
     <script src="js/auth.js"></script>
     <script src="js/notifications.js"></script>
     <script src="js/components.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.Components) window.Components.loadHeader();
-            document.getElementById('registerForm').addEventListener('submit', (e) => {
-                e.preventDefault();
-                // Simulate login
-                localStorage.setItem('user_token', 'mock_token_123');
-                window.location.href = 'profile.html';
-            });
-        });
-    </script>
+    <script src="js/register.js"></script>
 </body>
 
 </html>

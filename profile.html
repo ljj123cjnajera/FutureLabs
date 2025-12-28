@@ -207,19 +207,7 @@
     </div>
 
     <!-- Script for Tab Switching (Inline for simplicity or moved to profile.js) -->
-    <script>
-        function switchTab(tabId) {
-            // Hide all sections
-            document.querySelectorAll('.account-section').forEach(el => el.classList.remove('active'));
-            // Deactivate all nav buttons
-            document.querySelectorAll('.account-nav-btn').forEach(el => el.classList.remove('active'));
-
-            // Show target
-            document.getElementById(tabId).classList.add('active');
-            // Activate button (rough approximation, in real app use event.target or data attr)
-            event.currentTarget.classList.add('active');
-        }
-    </script>
+    <!-- Tab Switching Logic is handled in js/profile.js -->
 
     <!-- Address Modal -->
     <div id="addressModal" class="modal">

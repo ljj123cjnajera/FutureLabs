@@ -1001,4 +1001,15 @@ class HomeEngine {
 
 document.addEventListener('DOMContentLoaded', () => {
   window.homeEngine = new HomeEngine();
+
+  // Failsafe: Ensure Footer is visible if Engine hangs
+  setTimeout(() => {
+    const footer = document.getElementById('mainFooter');
+    if (footer && (!footer.innerHTML.trim() || footer.offsetHeight < 10)) {
+      if (window.Components && window.Components.getFooter) {
+        footer.innerHTML = window.Components.getFooter();
+        footer.style.display = 'block';
+      }
+    }
+  }, 2000);
 });
