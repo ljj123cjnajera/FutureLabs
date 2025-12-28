@@ -570,14 +570,17 @@ class Components {
     } catch (e) { }
 
 
+    // SVG Data URI Placeholder (Light Grey with Text)
+    const placeholderImg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Crect fill='%23f3f4f6' width='400' height='400'/%3E%3Ctext fill='%239ca3af' font-family='sans-serif' font-size='24' font-weight='bold' x='50%25' y='50%25' text-anchor='middle' dy='.3em'%3ESNEAKERS SHOP%3C/text%3E%3C/svg%3E";
+
     return `
       <div class="product-card" onclick="window.location.href='product-detail.html?id=${product.id}'">
         <div class="product-image-container">
-          <img src="${product.image_url || 'assets/images/products/placeholder.jpg'}" 
+          <img src="${product.image_url || placeholderImg}" 
                class="product-image"
                alt="${product.name}" 
                loading="lazy"
-               onerror="this.src='assets/images/products/placeholder.jpg'">
+               onerror="this.onerror=null; this.src='${placeholderImg}'">
           
           <div class="product-badges">
             ${discount > 0 ? `<span class="product-badge product-badge-sale">-${discount}%</span>` : ''}
