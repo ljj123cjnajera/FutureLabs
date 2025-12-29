@@ -79,6 +79,7 @@ class HomeEngine {
     };
 
     this.init();
+    console.log('🚀 HomeEngine v7.1-HOTFIX Loaded');
   }
 
   async init() {
