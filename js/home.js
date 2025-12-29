@@ -764,8 +764,12 @@ class HomeEngine {
     if (playBtn) {
       playBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        // Simple alert for MVP or implement full modal
-        console.log("Play Video");
+        // Improved Feedback
+        if (window.notifications) {
+          window.notifications.info('VIDEO PLAYER', 'Feature coming in v7.5 update');
+        } else {
+          alert('Video Player loading...');
+        }
       });
     }
   }

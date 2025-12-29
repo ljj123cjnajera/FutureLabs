@@ -1,15 +1,6 @@
 // 🧩 Componentes Reutilizables
 // Versión: 2.1 - Includes Global Auth Guard
-window.handleAuthRedirect = function (event, destination) {
-  if (event) event.preventDefault();
-  const token = localStorage.getItem('auth_token');
-  if (token) {
-    window.location.href = destination;
-  } else {
-    console.log('🔒 Guest user detected, redirecting to login...');
-    window.location.href = `login.html?returnUrl=${encodeURIComponent(destination)}`;
-  }
-};
+
 
 class Components {
   static updateCartCount() {
@@ -45,10 +36,10 @@ class Components {
                         EST. 2024 — WORLDWIDE
                     </p>
                     <div class="social-links">
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-tiktok"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <a href="https://instagram.com" target="_blank"><i class="fab fa-instagram"></i></a>
+                        <a href="https://tiktok.com" target="_blank"><i class="fab fa-tiktok"></i></a>
+                        <a href="https://twitter.com" target="_blank"><i class="fab fa-twitter"></i></a>
+                        <a href="https://youtube.com" target="_blank"><i class="fab fa-youtube"></i></a>
                     </div>
                 </div>
 
