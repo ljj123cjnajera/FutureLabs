@@ -144,26 +144,15 @@ async function loadOrders() {
         `).join('');
 
     } catch (e) {
-        // Mock fallback for demo
-        console.warn('Orders API Error, using mock:', e);
-        const mockOrders = [
-            { id: 'ORD-9921', status: 'SHIPPED', total: 450.00, created_at: new Date().toISOString() },
-            { id: 'ORD-8812', status: 'PROCESSING', total: 1200.00, created_at: new Date(Date.now() - 86400000).toISOString() }
-        ];
-
-        container.innerHTML = mockOrders.map(order => `
-            <div class="order-item">
-                <div class="order-header">
-                    <span class="order-id">#${order.id}</span>
-                    <span class="order-status" style="${order.status === 'SHIPPED' ? 'background:var(--accent); color:black' : ''}">${order.status}</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; font-size: 0.9rem; font-family: monospace;">
-                    <span>${new Date(order.created_at).toLocaleDateString()}</span>
-                    <span style="font-weight: 800;">S/ ${parseFloat(order.total).toFixed(2)}</span>
-                </div>
-                <button class="btn-save" style="margin-top: 1rem; width:100%; font-size: 0.8rem; padding: 0.5rem;" onclick="alert('Tracking ID: TRK-992123')">TRACK PACKAGE</button>
+        console.error('Orders API Error:', e);
+        container.innerHTML = `
+            <div style="padding: 2rem; border: 2px dashed var(--error); text-align: center; color: var(--error);">
+                <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                <h3>UNABLE TO LOAD HISTORY</h3>
+                <p>System connection failed. Please retry later.</p>
+                <button onclick="loadOrders()" class="btn btn-sm btn-outline-white" style="margin-top:1rem; border-color:var(--error); color:var(--error);">RETRY</button>
             </div>
-        `).join('');
+        `;
     }
 }
 
@@ -171,14 +160,35 @@ async function loadWishlist() {
     const container = document.getElementById('wishlistGrid');
     if (!container) return;
 
-    // Mock Wishlist Data
-    const mockWishlist = [
-        { name: 'Air Jordan 1 Lost & Found', image: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&q=80&w=600', price: 450 },
-        { name: 'Yeezy Slide Pure', image: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&q=80&w=600', price: 180 },
-        { name: 'Nike Dunk Low Panda', image: 'https://images.unsplash.com/photo-1637844527273-218ba489995a?auto=format&fit=crop&q=80&w=600', price: 220 }
-    ];
+    // Real Wishlist Load
+    try {
+        const res = await window.api.getWishlist();
+        // Assuming API structure, if different we handle it. 
+        // For now, if API fails or is empty, we show empty state.
+        const items = res.data?.items || [];
 
-    if (!mockWishlist || mockWishlist.length === 0) {
+        if (items.length === 0) {
+            // Fallthrough to empty state below
+        } else {
+            container.innerHTML = items.map(item => `
+                <div class="stat-box" style="padding:0; border:2px solid black; position:relative;">
+                    <div style="height:150px; overflow:hidden; border-bottom:2px solid black;">
+                        <img src="${item.image}" style="width:100%; height:100%; object-fit:cover;">
+                    </div>
+                    <div style="padding:1rem;">
+                        <h4 style="font-weight:900; font-size:0.9rem; margin-bottom:0.5rem;">${item.name}</h4>
+                        <span style="font-weight:mono;">S/ ${item.price}</span>
+                    </div>
+                </div>
+            `).join('');
+            return;
+        }
+    } catch (e) {
+        console.warn("Wishlist load failed", e);
+    }
+
+    // Default Empty State
+    if (!container.innerHTML) {
         container.innerHTML = `
             <div style="grid-column: 1 / -1; padding: 4rem 2rem; border: 2px dashed var(--black); text-align: center; background: var(--gray-100);">
                 <i class="far fa-heart" style="font-size: 3rem; margin-bottom: 1rem; color: var(--gray-400);"></i>
@@ -655,37 +665,12 @@ async function loadAddresses() {
             });
         }
     } catch (error) {
-        console.warn('Addresses API Error, using mock:', error);
-        // Mock Fallback
-        const mockAddresses = [
-            { id: 'addr_1', type: 'home', is_default: true, street: 'Calle Principal 123', city: 'Miraflores', region: 'Lima', country: 'Perú', postal_code: '15074' },
-            { id: 'addr_2', type: 'work', is_default: false, street: 'Av. Empresarial 456, Of 201', city: 'San Isidro', region: 'Lima', country: 'Perú', postal_code: '15046' }
-        ];
-
-        container.innerHTML = mockAddresses.map(addr => `
-            <div class="address-item ${addr.is_default ? 'default' : ''}">
-                <div class="address-item-header">
-                    <div class="address-item-title">
-                        <i class="fas fa-${addr.type === 'home' ? 'home' : addr.type === 'work' ? 'briefcase' : 'map-marker-alt'}"></i>
-                        <span>${addr.type === 'home' ? 'Casa' : addr.type === 'work' ? 'Trabajo' : 'Otra'}</span>
-                        ${addr.is_default ? '<span class="default-badge"><i class="fas fa-check"></i> Predeterminada</span>' : ''}
-                    </div>
-                    <div class="address-item-actions">
-                        <button class="btn btn-sm btn-ghost" onclick="editAddress('${addr.id}')">
-                            <i class="fas fa-edit"></i> Editar
-                        </button>
-                        <button class="btn btn-sm btn-error" onclick="deleteAddress('${addr.id}')">
-                            <i class="fas fa-trash"></i> Eliminar
-                        </button>
-                    </div>
-                </div>
-                <div class="address-item-content">
-                    ${addr.street}<br>
-                    ${addr.city}, ${addr.region}<br>
-                    ${addr.postal_code || ''} ${addr.country}
-                </div>
-            </div>
-        `).join('');
+        console.error('Addresses API Error:', error);
+        window.loadingState.renderError(container, 'No se pudieron cargar las direcciones. Verifique su conexión.', {
+            className: 'loading-state loading-state-error',
+            spinner: false,
+            retry: () => loadAddresses()
+        });
     }
 }
 
