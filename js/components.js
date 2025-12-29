@@ -344,7 +344,9 @@ class Components {
   }
 
   static initHeader() {
-    console.log('🔵 [COMPONENTS] initHeader() executed');
+    if (window.headerInitialized) return;
+    window.headerInitialized = true;
+    // console.log('🔵 [COMPONENTS] initHeader() executed');
 
     // Ticker Animation Logic
     const messages = [
@@ -716,18 +718,18 @@ window.handleAuthRedirect = function (event, targetUrl) {
 
 // --- DYNAMIC WIDGET LOADER (Chat & SEO) ---
 document.addEventListener('DOMContentLoaded', () => {
-    // Inject Chat Widget
-    if (!window.ChatWidget && !window.location.pathname.includes('checkout.html')) {
-        const script = document.createElement('script');
-        script.src = 'js/chat-widget.js';
-        script.onload = () => new window.ChatWidget();
-        document.body.appendChild(script);
-    }
+  // Inject Chat Widget
+  if (!window.ChatWidget && !window.location.pathname.includes('checkout.html')) {
+    const script = document.createElement('script');
+    script.src = 'js/chat-widget.js';
+    script.onload = () => new window.ChatWidget();
+    document.body.appendChild(script);
+  }
 
-    // Inject SEO Manager
-    if (!window.SeoManager) {
-        const script = document.createElement('script');
-        script.src = 'js/seo-manager.js';
-        document.head.appendChild(script);
-    }
+  // Inject SEO Manager
+  if (!window.SeoManager) {
+    const script = document.createElement('script');
+    script.src = 'js/seo-manager.js';
+    document.head.appendChild(script);
+  }
 });

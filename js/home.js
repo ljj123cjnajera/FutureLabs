@@ -194,20 +194,32 @@ class HomeEngine {
       }
     }
 
-    // 2. Fallback (System Status Mode)
+    // 2. Fallback (Default Premium Slides if API empty)
     if (slides.length === 0) {
-      container.innerHTML = `
-        <div class="slide active" style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('assets/images/banners/hero-banner.jpg');">
-            <div class="slide-content">
-                <span class="slide-eyebrow" style="color: var(--error);">SYSTEM_STATUS: OFFLINE</span>
-                <h1>SNEAKERS<span class="highlight">SHOP</span></h1>
-                <p>UNABLE TO RETRIEVE ACTIVE DROPS. CHECK YOUR CONNECTION.</p>
-                <button onclick="window.location.reload()" class="btn btn-outline-white">
-                    <i class="fas fa-sync"></i> RETRY_CONNECTION
-                </button>
-            </div>
-        </div>`;
-      return;
+      slides = [
+        {
+          image_url: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?q=80&w=2000&auto=format&fit=crop',
+          eyebrow: 'NEW ARRIVALS',
+          title: 'NIKE AIR MAX',
+          subtitle: 'The future of comfort is here.',
+          cta: 'SHOP COLLECTION',
+          link: 'products.html?brand=nike'
+        },
+        {
+          image_url: 'https://images.unsplash.com/photo-1607522370275-f14bc3a5d288?q=80&w=2000&auto=format&fit=crop',
+          eyebrow: 'LIMITED EDITION',
+          title: 'URBAN LEGENDS',
+          subtitle: 'Streetwear essentials for the bold.',
+          cta: 'DISCOVER MORE',
+          link: 'products.html'
+        }
+      ];
+    }
+
+    // Render Logic (Unified)
+    // Removed old "OFFLINE" block entirely
+    if (slides.length > 0) {
+      // Proceed to render
     }
 
     container.innerHTML = slides.map((slide, index) => `
