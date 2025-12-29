@@ -795,9 +795,40 @@ body.loaded #preloader {
 /* ============================================
    4. BENTO GRID CATEGORIES (MAGAZINE STYLE)
    ============================================ */
-/* ============================================
-   4. BENTO GRID CATEGORIES (MAGAZINE STYLE)
+/* 4. BENTO GRID CATEGORIES (MAGAZINE STYLE)
    ============================================ */
+
+
+/* 5. UTILITIES (EXTRACTED PHASE 172) */
+.hero-bg-1 {
+    background-image: url('https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&q=80&w=1600');
+}
+
+.hero-bg-2 {
+    background-image: url('https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&q=80&w=1600');
+}
+
+.hero-bg-3 {
+    background-image: url('https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=1600');
+}
+
+.engine-grid-container {
+    min-height: 400px;
+    display: none;
+}
+
+.trust-custom-bg {
+    background: var(--white);
+    border-bottom: 2px solid var(--black);
+}
+
+.offer-code-badge {
+    background: var(--black);
+    color: var(--white);
+    padding: 2px 6px;
+    font-weight: 900;
+}
+
 .bento-grid {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
@@ -3961,7 +3992,8 @@ footer .copyright {
         transform: translateX(-50%);
     }
 }
-}
+
+
 
 
 

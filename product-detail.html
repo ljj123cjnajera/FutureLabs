@@ -72,8 +72,9 @@
         </div>
 
         <!-- Recently Viewed Section -->
-        <section id="recentlyViewedSection" class="recently-viewed-section" data-recently-viewed-section
-            style="display:none;">
+        <section id="recentlyViewedSection" class="recently-viewed-section hidden-initially"
+            data-recently-viewed-section>
+
             <div class="container">
                 <div class="section-header">
                     <h2><i class="fas fa-eye"></i> Productos que viste recientemente</h2>
@@ -106,9 +107,9 @@
                 <div class="product-price-block">
                     <span class="currency">S/</span>
                     <span class="price-value" id="pdpPrice">000.00</span>
-                    <span class="stock-alert blink-text" id="stockAlert"
-                        style="display:none; color: red; font-size: 0.9rem; margin-left: 10px; font-weight: 800;">¡SOLO
+                    <span class="stock-alert blink-text hidden-initially" id="stockAlert">¡SOLO
                         QUEDAN 2!</span>
+
                 </div>
 
                 <!-- Payment Trust (Local) -->
@@ -151,7 +152,9 @@
 
     <!-- Scripts -->
     <!-- Scripts del Sistema Integrado -->
-    <script src="js/auth-guard.js"></script>
+    <!-- Scripts del Sistema Integrado -->
+    <!-- Removed: auth-guard.js (Legacy) -->
+
     <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/notifications.js"></script>

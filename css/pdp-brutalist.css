@@ -268,3 +268,15 @@
         padding: 1rem;
     }
 }
+
+/* 8. UTILITIES (EXTRACTED) */
+.hidden-initially {
+    display: none;
+}
+
+.stock-alert {
+    color: red;
+    font-size: 0.9rem;
+    margin-left: 10px;
+    font-weight: 800;
+}

@@ -254,3 +254,27 @@
     text-decoration: none;
     text-transform: uppercase;
 }
+
+/* 9. HEADER UTILITIES (EXTRACTED) */
+.cart-header-container {
+    margin-top: 4rem;
+    margin-bottom: 2rem;
+    border-bottom: 4px solid var(--black);
+    padding-bottom: 1rem;
+}
+
+.cart-header-subtitle {
+    letter-spacing: 2px;
+}
+
+.cart-header-title {
+    font-size: 4rem;
+    line-height: 0.9;
+    margin: 0;
+    text-transform: uppercase;
+    font-weight: 900;
+}
+
+.cart-min-height {
+    min-height: 40vh;
+}
