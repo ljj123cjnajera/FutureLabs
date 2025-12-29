@@ -14,73 +14,11 @@ class HomeEngine {
       newsletterSubscribed: false
     };
 
-    // 🛡️ DATA FALLBACK EXCELLENCE (High Heat Edition)
-    this.fallbackData = {
-      banners: [
-        {
-          id: 'hero-1',
-          title: 'TRAVIS SCOTT x JUMPMAN',
-          subtitle: 'THE FINAL CHAPTER. OLIVE LOWS AVAILABLE NOW.',
-          image_url: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&q=80&w=1920',
-          link: 'products.html?collection=travis-scott',
-          cta: 'SHOP COLLECTION'
-        },
-        {
-          id: 'hero-2',
-          title: 'YEEZY ARCHIVE',
-          subtitle: 'ICONIC SILHOUETTES RETURN. LIMITED QUANTITIES.',
-          image_url: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&q=80&w=1920',
-          link: 'products.html?category=yeezy',
-          cta: 'ACCESS ARCHIVE'
-        },
-        {
-          id: 'hero-3',
-          title: 'NIKE SB DUNK',
-          subtitle: 'SKATE CULTURE MEETS HIGH FASHION.',
-          image_url: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&q=80&w=1920',
-          link: 'products.html?category=nike-sb',
-          cta: 'SHOP DUNKS'
-        }
-      ],
-      categories: [
-        { id: 'cat-1', name: 'JORDAN RETRO', slug: 'jordan', image: 'https://images.unsplash.com/photo-1695513286047-9d7e56230873?auto=format&fit=crop&q=80&w=800' },
-        { id: 'cat-2', name: 'YEEZY SLIDES', slug: 'yeezy', image: 'https://images.unsplash.com/photo-1620332302351-8ca260e35730?auto=format&fit=crop&q=80&w=800' },
-        { id: 'cat-3', name: 'NIKE DUNK', slug: 'nike', image: 'https://images.unsplash.com/photo-1605218427368-22d7168b4f4c?auto=format&fit=crop&q=80&w=800' },
-        { id: 'cat-4', name: 'NEW BALANCE', slug: 'new-balance', image: 'https://images.unsplash.com/photo-1663044522649-6f9202611757?auto=format&fit=crop&q=80&w=800' }
-      ],
-      products: [
-        { id: 101, name: 'Air Jordan 1 High OG "Lost & Found"', price: 450.00, image_url: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&q=80&w=800', badge: 'GRAIL' },
-        { id: 102, name: 'Adidas Yeezy Boost 350 V2 "Zebra"', price: 380.00, image_url: 'https://images.unsplash.com/photo-1549488344-c7059349b576?auto=format&fit=crop&q=80&w=800', badge: 'RESTOCK' },
-        { id: 103, name: 'Nike Dunk Low Retro "Panda"', price: 180.00, image_url: 'https://images.unsplash.com/photo-1637844527273-218ba489995a?auto=format&fit=crop&q=80&w=800', badge: 'BESTSELLER' },
-        { id: 104, name: 'Travis Scott x AJ1 Low "Olive"', price: 1200.00, image_url: 'https://images.unsplash.com/photo-1584735175315-9d58160926ad?auto=format&fit=crop&q=80&w=800', badge: 'HYPE' },
-        { id: 105, name: 'New Balance 550 "Aimé Leon Dore"', price: 350.00, image_url: 'https://images.unsplash.com/photo-1656335362192-2bc9051b1824?auto=format&fit=crop&q=80&w=800', badge: 'COLLAB' },
-        { id: 106, name: 'Air Jordan 4 Retro "Military Black"', price: 420.00, image_url: 'https://images.unsplash.com/photo-1695513286047-9d7e56230873?auto=format&fit=crop&q=80&w=800', badge: 'HOT' },
-        { id: 107, name: 'Nike SB Dunk Low "Mummy"', price: 550.00, image_url: 'https://images.unsplash.com/photo-1523398002811-6ce9e490101d?auto=format&fit=crop&q=80&w=800', badge: 'TENDENCIA' },
-        { id: 108, name: 'Yeezy Foam Runner "Sand"', price: 150.00, image_url: 'https://images.unsplash.com/photo-1605218427368-22d7168b4f4c?auto=format&fit=crop&q=80&w=800', badge: 'SUMMER' },
-        { id: 109, name: 'Samba OG "Cloud White"', price: 120.00, image_url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=800', badge: 'CLASSIC' },
-        { id: 110, name: 'Off-White x Nike Air Force 1', price: 1500.00, image_url: 'https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&q=80&w=800', badge: 'MUSEUM' },
-        { id: 111, name: 'Rick Owens Geobasket', price: 980.00, image_url: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&q=80&w=800', badge: 'AVANT' },
-        { id: 112, name: 'Birkenstock Boston Taupe', price: 180.00, image_url: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=800', badge: 'COMFORT' },
-        // Expanded Data for Phase 104
-        { id: 113, name: 'Jordan 3 Retro "White Cement"', price: 280.00, image_url: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&q=80&w=800', badge: 'RESTOCK' },
-        { id: 114, name: 'Nike Dunk Low "Grey Fog"', price: 160.00, image_url: 'https://images.unsplash.com/photo-1637844527273-218ba489995a?auto=format&fit=crop&q=80&w=800', badge: 'ESSENTIAL' },
-        { id: 115, name: 'New Balance 2002R "Protection Pack"', price: 220.00, image_url: 'https://images.unsplash.com/photo-1620332302351-8ca260e35730?auto=format&fit=crop&q=80&w=800', badge: 'TRENDING' },
-        { id: 116, name: 'Adidas Forum Low 84', price: 110.00, image_url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=800', badge: 'VINTAGE' }
-      ],
-      brands: [
-        { name: 'NIKE', logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg' },
-        { name: 'JORDAN', logo: 'https://upload.wikimedia.org/wikipedia/en/3/37/Jumpman_logo.svg' },
-        { name: 'ADIDAS', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/20/Adidas_Logo.svg' },
-        { name: 'YEEZY', logo: 'https://upload.wikimedia.org/wikipedia/commons/f/f1/Yeezy_logo.svg' },
-        { name: 'NEW BALANCE', logo: 'https://upload.wikimedia.org/wikipedia/commons/e/ea/New_Balance_logo.svg' },
-        { name: 'OFF-WHITE', logo: 'https://upload.wikimedia.org/wikipedia/commons/1/19/Off-white_logo.svg' },
-        { name: 'SUPREME', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/28/Supreme_Logo.svg' }
-      ]
-    };
-
     this.init();
-    console.log('🚀 HomeEngine v7.2-STABLE Loaded');
+    console.log('🚀 HomeEngine v7.3-REAL-DATA Loaded');
   }
+
+
 
   async init() {
     try {
@@ -197,82 +135,10 @@ class HomeEngine {
     }
   }
 
-  async loadJournal() {
-    const container = document.querySelector('.journal-grid');
-    if (!container) return; // Fail silently if not found
-
-    try {
-      // Attempt API fetch
-      let posts = [];
-      if (this.api && this.api.getBlogPosts) {
-        const res = await this.api.getBlogPosts({ limit: 3 });
-        if (res.success) posts = res.data;
-      }
-
-      // Fallback if API fails or returns empty
-      if (!posts || posts.length === 0) {
-        posts = [
-          {
-            title: 'El fin de una era: Yeezy vs Adidas',
-            category: 'RELEASE',
-            excerpt: 'Analizamos el impacto en el mercado de reventa y qué esperar del futuro.',
-            image_url: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?q=80&w=800',
-            link: 'blog-post.html'
-          },
-          {
-            title: '¿Por qué las J1 High nunca mueren?',
-            category: 'CULTURE',
-            excerpt: 'La historia detrás de la silueta que inició todo en 1985.',
-            image_url: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?q=80&w=800',
-            link: 'blog-post.html'
-          },
-          {
-            title: 'Guía de Estilo: Streetwear Verano 2025',
-            category: 'STYLE',
-            excerpt: 'Los esenciales que necesitas en tu rotación esta temporada.',
-            image_url: 'https://images.unsplash.com/photo-1523398002811-6ce9e490101d?q=80&w=800',
-            link: 'blog-post.html'
-          }
-        ];
-      }
-
-      // Render
-      container.innerHTML = posts.map(post => `
-                <article class="journal-card" onclick="window.location.href='${post.link}'" style="cursor: pointer;">
-                    <div class="journal-image">
-                        <img src="${post.image_url}" alt="${post.title}" loading="lazy">
-                    </div>
-                    <div class="journal-content">
-                        <span class="journal-tag">${post.category || 'NEWS'}</span>
-                        <h3>${post.title}</h3>
-                        <p>${post.excerpt}</p>
-                        <span class="read-more">Leer más</span>
-                    </div>
-                </article>
-          `).join('');
-
-    } catch (e) {
-      console.warn('Journal Load Error:', e);
-    }
-  }
 
 
-  renderBrands() {
-    const marqueeContent = document.querySelector('.marquee-content');
-    if (!marqueeContent) return;
 
-    const brands = this.state.brands || this.fallbackData.brands;
 
-    // We need to duplicate content for infinite scroll effect
-    const brandHTML = brands.map(brand => `
-          <div class="brand-item">
-            <img src="${brand.logo}" alt="${brand.name}" style="height: 40px; width: auto; filter: invert(1);"> 
-          </div>
-      `).join('');
-
-    // Inject doubled content for smooth loop
-    marqueeContent.innerHTML = brandHTML + brandHTML + brandHTML + brandHTML;
-  }
 
   initHypeFeatures() {
     this.startCountdown();
@@ -306,28 +172,42 @@ class HomeEngine {
     });
   }
 
-  // ==========================================
+
   // 1. HERO SLIDER
   // ==========================================
   async loadHero() {
     const container = document.getElementById('heroSlidesContainer');
-    // If static content exists, don't overwrite it immediately (Hydration)
-    if (container && container.children.length > 0) {
-      console.log('⚡ Hero already rendered (Static). Initializing generic logic only.');
-      return;
-    }
     const dotsContainer = document.getElementById('heroSliderDots');
     if (!container) return;
 
-    let slides = this.fallbackData.banners; // Prioritize premium fallback for now
+    let slides = [];
+
+    // 1. Try API
+    if (this.api && this.api.getHomeHeroSlides) {
+      try {
+        const res = await this.api.getHomeHeroSlides();
+        if (res.success && Array.isArray(res.data)) {
+          slides = res.data;
+        }
+      } catch (e) {
+        console.error('❌ Hero API Error:', e);
+      }
+    }
+
+    // 2. Fallback (Minimal Safe Mode only if API completely dies)
+    if (slides.length === 0) {
+      // Show empty state or safe default
+      container.innerHTML = `<div class="slide active"><div class="slide-content"><h1>SNEAKERS SHOP</h1><p>Welcome to the future.</p></div></div>`;
+      return;
+    }
 
     container.innerHTML = slides.map((slide, index) => `
             <div class="slide ${index === 0 ? 'active' : ''}" style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('${slide.image_url}')">
                 <div class="slide-content">
-                    <span class="slide-eyebrow">LATEST DROPS</span>
+                    <span class="slide-eyebrow">${slide.eyebrow || 'LATEST DROPS'}</span>
                     <h1>${slide.title}</h1>
                     <p>${slide.subtitle || ''}</p>
-                    <a href="${slide.link}" class="btn btn-primary btn-lg">${slide.cta}</a>
+                    <a href="${slide.link || 'products.html'}" class="btn btn-primary btn-lg">${slide.cta || 'SHOP NOW'}</a>
                 </div>
             </div>
         `).join('');
@@ -389,17 +269,39 @@ class HomeEngine {
   // ==========================================
   // 2. CATEGORIES (Bento Grid)
   // ==========================================
+  // ==========================================
+  // 2. CATEGORIES (Bento Grid)
+  // ==========================================
   async loadCategories() {
     const container = document.getElementById('homeSectionsContainer');
     if (!container) return;
 
-    const categories = this.fallbackData.categories;
+    let categories = [];
+
+    // 1. API Call
+    if (this.api && this.api.getCategories) {
+      try {
+        const res = await this.api.getCategories();
+        if (res.success && Array.isArray(res.data)) {
+          categories = res.data;
+        }
+      } catch (e) { console.error('Categories API Error:', e); }
+    }
+
+    // 2. No Fallback?
+    if (categories.length === 0) {
+      // If API fails, maybe we show nothing or a retry button?
+      // User wants cleanliness. Empty is cleaner than broken.
+      // But let's at least show some structure or a skeleton.
+      container.innerHTML = `<p class="text-center py-5">Connecting to Sneakers API...</p>`;
+      return;
+    }
 
     container.innerHTML = `
         <div class="bento-grid">
             ${categories.map((cat, index) => `
                 <a href="products.html?category=${cat.slug}" class="bento-item">
-                    <img src="${cat.image}" alt="${cat.name}" loading="lazy">
+                    <img src="${cat.image || 'img/placeholder-sq.jpg'}" alt="${cat.name}" loading="lazy">
                     <div class="bento-overlay">
                         <h3>${cat.name}</h3>
                         <i class="fas fa-arrow-right"></i>
@@ -408,12 +310,6 @@ class HomeEngine {
             `).join('')}
         </div>
     `;
-
-    // Remove legacy listeners as CSS handles hover now
-    // Modern Hover Effect is handled by .bento-item:hover in CSS
-
-    // Modern Hover Effect
-
   }
 
   startCountdown() {
@@ -427,15 +323,17 @@ class HomeEngine {
   // ==========================================
   // 3. PRODUCTS (Grid & Slider)
   // ==========================================
+  // ==========================================
+  // 3. PRODUCTS (Grid & Slider)
+  // ==========================================
   async loadProducts() {
-    this.startCountdown(); // use simple startCountdown
+    this.startCountdown();
 
-    // 🛡️ Get Data (API or Fallback)
+    // 🛡️ Get Data (API Only)
     let products = [];
     try {
       if (this.api && this.api.getProducts) {
         const response = await this.api.getProducts();
-        // Handle { success: true, data: [...] } or direct array [...]
         if (Array.isArray(response)) {
           products = response;
         } else if (response && Array.isArray(response.data)) {
@@ -444,33 +342,18 @@ class HomeEngine {
           products = response.products;
         }
       }
-    } catch (e) { console.warn('API Error, using fallback', e); }
-
-    if (!products || products.length === 0) {
-      products = this.fallbackData.products;
+    } catch (e) {
+      console.error('API Error in Products:', e);
     }
 
-    // A. TRENDING / FEATURED (Slider)
-    // Filter logic: High Heat, New, or Hype badges
-    const trending = products.filter(p =>
-      ['GRAIL', 'HYPE', 'HOT', 'TRENDING', 'NEW'].includes(p.badge) || p.price > 400
-    ).slice(0, 8); // Top 8 
+    // No Mock Fallback. If backend down, user sees it.
 
+    // A. TRENDING / FEATURED (Slider)
+    const trending = products.length > 0 ? products.slice(0, 8) : [];
     await this.renderProductSlider('featuredProductsGrid', trending);
 
     // B. ON SALE (Grid)
-    // Logic: Products with discount (mocking if needed)
-    let saleProducts = products.filter(p => p.discount_price || p.badge === 'SALE');
-
-    // If no sale products in mock, generate some for demo
-    if (saleProducts.length < 4) {
-      saleProducts = products.slice(4, 12).map(p => ({
-        ...p,
-        discount_price: (p.price * 0.8).toFixed(2), // 20% off
-        badge: 'SALE'
-      }));
-    }
-
+    const saleProducts = products.filter(p => p.discount_price || p.on_sale).slice(0, 8);
     await this.renderProductGrid('onSaleProductsGrid', saleProducts);
   }
 
