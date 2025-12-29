@@ -230,17 +230,17 @@ class CheckoutManager {
                 ${this.paymentMethod === 'card' ? `
                     <form id="paymentForm">
                         <div class="form-group">
-                            <label>CARD NUMBER (Mock)</label>
-                            <input type="text" class="input-card" placeholder="4242 4242 4242 4242" value="4242 4242 4242 4242">
+                            <label>CARD NUMBER</label>
+                            <input type="text" class="input-card" placeholder="4242 4242 4242 4242">
                         </div>
                         <div class="form-row">
                             <div class="form-group half">
                                 <label>EXPIRY</label>
-                                <input type="text" placeholder="12/25" value="12/25">
+                                <input type="text" placeholder="MM/YY">
                             </div>
                             <div class="form-group half">
                                 <label>CVC</label>
-                                <input type="text" placeholder="123" value="123">
+                                <input type="text" placeholder="123">
                             </div>
                         </div>
                     </form>
@@ -295,7 +295,7 @@ class CheckoutManager {
                 </div>
 
                 <div class="checkout-actions">
-                     <button class="btn btn-outline" onclick="checkoutManager.renderStep(2)">BACK</button>
+                    <button class="btn btn-outline" onclick="checkoutManager.renderStep(2)">BACK</button>
                     <button class="btn btn-green btn-block" onclick="checkoutManager.placeOrder()">
                         PLACE ORDER ($${total.toFixed(2)})
                     </button>
@@ -322,9 +322,9 @@ class CheckoutManager {
                 })),
                 shipping_address_id: this.selectedAddressId,
                 payment_method: 'credit_card', // Mapping 'card' to backend enum if needed
-                payment_details: { // Mock payment details for V1
-                    provider: 'stripe_mock',
-                    transaction_id: 'tx_mock_' + Date.now()
+                payment_details: {
+                    provider: 'stripe',
+                    transaction_id: 'tx_' + Date.now() // Placeholder for actual gateway integration
                 }
             };
 
