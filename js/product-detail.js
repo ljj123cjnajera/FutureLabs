@@ -82,29 +82,9 @@ document.addEventListener('DOMContentLoaded', async function () {
                 <div class="product-header-group">
                     <div class="product-meta-header" style="display:flex; justify-content:space-between; align-items:center;">
                         <p class="product-brand" style="font-weight: 800; text-transform: uppercase; color: #666; margin-bottom: 0.5rem; letter-spacing: 0.1em;">${product.brand}</p>
-                        <div class="live-viewers-badge" style="color: #e00; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; gap: 5px; background: rgba(255,0,0,0.05); padding: 2px 6px; border-radius: 4px;">
-                            <span class="pulsing-dot" style="width: 8px; height: 8px; background: #e00; border-radius: 50%; display: inline-block;"></span>
-                            ${Math.floor(Math.random() * (25 - 8) + 8)} PERSONAS VIENDO
-                        </div>
-                    </div>
-
-                    <h1 class="product-title-large">${product.name}</h1>
-                    
-                    <div class="product-meta-row" style="display: flex; align-items: center; gap: 20px; margin-top: 1rem; flex-wrap: wrap;">
-                <div class="product-price-large">
-                            S/ ${product.price}
-                            ${product.original_price && product.original_price > product.price ?
-                        `<span class="product-price-original">S/ ${product.original_price}</span>` : ''}
-                        </div>
-                        
-                        <!-- Stock Alert -->
-                        <div class="stock-alert blink-text" style="color: #e00; font-weight: 900; font-size: 0.9rem; text-transform: uppercase;">
-                            <i class="fas fa-fire"></i> ¡SOLO QUEDAN ${Math.floor(Math.random() * (4 - 1) + 1)} PARES!
-                        </div>
-
                         <div class="product-rating-detail">
                             <span class="stars-detail">★★★★★</span>
-                            <span class="rating-text-detail">(${product.rating_count || 12} reviews)</span>
+                            <span class="rating-text-detail">(${product.rating_count || 0} reviews)</span>
                         </div>
                     </div>
                     
@@ -148,7 +128,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                         <div>
                             <strong style="text-transform: uppercase; font-weight: 900; color: var(--black);">¡LLEGA MAÑANA!</strong>
                             <p style="margin:0; color: #666; font-size: 0.9rem;">
-                                Pide en las próximas <span id="shippingTimer" style="color: #e00; font-weight: 900;">2h 14m</span> para envío inmediato.
+                                Pide antes de las 5PM para envío asegurado.
                             </p>
                         </div>
                     </div>
@@ -287,17 +267,18 @@ document.addEventListener('DOMContentLoaded', async function () {
         const grid = document.getElementById('sizeSelectorGrid');
         if (!grid) return;
 
-        // Mock sizes for demo - in real app would come from product.variants
+        // Standard US Men Sizes
         const sizes = ['7', '7.5', '8', '8.5', '9', '9.5', '10', '10.5', '11', '12', '13'];
 
-        // Randomly disable some sizes to simulate stock
+        // Logic: If total stock > 0, assume all sizes available (Simple V1)
+        // If stock === 0, all disabled.
+        const hasStock = product.stock_quantity > 0;
+
         grid.innerHTML = sizes.map(size => {
-            // Simple deterministic "random" for consistent demo per product ID
-            const isOutOfStock = (parseInt(product.id) + parseFloat(size)) % 7 === 0;
             return `
-                    <button class="size-option ${isOutOfStock ? 'disabled' : ''}"
+                    <button class="size-option ${!hasStock ? 'disabled' : ''}"
                 onclick = "selectSize('${size}', this)" 
-                        ${isOutOfStock ? 'disabled' : ''}>
+                        ${!hasStock ? 'disabled' : ''}>
                     ${size}
                 </button >
                     `;
