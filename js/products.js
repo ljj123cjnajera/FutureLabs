@@ -167,7 +167,7 @@ class CatalogEngine {
             if (window.notifications) window.notifications.success('AÑADIDO', `${name} al carrito`);
         } else {
             // Fallback if cartManager not ready
-            if (window.notifications) window.notifications.success('MOCK', 'Added to cart (Simulation)');
+            if (window.notifications) window.notifications.error('ERROR', 'Cart System Unavailable');
         }
     }
 }

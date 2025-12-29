@@ -200,20 +200,7 @@ async function loadWishlist() {
         return;
     }
 
-    container.innerHTML = mockWishlist.map(item => `
-        <div class="stat-box" style="padding:0; border:2px solid black; position:relative;">
-            <div style="height:150px; overflow:hidden; border-bottom:2px solid black;">
-                <img src="${item.image}" style="width:100%; height:100%; object-fit:cover; filter:grayscale(100%); transition:filter 0.3s;" onmouseover="this.style.filter='grayscale(0%)'" onmouseout="this.style.filter='grayscale(100%)'">
-            </div>
-            <div style="padding:1rem;">
-                <h4 style="font-weight:900; font-size:0.9rem; text-transform:uppercase; margin-bottom:0.5rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.name}</h4>
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-weight:mono;">S/ ${item.price}</span>
-                    <button style="background:black; color:white; border:none; padding:5px 10px; cursor:pointer;" onclick="window.quickAdd(123, '${item.name}')">+</button>
-                </div>
-            </div>
-        </div>
-    `).join('');
+    // End of loadWishlist
 }
 
 // --- UTILS ---

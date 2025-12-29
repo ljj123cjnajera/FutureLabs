@@ -896,7 +896,9 @@ class HomeEngine {
         } else {
           // Fallback to internal mock if API fails/returns empty
           console.warn(`⚠️ API returned no products for ${category}, utilizing fallback.`);
-          products = this.getFallbackProducts(category);
+          // products = this.getFallbackProducts(category);
+          products = [];
+          if (window.notifications) window.notifications.error('API Error', 'Could not load category');
         }
 
         // 3. Render
@@ -912,7 +914,8 @@ class HomeEngine {
       } catch (err) {
         console.warn('❌ Engine Error:', err);
         // Fallback on error
-        const fallbackIds = this.getFallbackProducts(category);
+        // const fallbackIds = this.getFallbackProducts(category); // Removed
+        products = [];
         grid.innerHTML = fallbackIds.map(p => window.Components.getProductCard(p)).join('');
       } finally {
         // 5. Reveal
@@ -935,29 +938,8 @@ class HomeEngine {
     });
   }
 
-  // Helper: Mock fallback if API is empty during dev
-  getFallbackProducts(category) {
-    // Return 4 mock items based on category
-    const mockDb = {
-      'nike': [1, 2, 3, 4],
-      'jordan': [5, 6, 7, 8],
-      'yeezy': [9, 10, 11, 12],
-      'adidas': [13, 14, 15, 16]
-    };
-    const ids = mockDb[category] || [1, 2, 3, 4];
+  // Fallbacks removed for production.
 
-    // Hydrate from catalogEngine if available, or generate generic
-    return ids.map(id => {
-      return {
-        id: id,
-        name: `${category.toUpperCase()} PROTOTYPE 00${id}`,
-        price: 299.00,
-        brand: category.toUpperCase(),
-        image_url: 'assets/images/products/placeholder.jpg',
-        is_new: Math.random() > 0.5
-      };
-    });
-  }
 
   // 🛡️ FAILSAFE: Force visibility after 2 seconds if observer fails or user turns off JS interactions
   forceReveal() {
