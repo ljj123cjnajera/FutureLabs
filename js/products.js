@@ -122,7 +122,7 @@ class CatalogEngine {
             container.innerHTML = products.map(p => `
                 <div class="product-card" onclick="window.location.href='product-detail.html?id=${p.id}'">
                     <div class="product-image-container">
-                        <img src="${p.image_url}" class="product-image" alt="${p.name}">
+                        <img src="${p.image_url}" class="product-image" alt="${p.name}" loading="lazy">
                         ${p.badge ? `<div class="product-badges"><span class="product-badge">${p.badge}</span></div>` : ''}
                     </div>
                     <div class="product-content">

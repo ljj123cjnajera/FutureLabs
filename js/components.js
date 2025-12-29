@@ -713,3 +713,21 @@ window.handleAuthRedirect = function (event, targetUrl) {
     window.location.href = 'login.html';
   }
 };
+
+// --- DYNAMIC WIDGET LOADER (Chat & SEO) ---
+document.addEventListener('DOMContentLoaded', () => {
+    // Inject Chat Widget
+    if (!window.ChatWidget && !window.location.pathname.includes('checkout.html')) {
+        const script = document.createElement('script');
+        script.src = 'js/chat-widget.js';
+        script.onload = () => new window.ChatWidget();
+        document.body.appendChild(script);
+    }
+
+    // Inject SEO Manager
+    if (!window.SeoManager) {
+        const script = document.createElement('script');
+        script.src = 'js/seo-manager.js';
+        document.head.appendChild(script);
+    }
+});

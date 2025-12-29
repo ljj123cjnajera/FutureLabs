@@ -69,6 +69,18 @@ document.addEventListener('DOMContentLoaded', async function () {
                     window.breadcrumbs.updateProductName(product.name);
                 }
 
+                // SEO ENGINE UPDATE
+                if (window.SeoManager) {
+                    window.SeoManager.updateProductSEO({
+                        title: product.name,
+                        description: product.description || `Buy ${product.name} at Sneakers Shop. Best price and authentic quality.`,
+                        image: product.image_url,
+                        url: window.location.href,
+                        price: product.price,
+                        currency: 'PEN'
+                    });
+                }
+
                 container.innerHTML = `
         <div class="product-detail-layout">
             <!-- Left Column: Sticky Gallery -->
