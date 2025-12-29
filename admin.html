@@ -1106,48 +1106,7 @@
     <script src="js/admin.js"></script>
     <script src="js/admin-crud.js"></script>
 
-    <script>
-        // Funciones para preview de imagen
-        function previewProductImage(input) {
-            const file = input.files[0];
-            if (file) {
-                // Validar tipo de archivo
-                if (!file.type.startsWith('image/')) {
-                    window.notifications.error('Por favor selecciona un archivo de imagen');
-                    input.value = '';
-                    return;
-                }
-
-                // Validar tamaño (máx 5MB)
-                if (file.size > 5 * 1024 * 1024) {
-                    window.notifications.error('La imagen no puede ser mayor a 5MB');
-                    input.value = '';
-                    return;
-                }
-
-                const reader = new FileReader();
-                reader.onload = function (event) {
-                    document.getElementById('previewImage').src = event.target.result;
-                    document.getElementById('imagePreviewContainer').style.display = 'block';
-                    document.getElementById('imageFileName').textContent = file.name;
-                    // Limpiar URL de imagen si había una
-                    document.getElementById('productImage').value = '';
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function clearImagePreview() {
-            document.getElementById('imagePreviewContainer').style.display = 'none';
-            document.getElementById('previewImage').src = '';
-            document.getElementById('imageFileName').textContent = '';
-            document.getElementById('productImageFile').value = '';
-        }
-
-        // Hacer funciones globales
-        window.previewProductImage = previewProductImage;
-        window.clearImagePreview = clearImagePreview;
-    </script>
+    <!-- Image Preview Logic handles by js/admin-crud.js -->
 
     <!-- Hero Slide Modal -->
     <div id="heroSlideModal" class="modal" style="display: none;">

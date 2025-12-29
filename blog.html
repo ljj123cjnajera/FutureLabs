@@ -101,22 +101,7 @@
 
     <script src="js/blog.js"></script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Force Footer Injection
-            const footer = document.getElementById('mainFooter');
-            if (window.Components && footer) {
-                footer.innerHTML = window.Components.getFooter();
-            }
-            // Force Header Injection
-            if (window.Components && document.getElementById('mainHeader')) {
-                document.getElementById('mainHeader').innerHTML = window.Components.getHeader(true, true);
-                window.Components.initHeader();
-                window.Components.initSearch();
-                window.Components.initCartCounter();
-            }
-        });
-    </script>
+    <!-- Logic handled by js/blog.js -->
 </body>
 
 </html>
