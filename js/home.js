@@ -379,7 +379,13 @@ class HomeEngine {
 
     // 🛡️ Guard: Empty State
     if (!products || products.length === 0) {
-      container.innerHTML = `<div class="p-8 text-center text-xl font-bold border-2 border-black">NO PRODUCTS FOUND IN THIS COLLECTION</div>`;
+      container.innerHTML = `
+        <div class="p-8 text-center border-2 border-black" style="min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <i class="fas fa-box-open fa-2x mb-3" style="color: var(--gray);"></i>
+            <h4 class="font-bold text-lg">COLLECTION_EMPTY</h4>
+            <p class="text-sm text-gray-500 mb-3">No inventory signal received.</p>
+            <button onclick="window.location.reload()" class="btn btn-sm btn-outline">REFRESH_GRID</button>
+        </div>`;
       return;
     }
 
