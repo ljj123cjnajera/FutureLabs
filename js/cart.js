@@ -7,13 +7,6 @@ class CartEngine {
   constructor() {
     this.api = window.api;
 
-    // 🛍️ MOCK MOCK MOCK
-    // If API fails or user is guest, we show this (unless empty)
-    this.mockItems = [
-      { id: 101, name: 'Air Jordan 1 High "Lost & Found"', price: 899.00, quantity: 1, image_url: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&q=80&w=800', brand: 'Jordan' },
-      { id: 104, name: 'New Balance 550', price: 549.00, quantity: 2, image_url: 'https://images.unsplash.com/photo-1656335362192-2bc9051b1824?auto=format&fit=crop&q=80&w=800', brand: 'New Balance' }
-    ];
-
     this.init();
   }
 
@@ -39,14 +32,8 @@ class CartEngine {
 
       if (localCart.length > 0) {
         items = localCart;
-      } else {
-        // Try API (or Mock if auth fails/demo mode)
-        // For this V3 Demo, we'll auto-fill with Mock if empty to show the UI
-        if (!localStorage.getItem('cart_cleared')) {
-          items = this.mockItems;
-          localStorage.setItem('brutalist_cart', JSON.stringify(items));
-        }
       }
+      // V3 PROD: No auto-fill mocks. Empty is empty.
     } catch (e) {
       console.warn('⚠️ [CartEngine] Fallback', e);
     }
@@ -166,7 +153,7 @@ class CartEngine {
       // Mock Fetch Product Data if not provided (Safety)
       //In real app, we would fetch from API or use the product object passed.
       // For now, assuming we use the global currentProduct or fetch
-      const product = window.currentProduct || { id, name: 'Product ' + id, price: 199, image_url: 'assets/images/products/placeholder.jpg', brand: 'Brand' };
+      const product = window.currentProduct || { id, name: 'Product ' + id, price: 0, image_url: 'assets/images/products/placeholder.jpg', brand: 'Brand' };
 
       cart.push({
         id: id,
