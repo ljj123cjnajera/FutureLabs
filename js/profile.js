@@ -307,7 +307,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     const headerContainer = document.getElementById('mainHeader');
     const footerContainer = document.getElementById('mainFooter');
 
-    const footerContainer = document.getElementById('mainFooter');
+    // const footerContainer = document.getElementById('mainFooter'); // REMOVED DUPLICATE
 
     if (headerContainer && window.Components) {
         headerContainer.innerHTML = window.Components.getHeader(true, true);
