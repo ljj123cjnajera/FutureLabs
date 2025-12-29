@@ -87,7 +87,7 @@ class Components {
                 <div class="footer-meta">
                     <a href="privacy.html">PRIVACY</a>
                     <a href="terms.html">TERMS</a>
-                    <a href="sitemap.html">SITEMAP</a>
+                    <a href="sitemap.xml">SITEMAP</a>
                 </div>
             </div>
         </div>

@@ -328,11 +328,11 @@ class CheckoutManager {
                 }
             };
 
-            console.log('📤 Placing Order:', orderData);
+            // console.log('📤 Placing Order:', orderData);
             const response = await window.api.createOrder(orderData);
 
             if (response.success) {
-                console.log('✅ Order Created:', response.data);
+                console.log('✅ Order Created');
 
                 // Clear Cart
                 localStorage.removeItem('cart');

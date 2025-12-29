@@ -164,12 +164,10 @@ class SneakersAPI {
 
       if (this.token) {
         config.headers['Authorization'] = `Bearer ${this.token}`;
-        console.log('🔑 Token enviado en request:', this.token.substring(0, 20) + '...');
       }
 
       try {
         window.pageProgress?.begin?.();
-        console.log('📤 Request a:', url);
 
         let response;
         try {
@@ -180,7 +178,7 @@ class SneakersAPI {
           throw netError;
         }
 
-        console.log('📥 Response status:', response.status);
+        // console.log('📥 Response status:', response.status);
 
         const parseResponse = async (resp) => {
           let data = {};
@@ -220,14 +218,11 @@ class SneakersAPI {
 
   // Guardar token
   setToken(token) {
-    console.log('🔑 API.setToken() - Token:', token ? token.substring(0, 20) + '...' : 'null');
     this.token = token;
     if (token) {
       localStorage.setItem('auth_token', token);
-      console.log('💾 Token guardado en localStorage');
     } else {
       localStorage.removeItem('auth_token');
-      console.log('🧹 Token eliminado de localStorage');
     }
   }
 

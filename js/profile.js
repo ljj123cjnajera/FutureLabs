@@ -1,109 +1,12 @@
 // PROFILE ENGINE V3 (Brutalist)
-console.log('⚫ [PROFILE] Brutalist Engine Loaded');
+// PROFILE ENGINE V3 (Brutalist)
 
-document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Init Header
-    if (document.getElementById('mainHeader') && window.Components) {
-        document.getElementById('mainHeader').innerHTML = window.Components.getHeader(true, true);
-        window.Components.initHeader();
-        window.Components.initCartCounter();
-    }
 
-    // 2. Auth Check
-    if (window.authManager && !window.authManager.isAuthenticated()) {
-        window.location.href = 'index.html';
-        return;
-    }
-
-    // 3. Load Data
-    await loadProfileData();
-    await loadOrders();
-    await loadLoyaltyData();
-    await loadAddresses();
-});
 
 // --- CORE FUNCTIONS ---
-async function loadLoyaltyData() {
-    const balanceEl = document.getElementById('loyaltyBalance');
-    const lifetimeEl = document.getElementById('loyaltyLifetime'); // Assuming API sends this or we calculate
-    const historyContainer = document.getElementById('loyaltyHistory');
 
-    if (!balanceEl) return;
 
-    try {
-        // 1. Get Points
-        const pointsRes = await window.api.getLoyaltyPoints();
-        const currentPoints = pointsRes.data?.points || 0;
 
-        balanceEl.textContent = `${currentPoints} PTS`;
-        // For now, mirroring balance as lifetime if API doesn't separate them, or 0 if not available
-        lifetimeEl.textContent = `${currentPoints} PTS`;
-
-        // 2. Get History
-        const historyRes = await window.api.getLoyaltyTransactions();
-        const transactions = historyRes.data?.transactions || [];
-
-        if (transactions.length === 0) {
-            historyContainer.innerHTML = `
-                <div style="padding: 2rem; border: 2px dashed var(--gray-400); text-align: center;">
-                    NO POINTS HISTORY FOUND.<br>
-                    <small>Start shopping to earn rewards.</small>
-                </div>`;
-            return;
-        }
-
-        historyContainer.innerHTML = transactions.map(t => {
-            const isEarned = t.type === 'earned';
-            const color = isEarned ? 'var(--highlight)' : 'var(--gray-300)';
-            const icon = isEarned ? 'fa-arrow-down' : 'fa-arrow-up';
-
-            return `
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-bottom: 1px solid var(--gray-300); background: var(--white);">
-                <div style="display: flex; align-items: center; gap: 1rem;">
-                    <div style="background: ${color}; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--black);">
-                        <i class="fas ${icon}"></i>
-                    </div>
-                    <div>
-                        <div style="font-weight: 800; font-size: 0.9rem; text-transform: uppercase;">${t.description}</div>
-                        <div style="font-size: 0.8rem; color: var(--gray-600);">${new Date(t.created_at).toLocaleDateString()}</div>
-                    </div>
-                </div>
-                <div style="font-weight: 900; font-size: 1.2rem; color: ${isEarned ? 'var(--black)' : 'var(--gray-500)'};">
-                    ${isEarned ? '+' : '-'}${t.points_change}
-                </div>
-            </div>`;
-        }).join('');
-
-    } catch (e) {
-        console.warn('Loyalty Fetch Error:', e);
-        if (historyContainer) {
-            historyContainer.innerHTML = `<div style="padding: 1rem; background: #ffebee; color: #c62828;">Authentication Error or System Offline</div>`;
-        }
-    }
-}
-
-async function loadProfileData() {
-    try {
-        const user = window.authManager.currentUser || (await window.api.getProfile()).data.user;
-
-        if (user) {
-            // Sidebar Info
-            setIdText('profileName', `${user.first_name} ${user.last_name}`);
-            setIdText('profileEmail', user.email);
-
-            // Dashboard Stats
-            // (Mocking stats if API doesn't provide them directly in user object)
-            // In a real app, these might come from a specific dashboard endpoint
-            setIdText('loyaltyPointsValue', user.points || 0);
-
-            // Settings Form
-            setIdValue('firstName', `${user.first_name} ${user.last_name}`); // Just mapping one field for now
-            setIdValue('email', user.email);
-        }
-    } catch (e) {
-        console.error('Profile Load Error:', e);
-    }
-}
 
 async function loadOrders() {
     const container = document.getElementById('ordersList');
@@ -399,23 +302,18 @@ function animateCounter(element, endValue, options = {}) {
 
 // Esperar a que todo se cargue
 document.addEventListener('DOMContentLoaded', async function () {
-    console.log('🔵 [PROFILE] DOMContentLoaded ejecutado');
 
     // Inicializar header y footer
     const headerContainer = document.getElementById('mainHeader');
     const footerContainer = document.getElementById('mainFooter');
 
-    console.log('🔵 [PROFILE] headerContainer:', headerContainer);
-    console.log('🔵 [PROFILE] window.Components:', window.Components);
+    const footerContainer = document.getElementById('mainFooter');
 
     if (headerContainer && window.Components) {
-        console.log('🔵 [PROFILE] Renderizando header...');
         headerContainer.innerHTML = window.Components.getHeader(true, true);
-        console.log('🔵 [PROFILE] Header renderizado, llamando initHeader()...');
         window.Components.initHeader();
         window.Components.initSearch();
         window.Components.initCartCounter();
-        console.log('🔵 [PROFILE] initHeader() ejecutado');
     }
 
     if (footerContainer && window.Components) {
@@ -430,11 +328,9 @@ document.addEventListener('DOMContentLoaded', async function () {
         retries++;
         if (window.authManager && window.authManager.isAuthenticated()) {
             clearInterval(checkAuth);
-            console.log('✅ Usuario autenticado, cargando perfil');
             initializeProfile();
         } else if (retries >= maxRetries) {
             clearInterval(checkAuth);
-            console.log('❌ Usuario no autenticado, redirigiendo');
             window.location.href = 'index.html';
         }
     }, 200);
@@ -513,6 +409,8 @@ function switchTab(tabId) {
         loadLoyaltyTransactions();
     } else if (tabId === 'wishlist') {
         loadWishlist();
+    } else if (tabId === 'orders') {
+        loadOrders();
     }
 }
 
@@ -522,6 +420,7 @@ async function initializeProfile() {
         loadUserData(),
         loadStats(),
         loadAddresses(),
+        loadOrders(),
         loadLoyaltyPoints()
     ]);
 }
