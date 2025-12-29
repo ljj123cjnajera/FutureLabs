@@ -101,7 +101,6 @@ class Components {
             </div>
         </div>
       </footer>
-      </footer>
     `;
   }
 

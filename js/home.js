@@ -83,26 +83,32 @@ class HomeEngine {
 
   async init() {
     try {
-      console.log('🚀 HomeEngine Starting...');
 
       // 1. CRITICAL: Inject Standard Header FIRST (matches products.html)
+      // Check if we have the placeholder ID
+      const headerPlaceholder = document.getElementById('mainHeader');
+
+      // If header is already injected (contains class header-v3), skip injection
+      const alreadyInjected = document.querySelector('header.header-v3');
+
       if (window.Components && window.Components.getHeader) {
-        const headerEl = document.getElementById('mainHeader');
-        if (headerEl) {
-          // Use outerHTML/replaceWith to prevent <header><header> nesting
+        if (headerPlaceholder && !alreadyInjected) {
           const newHeaderHTML = window.Components.getHeader(true, true);
+          // Create a temp container to parse the string
           const tempDiv = document.createElement('div');
           tempDiv.innerHTML = newHeaderHTML;
 
-          if (tempDiv.firstElementChild) {
-            tempDiv.firstElementChild.id = 'mainHeader'; // Keep ID for references
-            headerEl.replaceWith(tempDiv.firstElementChild);
+          // The first child is the <header class="header-v3"> element
+          const newHeaderEl = tempDiv.firstElementChild;
+          if (newHeaderEl) {
+            newHeaderEl.id = 'mainHeader'; // Preserve ID for CSS hooks
+            headerPlaceholder.replaceWith(newHeaderEl);
           }
+        }
 
-          // Initialize Header Logic
-          if (window.Components.initHeader) {
-            window.Components.initHeader();
-          }
+        // Initialize Header Logic (Always run this)
+        if (window.Components.initHeader) {
+          window.Components.initHeader();
         }
       }
 
@@ -110,7 +116,6 @@ class HomeEngine {
       if (window.Components && window.Components.getFooter) {
         const footerEl = document.getElementById('mainFooter');
         if (footerEl) {
-          console.log('🦶 Injecting Brutalist Footer...');
           footerEl.innerHTML = window.Components.getFooter();
         }
       }
@@ -133,9 +138,7 @@ class HomeEngine {
       this.initHypeFeatures();
       this.initScrollAnimations();
       this.initStickyFooter();
-      this.initTabbedEngine(); // 🚀 New Flagship Feature
-
-      console.log('🚀 [HomeEngine] V3.1 Initialized (Defensive Mode).');
+      this.initTabbedEngine();
     } catch (err) {
       console.error('⚠️ [HomeEngine] Partial Load Error:', err);
       // Ensure loader is removed even if error occurs
@@ -281,15 +284,20 @@ class HomeEngine {
   }
 
   setupScrollReveals() {
-    const targets = document.querySelectorAll('.section, .hero, .home-section-card, .brand-card');
+    const targets = document.querySelectorAll('.section, .hero-section, .home-section-card, .brand-card');
+
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
+          // Add a small delay based on index if possible for staggered effect
           entry.target.classList.add('visible');
           observer.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.1 });
+    }, {
+      threshold: 0.15, // Slightly higher to ensure user sees the element before animating
+      rootMargin: '0px 0px -50px 0px' // Trigget slightly before bottom
+    });
 
     targets.forEach(target => {
       target.classList.add('reveal-on-scroll');
@@ -330,6 +338,7 @@ class HomeEngine {
     }
 
     this.startSliderAutoPlay(slides.length);
+    this.setupHeroTouch(container, slides.length);
   }
 
   startSliderAutoPlay(count) {
@@ -346,6 +355,34 @@ class HomeEngine {
     const dots = document.querySelectorAll('.slider-dot');
     slides.forEach((s, i) => s.classList.toggle('active', i === index));
     dots.forEach((d, i) => d.classList.toggle('active', i === index));
+  }
+
+  setupHeroTouch(container, count) {
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    container.addEventListener('touchstart', e => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    container.addEventListener('touchend', e => {
+      touchEndX = e.changedTouches[0].screenX;
+      this.handleSwipe(count);
+    }, { passive: true });
+
+    this.handleSwipe = (count) => {
+      const threshold = 50;
+      if (touchEndX < touchStartX - threshold) {
+        // Swipe Left -> Next
+        const current = Array.from(document.querySelectorAll('.slide')).findIndex(s => s.classList.contains('active'));
+        this.goToSlide((current + 1) % count);
+      }
+      if (touchEndX > touchStartX + threshold) {
+        // Swipe Right -> Prev
+        const current = Array.from(document.querySelectorAll('.slide')).findIndex(s => s.classList.contains('active'));
+        this.goToSlide((current - 1 + count) % count);
+      }
+    };
   }
 
   // ==========================================
@@ -530,8 +567,8 @@ class HomeEngine {
     const container = document.querySelector('.journal-grid');
     if (!container) return;
 
-    // Fallback Data
-    const posts = [
+    // Default Fallback Data (Premium)
+    const fallbackPosts = [
       {
         category: 'RELEASE',
         title: 'El fin de una era: Yeezy vs Adidas',
@@ -558,11 +595,36 @@ class HomeEngine {
       }
     ];
 
-    // Check if static content exists, if so, replace it to ensure dynamic features
+    let posts = [];
+
+    // 1. Try API
+    if (this.api && this.api.getRecentBlogPosts) {
+      try {
+        const res = await this.api.getRecentBlogPosts(3);
+        if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+          posts = res.data.map(p => ({
+            category: p.category || 'NEWS',
+            title: p.title,
+            desc: p.excerpt || p.content.substring(0, 100) + '...',
+            img: p.image_url || 'img/placeholder-journal.jpg',
+            time: `${Math.ceil((p.content?.length || 1000) / 1000)} MIN READ`,
+            url: `blog-post.html?slug=${p.slug}`
+          }));
+        }
+      } catch (e) {
+        // Silent fail to fallback
+      }
+    }
+
+    // 2. Use Fallback if needed
+    if (posts.length === 0) {
+      posts = fallbackPosts;
+    }
+
     container.innerHTML = posts.map(post => `
         <article class="journal-card" onclick="window.location.href='${post.url}'">
             <div class="journal-image">
-                <img src="${post.img}" alt="${post.title}">
+                <img src="${post.img}" alt="${post.title}" loading="lazy">
                 <span class="read-time-badge"><i class="far fa-clock"></i> ${post.time}</span>
             </div>
             <div class="journal-content">

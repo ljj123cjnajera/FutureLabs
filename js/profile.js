@@ -808,15 +808,14 @@ document.getElementById('changePasswordForm').addEventListener('submit', async f
 });
 
 // Gestión de direcciones
-function openAddressModal(addressId = null) {
+async function openAddressModal(addressId = null) {
     const modal = document.getElementById('addressModal');
     const form = document.getElementById('addressForm');
     const title = document.getElementById('addressModalTitle');
 
     if (addressId) {
         title.textContent = 'Editar Dirección';
-        // Cargar datos de la dirección
-        // TODO: Implementar carga de datos
+        // Datos cargados asíncronamente por editAddress()
     } else {
         title.textContent = 'Nueva Dirección';
         form.reset();
@@ -866,9 +865,29 @@ document.getElementById('addressForm').addEventListener('submit', async function
     }
 });
 
-function editAddress(addressId) {
+async function editAddress(addressId) {
     openAddressModal(addressId);
-    // TODO: Cargar datos de la dirección
+    // Cargar datos de la dirección
+    try {
+        const response = await window.api.getAddress(addressId);
+        if (response.success && response.data) {
+            const addr = response.data;
+            document.getElementById('addressId').value = addr.id;
+            document.getElementById('addressType').value = addr.type;
+            document.getElementById('addressStreet').value = addr.street;
+            document.getElementById('addressCity').value = addr.city;
+            document.getElementById('addressRegion').value = addr.region || '';
+            document.getElementById('addressPostalCode').value = addr.postal_code || '';
+            document.getElementById('addressCountry').value = addr.country || 'Perú';
+            document.getElementById('addressIsDefault').checked = addr.is_default;
+        } else {
+            console.error('Error fetching address:', response.message);
+            window.notifications.error('No se pudo cargar la dirección.');
+        }
+    } catch (error) {
+        console.error('Error loading address details:', error);
+        window.notifications.error('Error de conexión al cargar dirección.');
+    }
 }
 
 async function deleteAddress(addressId) {

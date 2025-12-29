@@ -140,9 +140,6 @@ class SneakersAPI {
 
   // Helper para hacer requests
   async request(endpoint, options = {}) {
-    // 🛡️ MOCK MODE DISABLED (User Request: Connect to Real Backend)
-    // const isDemo = window.location.hostname.includes('github.io');
-
     // Override: Always use Real Backend
     const method = options.method ? options.method.toUpperCase() : 'GET';
     let effectiveEndpoint = endpoint;
