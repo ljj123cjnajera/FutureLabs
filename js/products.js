@@ -8,18 +8,8 @@ class CatalogEngine {
         this.api = window.api;
         this.allProducts = []; // Store for client-side filtering (perf optimization)
 
-        // 🛡️ MOCK DATA FORTRESS
-        this.fallbackProducts = [
-            { id: 201, name: 'Air Jordan 1 High "Chicago"', brand: 'Jordan', price: 1200.00, image_url: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&q=80&w=800', badge: 'GRAIL' },
-            { id: 202, name: 'Yeezy Boost 350 "Onyx"', brand: 'Yeezy', price: 950.00, image_url: 'https://images.unsplash.com/photo-1584735175315-9d5df23860e6?auto=format&fit=crop&q=80&w=800', badge: 'NEW' },
-            { id: 203, name: 'Nike Dunk Low SB', brand: 'Nike', price: 450.00, image_url: 'https://images.unsplash.com/photo-1575537302964-96cd47c06b1b?auto=format&fit=crop&q=80&w=800' },
-            { id: 204, name: 'New Balance 2002R', brand: 'New Balance', price: 600.00, image_url: 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&q=80&w=800' },
-            { id: 205, name: 'Adidas Samba OG', brand: 'Adidas', price: 380.00, image_url: 'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?auto=format&fit=crop&q=80&w=800' },
-            { id: 206, name: 'Jordan 4 Retro "Military Black"', brand: 'Jordan', price: 1100.00, image_url: 'https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?auto=format&fit=crop&q=80&w=800' },
-            { id: 207, name: 'Nike Air Max 1', brand: 'Nike', price: 550.00, image_url: 'https://images.unsplash.com/photo-1514989940723-e8875ea6ab7d?auto=format&fit=crop&q=80&w=800' },
-            { id: 208, name: 'Rick Owens Ramones', brand: 'Rick Owens', price: 2500.00, image_url: 'https://images.unsplash.com/photo-1620332302351-8ca260e35730?auto=format&fit=crop&q=80&w=800', badge: 'LUXURY' }
-        ];
-
+        this.api = window.api;
+        this.allProducts = []; // Store for client-side filtering (perf optimization)
         this.init();
     }
 
@@ -96,12 +86,13 @@ class CatalogEngine {
             if (response && response.length > 0) {
                 this.allProducts = response;
             } else {
-                throw new Error('API Empty');
+                // API Empty implies strict empty state
+                this.allProducts = [];
             }
         } catch (e) {
-            console.warn('⚠️ [CatalogEngine] Using Fallback Data', e);
-            // Multiply fallback data to fill grid
-            this.allProducts = [...this.fallbackProducts, ...this.fallbackProducts];
+            console.error('⚠️ [CatalogEngine] API Failed', e);
+            this.allProducts = [];
+            if (window.notifications) window.notifications.error('Connection Failed', 'Could not load products.');
         }
 
         this.render(this.allProducts);
@@ -113,6 +104,17 @@ class CatalogEngine {
         if (!container) return;
 
         // Use Global Standard Card Generator
+        if (products.length === 0) {
+            container.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; border: 2px dashed var(--gray-300);">
+                    <i class="fas fa-box-open" style="font-size: 3rem; color: var(--gray-400); margin-bottom: 1rem;"></i>
+                    <h2 class="text-2xl font-black uppercase mb-2">NO PRODUCTS FOUND</h2>
+                    <p class="text-gray-600">Check back later for new drops.</p>
+                </div>
+             `;
+            return;
+        }
+
         if (window.Components && window.Components.getProductCard) {
             container.innerHTML = products.map(p => window.Components.getProductCard(p)).join('');
         } else {
