@@ -695,6 +695,165 @@ class AdminCRUD {
     this.formsSetup = true;
   }
 
+  // 💾 SAVE METHODS
+  async saveProduct() {
+    if (this.isLoading) return;
+    this.isLoading = true;
+
+    const submitBtn = document.querySelector('#productForm button[type="submit"]');
+    const originalBtnText = submitBtn ? submitBtn.innerHTML : 'Guardar';
+    if (submitBtn) {
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+      submitBtn.disabled = true;
+    }
+
+    try {
+      // 1. Collect Data
+      const data = {
+        name: document.getElementById('productName').value,
+        slug: document.getElementById('productSlug').value,
+        description: document.getElementById('productDescription').value,
+        price: parseFloat(document.getElementById('productPrice').value),
+        discount_price: document.getElementById('productDiscountPrice').value ? parseFloat(document.getElementById('productDiscountPrice').value) : null,
+        stock_quantity: parseInt(document.getElementById('productStock').value),
+        category_id: document.getElementById('productCategory').value,
+        brand: document.getElementById('productBrand').value,
+        sku: document.getElementById('productSKU').value,
+        image_url: document.getElementById('productImage').value,
+        weight: document.getElementById('productWeight') ? parseFloat(document.getElementById('productWeight').value) : null,
+        dimensions: document.getElementById('productDimensions') ? document.getElementById('productDimensions').value : null,
+        is_active: document.getElementById('productIsActive').checked
+      };
+
+      // 2. Handle Image Upload
+      const fileInput = document.getElementById('productImageFile');
+      if (fileInput && fileInput.files.length > 0) {
+        try {
+          const uploadRes = await window.api.uploadImage(fileInput.files[0]);
+          if (uploadRes.success || uploadRes.url) {
+            data.image_url = uploadRes.url || uploadRes.data.url;
+          }
+        } catch (e) {
+          console.error("Image upload failed", e);
+          window.notifications?.warning('Error subiendo imagen, continuando con URL texto...');
+        }
+      }
+
+      // 3. Send Request
+      let response;
+      if (this.currentEditId) {
+        response = await window.api.request(`/admin/products/${this.currentEditId}`, { method: 'PUT', body: JSON.stringify(data) });
+      } else {
+        response = await window.api.request('/admin/products', { method: 'POST', body: JSON.stringify(data) });
+      }
+
+      // 4. Handle Result
+      if (response.success) {
+        window.notifications?.success(this.currentEditId ? 'Producto actualizado' : 'Producto creado');
+        this.closeModal(document.getElementById('productModal'));
+        if (window.adminManager) window.adminManager.loadProducts();
+      } else {
+        throw new Error(response.message || 'Error al guardar');
+      }
+    } catch (error) {
+      console.error('Save Product Error:', error);
+      window.notifications?.error(error.message || 'Error al guardar producto');
+    } finally {
+      this.isLoading = false;
+      if (submitBtn) {
+        submitBtn.innerHTML = originalBtnText;
+        submitBtn.disabled = false;
+      }
+    }
+  }
+
+  async saveCategory() {
+    if (this.isLoading) return;
+    this.isLoading = true;
+    const form = document.getElementById('categoryForm');
+
+    try {
+      const data = {
+        name: document.getElementById('categoryName').value,
+        slug: document.getElementById('categorySlug').value,
+        description: document.getElementById('categoryDescription').value,
+        image_url: document.getElementById('categoryImage').value,
+        is_active: document.getElementById('categoryIsActive').checked
+      };
+
+      const endpoint = this.currentEditId ? `/admin/categories/${this.currentEditId}` : '/admin/categories';
+      const method = this.currentEditId ? 'PUT' : 'POST';
+
+      const response = await window.api.request(endpoint, { method, body: JSON.stringify(data) });
+
+      if (response.success) {
+        window.notifications?.success('Categoría guardada exitosamente');
+        this.closeModal(document.getElementById('categoryModal'));
+        if (window.adminManager) window.adminManager.loadCategories();
+      } else {
+        throw new Error(response.message || 'Error al guardar categoría');
+      }
+    } catch (error) {
+      window.notifications?.error(error.message);
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  async saveUser() {
+    if (this.isLoading) return;
+    this.isLoading = true;
+    try {
+      const data = {
+        name: document.getElementById('userName').value,
+        email: document.getElementById('userEmail').value,
+        role: document.getElementById('userRole').value,
+        // Password only if provided (handling in backend)
+      };
+      const pwd = document.getElementById('userPassword').value;
+      if (pwd) data.password = pwd;
+
+      const endpoint = `/admin/users/${this.currentEditId}`; // Usually only edit supported for users in this panel?
+      // If create is supported, logic would be similar to products
+
+      const response = await window.api.request(endpoint, { method: 'PUT', body: JSON.stringify(data) });
+
+      if (response.success) {
+        window.notifications?.success('Usuario actualizado');
+        this.closeModal(document.getElementById('userModal'));
+        if (window.adminManager) window.adminManager.loadUsers();
+      } else {
+        throw new Error(response.message);
+      }
+    } catch (e) {
+      window.notifications?.error(e.message);
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  async saveReview() {
+    if (this.isLoading) return;
+    this.isLoading = true;
+    try {
+      const data = {
+        rating: parseInt(document.getElementById('reviewRating').value),
+        title: document.getElementById('reviewTitle').value,
+        comment: document.getElementById('reviewComment').value,
+        status: document.getElementById('reviewStatus').value
+      };
+      const response = await window.api.request(`/admin/reviews/${this.currentEditId}`, { method: 'PUT', body: JSON.stringify(data) });
+      if (response.success) {
+        window.notifications?.success('Reseña actualizada');
+        this.closeModal(document.getElementById('reviewModal'));
+        if (window.adminManager) window.adminManager.loadReviews();
+      } else {
+        throw new Error(response.message);
+      }
+    } catch (e) { window.notifications?.error(e.message); }
+    finally { this.isLoading = false; }
+  }
+
   // ===== PRODUCTS =====
   async loadProductForEdit(id, options = {}) {
     try {
