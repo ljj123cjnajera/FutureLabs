@@ -187,7 +187,7 @@ class Components {
                 ${showSearch ? `
                 <div class="header-search desktop-only">
                     <div class="search-input-wrapper" onclick="window.SearchOverlay.open()">
-                        <input type="text" placeholder="SEARCH DROPS..." readonly style="cursor: pointer;">
+                        <input type="text" id="headerSearchInput" name="q" placeholder="SEARCH DROPS..." readonly style="cursor: pointer;">
                         <button class="search-icon-btn"><i class="fas fa-search"></i></button>
                     </div>
                 </div>

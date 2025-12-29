@@ -79,7 +79,7 @@ class HomeEngine {
     };
 
     this.init();
-    console.log('🚀 HomeEngine v7.1-HOTFIX Loaded');
+    console.log('🚀 HomeEngine v7.2-STABLE Loaded');
   }
 
   async init() {
@@ -541,6 +541,7 @@ class HomeEngine {
     if (!marqueeTrack) return;
 
     // SVG Logos (White, High Quality)
+    // Using verified Wikipedia URLs
     const brands = [
       { name: 'NIKE', src: 'https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg' },
       { name: 'JORDAN', src: 'https://upload.wikimedia.org/wikipedia/en/3/37/Jumpman_logo.svg' },
@@ -549,14 +550,16 @@ class HomeEngine {
       { name: 'NEW BALANCE', src: 'https://upload.wikimedia.org/wikipedia/commons/e/ea/New_Balance_logo.svg' },
       { name: 'OFF-WHITE', src: 'https://upload.wikimedia.org/wikipedia/commons/1/19/Off-white_logo.svg' },
       { name: 'SUPREME', src: 'https://upload.wikimedia.org/wikipedia/commons/2/28/Supreme_Logo.svg' },
-      { name: 'NIKE', src: 'https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg' }, // Repeat for loop
-      { name: 'JORDAN', src: 'https://upload.wikimedia.org/wikipedia/en/3/37/Jumpman_logo.svg' }
+      // Duplicates for infinite scroll
+      { name: 'NIKE', src: 'https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg' },
+      { name: 'JORDAN', src: 'https://upload.wikimedia.org/wikipedia/en/3/37/Jumpman_logo.svg' },
+      { name: 'ADIDAS', src: 'https://upload.wikimedia.org/wikipedia/commons/2/20/Adidas_Logo.svg' }
     ];
 
     // Clear text placeholders
     marqueeTrack.innerHTML = brands.map(b => `
         <div class="brand-item svg-mode">
-            <img src="${b.src}" alt="${b.name}" loading="lazy">
+            <img src="${b.src}" alt="${b.name}" loading="lazy" width="80" height="40" style="object-fit: contain; filter: brightness(0) invert(1);">
         </div>
     `).join('');
   }
