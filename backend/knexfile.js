@@ -31,7 +31,7 @@ module.exports = {
   production: {
     client: 'postgresql',
     // Always parse DATABASE_URL to add SSL options
-    connection: (function() {
+    connection: (function () {
       // If DATABASE_URL is present, parse it and add SSL
       if (process.env.DATABASE_URL) {
         const { URL } = require('url');
@@ -67,8 +67,13 @@ module.exports = {
       directory: './database/seeds'
     },
     pool: {
-      min: 2,
-      max: 10
+      min: 0,
+      max: 4,
+      acquireTimeoutMillis: 60000,
+      createTimeoutMillis: 30000,
+      idleTimeoutMillis: 30000,
+      reapIntervalMillis: 1000,
+      propagateCreateError: false
     }
   }
 };
