@@ -194,10 +194,19 @@ class HomeEngine {
       }
     }
 
-    // 2. Fallback (Minimal Safe Mode only if API completely dies)
+    // 2. Fallback (System Status Mode)
     if (slides.length === 0) {
-      // Show empty state or safe default
-      container.innerHTML = `<div class="slide active"><div class="slide-content"><h1>SNEAKERS SHOP</h1><p>Welcome to the future.</p></div></div>`;
+      container.innerHTML = `
+        <div class="slide active" style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('assets/images/banners/hero-banner.jpg');">
+            <div class="slide-content">
+                <span class="slide-eyebrow" style="color: var(--error);">SYSTEM_STATUS: OFFLINE</span>
+                <h1>SNEAKERS<span class="highlight">SHOP</span></h1>
+                <p>UNABLE TO RETRIEVE ACTIVE DROPS. CHECK YOUR CONNECTION.</p>
+                <button onclick="window.location.reload()" class="btn btn-outline-white">
+                    <i class="fas fa-sync"></i> RETRY_CONNECTION
+                </button>
+            </div>
+        </div>`;
       return;
     }
 
@@ -290,10 +299,13 @@ class HomeEngine {
 
     // 2. No Fallback?
     if (categories.length === 0) {
-      // If API fails, maybe we show nothing or a retry button?
-      // User wants cleanliness. Empty is cleaner than broken.
-      // But let's at least show some structure or a skeleton.
-      container.innerHTML = `<p class="text-center py-5">Connecting to Sneakers API...</p>`;
+      container.innerHTML = `
+        <div class="text-center py-5" style="border: 2px dashed var(--black); margin: 2rem 0;">
+            <i class="fas fa-plug fa-3x mb-3" style="color: var(--gray);"></i>
+            <h3>CATALOG DATA UNAVAILABLE</h3>
+            <p>Accessing local backup node...</p>
+            <button onclick="window.location.reload()" class="btn btn-sm btn-black mt-3">RECONNECT</button>
+        </div>`;
       return;
     }
 
