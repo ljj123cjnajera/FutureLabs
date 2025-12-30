@@ -48,8 +48,8 @@ class ChatWidget {
             <style>
                 .chat-widget {
                     position: fixed;
-                    bottom: 90px; /* Elevated to clear Sticky Footer */
-                    right: 20px;
+                    bottom: 100px; /* Elevated further to strictly clear Sticky Footer & Close Button */
+                    right: 25px;
                     z-index: 10000; /* Ensure above footer */
                     font-family: 'Courier New', monospace;
                 }

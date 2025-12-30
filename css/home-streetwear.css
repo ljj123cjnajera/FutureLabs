@@ -30,6 +30,8 @@ html,
 body {
     margin: 0 !important;
     padding: 0 !important;
+    padding-bottom: 80px !important;
+    /* Prevent Sticky Footer from covering content */
     overflow-x: hidden;
     width: 100%;
 }
@@ -1345,21 +1347,26 @@ footer .copyright {
 }
 
 .close-sticky {
-    background: transparent;
+    background: rgba(0, 0, 0, 0.2);
     border: none;
     color: var(--white);
-    font-size: 1.5rem;
-    font-weight: 300;
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    /* Slight rounded corners for UI element */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
     cursor: pointer;
-    padding: 0 15px;
-    margin-left: 10px;
-    opacity: 0.8;
-    transition: opacity 0.2s;
+    margin-left: 15px;
+    transition: all 0.2s;
 }
 
 .close-sticky:hover {
-    opacity: 1;
-    color: var(--black);
+    background: var(--black);
+    color: var(--white);
+    transform: rotate(90deg);
 }
 
 @media (max-width: 768px) {
