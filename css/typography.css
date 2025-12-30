@@ -11,20 +11,44 @@
     /* Familias de Fuentes */
     --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
     --font-heading: 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    --font-heading: 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
     --font-mono: 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
-    
+
+    /* Colors (Visual Rescue Phase 186) */
+    --accent: #ff4400;
+    /* High Energy Orange/Red */
+    --black: #000000;
+    --white: #ffffff;
+    --gray-100: #f3f4f6;
+    --gray-600: #4b5563;
+    --gray-900: #111827;
+    --text: #1f2937;
+    --primary: var(--black);
+    --secondary: var(--gray-600);
+    --error: #ef4444;
+
     /* Tamaños de Fuente */
-    --font-size-xs: 0.75rem;      /* 12px */
-    --font-size-sm: 0.875rem;     /* 14px */
-    --font-size-base: 1rem;       /* 16px */
-    --font-size-lg: 1.125rem;     /* 18px */
-    --font-size-xl: 1.25rem;      /* 20px */
-    --font-size-2xl: 1.5rem;      /* 24px */
-    --font-size-3xl: 1.875rem;    /* 30px */
-    --font-size-4xl: 2.25rem;     /* 36px */
-    --font-size-5xl: 3rem;        /* 48px */
-    --font-size-6xl: 3.75rem;     /* 60px */
-    
+    --font-size-xs: 0.75rem;
+    /* 12px */
+    --font-size-sm: 0.875rem;
+    /* 14px */
+    --font-size-base: 1rem;
+    /* 16px */
+    --font-size-lg: 1.125rem;
+    /* 18px */
+    --font-size-xl: 1.25rem;
+    /* 20px */
+    --font-size-2xl: 1.5rem;
+    /* 24px */
+    --font-size-3xl: 1.875rem;
+    /* 30px */
+    --font-size-4xl: 2.25rem;
+    /* 36px */
+    --font-size-5xl: 3rem;
+    /* 48px */
+    --font-size-6xl: 3.75rem;
+    /* 60px */
+
     /* Pesos de Fuente */
     --font-weight-light: 300;
     --font-weight-normal: 400;
@@ -33,14 +57,14 @@
     --font-weight-bold: 700;
     --font-weight-extrabold: 800;
     --font-weight-black: 900;
-    
+
     /* Altura de Línea */
     --line-height-tight: 1.25;
     --line-height-snug: 1.375;
     --line-height-normal: 1.5;
     --line-height-relaxed: 1.625;
     --line-height-loose: 2;
-    
+
     /* Espaciado de Letras */
     --letter-spacing-tighter: -0.05em;
     --letter-spacing-tight: -0.025em;
@@ -59,10 +83,17 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    padding-bottom: 60px;
+    /* Space for Sticky Footer */
 }
 
 /* Títulos */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     font-family: var(--font-heading);
     font-weight: var(--font-weight-bold);
     line-height: var(--line-height-tight);
@@ -124,7 +155,8 @@ a:hover {
 }
 
 /* Listas */
-ul, ol {
+ul,
+ol {
     margin-bottom: var(--spacing-md);
     padding-left: var(--spacing-xl);
 }
@@ -217,23 +249,65 @@ small {
     text-align: justify;
 }
 
-.font-light { font-weight: var(--font-weight-light); }
-.font-normal { font-weight: var(--font-weight-normal); }
-.font-medium { font-weight: var(--font-weight-medium); }
-.font-semibold { font-weight: var(--font-weight-semibold); }
-.font-bold { font-weight: var(--font-weight-bold); }
-.font-extrabold { font-weight: var(--font-weight-extrabold); }
-.font-black { font-weight: var(--font-weight-black); }
+.font-light {
+    font-weight: var(--font-weight-light);
+}
 
-.leading-tight { line-height: var(--line-height-tight); }
-.leading-normal { line-height: var(--line-height-normal); }
-.leading-relaxed { line-height: var(--line-height-relaxed); }
-.leading-loose { line-height: var(--line-height-loose); }
+.font-normal {
+    font-weight: var(--font-weight-normal);
+}
 
-.tracking-tight { letter-spacing: var(--letter-spacing-tight); }
-.tracking-normal { letter-spacing: var(--letter-spacing-normal); }
-.tracking-wide { letter-spacing: var(--letter-spacing-wide); }
-.tracking-wider { letter-spacing: var(--letter-spacing-wider); }
+.font-medium {
+    font-weight: var(--font-weight-medium);
+}
+
+.font-semibold {
+    font-weight: var(--font-weight-semibold);
+}
+
+.font-bold {
+    font-weight: var(--font-weight-bold);
+}
+
+.font-extrabold {
+    font-weight: var(--font-weight-extrabold);
+}
+
+.font-black {
+    font-weight: var(--font-weight-black);
+}
+
+.leading-tight {
+    line-height: var(--line-height-tight);
+}
+
+.leading-normal {
+    line-height: var(--line-height-normal);
+}
+
+.leading-relaxed {
+    line-height: var(--line-height-relaxed);
+}
+
+.leading-loose {
+    line-height: var(--line-height-loose);
+}
+
+.tracking-tight {
+    letter-spacing: var(--letter-spacing-tight);
+}
+
+.tracking-normal {
+    letter-spacing: var(--letter-spacing-normal);
+}
+
+.tracking-wide {
+    letter-spacing: var(--letter-spacing-wide);
+}
+
+.tracking-wider {
+    letter-spacing: var(--letter-spacing-wider);
+}
 
 /* Texto con Gradiente */
 .text-gradient {

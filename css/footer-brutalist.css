@@ -13,9 +13,10 @@
 
 .footer-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr 2fr;
-    gap: 4rem;
-    margin-bottom: 4rem;
+    grid-template-columns: 1.5fr 1fr 1fr 1.5fr;
+    /* More balanced */
+    gap: 2rem;
+    margin-bottom: 3rem;
 }
 
 .footer-logo {
