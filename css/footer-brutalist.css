@@ -100,41 +100,60 @@
 
 .footer .input-group {
     display: flex;
-    border: 2px solid var(--white);
+    border: 3px solid var(--white);
+    position: relative;
+    background: var(--black);
 }
 
 .footer input {
     background: transparent;
     border: none;
     color: var(--white);
-    padding: 12px;
+    padding: 16px;
     width: 100%;
     font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
     outline: none;
+    text-transform: uppercase;
+}
+
+.footer input::placeholder {
+    color: #666;
+    text-transform: uppercase;
 }
 
 .footer button {
     background: var(--white);
     color: var(--black);
     border: none;
-    padding: 0 20px;
-    font-weight: 800;
+    padding: 0 25px;
+    font-weight: 900;
+    font-size: 1.2rem;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.2s;
+    border-left: 3px solid var(--black);
+    /* Visual separator if needed, but border is on group */
 }
 
 .footer button:hover {
     background: var(--accent);
+    color: var(--white);
 }
 
 .footer-bottom {
-    border-top: 2px solid #333;
+    border-top: 3px solid #333;
     padding-top: 2rem;
+    margin-top: 3rem;
+    /* Add clear separation from grid */
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 0.8rem;
-    color: #666;
+    font-size: 0.85rem;
+    color: #888;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .footer-meta {
@@ -145,18 +164,29 @@
 .social-links {
     margin-top: 2rem;
     display: flex;
-    gap: 1.5rem;
+    gap: 1rem;
 }
 
 .social-links a {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--white);
+    background: transparent;
     color: var(--white);
-    font-size: 1.5rem;
-    transition: transform 0.2s;
+    font-size: 1.2rem;
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    text-decoration: none;
 }
 
 .social-links a:hover {
-    color: var(--accent);
-    transform: translateY(-5px);
+    background: var(--white);
+    color: var(--black);
+    transform: translate(-3px, -3px);
+    box-shadow: 4px 4px 0 var(--accent);
+    border-color: var(--white);
 }
 
 @media (max-width: 1024px) {
