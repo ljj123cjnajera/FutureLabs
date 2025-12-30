@@ -539,36 +539,26 @@
         </div>
     </section>
 
-    <!-- Newsletter Section -->
-    <section class="newsletter-section">
-        <div class="container newsletter-content">
-            <h2>Únete al Futuro</h2>
-            <p>Recibe acceso anticipado a drops exclusivos y contenido secreto.</p>
-            <form class="newsletter-form" id="newsletterForm">
-                <input type="email" id="footerNewsletterEmail" name="email" autocomplete="email"
-                    class="newsletter-input" placeholder="TU@EMAIL.COM" required>
-                <button type="submit" class="newsletter-btn">Suscribirse</button>
-            </form>
-        </div>
-    </section>
+    <!-- Newsletter Section (Merged into Footer) -->
+    <!-- Removed redundant section -->
 
     <!-- Footer -->
     <footer id="mainFooter"></footer>
 
-    <!-- Floating Components -->
+    <!-- Sticky Promo Bar (Fixed to Bottom) -->
     <div class="sticky-footer" id="stickyFooter">
         <div class="container">
-            <p>🔥 <strong>OFERTA PERÚ:</strong> USA EL CÓDIGO <span class="offer-code-badge">LIMA20</span>
-
-                PARA S/ 20.00 OFF EN TU PRIMER PEDIDO. ACEPTAMOS YAPE.</p>
+            <p>🔥 <strong>OFERTA PERÚ:</strong> USA EL CÓDIGO <span class="offer-code-badge">LIMA20</span> PARA S/ 20.00
+                OFF. ACEPTAMOS YAPE.</p>
             <button class="cta-button" type="button" onclick="window.location.href='products.html'"
-                aria-label="Ir a comprar">USAR CÓDIGO AHORA</button>
+                aria-label="Ir a comprar">USAR CÓDIGO</button>
+            <button class="cta-button" type="button"
+                onclick="document.getElementById('stickyFooter').style.display='none'"
+                style="background:transparent; border:none; box-shadow:none; padding:0 10px; margin-left:0;">×</button>
         </div>
     </div>
 
-    <div class="chat-button" id="chatButton" role="button" tabindex="0" aria-label="Abrir chat de ayuda">
-        <i class="fas fa-comments" aria-hidden="true"></i>
-    </div>
+    <!-- Chat Button managed by chat-widget.js -->
 
     <!-- Core Libraries (Must load first) -->
     <!-- CORE SYSTEM (Matches products.html architecture) -->
