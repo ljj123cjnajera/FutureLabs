@@ -88,6 +88,8 @@ class Components {
                     <a href="sitemap.xml">SITEMAP</a>
                 </div>
             </div>
+            <!-- SPACER FOR STICKY FOOTER -->
+            <div style="height: 150px; width: 100%; display: block; background: transparent;"></div>
         </div>
     `;
   }
