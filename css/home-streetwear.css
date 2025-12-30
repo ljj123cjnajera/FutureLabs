@@ -1279,14 +1279,15 @@ footer .copyright {
     bottom: 0;
     left: 0;
     width: 100%;
-    background: var(--accent) !important;
-    border-top: 3px solid var(--black);
-    color: var(--white);
+    background: #ff4400 !important;
+    /* HARDCODED FAILSAFE */
+    border-top: 3px solid #000000;
+    color: #ffffff;
     border-radius: 0 !important;
     box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.2) !important;
     padding: 12px 0;
-    z-index: 9990;
-    /* High but below Modals (usually 10000+) */
+    z-index: 9999;
+    /* Max Z-Index for visibility */
     display: flex;
     justify-content: center;
     align-items: center;
