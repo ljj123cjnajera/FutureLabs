@@ -1280,20 +1280,21 @@ footer .copyright {
     left: 0;
     width: 100%;
     background: #ff4400 !important;
-    /* HARDCODED FAILSAFE */
-    border-top: 3px solid #000000;
+    border-top: 4px solid #000000;
     color: #ffffff;
     border-radius: 0 !important;
-    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.2) !important;
-    padding: 12px 0;
-    z-index: 9999;
-    /* Max Z-Index for visibility */
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.3) !important;
+    padding: 15px 0;
+    z-index: 9990;
+    /* Below Chat Widget */
     display: flex;
     justify-content: center;
     align-items: center;
     text-transform: uppercase;
-    font-weight: 700;
-    font-size: 0.9rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
 }
 
 .sticky-footer .container {
@@ -1310,25 +1311,54 @@ footer .copyright {
     letter-spacing: 0.5px;
 }
 
-.sticky-footer button {
+.sticky-footer button.cta-button {
     border-radius: 0 !important;
-    border: 2px solid var(--black);
+    border: 3px solid var(--black);
     box-shadow: 4px 4px 0 var(--black);
-    font-weight: 800;
+    font-weight: 900;
     text-transform: uppercase;
     background: var(--black);
     color: var(--white);
-    padding: 8px 16px;
-    font-size: 0.8rem;
+    padding: 10px 24px;
+    font-size: 0.9rem;
     cursor: pointer;
-    transition: all 0.2s;
-    margin-left: 1rem;
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    margin-left: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.sticky-footer button:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0 var(--black);
+.sticky-footer button.cta-button:hover {
+    transform: translate(-4px, -4px);
+    box-shadow: 8px 8px 0 var(--black);
     background: var(--white);
+    color: var(--black);
+}
+
+.sticky-footer .offer-code-badge {
+    background: var(--black);
+    color: var(--white);
+    padding: 2px 8px;
+    border: 1px dashed var(--white);
+    margin: 0 5px;
+}
+
+.close-sticky {
+    background: transparent;
+    border: none;
+    color: var(--white);
+    font-size: 1.5rem;
+    font-weight: 300;
+    cursor: pointer;
+    padding: 0 15px;
+    margin-left: 10px;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.close-sticky:hover {
+    opacity: 1;
     color: var(--black);
 }
 
