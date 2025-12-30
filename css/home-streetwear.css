@@ -30,7 +30,6 @@ html,
 body {
     margin: 0 !important;
     padding: 0 !important;
-    padding-bottom: 80px !important;
     /* Prevent Sticky Footer from covering content */
     overflow-x: hidden;
     width: 100%;
