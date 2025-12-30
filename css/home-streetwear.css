@@ -30,7 +30,8 @@ html,
 body {
     margin: 0 !important;
     padding: 0 !important;
-    /* Prevent Sticky Footer from covering content */
+    padding-bottom: 0 !important;
+    /* Force removal of any white gap */
     overflow-x: hidden;
     width: 100%;
 }
