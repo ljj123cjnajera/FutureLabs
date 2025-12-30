@@ -4,8 +4,8 @@
 .footer {
     background: var(--black);
     color: var(--white);
-    padding: 80px 0 100px;
-    /* Increased bottom padding to 100px for Sticky Bar clearance */
+    padding: 80px 0 200px;
+    /* AGGRESSIVE CLEARANCE: 200px to ensure Sticky Bar NEVER overlaps content */
     border-top: 5px solid var(--black);
     font-family: 'Poppins', sans-serif;
 }
