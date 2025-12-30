@@ -410,7 +410,7 @@ body.loaded #preloader {
 }
 
 .bento-item:hover img {
-    transform: scale(1.1);
+    transform: scale(1.15);
 }
 
 /* Brutalist Product Card */
@@ -423,8 +423,8 @@ body.loaded #preloader {
 }
 
 .brutalist-card:hover {
-    transform: translate(-4px, -4px);
-    box-shadow: 8px 8px 0 var(--black);
+    transform: translate(-6px, -6px);
+    box-shadow: 10px 10px 0 var(--black);
 }
 
 .product-image {

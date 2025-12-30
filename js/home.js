@@ -925,10 +925,9 @@ class HomeEngine {
 
       } catch (err) {
         console.warn('❌ Engine Error:', err);
-        // Fallback on error
-        // const fallbackIds = this.getFallbackProducts(category); // Removed
+        // Fallback on error - Silent fail to empty state
         products = [];
-        grid.innerHTML = fallbackIds.map(p => window.Components.getProductCard(p)).join('');
+        grid.innerHTML = `<div class="p-4 text-center border border-red-500 text-red-500">SYSTEM_OFFLINE // RETRYing...</div>`;
       } finally {
         // 5. Reveal
         if (loader) loader.style.display = 'none';
