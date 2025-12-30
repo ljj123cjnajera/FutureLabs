@@ -23,8 +23,6 @@ class Components {
 
   static getFooter() {
     return `
-      <!-- Footer (Brutalist) -->
-      <footer class="footer">
         <div class="container">
             <div class="footer-grid">
                 <!-- Brand / Bio -->
@@ -91,7 +89,6 @@ class Components {
                 </div>
             </div>
         </div>
-      </footer>
     `;
   }
 
