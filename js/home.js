@@ -464,75 +464,7 @@ class HomeEngine {
     }
   }
 
-  getFallbackProducts() {
-    return [
-      {
-        id: '101',
-        name: 'Air Jordan 1 Retro High OG',
-        price: '180.00',
-        image_url: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&q=80&w=800',
-        brand: 'JORDAN',
-        is_new: true
-      },
-      {
-        id: '102',
-        name: 'Yeezy Boost 350 V2 "Onyx"',
-        price: '230.00',
-        image_url: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&q=80&w=800',
-        brand: 'YEEZY',
-        on_sale: true,
-        discount_price: '200.00'
-      },
-      {
-        id: '103',
-        name: 'Nike Dunk Low Retro "Panda"',
-        price: '110.00',
-        image_url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=800',
-        brand: 'NIKE',
-        is_new: true
-      },
-      {
-        id: '104',
-        name: 'Adidas Forum Low',
-        price: '100.00',
-        image_url: 'https://images.unsplash.com/photo-1587563871167-1ea501d4a6cf?auto=format&fit=crop&q=80&w=800',
-        brand: 'ADIDAS',
-        on_sale: true,
-        discount_price: '85.00'
-      },
-      {
-        id: '105',
-        name: 'New Balance 550',
-        price: '120.00',
-        image_url: 'https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?auto=format&fit=crop&q=80&w=800',
-        brand: 'NEW BALANCE'
-      },
-      {
-        id: '106',
-        name: 'Travis Scott x Air Jordan 1',
-        price: '1200.00',
-        image_url: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&q=80&w=800',
-        brand: 'JORDAN',
-        is_new: true
-      },
-      {
-        id: '107',
-        name: 'Nike Air Force 1 "Triple White"',
-        price: '110.00',
-        image_url: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&q=80&w=800',
-        brand: 'NIKE'
-      },
-      {
-        id: '108',
-        name: 'Yeezy Slide "Pure"',
-        price: '70.00',
-        image_url: 'https://images.unsplash.com/photo-1627637454030-5ddd536e06e5?auto=format&fit=crop&q=80&w=800',
-        brand: 'YEEZY',
-        on_sale: true,
-        discount_price: '60.00'
-      }
-    ];
-  }
+
 
   // ==========================================
   // 4. BRAND MARQUEE (SVG UPGRADE)
@@ -1051,7 +983,7 @@ class HomeEngine {
 
 
   // 🛡️ DATA FAILSAFE: Hardcoded mocks to ensure layout never breaks
-  getFallbackProducts(category) {
+  getFallbackProducts(category = null) {
     const mocks = {
       'nike': [
         { id: 101, name: 'NIKE DUNK LOW RETRO', price: 110, image_url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=600', badge: 'BESTSELLER' },
@@ -1079,7 +1011,17 @@ class HomeEngine {
       ]
     };
 
-    return mocks[category] || [];
+    if (category && mocks[category]) {
+      return mocks[category];
+    }
+
+    // If no category (GLOBAL CALL), return a flattened mix
+    return [
+      ...mocks['jordan'].slice(0, 2),
+      ...mocks['yeezy'].slice(0, 2),
+      ...mocks['nike'].slice(0, 2),
+      ...mocks['adidas'].slice(0, 2)
+    ];
   }
 
   // 🛡️ FAILSAFE: Force visibility after 2 seconds if observer fails or user turns off JS interactions
