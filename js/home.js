@@ -309,16 +309,30 @@ class HomeEngine {
       } catch (e) { console.error('Categories API Error:', e); }
     }
 
-    // 2. No Fallback?
+    // 2. Fallback (Premium Data)
     if (categories.length === 0) {
-      container.innerHTML = `
-        <div class="text-center py-5" style="border: 2px dashed var(--black); margin: 2rem 0;">
-            <i class="fas fa-plug fa-3x mb-3" style="color: var(--gray);"></i>
-            <h3>CATALOG DATA UNAVAILABLE</h3>
-            <p>Accessing local backup node...</p>
-            <button onclick="window.location.reload()" class="btn btn-sm btn-black mt-3">RECONNECT</button>
-        </div>`;
-      return;
+      categories = [
+        {
+          name: 'JORDAN',
+          slug: 'jordan',
+          image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=800'
+        },
+        {
+          name: 'YEEZY',
+          slug: 'yeezy',
+          image: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&q=80&w=800'
+        },
+        {
+          name: 'NIKE',
+          slug: 'nike',
+          image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=800'
+        },
+        {
+          name: 'ACCESSORIES',
+          slug: 'accessories',
+          image: 'https://images.unsplash.com/photo-1523398002811-6ce9e490101d?auto=format&fit=crop&q=80&w=800'
+        }
+      ];
     }
 
     container.innerHTML = `
