@@ -232,15 +232,7 @@ app.use('/uploads', (req, res, next) => {
   next();
 }, express.static(path.join(__dirname, 'uploads')));
 
-// 🚀 SERVIR FRONTEND EN PRODUCCIÓN (Docker/Railway)
-if (process.env.NODE_ENV === 'production') {
-  console.log('🚀 Configurando servicio de archivos estáticos para Frontend');
-  app.use('/css', express.static(path.join(__dirname, 'css')));
-  app.use('/js', express.static(path.join(__dirname, 'js')));
-  app.use('/assets', express.static(path.join(__dirname, 'assets')));
-  app.use('/', express.static(path.join(__dirname), { index: 'index.html' }));
-}
-
+// 🚀 RUTAS API PRIMERO (antes de archivos estáticos para evitar conflictos)
 app.use('/api/auth', authRoutes);
 app.use('/api/verification', verificationRoutes);
 app.use('/api/products', productsRoutes);
@@ -273,11 +265,30 @@ app.get('/health', (req, res) => {
   });
 });
 
-// 404
-app.use((req, res) => {
+// 🚀 SERVIR FRONTEND EN PRODUCCIÓN (DESPUÉS de todas las rutas API)
+// Esto evita que las peticiones API reciban HTML en lugar de JSON
+if (process.env.NODE_ENV === 'production') {
+  console.log('🚀 Configurando servicio de archivos estáticos para Frontend');
+  app.use('/css', express.static(path.join(__dirname, 'css')));
+  app.use('/js', express.static(path.join(__dirname, 'js')));
+  app.use('/assets', express.static(path.join(__dirname, 'assets')));
+  
+  // Servir index.html solo para rutas que NO sean API
+  app.get('*', (req, res, next) => {
+    // Si es una ruta API, pasar al siguiente middleware (404)
+    if (req.path.startsWith('/api')) {
+      return next();
+    }
+    // Si no es API, servir index.html
+    res.sendFile(path.join(__dirname, 'index.html'));
+  });
+}
+
+// 404 para rutas API no encontradas
+app.use('/api/*', (req, res) => {
   res.status(404).json({
     success: false,
-    message: 'Ruta no encontrada'
+    message: 'Ruta API no encontrada'
   });
 });
 
@@ -304,6 +315,24 @@ async function runMigrations() {
     // Usar la instancia de knex directamente en lugar de execSync
     // Esto evita crear un proceso separado que también intenta usar el pool
     try {
+      // Limpiar migraciones huérfanas del blog eliminado antes de ejecutar migraciones
+      try {
+        const orphanMigration = await db('knex_migrations')
+          .where('name', '010_create_blog_posts_table.js')
+          .first();
+        
+        if (orphanMigration) {
+          console.log('🧹 Cleaning up orphaned blog migration from database...');
+          await db('knex_migrations')
+            .where('name', '010_create_blog_posts_table.js')
+            .del();
+          console.log('✅ Orphaned migration cleaned up');
+        }
+      } catch (cleanupError) {
+        // Ignorar errores de limpieza
+        console.log('⚠️  Could not cleanup orphaned migration (non-critical):', cleanupError.message);
+      }
+      
       const [batchNo, log] = await db.migrate.latest();
       
       if (log.length === 0) {
