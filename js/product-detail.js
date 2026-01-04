@@ -123,14 +123,47 @@ document.addEventListener('DOMContentLoaded', async function () {
                     </div>
                     <!-- Mini Trust -->
                     <div class="payment-trust-mini" style="display: flex; gap: 15px; margin-top: 10px; font-size: 0.75rem; color: #666; border-bottom: 1px solid #eee; padding-bottom: 10px;">
-                        <span><i class="fas fa-mobile-alt"></i> Yape/Plin</span>
-                        <span><i class="fas fa-lock"></i> Compra Segura</span>
-                        <span><i class="fas fa-shipping-fast"></i> Envío Inmediato</span>
+                        <span><i class="fas fa-mobile-alt" aria-hidden="true"></i> Yape/Plin</span>
+                        <span><i class="fas fa-lock" aria-hidden="true"></i> Compra Segura</span>
+                        <span><i class="fas fa-shipping-fast" aria-hidden="true"></i> Envío Inmediato</span>
                     </div>
                 </div>
                 
-                <div class="product-description-detail" style="font-size: 1.1rem; line-height: 1.6; margin-bottom: 3rem;">
+                <!-- Stock Urgency Badge -->
+                ${product.stock_quantity !== undefined && product.stock_quantity > 0 && product.stock_quantity <= 5 ? `
+                <div class="stock-urgency-banner" style="background: #fff3cd; border: 2px solid #ffc107; padding: 15px; margin-bottom: 1.5rem; border-radius: 4px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-exclamation-triangle" style="color: #ff9800; font-size: 1.5rem;" aria-hidden="true"></i>
+                        <div>
+                            <strong style="color: #d32f2f; text-transform: uppercase; font-weight: 900;">¡ÚLTIMAS UNIDADES!</strong>
+                            <p style="margin: 5px 0 0 0; color: #666; font-size: 0.9rem;">Solo quedan ${product.stock_quantity} pares disponibles</p>
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+                
+                <div class="product-description-detail" style="font-size: 1.1rem; line-height: 1.6; margin-bottom: 2rem;">
                     ${product.description || 'La máxima expresión del estilo urbano. Diseñados para destacar y construidos para durar.'}
+                </div>
+                
+                <!-- Key Features -->
+                <div class="product-features-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 2rem; padding: 20px; background: #f8f9fa; border-radius: 4px;">
+                    <div class="feature-item" style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-check-circle" style="color: #4caf50; font-size: 1.2rem;" aria-hidden="true"></i>
+                        <span style="font-size: 0.9rem; font-weight: 600;">100% Auténtico</span>
+                    </div>
+                    <div class="feature-item" style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-shipping-fast" style="color: #2196f3; font-size: 1.2rem;" aria-hidden="true"></i>
+                        <span style="font-size: 0.9rem; font-weight: 600;">Envío Gratis S/150+</span>
+                    </div>
+                    <div class="feature-item" style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-undo" style="color: #ff9800; font-size: 1.2rem;" aria-hidden="true"></i>
+                        <span style="font-size: 0.9rem; font-weight: 600;">30 Días Devolución</span>
+                    </div>
+                    <div class="feature-item" style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-shield-alt" style="color: #9c27b0; font-size: 1.2rem;" aria-hidden="true"></i>
+                        <span style="font-size: 0.9rem; font-weight: 600;">Garantía Oficial</span>
+                    </div>
                 </div>
                 
                 <div class="size-selector-container">
@@ -146,18 +179,77 @@ document.addEventListener('DOMContentLoaded', async function () {
                     </div>
                 </div>
 
-                <div class="product-actions-sticky">
-                        <button type="button" class="btn btn-massive" id="addToCartBtn" onclick="addToCart()" ${product.stock_quantity === 0 ? 'disabled' : ''}>
-                        ${product.stock_quantity > 0 || product.stock_quantity === undefined ? `AÑADIR AL CARRITO` : 'AGOTADO'} <i class="fas fa-arrow-right"></i>
+                <!-- Price Display with Discount -->
+                ${product.discount_price && product.discount_price < product.price ? `
+                <div class="product-price-display" style="margin-bottom: 1.5rem; padding: 20px; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 4px;">
+                    <div style="display: flex; align-items: baseline; gap: 15px; margin-bottom: 10px;">
+                        <span style="font-size: 2rem; font-weight: 900; color: var(--black);">S/ ${parseFloat(product.discount_price).toFixed(2)}</span>
+                        <span style="font-size: 1.2rem; color: #666; text-decoration: line-through;">S/ ${parseFloat(product.price).toFixed(2)}</span>
+                        <span style="background: #d32f2f; color: white; padding: 5px 10px; border-radius: 4px; font-weight: 700; font-size: 0.9rem;">
+                            -${Math.round(((product.price - product.discount_price) / product.price) * 100)}% OFF
+                        </span>
+                    </div>
+                    <p style="margin: 0; color: #666; font-size: 0.9rem;">
+                        <i class="fas fa-tag" aria-hidden="true"></i> Ahorras S/ ${(parseFloat(product.price) - parseFloat(product.discount_price)).toFixed(2)}
+                    </p>
+                </div>
+                ` : `
+                <div class="product-price-display" style="margin-bottom: 1.5rem;">
+                    <span style="font-size: 2rem; font-weight: 900; color: var(--black);">S/ ${parseFloat(product.price).toFixed(2)}</span>
+                </div>
+                `}
+                
+                <!-- Action Buttons -->
+                <div class="product-actions-sticky" style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 2rem;">
+                    ${product.stock_quantity > 0 || product.stock_quantity === undefined ? `
+                    <button type="button" class="btn btn-massive btn-primary" id="buyNowBtn" onclick="buyNow()" style="background: var(--black); color: white; padding: 18px; font-size: 1.1rem; font-weight: 900; text-transform: uppercase; border: none; cursor: pointer; width: 100%;">
+                        <i class="fas fa-bolt" aria-hidden="true"></i> COMPRAR AHORA
                     </button>
+                    <button type="button" class="btn btn-massive" id="addToCartBtn" onclick="addToCart()" style="background: white; color: var(--black); padding: 18px; font-size: 1.1rem; font-weight: 900; text-transform: uppercase; border: 3px solid var(--black); cursor: pointer; width: 100%;">
+                        <i class="fas fa-shopping-cart" aria-hidden="true"></i> AÑADIR AL CARRITO
+                    </button>
+                    ` : `
+                    <button type="button" class="btn btn-massive" disabled style="background: #ccc; color: #666; padding: 18px; font-size: 1.1rem; font-weight: 900; text-transform: uppercase; border: none; cursor: not-allowed; width: 100%;">
+                        <i class="fas fa-times-circle" aria-hidden="true"></i> AGOTADO
+                    </button>
+                    `}
                 </div>
                 
-                <div class="product-meta-footer" style="margin-top: 3rem; border-top: 4px solid var(--black); padding-top: 2rem;">
-                    <div class="meta-item shipping-countdown" style="display: flex; gap: 1rem; margin-bottom: 1rem; background: #f0f0f0; padding: 15px; border-radius: 4px;">
-                        <i class="fas fa-stopwatch" style="font-size: 1.5rem; color: var(--black);"></i>
-                        <div>
-                            <strong style="text-transform: uppercase; font-weight: 900; color: var(--black);">¡LLEGA MAÑANA!</strong>
-                            <p style="margin:0; color: #666; font-size: 0.9rem;">Pide antes de las 5PM.</p>
+                <!-- Shipping & Guarantees Section -->
+                <div class="product-meta-footer" style="margin-top: 2rem; border-top: 4px solid var(--black); padding-top: 2rem;">
+                    <div class="shipping-info-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 1.5rem;">
+                        <div class="shipping-item" style="display: flex; gap: 10px; padding: 15px; background: #e3f2fd; border-radius: 4px;">
+                            <i class="fas fa-stopwatch" style="font-size: 1.5rem; color: #2196f3;" aria-hidden="true"></i>
+                            <div>
+                                <strong style="text-transform: uppercase; font-weight: 900; color: var(--black); display: block;">¡LLEGA MAÑANA!</strong>
+                                <p style="margin:5px 0 0 0; color: #666; font-size: 0.85rem;">Pide antes de las 5PM</p>
+                            </div>
+                        </div>
+                        <div class="shipping-item" style="display: flex; gap: 10px; padding: 15px; background: #f3e5f5; border-radius: 4px;">
+                            <i class="fas fa-truck" style="font-size: 1.5rem; color: #9c27b0;" aria-hidden="true"></i>
+                            <div>
+                                <strong style="text-transform: uppercase; font-weight: 900; color: var(--black); display: block;">ENVÍO GRATIS</strong>
+                                <p style="margin:5px 0 0 0; color: #666; font-size: 0.85rem;">En compras S/150+</p>
+                            </div>
+                        </div>
+                        <div class="shipping-item" style="display: flex; gap: 10px; padding: 15px; background: #e8f5e9; border-radius: 4px;">
+                            <i class="fas fa-shield-alt" style="font-size: 1.5rem; color: #4caf50;" aria-hidden="true"></i>
+                            <div>
+                                <strong style="text-transform: uppercase; font-weight: 900; color: var(--black); display: block;">GARANTÍA</strong>
+                                <p style="margin:5px 0 0 0; color: #666; font-size: 0.85rem;">100% Auténtico</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Methods -->
+                    <div class="payment-methods-display" style="padding: 15px; background: #f5f5f5; border-radius: 4px; margin-bottom: 1rem;">
+                        <p style="margin: 0 0 10px 0; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; color: #666;">Métodos de Pago:</p>
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                            <span style="padding: 5px 10px; background: white; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">VISA</span>
+                            <span style="padding: 5px 10px; background: white; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">MASTERCARD</span>
+                            <span style="padding: 5px 10px; background: white; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">YAPE</span>
+                            <span style="padding: 5px 10px; background: white; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">PLIN</span>
+                            <span style="padding: 5px 10px; background: white; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">EFECTIVO</span>
                         </div>
                     </div>
                 </div>
