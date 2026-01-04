@@ -54,21 +54,35 @@ if (dbUrl && !isPlaceholder) {
       migrations: baseEnvConfig.migrations || {},
       seeds: baseEnvConfig.seeds || {},
       pool: {
-        min: 1,
-        max: 3,
-        acquireTimeoutMillis: 10000,
-        createTimeoutMillis: 5000,
-        idleTimeoutMillis: 20000,
+        min: 0, // Empezar sin conexiones para evitar bloqueo al inicio
+        max: 5, // Aumentar máximo pero con mejor manejo
+        acquireTimeoutMillis: 5000, // Reducir timeout a 5s (fallar muy rápido)
+        createTimeoutMillis: 3000, // Timeout de creación muy corto
+        idleTimeoutMillis: 10000, // Liberar conexiones idle muy rápido
         reapIntervalMillis: 1000,
         propagateCreateError: false,
         afterCreate: function(conn, done) {
           conn.on('error', function(err) {
             console.log('⚠️ Database connection error:', err.message);
             if (conn && !conn._ending) {
-              conn.end();
+              try {
+                conn.end();
+              } catch (e) {
+                // Ignorar errores al cerrar conexión con error
+              }
             }
           });
           done(null, conn);
+        },
+        destroy: function(client) {
+          if (client && !client._ending) {
+            try {
+              return client.end();
+            } catch (e) {
+              return Promise.resolve();
+            }
+          }
+          return Promise.resolve();
         }
       }
     };
