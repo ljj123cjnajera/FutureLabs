@@ -26,45 +26,52 @@ if (!fs.existsSync(uploadsDir)) {
   console.log('📁 Directorio uploads creado');
 }
 
-// Auto-run seeds if products table is empty (DESHABILITADO - causan bloqueo del pool)
+// Auto-run seeds if products table is empty (ejecutar DESPUÉS de migraciones)
 async function ensureDataSeeded() {
-  // DESHABILITADO: Los seeds están bloqueando el pool de conexiones
-  // Ejecutar seeds manualmente cuando sea necesario
-  console.log('⚠️  Seeds disabled at startup to prevent pool blocking');
-  console.log('⚠️  Run seeds manually: npx knex seed:run');
-  return;
-  
-  /* CÓDIGO COMENTADO - Deshabilitado para evitar bloqueo del pool
   try {
+    // Esperar 10 segundos adicionales después de las migraciones
+    // para asegurar que las migraciones hayan terminado
+    await new Promise(resolve => setTimeout(resolve, 10000));
+    
     console.log('🔍 Checking if products exist...');
     
+    // Usar Promise.race para timeout de 5 segundos
     const checkPromise = db('products').select('id').limit(1).timeout(5000);
     const timeoutPromise = new Promise((_, reject) => 
       setTimeout(() => reject(new Error('Query timeout')), 5000)
     );
     
-    const products = await Promise.race([checkPromise, timeoutPromise]);
-    console.log(`📊 Products found: ${products.length}`);
+    try {
+      const products = await Promise.race([checkPromise, timeoutPromise]);
+      console.log(`📊 Products found: ${products.length}`);
 
-    if (products.length === 0) {
-      console.log('📦 Products table is empty, running seeds...');
-      const { execSync } = require('child_process');
-      execSync('npx knex seed:run --knexfile=./knexfile.js', {
-        stdio: 'inherit',
-        cwd: process.cwd(),
-        timeout: 20000
-      });
-      console.log('✅ Seeds completed');
-    } else {
-      console.log('✅ Products already exist, skipping seeds');
+      if (products.length === 0) {
+        console.log('📦 Products table is empty, running seeds...');
+        const { execSync } = require('child_process');
+        
+        try {
+          execSync('npx knex seed:run', {
+            stdio: 'pipe', // Cambiar a 'pipe' para evitar bloquear output
+            cwd: process.cwd(),
+            timeout: 30000, // 30 segundos máximo
+            env: { ...process.env, NODE_ENV: 'production' }
+          });
+          console.log('✅ Seeds completed successfully');
+        } catch (seedError) {
+          console.log('⚠️  Seeds failed (non-blocking):', seedError.message);
+          console.log('⚠️  Server continues running - seeds can be retried');
+        }
+      } else {
+        console.log('✅ Products already exist, skipping seeds');
+      }
+    } catch (checkError) {
+      console.log('⚠️  Could not check products (non-blocking):', checkError.message);
+      // No bloquear el servidor si el check falla
     }
   } catch (error) {
-    console.log('⚠️  Could not check/seed products:', error.message);
-    if (process.env.NODE_ENV === 'development') {
-      console.log('⚠️  Error stack:', error.stack);
-    }
+    console.log('⚠️  Seed runner error (non-blocking):', error.message);
+    // No bloquear el servidor si hay error
   }
-  */
 }
 
 // Agrega esta línea para el proxy:
@@ -289,29 +296,35 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Ejecutar migraciones de forma asíncrona (DESHABILITADO - causan bloqueo del pool)
+// Ejecutar migraciones de forma asíncrona DESPUÉS de que el servidor inicie
 async function runMigrations() {
-  // DESHABILITADO: Las migraciones están bloqueando el pool de conexiones
-  // Ejecutar migraciones manualmente cuando sea necesario
-  console.log('⚠️  Migrations disabled at startup to prevent pool blocking');
-  console.log('⚠️  Run migrations manually: npx knex migrate:latest');
-  return;
-  
-  /* CÓDIGO COMENTADO - Deshabilitado para evitar bloqueo del pool
   try {
-    console.log('🔄 Running database migrations...');
+    // Esperar 5 segundos para que el servidor esté completamente iniciado
+    // y el pool de conexiones se haya inicializado
+    await new Promise(resolve => setTimeout(resolve, 5000));
+    
+    console.log('🔄 Running database migrations in background...');
+    
+    // Usar execSync con timeout y mejor manejo de errores
     const { execSync } = require('child_process');
-    execSync('npx knex migrate:latest', {
-      stdio: 'inherit',
-      cwd: process.cwd(),
-      timeout: 20000
-    });
-    console.log('✅ Migrations completed');
+    
+    try {
+      execSync('npx knex migrate:latest', {
+        stdio: 'pipe', // Cambiar a 'pipe' para evitar bloquear output
+        cwd: process.cwd(),
+        timeout: 30000, // 30 segundos máximo
+        env: { ...process.env, NODE_ENV: 'production' }
+      });
+      console.log('✅ Migrations completed successfully');
+    } catch (migrationError) {
+      // Si las migraciones fallan, no bloquear el servidor
+      console.log('⚠️  Migrations failed (non-blocking):', migrationError.message);
+      console.log('⚠️  Server continues running - migrations can be retried');
+    }
   } catch (error) {
-    console.log('⚠️  Migrations failed:', error.message);
-    console.log('⚠️  Server will continue without migrations');
+    console.log('⚠️  Migration runner error (non-blocking):', error.message);
+    // No bloquear el servidor si hay error
   }
-  */
 }
 
 // Iniciar servidor inmediatamente (sin esperar migraciones)
