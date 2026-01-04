@@ -335,19 +335,15 @@ class HomeEngine {
       ];
     }
 
-    container.innerHTML = `
-        <div class="bento-grid">
-            ${categories.map((cat, index) => `
-                <a href="products.html?category=${cat.slug}" class="bento-item">
-                    <img src="${cat.image || 'img/placeholder-sq.jpg'}" alt="${cat.name}" loading="lazy">
-                    <div class="bento-overlay">
-                        <h3>${cat.name}</h3>
-                        <i class="fas fa-arrow-right"></i>
-                    </div>
-                </a>
-            `).join('')}
-        </div>
-    `;
+    container.innerHTML = categories.map((cat, index) => `
+        <a href="products.html?category=${cat.slug}" class="bento-item">
+            <img src="${cat.image || 'img/placeholder-sq.jpg'}" alt="${cat.name}" loading="lazy">
+            <div class="bento-overlay">
+                <h3>${cat.name}</h3>
+                <i class="fas fa-arrow-right"></i>
+            </div>
+        </a>
+    `).join('');
   }
 
   startCountdown() {
