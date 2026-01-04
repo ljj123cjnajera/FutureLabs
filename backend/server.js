@@ -26,21 +26,27 @@ if (!fs.existsSync(uploadsDir)) {
   console.log('📁 Directorio uploads creado');
 }
 
-// Auto-run seeds if products table is empty
+// Auto-run seeds if products table is empty (con timeout y manejo mejorado)
 async function ensureDataSeeded() {
   try {
     console.log('🔍 Checking if products exist...');
-    // Check if products table has any data
-    const products = await db('products').select('id').limit(1);
+    
+    // Usar Promise.race para timeout de 5 segundos
+    const checkPromise = db('products').select('id').limit(1).timeout(5000);
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Query timeout')), 5000)
+    );
+    
+    const products = await Promise.race([checkPromise, timeoutPromise]);
     console.log(`📊 Products found: ${products.length}`);
 
     if (products.length === 0) {
       console.log('📦 Products table is empty, running seeds...');
       const { execSync } = require('child_process');
-      // Use absolute path to knexfile.js
       execSync('npx knex seed:run --knexfile=./knexfile.js', {
         stdio: 'inherit',
-        cwd: process.cwd()
+        cwd: process.cwd(),
+        timeout: 20000 // 20 segundos máximo
       });
       console.log('✅ Seeds completed');
     } else {
@@ -48,7 +54,11 @@ async function ensureDataSeeded() {
     }
   } catch (error) {
     console.log('⚠️  Could not check/seed products:', error.message);
-    console.log('⚠️  Error stack:', error.stack);
+    // No mostrar stack completo en producción para evitar logs largos
+    if (process.env.NODE_ENV === 'development') {
+      console.log('⚠️  Error stack:', error.stack);
+    }
+    // Continuar sin bloquear - el servidor debe iniciar de todas formas
   }
 }
 
@@ -89,22 +99,24 @@ function isOriginAllowed(origin) {
 }
 
 // Middleware CORS personalizado - MANEJA EXPLÍCITAMENTE PREFLIGHT
+// CRÍTICO: Debe estar ANTES de cualquier otro middleware
 app.use((req, res, next) => {
   const origin = req.headers.origin;
   
-  // Establecer headers CORS para todos los orígenes permitidos
-  if (isOriginAllowed(origin)) {
+  // SIEMPRE establecer headers CORS (incluso si no hay origin)
+  // Esto es crítico para que funcione con GitHub Pages
+  if (!origin || isOriginAllowed(origin)) {
     res.header('Access-Control-Allow-Origin', origin || '*');
     res.header('Access-Control-Allow-Credentials', 'true');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin, Access-Control-Request-Method, Access-Control-Request-Headers');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin, Access-Control-Request-Method, Access-Control-Request-Headers, X-CSRF-Token');
     res.header('Access-Control-Expose-Headers', 'Content-Range, X-Content-Range');
     res.header('Access-Control-Max-Age', '86400');
   }
   
-  // Manejar peticiones OPTIONS (preflight) explícitamente
+  // Manejar peticiones OPTIONS (preflight) explícitamente - RESPONDER INMEDIATAMENTE
   if (req.method === 'OPTIONS') {
-    return res.status(204).end();
+    return res.status(200).end(); // Cambiar a 200 para mejor compatibilidad
   }
   
   next();
@@ -280,12 +292,13 @@ async function runMigrations() {
     execSync('npx knex migrate:latest', {
       stdio: 'inherit',
       cwd: process.cwd(),
-      timeout: 30000 // 30 segundos máximo
+      timeout: 20000 // Reducir a 20 segundos máximo
     });
     console.log('✅ Migrations completed');
   } catch (error) {
     console.log('⚠️  Migrations failed:', error.message);
     console.log('⚠️  Server will continue without migrations');
+    // No bloquear el servidor si las migraciones fallan
   }
 }
 

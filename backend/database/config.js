@@ -53,7 +53,24 @@ if (dbUrl && !isPlaceholder) {
       connection: connectionObj,
       migrations: baseEnvConfig.migrations || {},
       seeds: baseEnvConfig.seeds || {},
-      pool: baseEnvConfig.pool || { min: 2, max: 10 }
+      pool: {
+        min: 1,
+        max: 3,
+        acquireTimeoutMillis: 10000,
+        createTimeoutMillis: 5000,
+        idleTimeoutMillis: 20000,
+        reapIntervalMillis: 1000,
+        propagateCreateError: false,
+        afterCreate: function(conn, done) {
+          conn.on('error', function(err) {
+            console.log('⚠️ Database connection error:', err.message);
+            if (conn && !conn._ending) {
+              conn.end();
+            }
+          });
+          done(null, conn);
+        }
+      }
     };
     
     // Log connection info (safe - no password)
