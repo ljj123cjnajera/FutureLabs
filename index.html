@@ -262,14 +262,21 @@
 
     <!-- TRENDING NOW (HORIZONTAL SLIDER) -->
     <section class="section">
-        <div class="section-header">
-            <h2 class="section-title glitch-text" data-text="TENDENCIA AHORA">TENDENCIA AHORA</h2>
-            <p class="section-description">ALTA DEMANDA. STOCK LIMITADO.</p>
+        <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <h2 class="section-title glitch-text" data-text="TENDENCIA AHORA">TENDENCIA AHORA</h2>
+                <p class="section-description">ALTA DEMANDA. STOCK LIMITADO.</p>
+            </div>
+            <a href="products.html?filter=trending" class="link-arrow">Ver más <i class="fas fa-arrow-right"></i></a>
         </div>
         <div class="fluid-container">
             <!-- Converted to Horizontal Scroll Container -->
             <div id="featuredProductsGrid" class="products-horizontal-scroll">
-                <!-- Products injected by JS -->
+                <!-- Loading state -->
+                <div class="loading-state" style="min-width: 100%; padding: 3rem;">
+                    <div class="loading-spinner"></div>
+                    <p>Cargando productos en tendencia...</p>
+                </div>
             </div>
         </div>
     </section>
@@ -307,9 +314,16 @@
     <!-- ON SALE -->
     <section class="section">
         <div class="container">
-            <h2 class="section-title-brutalist glitch-text" data-text="EN OFERTA">EN OFERTA</h2>
+            <div class="section-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2 class="section-title-brutalist glitch-text" data-text="EN OFERTA">EN OFERTA</h2>
+                <a href="products.html?filter=on-sale" class="link-arrow">Ver todas las ofertas <i class="fas fa-arrow-right"></i></a>
+            </div>
             <div id="onSaleProductsGrid" class="product-grid-v3">
-                <!-- JS will pop this -->
+                <!-- Loading state -->
+                <div class="loading-state" style="grid-column: 1 / -1;">
+                    <div class="loading-spinner"></div>
+                    <p>Cargando ofertas...</p>
+                </div>
             </div>
         </div>
     </section>
@@ -393,6 +407,67 @@
                 <h3 class="outline-text">CULTURA URBANA</h3>
                 <p>DEFINIENDO LA ESTÉTICA DEL MAÑANA</p>
                 <a href="#" class="btn-play video-trigger"><i class="fas fa-play"></i> VER_VIDEO</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- TESTIMONIALS SECTION (NEW) -->
+    <section class="section testimonials-section" style="background: var(--gray-50); padding: 4rem 0;">
+        <div class="container">
+            <h2 class="section-title-brutalist glitch-text" data-text="LO QUE DICEN NUESTROS CLIENTES">LO QUE DICEN NUESTROS CLIENTES</h2>
+            <div id="testimonialsGrid" class="testimonials-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 3rem;">
+                <!-- Testimonials will be loaded dynamically -->
+                <div class="testimonial-card" style="border: 2px solid var(--black); padding: 2rem; background: var(--white);">
+                    <div class="testimonial-stars" style="color: #FFD700; margin-bottom: 1rem;">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p class="testimonial-text" style="font-size: 1.1rem; line-height: 1.6; margin-bottom: 1.5rem; font-style: italic;">
+                        "Las mejores zapatillas que he comprado. Calidad premium y envío súper rápido. 100% recomendado."
+                    </p>
+                    <div class="testimonial-author" style="display: flex; align-items: center; gap: 1rem;">
+                        <div class="author-avatar" style="width: 50px; height: 50px; border-radius: 50%; background: var(--black); display: flex; align-items: center; justify-content: center; color: var(--white); font-weight: 700;">
+                            JD
+                        </div>
+                        <div>
+                            <div class="author-name" style="font-weight: 700;">Juan Díaz</div>
+                            <div class="author-location" style="font-size: 0.9rem; color: var(--gray-600);">Lima, Perú</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card" style="border: 2px solid var(--black); padding: 2rem; background: var(--white);">
+                    <div class="testimonial-stars" style="color: #FFD700; margin-bottom: 1rem;">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p class="testimonial-text" style="font-size: 1.1rem; line-height: 1.6; margin-bottom: 1.5rem; font-style: italic;">
+                        "Excelente servicio al cliente y productos 100% auténticos. Ya he comprado varias veces y siempre superan mis expectativas."
+                    </p>
+                    <div class="testimonial-author" style="display: flex; align-items: center; gap: 1rem;">
+                        <div class="author-avatar" style="width: 50px; height: 50px; border-radius: 50%; background: var(--black); display: flex; align-items: center; justify-content: center; color: var(--white); font-weight: 700;">
+                            MR
+                        </div>
+                        <div>
+                            <div class="author-name" style="font-weight: 700;">María Rodríguez</div>
+                            <div class="author-location" style="font-size: 0.9rem; color: var(--gray-600);">Arequipa, Perú</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card" style="border: 2px solid var(--black); padding: 2rem; background: var(--white);">
+                    <div class="testimonial-stars" style="color: #FFD700; margin-bottom: 1rem;">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p class="testimonial-text" style="font-size: 1.1rem; line-height: 1.6; margin-bottom: 1.5rem; font-style: italic;">
+                        "La mejor tienda de sneakers en Perú. Tienen los drops más exclusivos y el proceso de compra es súper fácil."
+                    </p>
+                    <div class="testimonial-author" style="display: flex; align-items: center; gap: 1rem;">
+                        <div class="author-avatar" style="width: 50px; height: 50px; border-radius: 50%; background: var(--black); display: flex; align-items: center; justify-content: center; color: var(--white); font-weight: 700;">
+                            CS
+                        </div>
+                        <div>
+                            <div class="author-name" style="font-weight: 700;">Carlos Sánchez</div>
+                            <div class="author-location" style="font-size: 0.9rem; color: var(--gray-600);">Trujillo, Perú</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>

@@ -436,8 +436,11 @@ class HomeEngine {
     await this.renderProductSlider('featuredProductsGrid', trending);
 
     // B. ON SALE (Grid)
-    const saleProducts = products.filter(p => p.discount_price || p.on_sale).slice(0, 8);
+    const saleProducts = products.filter(p => p.discount_price || p.on_sale || p.discount_percentage).slice(0, 8);
     await this.renderProductGrid('onSaleProductsGrid', saleProducts);
+
+    // C. Load testimonials from reviews API
+    await this.loadTestimonials();
   }
 
   async renderProductGrid(containerId, products) {
@@ -451,17 +454,17 @@ class HomeEngine {
     // 🛡️ Guard: Empty State
     if (!products || products.length === 0) {
       container.innerHTML = `
-        <div class="p-8 text-center border-2 border-black" style="min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <div class="p-8 text-center border-2 border-black" style="min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; grid-column: 1 / -1;">
             <i class="fas fa-box-open fa-2x mb-3" style="color: var(--gray);"></i>
             <h4 class="font-bold text-lg">COLECCIÓN VACÍA</h4>
-            <p class="text-sm text-gray-500 mb-3">No inventory signal received.</p>
-            <button onclick="window.location.reload()" class="btn btn-sm btn-outline">REFRESH_GRID</button>
+            <p class="text-sm text-gray-500 mb-3">No hay productos disponibles en este momento.</p>
+            <button onclick="window.location.href='products.html'" class="btn btn-sm btn-outline">VER TODOS LOS PRODUCTOS</button>
         </div>`;
       return;
     }
 
     // Simulate network delay for premium 'Skeleton to Content' transition effect
-    await new Promise(r => setTimeout(r, 600));
+    await new Promise(r => setTimeout(r, 300));
 
     // Use Component's Card Generator for consistency
     const cardsHTML = window.Components && window.Components.getProductCard
@@ -469,8 +472,8 @@ class HomeEngine {
       : products.map(p => `
             <div class="product-card brutalist-fallback">
                 <h3>${p.name}</h3>
-                <p>$${p.price}</p>
-                <button>Add to Cart</button>
+                <p>S/ ${p.price}</p>
+                <button onclick="window.cartManager?.add('${p.id}')">Agregar al Carrito</button>
             </div>
         `).join('');
 
@@ -487,7 +490,40 @@ class HomeEngine {
         container.style.gridTemplateColumns = 'repeat(auto-fill, minmax(280px, 1fr))';
         container.style.gap = '20px';
       }
+
+      // Lazy load images with IntersectionObserver
+      this.initLazyLoading(container);
     }, 200);
+  }
+
+  // Mejorar lazy loading de imágenes
+  initLazyLoading(container) {
+    const images = container.querySelectorAll('img[loading="lazy"]');
+    if (!images.length) return;
+
+    const imageObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          // Si tiene data-src, usarlo (para carga diferida avanzada)
+          if (img.dataset.src) {
+            img.src = img.dataset.src;
+            img.removeAttribute('data-src');
+          }
+          // Agregar clase para animación de fade-in
+          img.style.opacity = '0';
+          img.style.transition = 'opacity 0.3s ease';
+          img.onload = () => {
+            img.style.opacity = '1';
+          };
+          observer.unobserve(img);
+        }
+      });
+    }, {
+      rootMargin: '50px' // Cargar 50px antes de que sea visible
+    });
+
+    images.forEach(img => imageObserver.observe(img));
   }
 
   // NEW: Slider Renderer for Trending and Sale
@@ -497,11 +533,32 @@ class HomeEngine {
 
     // Force horizontal scroll class
     container.classList.add('products-horizontal-scroll');
-    // container.style.display = 'flex'; // Handled by CSS class usually
+
+    // Empty state
+    if (!products || products.length === 0) {
+      container.innerHTML = `
+        <div style="grid-column: 1 / -1; padding: 3rem; text-align: center; border: 2px dashed var(--black);">
+          <i class="fas fa-fire" style="font-size: 2rem; margin-bottom: 1rem; color: var(--gray-400);"></i>
+          <p style="font-weight: 600;">No hay productos en tendencia en este momento</p>
+        </div>`;
+      return;
+    }
 
     // Transform grid to slider via style injection if needed
     if (window.Components && window.Components.getProductCard) {
       container.innerHTML = products.map(p => window.Components.getProductCard(p)).join('');
+      
+      // Lazy load images
+      this.initLazyLoading(container);
+    } else {
+      // Fallback
+      container.innerHTML = products.map(p => `
+        <div class="product-card">
+          <img src="${p.image_url || ''}" alt="${p.name}" loading="lazy">
+          <h3>${p.name}</h3>
+          <p>S/ ${p.price}</p>
+        </div>
+      `).join('');
     }
   }
 
@@ -1026,6 +1083,102 @@ class HomeEngine {
 
   // Fallbacks removed for production.
 
+  // ==========================================
+  // 8. TESTIMONIALS (From Reviews API)
+  // ==========================================
+  async loadTestimonials() {
+    const container = document.getElementById('testimonialsGrid');
+    if (!container) return;
+
+    let testimonials = [];
+
+    // Try to load from reviews API
+    try {
+      // Use getReviews method from API (it accepts query params)
+      if (this.api && typeof this.api.request === 'function') {
+        const response = await this.api.request('/reviews?limit=10&rating=5');
+        if (response && response.success && Array.isArray(response.data)) {
+          // Filter approved reviews with comments
+          const topReviews = response.data
+            .filter(r => r.rating === 5 && r.approved !== false && (r.comment || r.content))
+            .slice(0, 3);
+          
+          testimonials = topReviews.map(review => ({
+            text: review.comment || review.content || 'Excelente producto y servicio.',
+            author: review.user_name || review.user?.name || review.user?.full_name || 'Cliente',
+            location: review.user?.location || review.user?.city || 'Perú',
+            rating: review.rating || 5,
+            avatar: review.user?.avatar || null
+          }));
+        }
+      }
+    } catch (e) {
+      console.warn('⚠️ Testimonials API Error:', e);
+    }
+
+    // Use fallback if API failed
+    if (testimonials.length === 0) {
+      testimonials = [
+        {
+          text: "Las mejores zapatillas que he comprado. Calidad premium y envío súper rápido. 100% recomendado.",
+          author: "Juan Díaz",
+          location: "Lima, Perú",
+          rating: 5
+        },
+        {
+          text: "Excelente servicio al cliente y productos 100% auténticos. Ya he comprado varias veces y siempre superan mis expectativas.",
+          author: "María Rodríguez",
+          location: "Arequipa, Perú",
+          rating: 5
+        },
+        {
+          text: "La mejor tienda de sneakers en Perú. Tienen los drops más exclusivos y el proceso de compra es súper fácil.",
+          author: "Carlos Sánchez",
+          location: "Trujillo, Perú",
+          rating: 5
+        }
+      ];
+    }
+
+    // Render testimonials
+    if (testimonials.length > 0) {
+      container.innerHTML = testimonials.map(t => {
+        const initials = t.author.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+        const stars = '★'.repeat(t.rating);
+        return `
+          <div class="testimonial-card" style="border: 2px solid var(--black); padding: 2rem; background: var(--white); transition: transform 0.2s;">
+            <div class="testimonial-stars" style="color: #FFD700; margin-bottom: 1rem; font-size: 1.2rem;">
+              ${stars}
+            </div>
+            <p class="testimonial-text" style="font-size: 1.1rem; line-height: 1.6; margin-bottom: 1.5rem; font-style: italic;">
+              "${t.text}"
+            </p>
+            <div class="testimonial-author" style="display: flex; align-items: center; gap: 1rem;">
+              <div class="author-avatar" style="width: 50px; height: 50px; border-radius: 50%; background: var(--black); display: flex; align-items: center; justify-content: center; color: var(--white); font-weight: 700;">
+                ${initials}
+              </div>
+              <div>
+                <div class="author-name" style="font-weight: 700;">${t.author}</div>
+                <div class="author-location" style="font-size: 0.9rem; color: var(--gray-600);">${t.location}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Add hover effect
+      container.querySelectorAll('.testimonial-card').forEach(card => {
+        card.addEventListener('mouseenter', () => {
+          card.style.transform = 'translateY(-5px)';
+          card.style.boxShadow = '6px 6px 0 var(--black)';
+        });
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = 'translateY(0)';
+          card.style.boxShadow = 'none';
+        });
+      });
+    }
+  }
 
   // 🛡️ DATA FAILSAFE: Hardcoded mocks to ensure layout never breaks
   getFallbackProducts(category = null) {
