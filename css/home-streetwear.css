@@ -1866,12 +1866,16 @@ footer .copyright {
     width: 100%;
     background-color: var(--black);
     color: var(--white);
-    padding: var(--spacing-md) 0;
+    padding: var(--spacing-sm) 0;
+    /* Reduced padding */
     border-top: 4px solid var(--black);
-    border-bottom: 4px solid var(--black);
+    border-bottom: none;
+    /* Merged look */
     overflow: hidden;
     position: relative;
     z-index: 5;
+    margin-bottom: 0;
+    /* Flush with next element */
 }
 
 .brand-marquee {
