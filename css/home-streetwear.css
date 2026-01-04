@@ -1883,28 +1883,33 @@ footer .copyright {
 
 .marquee-track {
     display: flex;
-    animation: marqueeScroll 40s linear infinite;
+    animation: marqueeScroll 30s linear infinite;
     /* Slower for better readability */
     width: max-content;
     /* Ensure it takes full width of content */
     will-change: transform;
+    align-items: center;
+    /* Center vertically */
 }
 
 .brand-item {
     font-family: 'Poppins', sans-serif;
     font-weight: 900;
-    font-size: 4rem;
-    /* Bigger */
+    font-size: 5rem;
+    /* Even bigger */
     text-transform: uppercase;
     margin: 0 4rem;
     letter-spacing: -0.02em;
-    color: transparent;
+    color: var(--white);
+    /* Solid White */
     /* Outline style based on "Van" comment maybe? No, let's make it solid white first */
-    -webkit-text-stroke: 2px var(--white);
+    /* -webkit-text-stroke: 2px var(--white); */
     /* Hollow effect for brutalist style */
-    opacity: 0.8;
+    opacity: 1;
+    /* Full opacity */
     flex-shrink: 0;
     /* Prevent squishing */
+    line-height: 1;
 }
 
 /* Duplication logic is handled by HTML, but we ensure smooth infinite scroll */
