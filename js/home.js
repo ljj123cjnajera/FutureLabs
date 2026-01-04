@@ -458,19 +458,24 @@ class HomeEngine {
       products = this.getFallbackProducts();
     }
 
-    // A. TRENDING / FEATURED (Slider) - Más productos
+    // Priorizar carga: Trending primero (más visible), luego On Sale, luego New Products
+    // A. TRENDING / FEATURED (Slider) - PRIORIDAD ALTA (renderizar primero)
     const trending = products.length > 0 ? products.slice(0, 12) : [];
-    await this.renderProductSlider('featuredProductsGrid', trending);
+    this.renderProductSlider('featuredProductsGrid', trending).catch(e => console.error('Error rendering trending:', e));
 
-    // B. ON SALE (Grid) - Más productos
+    // B. ON SALE (Grid) - PRIORIDAD MEDIA (cargar después de trending)
     const saleProducts = products.filter(p => p.discount_price || p.on_sale || p.discount_percentage).slice(0, 12);
-    await this.renderProductGrid('onSaleProductsGrid', saleProducts);
+    setTimeout(() => {
+      this.renderProductGrid('onSaleProductsGrid', saleProducts).catch(e => console.error('Error rendering on sale:', e));
+    }, 200); // Pequeño delay para no bloquear trending
 
-    // C. NEW PRODUCTS (Grid) - Nuevos lanzamientos
+    // C. NEW PRODUCTS (Grid) - PRIORIDAD BAJA (cargar último)
     const newProducts = products
       .sort((a, b) => new Date(b.created_at || b.createdAt || 0) - new Date(a.created_at || a.createdAt || 0))
       .slice(0, 12);
-    await this.renderProductGrid('newProductsGrid', newProducts);
+    setTimeout(() => {
+      this.renderProductGrid('newProductsGrid', newProducts).catch(e => console.error('Error rendering new products:', e));
+    }, 400); // Delay adicional para no bloquear otras secciones
   }
 
   async renderProductGrid(containerId, products) {
@@ -493,8 +498,11 @@ class HomeEngine {
       return;
     }
 
-    // Simulate network delay for premium 'Skeleton to Content' transition effect
-    await new Promise(r => setTimeout(r, 300));
+    // Mostrar skeleton loader mientras se renderiza
+    this.showSkeletonLoader(container, products.length);
+    
+    // Pequeño delay para transición suave (reducido de 300ms a 150ms)
+    await new Promise(r => setTimeout(r, 150));
 
     // Use Component's Card Generator for consistency
     const cardsHTML = window.Components && window.Components.getProductCard
@@ -524,6 +532,21 @@ class HomeEngine {
       // Lazy load images with IntersectionObserver
       this.initLazyLoading(container);
     }, 200);
+  }
+
+  // Mostrar skeleton loader mejorado
+  showSkeletonLoader(container, count = 8) {
+    const skeletonCards = Array.from({ length: Math.min(count, 12) }, () => `
+      <div class="skeleton-product-card">
+        <div class="skeleton skeleton-image"></div>
+        <div class="skeleton skeleton-title"></div>
+        <div class="skeleton skeleton-text"></div>
+        <div class="skeleton skeleton-text" style="width: 60%;"></div>
+        <div class="skeleton skeleton-button" style="margin-top: 1rem;"></div>
+      </div>
+    `).join('');
+    
+    container.innerHTML = `<div class="product-grid-v3">${skeletonCards}</div>`;
   }
 
   // Mejorar lazy loading de imágenes
@@ -561,6 +584,12 @@ class HomeEngine {
     const container = document.getElementById(containerId);
     if (!container) return;
 
+    // Mostrar skeleton loader para slider
+    this.showSkeletonSlider(container, products.length || 8);
+    
+    // Pequeño delay para transición suave
+    await new Promise(r => setTimeout(r, 150));
+
     // Force horizontal scroll class
     container.classList.add('products-horizontal-scroll');
 
@@ -575,21 +604,46 @@ class HomeEngine {
     }
 
     // Transform grid to slider via style injection if needed
-    if (window.Components && window.Components.getProductCard) {
-      container.innerHTML = products.map(p => window.Components.getProductCard(p)).join('');
+    container.style.opacity = '0';
+    container.style.transition = 'opacity 0.3s ease';
+    
+    setTimeout(() => {
+      if (window.Components && window.Components.getProductCard) {
+        container.innerHTML = products.map(p => window.Components.getProductCard(p)).join('');
+        
+        // Lazy load images
+        this.initLazyLoading(container);
+      } else {
+        // Fallback
+        container.innerHTML = products.map(p => `
+          <div class="product-card">
+            <img src="${p.image_url || ''}" alt="${p.name}" loading="lazy">
+            <h3>${p.name}</h3>
+            <p>S/ ${p.price}</p>
+          </div>
+        `).join('');
+      }
       
-      // Lazy load images
-      this.initLazyLoading(container);
-    } else {
-      // Fallback
-      container.innerHTML = products.map(p => `
-        <div class="product-card">
-          <img src="${p.image_url || ''}" alt="${p.name}" loading="lazy">
-          <h3>${p.name}</h3>
-          <p>S/ ${p.price}</p>
-        </div>
-      `).join('');
-    }
+      requestAnimationFrame(() => {
+        container.style.opacity = '1';
+      });
+    }, 50);
+  }
+
+  // Skeleton loader para slider horizontal
+  showSkeletonSlider(container, count = 8) {
+    const skeletonCards = Array.from({ length: Math.min(count, 12) }, () => `
+      <div class="product-card skeleton-product-card" style="min-width: 320px; max-width: 320px;">
+        <div class="skeleton skeleton-image"></div>
+        <div class="skeleton skeleton-title"></div>
+        <div class="skeleton skeleton-text"></div>
+        <div class="skeleton skeleton-text" style="width: 60%;"></div>
+        <div class="skeleton skeleton-button" style="margin-top: 1rem;"></div>
+      </div>
+    `).join('');
+    
+    container.innerHTML = skeletonCards;
+    container.classList.add('products-horizontal-scroll');
   }
 
 
