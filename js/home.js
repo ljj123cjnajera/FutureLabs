@@ -343,58 +343,6 @@ class HomeEngine {
     `).join('');
   }
 
-  startCountdown() {
-    const dropTimer = document.getElementById('dropTimer');
-    if (!dropTimer) return;
-
-    // Set target date to 3 days from now (Simulated Drop)
-    const targetDate = new Date();
-    targetDate.setDate(targetDate.getDate() + 3);
-    targetDate.setHours(20, 0, 0, 0); // 8 PM Launch
-
-    // Store in session to keep consistent while browsing
-    let savedTarget = sessionStorage.getItem('nextDropTime');
-    if (!savedTarget) {
-      sessionStorage.setItem('nextDropTime', targetDate.getTime());
-      savedTarget = targetDate.getTime();
-    }
-
-    const updateTimer = () => {
-      const now = new Date().getTime();
-      const distance = parseInt(savedTarget) - now;
-
-      const set = (id, value) => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = value.toString().padStart(2, '0');
-      };
-
-      if (distance < 0) {
-        set('days', '00');
-        set('hours', '00');
-        set('minutes', '00');
-        set('seconds', '00');
-        const dropSection = document.getElementById('nextDrop');
-        if (dropSection) {
-          dropSection.querySelector('.drop-badge').textContent = 'LANZAMIENTO ACTIVO';
-        }
-        return;
-      }
-
-      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-      set('days', days);
-      set('hours', hours);
-      set('minutes', minutes);
-      set('seconds', seconds);
-    };
-
-    // Update immediately and then every second
-    updateTimer();
-    setInterval(updateTimer, 1000);
-  }
 
   // ==========================================
   // 3. PRODUCTS (Grid & Slider)
