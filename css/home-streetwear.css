@@ -55,8 +55,7 @@ body {
 /* Smooth transitions for all interactive elements */
 .product-card,
 .bento-item,
-.testimonial-card,
-.journal-card {
+.testimonial-card {
     transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
 }
 
@@ -3013,16 +3012,6 @@ footer .copyright {
         padding: 0 var(--spacing-sm);
     }
 
-    /* Journal Stacking */
-    .journal-grid {
-        grid-template-columns: 1fr;
-        gap: var(--spacing-2xl);
-    }
-
-    .journal-image {
-        height: 200px;
-        /* Slightly smaller on mobile*/
-    }
 
     /* Trust Bar Grid */
     .trust-grid {
@@ -3060,7 +3049,6 @@ footer .copyright {
     }
 
     /* Ensure tap targets are large enough */
-    .journal-card a,
     .product-card a,
     .btn,
     .cta-button {
