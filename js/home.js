@@ -767,8 +767,50 @@ class HomeEngine {
   }
 
   // 6. Sticky Footer Logic (Dismissible)
+  initFlashSaleTimer() {
+    const timerDisplay = document.getElementById('timerDisplay');
+    if (!timerDisplay) return;
+
+    // Obtener tiempo objetivo desde sessionStorage o establecer uno nuevo (24 horas desde ahora)
+    let targetTime = sessionStorage.getItem('flashSaleEndTime');
+    if (!targetTime) {
+      const now = new Date();
+      now.setHours(now.getHours() + 24); // 24 horas desde ahora
+      targetTime = now.getTime();
+      sessionStorage.setItem('flashSaleEndTime', targetTime);
+    } else {
+      targetTime = parseInt(targetTime);
+    }
+
+    const updateTimer = () => {
+      const now = new Date().getTime();
+      const distance = targetTime - now;
+
+      if (distance < 0) {
+        // Oferta expirada, resetear para 24 horas más
+        const newTarget = new Date();
+        newTarget.setHours(newTarget.getHours() + 24);
+        targetTime = newTarget.getTime();
+        sessionStorage.setItem('flashSaleEndTime', targetTime);
+        return;
+      }
+
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      timerDisplay.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    };
+
+    updateTimer();
+    setInterval(updateTimer, 1000);
+  }
+
   initStickyFooter() {
     const sticky = document.getElementById('stickyFooter');
+    
+    // Inicializar contador de tiempo para oferta flash
+    this.initFlashSaleTimer();
     if (!sticky) return;
 
     // Check if dismissed in session

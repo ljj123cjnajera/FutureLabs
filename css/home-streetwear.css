@@ -369,6 +369,120 @@ body.loaded #preloader {
     transform: translateY(-5px);
 }
 
+/* HERO URGENCY ELEMENTS - CONVERSION OPTIMIZATION */
+.hero-urgency-badge {
+    display: inline-block;
+    background: rgba(255, 0, 0, 0.9);
+    color: var(--white);
+    padding: 0.5rem 1.5rem;
+    font-size: 0.85rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 1rem;
+    border: 2px solid var(--white);
+    box-shadow: 4px 4px 0 var(--black);
+    animation: pulse-urgency 2s infinite;
+}
+
+.urgency-pulse {
+    display: inline-block;
+    animation: pulse-icon 1s infinite;
+    margin-right: 0.5rem;
+}
+
+@keyframes pulse-urgency {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 4px 4px 0 var(--black);
+    }
+    50% {
+        transform: scale(1.02);
+        box-shadow: 6px 6px 0 var(--black);
+    }
+}
+
+@keyframes pulse-icon {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+}
+
+.hero-cta-group {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.btn-primary {
+    background: var(--accent) !important;
+    color: var(--black) !important;
+    border-color: var(--accent) !important;
+    font-weight: 900;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: var(--white);
+    transition: left 0.3s ease;
+    z-index: -1;
+}
+
+.btn-primary:hover::before {
+    left: 0;
+}
+
+.btn-primary:hover {
+    color: var(--black) !important;
+    transform: translateY(-3px);
+    box-shadow: 8px 8px 0 var(--black);
+}
+
+.hero-stock-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--gray-300);
+    font-weight: 600;
+}
+
+.stock-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ff4444;
+    animation: pulse-stock 2s infinite;
+    box-shadow: 0 0 10px rgba(255, 68, 68, 0.6);
+}
+
+.stock-dot.available {
+    background: #44ff44;
+    box-shadow: 0 0 10px rgba(68, 255, 68, 0.6);
+}
+
+@keyframes pulse-stock {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(1.2);
+    }
+}
+
 /* ============================================
    V3 REFORM STYLES (BRUTALIST ENGINE)
    ============================================ */
@@ -1444,12 +1558,77 @@ footer .copyright {
 }
 
 .sticky-footer .container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     width: 100%;
     max-width: 1400px;
     padding: 0 20px;
+}
+
+.sticky-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.sticky-urgency {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.urgency-icon {
+    font-size: 1.5rem;
+    animation: pulse-icon 1.5s infinite;
+}
+
+.sticky-text {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.95rem;
+    color: var(--white);
+    margin: 0;
+}
+
+.sticky-separator {
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 300;
+}
+
+.sticky-timer {
+    color: var(--black);
+    font-weight: 900;
+    font-family: 'Courier New', monospace;
+    font-size: 1rem;
+    white-space: nowrap;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+}
+
+#timerDisplay {
+    color: var(--black);
+    font-weight: 900;
+    animation: pulse-timer 1s infinite;
+}
+
+@keyframes pulse-timer {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.sticky-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
 .sticky-footer p {
@@ -1754,6 +1933,80 @@ footer .copyright {
 /* ============================================
    9. TRUST MONITOR (DATA STRIP)
    ============================================ */
+/* TRUST BAR ENHANCED - CONVERSION OPTIMIZED */
+.trust-bar-enhanced {
+    background: var(--black);
+    color: var(--white);
+    padding: 2.5rem 0;
+    border-top: 4px solid var(--accent);
+    border-bottom: 4px solid var(--accent);
+    margin: 3rem 0;
+}
+
+.trust-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    align-items: center;
+}
+
+.trust-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    text-align: left;
+}
+
+.trust-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--accent);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.trust-icon {
+    font-size: 2.5rem;
+    line-height: 1;
+    min-width: 50px;
+    text-align: center;
+}
+
+.trust-content {
+    flex: 1;
+}
+
+.trust-number {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--accent);
+    line-height: 1.2;
+    margin-bottom: 0.25rem;
+    font-family: 'Poppins', sans-serif;
+}
+
+.trust-label {
+    font-size: 0.85rem;
+    color: var(--gray-300);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .trust-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .trust-number {
+        font-size: 1.5rem;
+    }
+}
+
 .trust-bar {
     background: var(--black);
     color: var(--white);
