@@ -66,9 +66,20 @@ class ProductComparator {
     document.addEventListener('click', (e) => {
       if (e.target.closest('.compare-now')) {
         e.preventDefault();
-        window.location.href = 'compare.html';
+        if (this.products.length > 0) {
+          window.location.href = 'compare.html';
+        } else {
+          if (window.notifications) {
+            window.notifications.warning('Agrega productos para comparar');
+          }
+        }
       }
     });
+
+    // Dispatch event when comparator is updated
+    this.dispatchUpdateEvent = () => {
+      document.dispatchEvent(new CustomEvent('comparatorUpdated'));
+    };
   }
 
   isInComparator(productId) {
@@ -94,10 +105,11 @@ class ProductComparator {
       
       if (response.success) {
         const product = response.data.product;
-        this.products.push(product);
-        this.saveToStorage();
-        this.render();
-        window.notifications?.success?.('Producto agregado al comparador');
+      this.products.push(product);
+      this.saveToStorage();
+      this.render();
+      this.emitUpdate();
+      window.notifications?.success?.('Producto agregado al comparador');
       }
     } catch (error) {
       window.notifications?.error?.('Error al agregar producto al comparador');
@@ -127,6 +139,7 @@ class ProductComparator {
     this.products = [];
     this.saveToStorage();
     this.render();
+    this.emitUpdate();
     window.notifications?.success?.('Comparador vaciado');
   }
 
@@ -274,6 +287,7 @@ class ProductComparator {
       this.products = products.filter(Boolean);
       this.saveToStorage();
       this.render();
+      this.emitUpdate();
     } finally {
       this.pendingSetFromIds = null;
     }
