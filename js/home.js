@@ -176,21 +176,42 @@ class HomeEngine {
     const dotsContainer = document.getElementById('heroSliderDots');
     if (!container) return;
 
+    // Verificar si ya hay slides estáticos renderizados
+    const existingSlides = container.querySelectorAll('.slide');
+    const hasStaticSlides = existingSlides.length > 0;
+
     let slides = [];
+    let shouldUpdate = false;
 
     // 1. Try API
     if (this.api && this.api.getHomeHeroSlides) {
       try {
         const res = await this.api.getHomeHeroSlides();
-        if (res.success && Array.isArray(res.data)) {
+        if (res.success && Array.isArray(res.data) && res.data.length > 0) {
           slides = res.data;
+          shouldUpdate = true; // Solo actualizar si hay datos nuevos de la API
         }
       } catch (e) {
         console.error('❌ Hero API Error:', e);
       }
     }
 
-    // 2. Fallback (Default Premium Slides if API empty)
+    // 2. Si no hay datos de API y ya hay slides estáticos, NO actualizar
+    if (!shouldUpdate && hasStaticSlides) {
+      console.log('✅ Using static hero slides from HTML');
+      // Solo inicializar el slider con los slides existentes
+      if (dotsContainer) {
+        const slideCount = existingSlides.length;
+        dotsContainer.innerHTML = Array.from({ length: slideCount }, (_, index) => `
+          <button class="slider-dot ${index === 0 ? 'active' : ''}" onclick="window.homeEngine.goToSlide(${index})"></button>
+        `).join('');
+      }
+      this.startSliderAutoPlay(existingSlides.length);
+      this.setupHeroTouch(container, existingSlides.length);
+      return; // Salir sin reemplazar el contenido
+    }
+
+    // 3. Fallback (Default Premium Slides if API empty AND no static slides)
     if (slides.length === 0) {
       slides = [
         {
@@ -218,16 +239,47 @@ class HomeEngine {
       // Proceed to render
     }
 
-    container.innerHTML = slides.map((slide, index) => `
+    // Renderizar slides con estructura mejorada (incluyendo badges de urgencia)
+    container.innerHTML = slides.map((slide, index) => {
+      // Determinar badge de urgencia basado en el índice o datos del slide
+      const urgencyBadges = [
+        { icon: '⚡', text: 'SOLO 12 PARES DISPONIBLES' },
+        { icon: '🔥', text: 'MÁS VENDIDO ESTA SEMANA' },
+        { icon: '✨', text: 'NUEVO LANZAMIENTO' }
+      ];
+      const urgencyBadge = slide.urgency_badge || urgencyBadges[index] || urgencyBadges[0];
+      
+      // Determinar indicador de stock
+      const stockIndicators = [
+        { dot: '', text: '12 pares restantes' },
+        { dot: 'available', text: 'En stock' },
+        { dot: 'available', text: 'Disponible en 8 colores' }
+      ];
+      const stockIndicator = slide.stock_indicator || stockIndicators[index] || stockIndicators[0];
+      
+      return `
             <div class="slide ${index === 0 ? 'active' : ''}" style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('${slide.image_url}')">
                 <div class="slide-content">
-                    <span class="slide-eyebrow">${slide.eyebrow || 'ÚLTIMOS LANZAMIENTOS'}</span>
-                    <h1>${slide.title}</h1>
-                    <p>${slide.subtitle || ''}</p>
-                    <a href="${slide.link || 'products.html'}" class="btn btn-primary btn-lg">${slide.cta || 'COMPRAR AHORA'}</a>
+                    ${urgencyBadge ? `
+                    <div class="hero-urgency-badge">
+                        <span class="urgency-pulse">${urgencyBadge.icon}</span> ${urgencyBadge.text}
+                    </div>
+                    ` : ''}
+                    <span class="slide-subtitle">${slide.eyebrow || slide.subtitle || 'ÚLTIMOS LANZAMIENTOS'}</span>
+                    <h1 class="hero-title">${slide.title}${slide.title_highlight ? ` <span class="highlight">${slide.title_highlight}</span>` : ''}</h1>
+                    <p>${slide.subtitle || slide.description || ''}</p>
+                    <div class="hero-cta-group">
+                        <a href="${slide.link || 'products.html'}" class="btn btn-primary">${slide.cta || 'COMPRAR AHORA'}</a>
+                        ${stockIndicator ? `
+                        <div class="hero-stock-indicator">
+                            <span class="stock-dot ${stockIndicator.dot}"></span> ${stockIndicator.text}
+                        </div>
+                        ` : ''}
+                    </div>
                 </div>
             </div>
-        `).join('');
+        `;
+    }).join('');
 
     if (dotsContainer) {
       dotsContainer.innerHTML = slides.map((_, index) => `
