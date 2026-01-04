@@ -649,6 +649,25 @@ class HomeEngine {
     if (window.notifications) window.notifications.success('WISHLIST', 'Producto guardado');
   }
 
+  subscribeNewsletter(email) {
+    if (!email || !email.includes('@')) {
+      if (window.notifications) {
+        window.notifications.show('Por favor ingresa un email válido', 'error');
+      }
+      return;
+    }
+
+    // Simular suscripción (aquí iría la llamada real a la API)
+    if (window.notifications) {
+      window.notifications.show('¡Te has suscrito! Revisa tu email para confirmar.', 'success');
+    }
+    localStorage.setItem('newsletter_subscribed', 'true');
+    
+    // Limpiar input
+    const input = document.getElementById('jsFooterEmail');
+    if (input) input.value = '';
+  }
+
   setupNewsletter() {
     // 1. Footer Form (Intercept ID specific to Index or Generic)
     const forms = document.querySelectorAll('.footer-newsletter form, #newsletterPopup form');

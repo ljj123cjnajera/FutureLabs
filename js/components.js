@@ -63,13 +63,34 @@ class Components {
                     </ul>
                 </div>
 
-                <!-- Newsletter -->
+                <!-- Newsletter Mejorado -->
                 <div class="footer-col footer-newsletter">
-                    <h3>STAY IN THE KNOW</h3>
-                    <p class="newsletter-desc">Suscríbete para acceso exclusivo a lanzamientos y eventos.</p>
+                    <h3>🔥 ÚNETE AL CLUB</h3>
+                    <p class="newsletter-desc">
+                        <strong>10% OFF</strong> en tu primera compra + acceso exclusivo a drops limitados
+                    </p>
+                    <div class="newsletter-benefits">
+                        <span class="benefit-item">✓ Acceso anticipado</span>
+                        <span class="benefit-item">✓ Ofertas exclusivas</span>
+                        <span class="benefit-item">✓ Notificaciones de restock</span>
+                    </div>
                     <div class="input-group">
-                        <input type="email" id="jsFooterEmail" name="email" autocomplete="email" placeholder="ENTER YOUR EMAIL">
-                        <button>→</button>
+                        <input type="email" id="jsFooterEmail" name="email" autocomplete="email" placeholder="TU EMAIL AQUÍ">
+                        <button onclick="window.homeEngine?.subscribeNewsletter(document.getElementById('jsFooterEmail').value)">→</button>
+                    </div>
+                    <div class="guarantees-bar">
+                        <div class="guarantee-item">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>100% Auténtico</span>
+                        </div>
+                        <div class="guarantee-item">
+                            <i class="fas fa-truck"></i>
+                            <span>Envío Gratis</span>
+                        </div>
+                        <div class="guarantee-item">
+                            <i class="fas fa-undo"></i>
+                            <span>30 Días Devolución</span>
+                        </div>
                     </div>
                     <div class="payment-methods">
                         <span class="payment-method">VISA</span>
@@ -347,11 +368,12 @@ class Components {
     window.headerInitialized = true;
     // console.log('🔵 [COMPONENTS] initHeader() executed');
 
-    // Ticker Animation Logic
+    // Ticker Animation Logic - Mensajes más convincentes
     const messages = [
-      "FREE SHIPPING ON ORDERS OVER $150 ✈️",
-      "NEW JORDAN DROP THIS FRIDAY 🔥",
-      "JOIN THE CLUB & GET 10% OFF 👟"
+      "🚚 ENVÍO GRATIS A TODO PERÚ • CÓDIGO: LIMA20 = S/ 20 OFF",
+      "🔥 NUEVO DROP JORDAN ESTE VIERNES • STOCK LIMITADO",
+      "⚡ ÚNETE AL CLUB Y OBTÉN 10% OFF EN TU PRIMERA COMPRA",
+      "💳 ACEPTAMOS YAPE • PAGO SEGURO • 100% AUTÉNTICO"
     ];
     let msgIndex = 0;
     const ticker = document.getElementById('announcementText');
@@ -593,9 +615,17 @@ class Components {
                onerror="this.onerror=null; this.src='${placeholderImg}'">
           
           <div class="product-badges">
-            ${discount > 0 ? `<span class="product-badge product-badge-sale">-${discount}%</span>` : ''}
-            ${product.is_new ? `<span class="product-badge product-badge-new">NUEVO</span>` : ''}
+            ${discount > 0 ? `<span class="product-badge product-badge-sale">-${Math.round(discount)}% OFF</span>` : ''}
+            ${product.is_new || product.created_at ? `<span class="product-badge product-badge-new">NUEVO</span>` : ''}
+            ${product.is_bestseller || product.sales_count > 50 ? `<span class="product-badge product-badge-bestseller">🔥 MÁS VENDIDO</span>` : ''}
+            ${product.is_trending || product.views > 100 ? `<span class="product-badge product-badge-trending">⚡ TENDENCIA</span>` : ''}
+            ${product.stock_quantity !== undefined && product.stock_quantity > 0 && product.stock_quantity <= 5 ? `<span class="product-badge product-badge-low-stock">⚠️ ÚLTIMAS ${product.stock_quantity}</span>` : ''}
           </div>
+          ${product.stock_quantity !== undefined ? `
+            <div class="product-stock-badge ${product.stock_quantity === 0 ? 'sold-out' : product.stock_quantity <= 5 ? 'low' : 'available'}">
+              ${product.stock_quantity === 0 ? 'AGOTADO' : product.stock_quantity <= 5 ? `Solo ${product.stock_quantity} pares` : 'En stock'}
+            </div>
+          ` : ''}
 
           <div class="product-quick-actions">
             <button class="product-quick-action" onclick="event.stopPropagation(); window.wishlistManager?.toggle('${product.id}')" title="Agregar a favoritos">
