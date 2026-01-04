@@ -44,7 +44,12 @@ class Product {
       query = query.limit(filters.limit).offset(offset);
     }
 
-    return await query;
+    try {
+      return await query.timeout(5000); // 5 segundos máximo
+    } catch (error) {
+      console.error('Error en Product.getAll:', error.message);
+      throw error;
+    }
   }
 
   // Obtener producto por ID

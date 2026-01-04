@@ -1,11 +1,17 @@
 const db = require('../database/config');
 
 class Category {
-  // Obtener todas las categorías
+  // Obtener todas las categorías (con timeout)
   static async getAll() {
-    return await db('categories')
-      .select('*')
-      .orderBy('sort_order', 'asc');
+    try {
+      return await db('categories')
+        .select('*')
+        .orderBy('sort_order', 'asc')
+        .timeout(5000); // 5 segundos máximo
+    } catch (error) {
+      console.error('Error en Category.getAll:', error.message);
+      throw error;
+    }
   }
 
   // Obtener categoría por ID

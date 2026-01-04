@@ -2,13 +2,18 @@ const knex = require('../database/config');
 
 class HeroSlide {
   static async getAll(activeOnly = false) {
-    let query = knex('hero_slides');
-    
-    if (activeOnly) {
-      query = query.where('is_active', true);
+    try {
+      let query = knex('hero_slides');
+      
+      if (activeOnly) {
+        query = query.where('is_active', true);
+      }
+      
+      return await query.orderBy('order_index', 'asc').timeout(5000); // 5 segundos máximo
+    } catch (error) {
+      console.error('Error en HeroSlide.getAll:', error.message);
+      throw error;
     }
-    
-    return await query.orderBy('order_index', 'asc');
   }
 
   static async getById(id) {
