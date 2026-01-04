@@ -176,9 +176,9 @@ class Components {
                 <!-- SEARCH (Desktop) -->
                 ${showSearch ? `
                 <div class="header-search desktop-only">
-                    <div class="search-input-wrapper" onclick="window.SearchOverlay.open()">
-                        <input type="text" id="headerSearchInput" name="q" placeholder="SEARCH DROPS..." readonly style="cursor: pointer;">
-                        <button class="search-icon-btn"><i class="fas fa-search"></i></button>
+                    <div class="search-input-wrapper">
+                        <input type="text" id="headerSearchInput" name="q" placeholder="SEARCH DROPS..." style="cursor: text;">
+                        <button class="search-icon-btn" onclick="window.Components.submitSearch()"><i class="fas fa-search"></i></button>
                     </div>
                 </div>
                 ` : ''}
@@ -422,7 +422,26 @@ class Components {
   }
 
   static initSearch() {
+    // Init logic for Header Search Input
+    const input = document.getElementById('headerSearchInput');
+    if (input) {
+      input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          this.submitSearch();
+        }
+      });
+    }
+
+    // Keep autocomplete loading if needed but ensure our direct search works
     this.ensureAutocompleteAssets();
+  }
+
+  static submitSearch() {
+    const input = document.getElementById('headerSearchInput');
+    const query = input ? input.value.trim() : '';
+    if (query) {
+      window.location.href = `search.html?q=${encodeURIComponent(query)}`;
+    }
   }
 
   static ensureWishlistAssets() {
