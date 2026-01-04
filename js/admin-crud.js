@@ -975,7 +975,11 @@ class AdminCRUD {
 
     if (weightInput) weightInput.value = product.weight || '';
     if (dimensionsInput) dimensionsInput.value = product.dimensions || '';
-    if (isActiveInput) isActiveInput.checked = product.is_active;
+    if (isActiveInput) isActiveInput.checked = product.is_active !== false;
+    if (featuredInput) featuredInput.checked = product.featured === true;
+    if (isNewInput) isNewInput.checked = product.is_new === true;
+    if (isTrendingInput) isTrendingInput.checked = product.is_trending === true;
+    if (isBestsellerInput) isBestsellerInput.checked = product.is_bestseller === true;
   }
 
   // ... (Other entity methods truncated for brevity but preserved)

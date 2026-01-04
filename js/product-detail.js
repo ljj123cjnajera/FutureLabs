@@ -64,17 +64,20 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
 
         } catch (error) {
-            console.warn('❌ API Error in PDP:', error);
-
-            // 4. Fallback Logic
-            const mock = getMockProduct(productId);
-            if (mock) {
-                window.currentProduct = mock;
-                const imgs = [mock.image_url, mock.image_url, mock.image_url, mock.image_url];
-                renderProductDetails(mock, container, imgs);
-                if (window.notifications) window.notifications.info('OFFLINE MODE', 'Mostrando versión simulada');
-            } else {
-                renderErrorState(container, 'Producto no encontrado');
+            console.error('❌ API Error in PDP:', error);
+            
+            // Mostrar error real al usuario
+            renderErrorState(container, `Error al cargar producto: ${error.message || 'Error de conexión'}`);
+            
+            // Solo usar fallback si realmente no hay conexión (no para errores 404, etc)
+            if (error.message && error.message.includes('Failed to fetch')) {
+                const mock = getMockProduct(productId);
+                if (mock) {
+                    window.currentProduct = mock;
+                    const imgs = [mock.image_url, mock.image_url, mock.image_url, mock.image_url];
+                    renderProductDetails(mock, container, imgs);
+                    if (window.notifications) window.notifications.warning('MODO OFFLINE', 'No hay conexión. Mostrando versión simulada.');
+                }
             }
         }
     }
