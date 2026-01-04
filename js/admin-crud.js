@@ -722,7 +722,11 @@ class AdminCRUD {
         image_url: document.getElementById('productImage').value,
         weight: document.getElementById('productWeight') ? parseFloat(document.getElementById('productWeight').value) : null,
         dimensions: document.getElementById('productDimensions') ? document.getElementById('productDimensions').value : null,
-        is_active: document.getElementById('productIsActive').checked
+        is_active: document.getElementById('productIsActive').checked,
+        featured: document.getElementById('productFeatured')?.checked || false,
+        is_new: document.getElementById('productIsNew')?.checked || false,
+        is_trending: document.getElementById('productIsTrending')?.checked || false,
+        is_bestseller: document.getElementById('productIsBestseller')?.checked || false
       };
 
       // 2. Handle Image Upload

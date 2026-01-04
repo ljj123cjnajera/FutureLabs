@@ -642,9 +642,29 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="productIsActive" checked> Activo
-                    </label>
+                    <label style="font-weight: 600; margin-bottom: 10px; display: block;">Configuración del Producto</label>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="checkbox" id="productIsActive" checked>
+                            <span>Activo</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="checkbox" id="productFeatured">
+                            <span>⭐ Destacado</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="checkbox" id="productIsNew">
+                            <span>🆕 Nuevo</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="checkbox" id="productIsTrending">
+                            <span>⚡ En Tendencia</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="checkbox" id="productIsBestseller">
+                            <span>🔥 Más Vendido</span>
+                        </label>
+                    </div>
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn-secondary"
