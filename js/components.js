@@ -29,37 +29,37 @@ class Components {
                 <div class="footer-col footer-brand">
                     <div class="footer-logo">SNEAKERS SHOP</div>
                     <p class="footer-bio">
-                        The ultimate destination for hype. Curating the best sneakers from Nike, Jordan, Yeezy and more. 
+                        El destino definitivo para los mejores sneakers. Selección exclusiva de Nike, Jordan, Yeezy y más. 
                         <br><br>
-                        EST. 2024 — WORLDWIDE
+                        EST. 2024 — PERÚ
                     </p>
                     <div class="social-links">
-                        <a href="https://instagram.com" target="_blank"><i class="fab fa-instagram"></i></a>
-                        <a href="https://tiktok.com" target="_blank"><i class="fab fa-tiktok"></i></a>
-                        <a href="https://twitter.com" target="_blank"><i class="fab fa-twitter"></i></a>
-                        <a href="https://youtube.com" target="_blank"><i class="fab fa-youtube"></i></a>
+                        <a href="https://instagram.com" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://tiktok.com" target="_blank" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+                        <a href="https://twitter.com" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="https://youtube.com" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
                     </div>
                 </div>
 
                 <!-- Links 1 -->
                 <div class="footer-col">
-                    <h3>SHOP</h3>
+                    <h3>TIENDA</h3>
                     <ul>
-                        <li><a href="products.html?filter=new">New Arrivals</a></li>
-                        <li><a href="products.html?filter=best">Best Sellers</a></li>
-                        <li><a href="products.html?filter=upcoming">Upcoming Drops</a></li>
-                        <li><a href="products.html?cat=sale">Archived Sale</a></li>
+                        <li><a href="products.html?filter=new">Nuevos Lanzamientos</a></li>
+                        <li><a href="products.html?filter=best">Más Vendidos</a></li>
+                        <li><a href="products.html?filter=trending">En Tendencia</a></li>
+                        <li><a href="products.html?filter=on-sale">En Oferta</a></li>
                     </ul>
                 </div>
 
                 <!-- Links 2 -->
                 <div class="footer-col">
-                    <h3>SUPPORT</h3>
+                    <h3>SOPORTE</h3>
                     <ul>
-                        <li><a href="profile.html?tab=orders">Track Order</a></li>
-                        <li><a href="faq.html">FAQs</a></li>
-                        <li><a href="returns.html">Returns & Exchange</a></li>
-                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="profile.html?tab=orders">Rastrear Pedido</a></li>
+                        <li><a href="faq.html">Preguntas Frecuentes</a></li>
+                        <li><a href="returns.html">Devoluciones</a></li>
+                        <li><a href="contact.html">Contáctanos</a></li>
                     </ul>
                 </div>
 
@@ -102,11 +102,11 @@ class Components {
             </div>
 
             <div class="footer-bottom">
-                <p>&copy; ${new Date().getFullYear()} SNEAKERS SHOP. ALL RIGHTS RESERVED.</p>
+                <p>&copy; ${new Date().getFullYear()} SNEAKERS SHOP. TODOS LOS DERECHOS RESERVADOS.</p>
                 <div class="footer-meta">
-                    <a href="privacy.html">PRIVACY</a>
-                    <a href="terms.html">TERMS</a>
-                    <a href="sitemap.xml">SITEMAP</a>
+                    <a href="privacy.html">PRIVACIDAD</a>
+                    <a href="terms.html">TÉRMINOS</a>
+                    <a href="sitemap.xml">MAPA DEL SITIO</a>
                 </div>
             </div>
             <!-- SPACER FOR STICKY FOOTER -->
@@ -131,7 +131,7 @@ class Components {
     const announcementBar = `
         <div class="announcement-bar">
             <div class="announcement-content" id="announcementText">
-                FREE SHIPPING ON ORDERS OVER $150 ✈️
+                ENVÍO GRATIS EN PEDIDOS MAYORES A S/ 150 ✈️
             </div>
         </div>
     `;
@@ -159,7 +159,7 @@ class Components {
                     </ul>
                 </div>
                 <div class="mega-column">
-                    <h4>Categories</h4>
+                    <h4>Categorías</h4>
                     <ul>
                         <li><a href="products.html?type=high-top">High Tops</a></li>
                         <li><a href="products.html?type=low-top">Low Tops</a></li>
@@ -169,10 +169,10 @@ class Components {
                 </div>
                 <div class="mega-column">
                     <div class="mega-promo">
-                        <img src="https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&q=80&w=600" alt="Promo">
+                        <img src="https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&q=80&w=600" alt="Promoción" loading="lazy">
                         <div class="promo-content">
-                            <h5>JUST DROPPED</h5>
-                            <a href="products.html?filter=new" class="promo-btn">SHOP NOW</a>
+                            <h5>RECIÉN LANZADO</h5>
+                            <a href="products.html?filter=new" class="promo-btn">COMPRAR AHORA</a>
                         </div>
                     </div>
                 </div>
@@ -198,8 +198,8 @@ class Components {
                 ${showSearch ? `
                 <div class="header-search desktop-only">
                     <div class="search-input-wrapper">
-                        <input type="text" id="headerSearchInput" name="q" placeholder="SEARCH DROPS..." style="cursor: text;">
-                        <button class="search-icon-btn" onclick="window.Components.submitSearch()"><i class="fas fa-search"></i></button>
+                        <input type="text" id="headerSearchInput" name="q" placeholder="BUSCAR PRODUCTOS..." style="cursor: text;" aria-label="Buscar productos">
+                        <button class="search-icon-btn" onclick="window.Components.submitSearch()" aria-label="Buscar"><i class="fas fa-search" aria-hidden="true"></i></button>
                     </div>
                 </div>
                 ` : ''}
@@ -210,19 +210,19 @@ class Components {
                         <i class="fas fa-medal"></i>
                         <span class="desktop-only" id="headerLoyaltyPoints">0 PTS</span>
                     </a>
-                    <a href="#" onclick="window.handleAuthRedirect(event, 'profile.html')" class="action-btn">
-                        <i class="far fa-user"></i>
-                        <span class="desktop-only">ACCOUNT</span>
+                    <a href="#" onclick="window.handleAuthRedirect(event, 'profile.html')" class="action-btn" aria-label="Mi cuenta">
+                        <i class="far fa-user" aria-hidden="true"></i>
+                        <span class="desktop-only">CUENTA</span>
                     </a>
-                    <button class="action-btn" onclick="window.location.href='profile.html?tab=wishlist'">
-                        <i class="far fa-heart"></i>
+                    <button class="action-btn" onclick="window.location.href='profile.html?tab=wishlist'" aria-label="Lista de deseos">
+                        <i class="far fa-heart" aria-hidden="true"></i>
                         <span class="action-badge" id="wishlistCount" style="display: none;">0</span>
-                        <span class="desktop-only">WISHLIST</span>
+                        <span class="desktop-only">FAVORITOS</span>
                     </button>
-                    <button class="action-btn" onclick="window.CartDrawer ? window.CartDrawer.open() : window.location.href='cart.html'">
-                        <i class="fas fa-shopping-bag"></i>
+                    <button class="action-btn" onclick="window.CartDrawer ? window.CartDrawer.open() : window.location.href='cart.html'" aria-label="Carrito de compras">
+                        <i class="fas fa-shopping-bag" aria-hidden="true"></i>
                         <span class="action-badge cart-count">0</span>
-                        <span class="desktop-only">CART</span>
+                        <span class="desktop-only">CARRITO</span>
                     </button>
                     <button class="header-mobile-toggle mobile-only" onclick="document.getElementById('mobileMenu').classList.add('active')">
                         <i class="fas fa-bars"></i>
@@ -237,13 +237,13 @@ class Components {
             <div class="container" style="padding: 0;">
                 <ul class="nav-list">
                     <li class="nav-item">
-                        <a href="products.html?filter=new" class="nav-link">NEW ARRIVALS</a>
+                        <a href="products.html?filter=new" class="nav-link">NUEVOS LANZAMIENTOS</a>
                         ${megaMenuHTML}
                     </li>
                     <li class="nav-item"><a href="products.html?category=jordan" class="nav-link">JORDAN</a></li>
                     <li class="nav-item"><a href="products.html?category=yeezy" class="nav-link">YEEZY</a></li>
                     <li class="nav-item"><a href="products.html?category=nike" class="nav-link">NIKE</a></li>
-                    <li class="nav-item"><a href="products.html?filter=sale" class="nav-link" style="color: var(--accent);">SALE</a></li>
+                    <li class="nav-item"><a href="products.html?filter=sale" class="nav-link" style="color: var(--accent);">OFERTAS</a></li>
                 </ul>
             </nav>
             ` : ''}
@@ -252,23 +252,23 @@ class Components {
         <div id="cartDrawerOverlay" class="cart-drawer-overlay" onclick="window.CartDrawer.close()"></div>
         <div id="cartDrawer" class="cart-drawer">
             <div class="cart-drawer-header">
-                <h3>YOUR CART (<span class="cart-count">0</span>)</h3>
-                <button class="close-drawer-btn" onclick="window.CartDrawer.close()">×</button>
+                <h3>TU CARRITO (<span class="cart-count">0</span>)</h3>
+                <button class="close-drawer-btn" onclick="window.CartDrawer.close()" aria-label="Cerrar carrito">×</button>
             </div>
             <div class="cart-drawer-items" id="cartDrawerItems">
                 <!-- Items injected here -->
                 <div class="empty-cart-message">
-                    <p>YOUR CART IS EMPTY</p>
-                    <button class="btn btn-black" onclick="window.CartDrawer.close()">START SHOPPING</button>
+                    <p>TU CARRITO ESTÁ VACÍO</p>
+                    <button class="btn btn-black" onclick="window.CartDrawer.close()">EMPEZAR A COMPRAR</button>
                 </div>
             </div>
             <div class="cart-drawer-footer">
                 <div class="cart-total-row">
                     <span>TOTAL</span>
-                    <span id="cartDrawerTotal">$0.00</span>
+                    <span id="cartDrawerTotal">S/ 0.00</span>
                 </div>
-                <button class="btn btn-black btn-block" onclick="window.location.href='checkout.html'">CHECKOUT</button>
-                <button class="btn btn-outline btn-block" onclick="window.location.href='cart.html'">VIEW CART</button>
+                <button class="btn btn-black btn-block" onclick="window.location.href='checkout.html'">PAGAR</button>
+                <button class="btn btn-outline btn-block" onclick="window.location.href='cart.html'">VER CARRITO</button>
             </div>
         </div>
 
@@ -276,7 +276,7 @@ class Components {
         <div id="searchOverlay" class="search-overlay">
             <button class="search-close-btn" onclick="window.SearchOverlay.close()">×</button>
             <div class="search-container-large search-bar">
-                <input type="text" id="largeSearchInput" class="search-input-large" placeholder="WHAT ARE YOU LOOKING FOR?" autocomplete="off">
+                <input type="text" id="largeSearchInput" class="search-input-large" placeholder="¿QUÉ ESTÁS BUSCANDO?" autocomplete="off" aria-label="Buscar productos">
                 <div class="search-suggestions">
                     <span class="search-tag" onclick="window.SearchOverlay.search('Jordan')">JORDAN</span>
                     <span class="search-tag" onclick="window.SearchOverlay.search('Yeezy')">YEEZY</span>
@@ -295,20 +295,20 @@ class Components {
             </div>
             <div class="mobile-menu-content">
                 <div class="mobile-search" onclick="window.SearchOverlay.open()">
-                    <input type="text" placeholder="SEARCH SNEAKERS..." readonly>
-                    <button><i class="fas fa-search"></i></button>
+                    <input type="text" placeholder="BUSCAR SNEAKERS..." readonly aria-label="Buscar">
+                    <button aria-label="Buscar"><i class="fas fa-search" aria-hidden="true"></i></button>
                 </div>
                 <ul class="mobile-nav-list">
-                    <li><a href="products.html?filter=new">🔥 NEW ARRIVALS</a></li>
+                    <li><a href="products.html?filter=new">🔥 NUEVOS LANZAMIENTOS</a></li>
                     <li><a href="products.html?category=jordan">JORDAN</a></li>
                     <li><a href="products.html?category=yeezy">YEEZY</a></li>
                     <li><a href="products.html?category=nike">NIKE</a></li>
                     <li><a href="products.html?category=adidas">ADIDAS</a></li>
-                    <li><a href="products.html?filter=sale" style="color: var(--error);">SALE ARCHIVE</a></li>
+                    <li><a href="products.html?filter=sale" style="color: var(--error);">OFERTAS</a></li>
                 </ul>
                 <div class="mobile-auth-links">
-                    <a href="login.html">LOGIN</a>
-                    <a href="register.html">JOIN</a>
+                    <a href="login.html">INICIAR SESIÓN</a>
+                    <a href="register.html">REGISTRARSE</a>
                 </div>
             </div>
         </div>
@@ -628,11 +628,11 @@ class Components {
           ` : ''}
 
           <div class="product-quick-actions">
-            <button class="product-quick-action" onclick="event.stopPropagation(); window.wishlistManager?.toggle('${product.id}')" title="Agregar a favoritos">
-              <i class="far fa-heart"></i>
+            <button class="product-quick-action" onclick="event.stopPropagation(); window.wishlistManager?.toggle('${product.id}')" title="Agregar a favoritos" aria-label="Agregar a favoritos">
+              <i class="far fa-heart" aria-hidden="true"></i>
             </button>
-            <button class="product-quick-action" onclick="event.stopPropagation(); window.openQuickView?.('${product.id}') || window.quickView?.show('${product.id}')" title="Vista Rápida">
-              <i class="fas fa-eye"></i>
+            <button class="product-quick-action" onclick="event.stopPropagation(); window.openQuickView?.('${product.id}') || window.quickView?.show('${product.id}')" title="Vista Rápida" aria-label="Vista rápida">
+              <i class="fas fa-eye" aria-hidden="true"></i>
             </button>
           </div>
         </div>
@@ -650,14 +650,14 @@ class Components {
                 <span class="product-price-current">S/ ${parseFloat(product.price).toFixed(2)}</span>
               `}
             </div>
-            <button class="btn-quick-add" onclick="event.preventDefault(); event.stopPropagation(); window.cartManager?.add(${product.id ? `'${product.id}'` : 'null'}, 1); window.notifications?.success('AÑADIDO', '${product.name.replace(/'/g, "\\'")} al carrito');">
-                <i class="fas fa-plus"></i>
+            <button class="btn-quick-add" onclick="event.preventDefault(); event.stopPropagation(); window.cartManager?.add(${product.id ? `'${product.id}'` : 'null'}, 1); window.notifications?.success('AÑADIDO', '${product.name.replace(/'/g, "\\'")} al carrito');" aria-label="Agregar ${product.name.replace(/"/g, '&quot;')} al carrito">
+                <i class="fas fa-plus" aria-hidden="true"></i>
             </button>
           </div>
 
           <div class="product-size-preview">${sizeText}</div>
 
-          <button class="product-btn" onclick="event.stopPropagation(); window.cartManager?.add('${product.id}', 1)">
+          <button class="product-btn" onclick="event.stopPropagation(); window.cartManager?.add('${product.id}', 1)" aria-label="Agregar ${product.name.replace(/"/g, '&quot;')} al carrito">
             AGREGAR AL CARRITO
           </button>
         </div>
