@@ -31,26 +31,26 @@
 
             <nav class="account-nav">
                 <button class="account-nav-btn active" onclick="switchTab('overview')">
-                    <i class="fas fa-th-large"></i> OVERVIEW
+                    <i class="fas fa-th-large"></i> RESUMEN
                 </button>
                 <button class="account-nav-btn" onclick="switchTab('orders')">
-                    <i class="fas fa-box"></i> ORDERS
+                    <i class="fas fa-box"></i> PEDIDOS
                 </button>
                 <button class="account-nav-btn" onclick="switchTab('addresses')">
-                    <i class="fas fa-map-marker-alt"></i> ADDRESSES
+                    <i class="fas fa-map-marker-alt"></i> DIRECCIONES
                 </button>
                 <button class="account-nav-btn" onclick="switchTab('wishlist')">
-                    <i class="fas fa-heart"></i> WISHLIST
+                    <i class="fas fa-heart"></i> FAVORITOS
                 </button>
                 <button class="account-nav-btn" onclick="switchTab('loyalty')">
-                    <i class="fas fa-medal"></i> LOYALTY
+                    <i class="fas fa-medal"></i> PUNTOS
                 </button>
                 <button class="account-nav-btn" onclick="switchTab('settings')">
-                    <!-- <i class="fas fa-cog"></i> --> SETTINGS
+                    <!-- <i class="fas fa-cog"></i> --> CONFIGURACIÓN
                 </button>
                 <button class="account-nav-btn" onclick="window.authManager.logout()"
                     style="margin-top: 2rem; color: red; border-color: red;">
-                    LOGOUT
+                    CERRAR SESIÓN
                 </button>
             </nav>
         </aside>
@@ -59,42 +59,42 @@
         <main class="account-content">
             <!-- OVERVIEW SECTION -->
             <section id="overview" class="account-section active">
-                <h1 class="section-title">DASHBOARD</h1>
+                <h1 class="section-title">RESUMEN</h1>
 
                 <div class="stats-grid">
                     <div class="stat-box">
-                        <span class="stat-label">TOTAL SPENT</span>
+                        <span class="stat-label">TOTAL GASTADO</span>
                         <div class="stat-value" id="totalSpent">S/ 0</div>
                     </div>
                     <div class="stat-box">
-                        <span class="stat-label">ORDERS</span>
+                        <span class="stat-label">PEDIDOS</span>
                         <div class="stat-value" id="totalOrders">0</div>
                     </div>
                     <div class="stat-box">
-                        <span class="stat-label">LOYALTY POINTS</span>
+                        <span class="stat-label">PUNTOS DE FIDELIDAD</span>
                         <div class="stat-value" id="loyaltyPointsValue">0</div>
                     </div>
                 </div>
 
                 <div style="border: 2px solid var(--black); padding: 2rem; text-align: center;">
-                    <h3 style="font-weight: 800; text-transform: uppercase; margin-bottom: 1rem;">NEED HELP?</h3>
-                    <p style="margin-bottom: 1.5rem;">Contact our support team for any issues with your orders.</p>
-                    <button class="btn-save" onclick="window.location.href='mailto:support@sneakersshop.com'">CONTACT
-                        SUPPORT</button>
+                    <h3 style="font-weight: 800; text-transform: uppercase; margin-bottom: 1rem;">¿NECESITAS AYUDA?</h3>
+                    <p style="margin-bottom: 1.5rem;">Contacta a nuestro equipo de soporte para cualquier problema con tus pedidos.</p>
+                    <button class="btn-save" onclick="window.location.href='mailto:support@sneakersshop.com'">CONTACTAR
+                        SOPORTE</button>
                 </div>
             </section>
 
             <!-- ORDERS SECTION -->
             <section id="orders" class="account-section">
-                <h1 class="section-title">MY ORDERS</h1>
+                <h1 class="section-title">MIS PEDIDOS</h1>
                 <div id="ordersList">
-                    <div style="padding: 2rem; border: 2px dashed #ccc; text-align: center;">NO ORDERS YET</div>
+                    <div style="padding: 2rem; border: 2px dashed #ccc; text-align: center;">AÚN NO HAY PEDIDOS</div>
                 </div>
             </section>
 
             <!-- ADDRESSES SECTION -->
             <section id="addresses" class="account-section">
-                <h1 class="section-title">ADDRESSES</h1>
+                <h1 class="section-title">DIRECCIONES</h1>
                 <div class="address-manager">
                     <!-- Address List (Injected) -->
                     <div id="addressList" class="address-grid">
@@ -102,13 +102,13 @@
                     </div>
 
                     <!-- Add Address Button -->
-                    <button class="btn btn-outline" style="margin-top: 2rem;" onclick="toggleAddressForm()">+ ADD NEW
-                        ADDRESS</button>
+                    <button class="btn btn-outline" style="margin-top: 2rem;" onclick="toggleAddressForm()">+ AGREGAR NUEVA
+                        DIRECCIÓN</button>
 
                     <!-- Add Address Form (Hidden by default) -->
                     <div id="addressFormContainer" class="brutalist-form"
                         style="display: none; margin-top: 2rem; border-top: 2px solid var(--black); padding-top: 2rem;">
-                        <h3 class="section-subtitle">NEW SHIPPING ADDRESS</h3>
+                        <h3 class="section-subtitle">NUEVA DIRECCIÓN DE ENVÍO</h3>
                         <form id="newAddressForm" onsubmit="handleSaveAddress(event)">
                             <div class="form-row">
                                 <div class="form-group half">
@@ -156,29 +156,29 @@
 
             <!-- LOYALTY SECTION (NEW) -->
             <section id="loyalty" class="account-section">
-                <h1 class="section-title">LOYALTY VAULT</h1>
+                <h1 class="section-title">PUNTOS DE FIDELIDAD</h1>
                 <div class="stats-grid">
                     <div class="stat-box" style="background: var(--black); color: var(--white);">
-                        <span class="stat-label">CURRENT BALANCE</span>
+                        <span class="stat-label">SALDO ACTUAL</span>
                         <div class="stat-value" id="loyaltyBalance">0 PTS</div>
                     </div>
                     <div class="stat-box">
-                        <span class="stat-label">LIFETIME EARNED</span>
+                        <span class="stat-label">GANADOS EN TOTAL</span>
                         <div class="stat-value" id="loyaltyLifetime">0 PTS</div>
                     </div>
                 </div>
 
                 <h3
                     style="margin-top: 2rem; border-bottom: 2px solid var(--black); padding-bottom: 0.5rem; text-transform: uppercase; font-weight: 800;">
-                    Transaction History</h3>
+                    Historial de Transacciones</h3>
                 <div id="loyaltyHistory" class="loyalty-history-list" style="margin-top: 1rem;">
-                    <div class="loading-brutalist">LOADING HISTORY...</div>
+                    <div class="loading-brutalist">CARGANDO HISTORIAL...</div>
                 </div>
             </section>
 
             <!-- WISHLIST SECTION -->
             <section id="wishlist" class="account-section">
-                <h1 class="section-title">WISHLIST</h1>
+                <h1 class="section-title">FAVORITOS</h1>
                 <div id="wishlistGrid" class="stats-grid"
                     style="grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));">
                     <!-- Items injected via JS -->
@@ -190,7 +190,7 @@
 
             <!-- SETTINGS SECTION -->
             <section id="settings" class="account-section">
-                <h1 class="section-title">SETTINGS</h1>
+                <h1 class="section-title">CONFIGURACIÓN</h1>
                 <form class="brutalist-form" id="profileForm">
                     <div class="form-group">
                         <label>FULL NAME</label>

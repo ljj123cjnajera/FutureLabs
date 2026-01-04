@@ -199,18 +199,18 @@ class HomeEngine {
       slides = [
         {
           image_url: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?q=80&w=2000&auto=format&fit=crop',
-          eyebrow: 'NEW ARRIVALS',
+          eyebrow: 'NUEVOS LANZAMIENTOS',
           title: 'NIKE AIR MAX',
-          subtitle: 'The future of comfort is here.',
-          cta: 'SHOP COLLECTION',
+          subtitle: 'El futuro de la comodidad está aquí.',
+          cta: 'VER COLECCIÓN',
           link: 'products.html?brand=nike'
         },
         {
           image_url: 'https://images.unsplash.com/photo-1607522370275-f14bc3a5d288?q=80&w=2000&auto=format&fit=crop',
-          eyebrow: 'LIMITED EDITION',
-          title: 'URBAN LEGENDS',
-          subtitle: 'Streetwear essentials for the bold.',
-          cta: 'DISCOVER MORE',
+          eyebrow: 'EDICIÓN LIMITADA',
+          title: 'LEYENDAS URBANAS',
+          subtitle: 'Esenciales de streetwear para los audaces.',
+          cta: 'DESCUBRIR MÁS',
           link: 'products.html'
         }
       ];
@@ -225,10 +225,10 @@ class HomeEngine {
     container.innerHTML = slides.map((slide, index) => `
             <div class="slide ${index === 0 ? 'active' : ''}" style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('${slide.image_url}')">
                 <div class="slide-content">
-                    <span class="slide-eyebrow">${slide.eyebrow || 'LATEST DROPS'}</span>
+                    <span class="slide-eyebrow">${slide.eyebrow || 'ÚLTIMOS LANZAMIENTOS'}</span>
                     <h1>${slide.title}</h1>
                     <p>${slide.subtitle || ''}</p>
-                    <a href="${slide.link || 'products.html'}" class="btn btn-primary btn-lg">${slide.cta || 'SHOP NOW'}</a>
+                    <a href="${slide.link || 'products.html'}" class="btn btn-primary btn-lg">${slide.cta || 'COMPRAR AHORA'}</a>
                 </div>
             </div>
         `).join('');
@@ -408,7 +408,7 @@ class HomeEngine {
       container.innerHTML = `
         <div class="p-8 text-center border-2 border-black" style="min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
             <i class="fas fa-box-open fa-2x mb-3" style="color: var(--gray);"></i>
-            <h4 class="font-bold text-lg">COLLECTION_EMPTY</h4>
+            <h4 class="font-bold text-lg">COLECCIÓN VACÍA</h4>
             <p class="text-sm text-gray-500 mb-3">No inventory signal received.</p>
             <button onclick="window.location.reload()" class="btn btn-sm btn-outline">REFRESH_GRID</button>
         </div>`;
@@ -1004,7 +1004,7 @@ class HomeEngine {
         { id: 304, name: 'YEEZY FOAM RNR', price: 90, image_url: 'https://images.unsplash.com/photo-1617267571626-829db2d558d6?auto=format&fit=crop&q=80&w=600' }
       ],
       'adidas': [
-        { id: 401, name: 'ADIDAS FORUM LOW', price: 100, image_url: 'https://images.unsplash.com/photo-1518002171953-a080ee817e1f?auto=format&fit=crop&q=80&w=600', badge: 'TRENDING' },
+        { id: 401, name: 'ADIDAS FORUM LOW', price: 100, image_url: 'https://images.unsplash.com/photo-1518002171953-a080ee817e1f?auto=format&fit=crop&q=80&w=600', badge: 'TENDENCIA' },
         { id: 402, name: 'ADIDAS SAMBA', price: 100, image_url: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?auto=format&fit=crop&q=80&w=600' },
         { id: 403, name: 'ULTRABOOST', price: 180, image_url: 'https://images.unsplash.com/photo-1603808033192-082d6919d3e1?auto=format&fit=crop&q=80&w=600' },
         { id: 404, name: 'GAZELLE', price: 95, image_url: 'https://images.unsplash.com/photo-1616124619460-c9fa42f7481f?auto=format&fit=crop&q=80&w=600' }

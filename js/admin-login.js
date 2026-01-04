@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const originalBtnText = btn.innerHTML;
 
         // Loading State
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> AUTHENTICATING...';
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> AUTENTICANDO...';
         btn.disabled = true;
 
         try {

@@ -103,7 +103,7 @@ class CartEngine {
                     </button>
                     
                     <div style="margin-top: 2rem; text-align: center; font-size: 0.8rem; color: #666;">
-                        <i class="fas fa-lock"></i> SECURE CHECKOUT
+                        <i class="fas fa-lock"></i> PAGO SEGURO
                     </div>
                 </div>
             </div>

@@ -97,7 +97,7 @@ async function loadWishlist() {
                 <i class="far fa-heart" style="font-size: 3rem; margin-bottom: 1rem; color: var(--gray-400);"></i>
                 <h3 style="font-weight: 900; text-transform: uppercase;">YOUR ROTATION IS EMPTY</h3>
                 <p style="margin-bottom: 2rem;">Save items here to track price drops and restocks.</p>
-                <a href="products.html" class="btn btn-primary">EXPLORE CATALOG</a>
+                <a href="products.html" class="btn btn-primary">EXPLORAR CATÁLOGO</a>
             </div>
         `;
         return;
@@ -405,7 +405,8 @@ function switchTab(tabId) {
     // Cargar datos específicos de la sección
     if (tabId === 'addresses') {
         loadAddresses();
-    } else if (tabId === 'points') {
+    } else if (tabId === 'loyalty' || tabId === 'points') {
+        loadLoyaltyPoints();
         loadLoyaltyTransactions();
     } else if (tabId === 'wishlist') {
         loadWishlist();
@@ -565,7 +566,27 @@ async function loadLoyaltyPoints() {
     try {
         const response = await window.api.getLoyaltyPoints();
         if (response.success && response.data.points !== undefined) {
-            updateLoyaltyUI(Number(response.data.points || 0));
+            const points = Number(response.data.points || 0);
+            updateLoyaltyUI(points);
+            
+            // Actualizar también en la sección de loyalty
+            const balanceEl = document.getElementById('loyaltyBalance');
+            if (balanceEl) {
+                balanceEl.textContent = `${points.toLocaleString('es-PE')} PTS`;
+            }
+            
+            // Calcular puntos ganados en total (suma de transacciones positivas)
+            const transactionsResponse = await window.api.getLoyaltyTransactions(100);
+            if (transactionsResponse.success && transactionsResponse.data.transactions) {
+                const lifetimeEarned = transactionsResponse.data.transactions
+                    .filter(t => t.points_change > 0)
+                    .reduce((sum, t) => sum + t.points_change, 0);
+                
+                const lifetimeEl = document.getElementById('loyaltyLifetime');
+                if (lifetimeEl) {
+                    lifetimeEl.textContent = `${lifetimeEarned.toLocaleString('es-PE')} PTS`;
+                }
+            }
         }
     } catch (error) {
         console.error('Error loading loyalty points:', error);
@@ -574,8 +595,19 @@ async function loadLoyaltyPoints() {
 
 // Cargar transacciones de lealtad
 async function loadLoyaltyTransactions() {
-    const container = document.getElementById('loyaltyTransactions');
-    if (!container) return;
+    const container = document.getElementById('loyaltyHistory');
+    if (!container) {
+        // Fallback al ID alternativo
+        const altContainer = document.getElementById('loyaltyTransactions');
+        if (altContainer) {
+            return loadLoyaltyTransactionsInContainer(altContainer);
+        }
+        return;
+    }
+    return loadLoyaltyTransactionsInContainer(container);
+}
+
+async function loadLoyaltyTransactionsInContainer(container) {
 
     window.loadingState.renderLoading(container, 'Cargando transacciones de puntos...');
 
@@ -597,15 +629,15 @@ async function loadLoyaltyTransactions() {
             }
 
             container.innerHTML = transactions.map(trans => `
-                <div class="loyalty-transaction">
+                <div class="loyalty-transaction" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-bottom: 1px solid var(--gray-200);">
                     <div>
-                        <div class="loyalty-transaction-type">${trans.description || 'Transacción'}</div>
-                        <div style="font-size: 0.875rem; color: var(--gray-500); margin-top: 4px;">
-                            ${new Date(trans.created_at).toLocaleDateString('es-PE')}
+                        <div style="font-weight: 600; margin-bottom: 0.25rem;">${trans.description || trans.type === 'earned' ? 'Puntos ganados' : 'Canje de puntos'}</div>
+                        <div style="font-size: 0.875rem; color: var(--gray-500);">
+                            ${new Date(trans.created_at).toLocaleDateString('es-PE', { year: 'numeric', month: 'long', day: 'numeric' })}
                         </div>
                     </div>
-                    <div class="loyalty-transaction-amount ${trans.points > 0 ? 'positive' : 'negative'}">
-                        ${trans.points > 0 ? '+' : ''}${trans.points}
+                    <div style="font-weight: 800; font-size: 1.1rem; color: ${trans.points_change > 0 ? 'var(--success)' : 'var(--error)'};">
+                        ${trans.points_change > 0 ? '+' : ''}${trans.points_change}
                     </div>
                 </div>
             `).join('');

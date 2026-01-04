@@ -67,13 +67,13 @@
             style="margin-top: 4rem; margin-bottom: 2rem; border-bottom: 4px solid var(--black); padding-bottom: 1rem;">
             <div class="d-flex justify-content-between align-items-end flex-wrap gap-4">
                 <div>
-                    <span class="text-uppercase fw-bold" style="letter-spacing: 2px;">Catalog v3.0</span>
+                    <span class="text-uppercase fw-bold" style="letter-spacing: 2px;">Catálogo v3.0</span>
                     <h1
                         style="font-size: 4rem; line-height: 0.9; margin: 0; text-transform: uppercase; font-weight: 900;">
-                        ALL ACCESS</h1>
+                        ACCESO TOTAL</h1>
                 </div>
                 <div class="catalog-stats fw-bold">
-                    <span id="productCount">0</span> ITEMS LOADED
+                    <span id="productCount">0</span> PRODUCTOS CARGADOS
                 </div>
             </div>
         </div>
@@ -82,15 +82,15 @@
             <!-- V3 Controls -->
             <div class="catalog-controls"
                 style="margin-bottom: 2rem; display: flex; gap: 1rem; border: 2px solid var(--black); padding: 1rem;">
-                <button class="btn-filter" onclick="window.catalogEngine.filter('all')">ALL</button>
+                <button class="btn-filter" onclick="window.catalogEngine.filter('all')">TODOS</button>
                 <button class="btn-filter" onclick="window.catalogEngine.filter('jordan')">JORDAN</button>
                 <button class="btn-filter" onclick="window.catalogEngine.filter('yeezy')">YEEZY</button>
                 <button class="btn-filter" onclick="window.catalogEngine.filter('nike')">NIKE</button>
                 <div style="margin-left: auto;">
                     <select id="sortSelect" class="brutalist-select" onchange="window.catalogEngine.sort(this.value)">
-                        <option value="newest">LATEST DROP</option>
-                        <option value="price-asc">CHEAPEST</option>
-                        <option value="price-desc">MOST HYPE</option>
+                        <option value="newest">ÚLTIMO LANZAMIENTO</option>
+                        <option value="price-asc">MÁS BARATO</option>
+                        <option value="price-desc">MÁS HYPE</option>
                     </select>
                 </div>
             </div>

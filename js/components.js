@@ -66,7 +66,7 @@ class Components {
                 <!-- Newsletter -->
                 <div class="footer-col footer-newsletter">
                     <h3>STAY IN THE KNOW</h3>
-                    <p class="newsletter-desc">Subscribe for exclusive access to drops and events.</p>
+                    <p class="newsletter-desc">Suscríbete para acceso exclusivo a lanzamientos y eventos.</p>
                     <div class="input-group">
                         <input type="email" id="jsFooterEmail" name="email" autocomplete="email" placeholder="ENTER YOUR EMAIL">
                         <button>→</button>
@@ -120,16 +120,16 @@ class Components {
         <div class="mega-menu-dropdown">
             <div class="mega-menu-container">
                 <div class="mega-column">
-                    <h4>Collections</h4>
+                    <h4>Colecciones</h4>
                     <ul>
-                        <li><a href="products.html?filter=new-arrivals">New Arrivals 🔥</a></li>
-                        <li><a href="products.html?filter=best-sellers">Best Sellers</a></li>
-                        <li><a href="products.html?collection=limited">Limited Editions</a></li>
-                        <li><a href="products.html?collection=essentials">Essentials</a></li>
+                        <li><a href="products.html?filter=new-arrivals">Nuevos Lanzamientos 🔥</a></li>
+                        <li><a href="products.html?filter=best-sellers">Más Vendidos</a></li>
+                        <li><a href="products.html?collection=limited">Ediciones Limitadas</a></li>
+                        <li><a href="products.html?collection=essentials">Esenciales</a></li>
                     </ul>
                 </div>
                 <div class="mega-column">
-                    <h4>Brands</h4>
+                    <h4>Marcas</h4>
                     <ul>
                         <li><a href="products.html?category=jordan">Air Jordan</a></li>
                         <li><a href="products.html?category=yeezy">Yeezy</a></li>
