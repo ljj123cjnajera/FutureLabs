@@ -44,7 +44,7 @@
                 FUTURE<span>LABS</span>
             </a>
             <div class="secure-badge">
-                <i class="fas fa-lock"></i> CHECKOUT SEGURO 256-BIT
+                <i class="fas fa-lock" aria-hidden="true"></i> CHECKOUT SEGURO 256-BIT
             </div>
         </div>
     </header>
@@ -54,11 +54,11 @@
         <!-- Brutalist Title -->
         <!-- Brutalist Title -->
         <div class="container checkout-title-container">
-            <h1 class="checkout-main-title">SECURE
-                CHECKOUT</h1>
+            <h1 class="checkout-main-title">CHECKOUT
+                SEGURO</h1>
             <div class="checkout-trust-row">
-                <span><i class="fas fa-shield-alt checkout-trust-icon"></i> PAGO ENCRIPTADO</span>
-                <span><i class="fas fa-check-circle checkout-trust-icon"></i> GARANTÍA DE SATISFACCIÓN</span>
+                <span><i class="fas fa-shield-alt checkout-trust-icon" aria-hidden="true"></i> PAGO ENCRIPTADO</span>
+                <span><i class="fas fa-check-circle checkout-trust-icon" aria-hidden="true"></i> GARANTÍA DE SATISFACCIÓN</span>
             </div>
         </div>
 
@@ -66,21 +66,21 @@
         <div class="container">
             <!-- Progress Bar -->
             <div class="checkout-progress" id="checkoutProgress">
-                <div class="step active" data-step="1">
+                <div class="step active" data-step="1" aria-current="step">
                     <div class="step-number">1</div>
-                    <div class="step-label">SHIPPING</div>
+                    <div class="step-label">ENVÍO</div>
                 </div>
                 <div class="step" data-step="2">
                     <div class="step-number">2</div>
-                    <div class="step-label">PAYMENT</div>
+                    <div class="step-label">PAGO</div>
                 </div>
                 <div class="step" data-step="3">
                     <div class="step-number">3</div>
-                    <div class="step-label">REVIEW</div>
+                    <div class="step-label">REVISAR</div>
                 </div>
                 <div class="step" data-step="4">
                     <div class="step-number">4</div>
-                    <div class="step-label">CONFIRM</div>
+                    <div class="step-label">CONFIRMAR</div>
                 </div>
             </div>
 
@@ -88,14 +88,14 @@
             <div class="checkout-container">
                 <!-- Left Column: Forms -->
                 <div class="checkout-content" id="checkoutContent">
-                    <div style="text-align: center; padding: 100px;">
-                        <div class="loading-brutalist">LOADING SECURE SERVER...</div>
+                    <div style="text-align: center; padding: 100px;" role="status" aria-live="polite">
+                        <div class="loading-brutalist">CARGANDO SERVIDOR SEGURO...</div>
                     </div>
                 </div>
 
                 <!-- Right Column: Summary (Sticky in CSS) -->
-                <div class="order-summary-box" id="orderSummary">
-                    <div class="loading-brutalist">LOADING CART...</div>
+                <div class="order-summary-box" id="orderSummary" role="complementary" aria-label="Resumen del pedido">
+                    <div class="loading-brutalist">CARGANDO CARRITO...</div>
                 </div>
             </div>
 
