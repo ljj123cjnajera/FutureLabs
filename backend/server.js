@@ -26,12 +26,18 @@ if (!fs.existsSync(uploadsDir)) {
   console.log('📁 Directorio uploads creado');
 }
 
-// Auto-run seeds if products table is empty (con timeout y manejo mejorado)
+// Auto-run seeds if products table is empty (DESHABILITADO - causan bloqueo del pool)
 async function ensureDataSeeded() {
+  // DESHABILITADO: Los seeds están bloqueando el pool de conexiones
+  // Ejecutar seeds manualmente cuando sea necesario
+  console.log('⚠️  Seeds disabled at startup to prevent pool blocking');
+  console.log('⚠️  Run seeds manually: npx knex seed:run');
+  return;
+  
+  /* CÓDIGO COMENTADO - Deshabilitado para evitar bloqueo del pool
   try {
     console.log('🔍 Checking if products exist...');
     
-    // Usar Promise.race para timeout de 5 segundos
     const checkPromise = db('products').select('id').limit(1).timeout(5000);
     const timeoutPromise = new Promise((_, reject) => 
       setTimeout(() => reject(new Error('Query timeout')), 5000)
@@ -46,7 +52,7 @@ async function ensureDataSeeded() {
       execSync('npx knex seed:run --knexfile=./knexfile.js', {
         stdio: 'inherit',
         cwd: process.cwd(),
-        timeout: 20000 // 20 segundos máximo
+        timeout: 20000
       });
       console.log('✅ Seeds completed');
     } else {
@@ -54,12 +60,11 @@ async function ensureDataSeeded() {
     }
   } catch (error) {
     console.log('⚠️  Could not check/seed products:', error.message);
-    // No mostrar stack completo en producción para evitar logs largos
     if (process.env.NODE_ENV === 'development') {
       console.log('⚠️  Error stack:', error.stack);
     }
-    // Continuar sin bloquear - el servidor debe iniciar de todas formas
   }
+  */
 }
 
 // Agrega esta línea para el proxy:
@@ -284,22 +289,29 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Ejecutar migraciones de forma asíncrona (no bloquea el inicio)
+// Ejecutar migraciones de forma asíncrona (DESHABILITADO - causan bloqueo del pool)
 async function runMigrations() {
+  // DESHABILITADO: Las migraciones están bloqueando el pool de conexiones
+  // Ejecutar migraciones manualmente cuando sea necesario
+  console.log('⚠️  Migrations disabled at startup to prevent pool blocking');
+  console.log('⚠️  Run migrations manually: npx knex migrate:latest');
+  return;
+  
+  /* CÓDIGO COMENTADO - Deshabilitado para evitar bloqueo del pool
   try {
     console.log('🔄 Running database migrations...');
     const { execSync } = require('child_process');
     execSync('npx knex migrate:latest', {
       stdio: 'inherit',
       cwd: process.cwd(),
-      timeout: 20000 // Reducir a 20 segundos máximo
+      timeout: 20000
     });
     console.log('✅ Migrations completed');
   } catch (error) {
     console.log('⚠️  Migrations failed:', error.message);
     console.log('⚠️  Server will continue without migrations');
-    // No bloquear el servidor si las migraciones fallan
   }
+  */
 }
 
 // Iniciar servidor inmediatamente (sin esperar migraciones)
