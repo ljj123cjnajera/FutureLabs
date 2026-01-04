@@ -70,17 +70,38 @@ const allowedOrigins = [
   'http://localhost:3000'
 ].filter(Boolean); // Elimina valores undefined/null
 
+// Función para verificar si el origen está permitido
+function isOriginAllowed(origin) {
+  if (!origin) return true; // Permite requests sin origen
+  
+  // Verificar lista exacta
+  if (allowedOrigins.indexOf(origin) !== -1) {
+    return true;
+  }
+  
+  // Permitir cualquier subdominio de github.io
+  if (origin.includes('.github.io')) {
+    return true;
+  }
+  
+  // Permitir localhost en cualquier puerto
+  if (origin.startsWith('http://localhost:') || origin.startsWith('https://localhost:')) {
+    return true;
+  }
+  
+  return false;
+}
+
 app.use(cors({
   origin: function (origin, callback) {
-    // Permite requests sin origen (como mobile apps o curl)
-    if (!origin) return callback(null, true);
-
-    if (allowedOrigins.indexOf(origin) !== -1) {
+    if (isOriginAllowed(origin)) {
       callback(null, true);
     } else {
-      // Log para debugging pero permitir en desarrollo
       console.log('⚠️ CORS: Origin not allowed:', origin);
-      if (process.env.NODE_ENV === 'development') {
+      // En producción, permitir GitHub Pages incluso si no está en la lista exacta
+      if (process.env.NODE_ENV === 'production' && origin && origin.includes('github.io')) {
+        callback(null, true);
+      } else if (process.env.NODE_ENV === 'development') {
         callback(null, true); // Permitir en desarrollo
       } else {
         callback(new Error('Not allowed by CORS'));
@@ -89,9 +110,19 @@ app.use(cors({
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  allowedHeaders: [
+    'Content-Type', 
+    'Authorization', 
+    'X-Requested-With',
+    'Accept',
+    'Origin',
+    'Access-Control-Request-Method',
+    'Access-Control-Request-Headers'
+  ],
+  exposedHeaders: ['Content-Range', 'X-Content-Range'],
   preflightContinue: false,
-  optionsSuccessStatus: 204
+  optionsSuccessStatus: 204,
+  maxAge: 86400 // Cache preflight por 24 horas
 }));
 
 // Compresión
