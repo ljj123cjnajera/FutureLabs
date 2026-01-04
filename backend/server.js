@@ -29,9 +29,9 @@ if (!fs.existsSync(uploadsDir)) {
 // Auto-run seeds if products table is empty (ejecutar DESPUÉS de migraciones)
 async function ensureDataSeeded() {
   try {
-    // Esperar 15 segundos adicionales después de las migraciones
-    // para asegurar que las migraciones hayan terminado completamente
-    await new Promise(resolve => setTimeout(resolve, 15000));
+    // Reducir delay a 5 segundos después de las migraciones
+    // para acelerar el proceso de inicialización
+    await new Promise(resolve => setTimeout(resolve, 5000));
     
     console.log('🔍 Checking if products exist...');
     
@@ -306,9 +306,9 @@ app.use((err, req, res, next) => {
 // Usando la instancia de knex directamente para evitar procesos separados
 async function runMigrations() {
   try {
-    // Esperar 10 segundos para que el servidor esté completamente iniciado
-    // y haya respondido a algunas peticiones iniciales
-    await new Promise(resolve => setTimeout(resolve, 10000));
+    // Reducir delay a 3 segundos - suficiente para que Railway detecte que el servidor está vivo
+    // pero no tanto que cause problemas de inicialización
+    await new Promise(resolve => setTimeout(resolve, 3000));
     
     console.log('🔄 Running database migrations in background...');
     
@@ -353,12 +353,13 @@ async function runMigrations() {
 }
 
 // Iniciar servidor inmediatamente (sin esperar migraciones)
-app.listen(PORT, '0.0.0.0', () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 FutureLabs API corriendo en puerto ${PORT}`);
   console.log(`📡 Ambiente: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🌐 Escuchando en 0.0.0.0:${PORT}`);
+  console.log(`✅ Server is ready to accept connections`);
   
-  // Ejecutar migraciones en background después de iniciar
+  // Ejecutar migraciones en background después de iniciar (con delay reducido)
   runMigrations().catch(err => {
     console.log('⚠️  Migration error:', err.message);
   });
@@ -366,5 +367,18 @@ app.listen(PORT, '0.0.0.0', () => {
   // Ejecutar seed check después de iniciar
   ensureDataSeeded().catch(err => {
     console.log('⚠️  Seed check error:', err.message);
+  });
+});
+
+// Manejar errores del servidor
+server.on('error', (err) => {
+  console.error('❌ Server error:', err);
+});
+
+// Asegurar que el servidor responda inmediatamente al health check
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down gracefully');
+  server.close(() => {
+    console.log('Server closed');
   });
 });
