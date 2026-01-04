@@ -929,24 +929,33 @@ class HomeEngine {
   initScrollAnimations() {
     const observerOptions = {
       root: null,
-      rootMargin: '0px',
+      rootMargin: '0px 0px -50px 0px', // Trigger slightly before element is visible
       threshold: 0.1
     };
 
     const observer = new IntersectionObserver((entries, observer) => {
-      entries.forEach(entry => {
+      entries.forEach((entry, index) => {
         if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
+          // Add staggered delay for better visual effect
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+          }, index % 4 * 50);
           observer.unobserve(entry.target); // Reveal once
         }
       });
     }, observerOptions);
 
     // Select elements to reveal
-    const elementsToReveal = document.querySelectorAll('.section, .bento-item, .product-card, .brand-item, .journal-card, .trust-bar, .newsletter-section');
+    const elementsToReveal = document.querySelectorAll('.section, .bento-item, .product-card, .brand-item, .journal-card, .trust-bar, .newsletter-section, .testimonial-card');
 
     elementsToReveal.forEach((el, index) => {
       el.classList.add('reveal-on-scroll');
+      // Initial hidden state
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(30px)';
+      el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
       el.style.transitionDelay = `${index % 4 * 100}ms`; // Stagger effect
       observer.observe(el);
     });

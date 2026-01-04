@@ -26,6 +26,10 @@
 }
 
 /* RESET & CORE */
+html {
+    scroll-behavior: smooth;
+}
+
 html,
 body {
     margin: 0 !important;
@@ -34,6 +38,35 @@ body {
     /* Force removal of any white gap */
     overflow-x: hidden;
     width: 100%;
+}
+
+/* Scroll Reveal Animations */
+.reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.reveal-on-scroll.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Smooth transitions for all interactive elements */
+.product-card,
+.bento-item,
+.testimonial-card,
+.journal-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+}
+
+/* Hover effects */
+.product-card:hover {
+    transform: translateY(-5px);
+}
+
+.bento-item:hover {
+    transform: scale(1.02);
 }
 
 /* Ensure no elements push the content down */
