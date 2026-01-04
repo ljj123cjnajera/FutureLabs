@@ -917,14 +917,14 @@ class HomeEngine {
       tabs.forEach(t => t.classList.remove('active'));
       document.querySelector(`.engine-tab[data-tab="${category}"]`)?.classList.add('active');
 
+      let products = []; // Fix: Declare outside try/catch
+
       try {
         // 2. Fetch Data (Real API)
         const response = await window.api.getProducts({
           category: category,
           limit: 4
         });
-
-        let products = [];
 
         // ROBUST PARSING (Matches loadProducts logic)
         if (Array.isArray(response)) {
@@ -948,6 +948,7 @@ class HomeEngine {
         } else {
           grid.innerHTML = `<div class="empty-state">NO WEAPONS FOUND IN SECTOR ${category.toUpperCase()}</div>`;
         }
+
 
         // 4. Update "See All" Link
         if (seeAll) seeAll.href = `products.html?category=${category}`;
