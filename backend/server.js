@@ -72,6 +72,16 @@ async function ensureDataSeeded() {
 // Agrega esta línea para el proxy:
 app.set('trust proxy', 1);
 
+// Health check - DEBE IR PRIMERO para que Railway lo detecte inmediatamente
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'OK',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    ready: true
+  });
+});
+
 // CORS - DEBE IR ANTES DE HELMET para que funcione correctamente
 // CORS - Permite múltiples orígenes (GitHub Pages + localhost)
 const allowedOrigins = [
@@ -256,14 +266,6 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/addresses', addressesRoutes);
 app.use('/api/home-content', homeContentRoutes);
 
-// Health check
-app.get('/health', (req, res) => {
-  res.json({
-    status: 'OK',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime()
-  });
-});
 
 // 🚀 SERVIR FRONTEND EN PRODUCCIÓN (DESPUÉS de todas las rutas API)
 // Esto evita que las peticiones API reciban HTML en lugar de JSON
