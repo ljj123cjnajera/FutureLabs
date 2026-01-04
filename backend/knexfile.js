@@ -67,7 +67,7 @@ module.exports = {
       directory: './database/seeds'
     },
     pool: {
-      min: 0,
+      min: 2, // Mantener mínimo 2 conexiones idle para mejor rendimiento
       max: 4,
       acquireTimeoutMillis: 60000,
       createTimeoutMillis: 30000,
