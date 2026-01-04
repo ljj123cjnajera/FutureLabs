@@ -403,7 +403,7 @@ class HomeEngine {
   // 3. PRODUCTS (Grid & Slider)
   // ==========================================
   async loadProducts() {
-    this.startCountdown();
+    // Countdown removido - enfocado en productos
 
     // 🛡️ Get Data (API Only)
     let products = [];
@@ -428,16 +428,19 @@ class HomeEngine {
       products = this.getFallbackProducts();
     }
 
-    // A. TRENDING / FEATURED (Slider)
-    const trending = products.length > 0 ? products.slice(0, 8) : [];
+    // A. TRENDING / FEATURED (Slider) - Más productos
+    const trending = products.length > 0 ? products.slice(0, 12) : [];
     await this.renderProductSlider('featuredProductsGrid', trending);
 
-    // B. ON SALE (Grid)
-    const saleProducts = products.filter(p => p.discount_price || p.on_sale || p.discount_percentage).slice(0, 8);
+    // B. ON SALE (Grid) - Más productos
+    const saleProducts = products.filter(p => p.discount_price || p.on_sale || p.discount_percentage).slice(0, 12);
     await this.renderProductGrid('onSaleProductsGrid', saleProducts);
 
-    // C. Load testimonials from reviews API
-    await this.loadTestimonials();
+    // C. NEW PRODUCTS (Grid) - Nuevos lanzamientos
+    const newProducts = products
+      .sort((a, b) => new Date(b.created_at || b.createdAt || 0) - new Date(a.created_at || a.createdAt || 0))
+      .slice(0, 12);
+    await this.renderProductGrid('newProductsGrid', newProducts);
   }
 
   async renderProductGrid(containerId, products) {
@@ -948,10 +951,10 @@ class HomeEngine {
       let products = []; // Fix: Declare outside try/catch
 
       try {
-        // 2. Fetch Data (Real API)
+        // 2. Fetch Data (Real API) - Más productos por categoría
         const response = await window.api.getProducts({
           category: category,
-          limit: 4
+          limit: 8
         });
 
         // ROBUST PARSING (Matches loadProducts logic)
@@ -1013,102 +1016,6 @@ class HomeEngine {
 
   // Fallbacks removed for production.
 
-  // ==========================================
-  // 8. TESTIMONIALS (From Reviews API)
-  // ==========================================
-  async loadTestimonials() {
-    const container = document.getElementById('testimonialsGrid');
-    if (!container) return;
-
-    let testimonials = [];
-
-    // Try to load from reviews API
-    try {
-      // Use getReviews method from API (it accepts query params)
-      if (this.api && typeof this.api.request === 'function') {
-        const response = await this.api.request('/reviews?limit=10&rating=5');
-        if (response && response.success && Array.isArray(response.data)) {
-          // Filter approved reviews with comments
-          const topReviews = response.data
-            .filter(r => r.rating === 5 && r.approved !== false && (r.comment || r.content))
-            .slice(0, 3);
-          
-          testimonials = topReviews.map(review => ({
-            text: review.comment || review.content || 'Excelente producto y servicio.',
-            author: review.user_name || review.user?.name || review.user?.full_name || 'Cliente',
-            location: review.user?.location || review.user?.city || 'Perú',
-            rating: review.rating || 5,
-            avatar: review.user?.avatar || null
-          }));
-        }
-      }
-    } catch (e) {
-      console.warn('⚠️ Testimonials API Error:', e);
-    }
-
-    // Use fallback if API failed
-    if (testimonials.length === 0) {
-      testimonials = [
-        {
-          text: "Las mejores zapatillas que he comprado. Calidad premium y envío súper rápido. 100% recomendado.",
-          author: "Juan Díaz",
-          location: "Lima, Perú",
-          rating: 5
-        },
-        {
-          text: "Excelente servicio al cliente y productos 100% auténticos. Ya he comprado varias veces y siempre superan mis expectativas.",
-          author: "María Rodríguez",
-          location: "Arequipa, Perú",
-          rating: 5
-        },
-        {
-          text: "La mejor tienda de sneakers en Perú. Tienen los drops más exclusivos y el proceso de compra es súper fácil.",
-          author: "Carlos Sánchez",
-          location: "Trujillo, Perú",
-          rating: 5
-        }
-      ];
-    }
-
-    // Render testimonials
-    if (testimonials.length > 0) {
-      container.innerHTML = testimonials.map(t => {
-        const initials = t.author.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-        const stars = '★'.repeat(t.rating);
-        return `
-          <div class="testimonial-card" style="border: 2px solid var(--black); padding: 2rem; background: var(--white); transition: transform 0.2s;">
-            <div class="testimonial-stars" style="color: #FFD700; margin-bottom: 1rem; font-size: 1.2rem;">
-              ${stars}
-            </div>
-            <p class="testimonial-text" style="font-size: 1.1rem; line-height: 1.6; margin-bottom: 1.5rem; font-style: italic;">
-              "${t.text}"
-            </p>
-            <div class="testimonial-author" style="display: flex; align-items: center; gap: 1rem;">
-              <div class="author-avatar" style="width: 50px; height: 50px; border-radius: 50%; background: var(--black); display: flex; align-items: center; justify-content: center; color: var(--white); font-weight: 700;">
-                ${initials}
-              </div>
-              <div>
-                <div class="author-name" style="font-weight: 700;">${t.author}</div>
-                <div class="author-location" style="font-size: 0.9rem; color: var(--gray-600);">${t.location}</div>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      // Add hover effect
-      container.querySelectorAll('.testimonial-card').forEach(card => {
-        card.addEventListener('mouseenter', () => {
-          card.style.transform = 'translateY(-5px)';
-          card.style.boxShadow = '6px 6px 0 var(--black)';
-        });
-        card.addEventListener('mouseleave', () => {
-          card.style.transform = 'translateY(0)';
-          card.style.boxShadow = 'none';
-        });
-      });
-    }
-  }
 
   // 🛡️ DATA FAILSAFE: Hardcoded mocks to ensure layout never breaks
   getFallbackProducts(category = null) {
