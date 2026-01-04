@@ -424,21 +424,37 @@ class HomeEngine {
     try {
       if (this.api && this.api.getProducts) {
         const response = await this.api.getProducts();
+        
+        // Manejar diferentes formatos de respuesta de la API
         if (Array.isArray(response)) {
+          // Respuesta directa como array
           products = response;
+        } else if (response && response.success && response.data) {
+          // Formato: { success: true, data: { products: [...], total: X } }
+          if (Array.isArray(response.data.products)) {
+            products = response.data.products;
+          } else if (Array.isArray(response.data)) {
+            products = response.data;
+          }
         } else if (response && Array.isArray(response.data)) {
+          // Formato: { data: [...] }
           products = response.data;
         } else if (response && response.products && Array.isArray(response.products)) {
+          // Formato: { products: [...] }
           products = response.products;
+        }
+        
+        if (products.length > 0) {
+          console.log(`✅ Loaded ${products.length} products from API`);
         }
       }
     } catch (e) {
-      console.error('API Error in Products:', e);
+      console.error('❌ API Error in Products:', e);
     }
 
-    // 🛡️ Fallback: If API failed or returned 0, use Mock Data
+    // 🛡️ Fallback: Solo si API falló completamente o devolvió 0 productos
     if (products.length === 0) {
-      console.warn('⚠️ using Fallback Products for Home Page');
+      console.warn('⚠️ using Fallback Products for Home Page (API returned empty or failed)');
       products = this.getFallbackProducts();
     }
 
