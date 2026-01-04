@@ -81,6 +81,69 @@ router.get('/on-sale', async (req, res) => {
   }
 });
 
+// GET /api/products/trending - Obtener productos en tendencia
+router.get('/trending', async (req, res) => {
+  try {
+    const limit = req.query.limit ? parseInt(req.query.limit) : 8;
+    const products = await Product.getTrending(limit);
+
+    res.json({
+      success: true,
+      data: {
+        products
+      }
+    });
+  } catch (error) {
+    console.error('Error obteniendo productos en tendencia:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error obteniendo productos en tendencia'
+    });
+  }
+});
+
+// GET /api/products/bestseller - Obtener productos más vendidos
+router.get('/bestseller', async (req, res) => {
+  try {
+    const limit = req.query.limit ? parseInt(req.query.limit) : 8;
+    const products = await Product.getBestseller(limit);
+
+    res.json({
+      success: true,
+      data: {
+        products
+      }
+    });
+  } catch (error) {
+    console.error('Error obteniendo productos más vendidos:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error obteniendo productos más vendidos'
+    });
+  }
+});
+
+// GET /api/products/new - Obtener productos nuevos
+router.get('/new', async (req, res) => {
+  try {
+    const limit = req.query.limit ? parseInt(req.query.limit) : 8;
+    const products = await Product.getNew(limit);
+
+    res.json({
+      success: true,
+      data: {
+        products
+      }
+    });
+  } catch (error) {
+    console.error('Error obteniendo productos nuevos:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error obteniendo productos nuevos'
+    });
+  }
+});
+
 // GET /api/products/category/:slug - Obtener productos por categoría
 router.get('/category/:slug', async (req, res) => {
   try {

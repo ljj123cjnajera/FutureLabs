@@ -321,6 +321,18 @@ class SneakersAPI {
     return this.request(`/products/on-sale?limit=${limit}`);
   }
 
+  async getTrendingProducts(limit = 8) {
+    return this.request(`/products/trending?limit=${limit}`);
+  }
+
+  async getBestsellerProducts(limit = 8) {
+    return this.request(`/products/bestseller?limit=${limit}`);
+  }
+
+  async getNewProducts(limit = 8) {
+    return this.request(`/products/new?limit=${limit}`);
+  }
+
   async getProductsByCategory(categorySlug, filters = {}) {
     const params = new URLSearchParams(filters);
     return this.request(`/products/category/${categorySlug}?${params.toString()}`);

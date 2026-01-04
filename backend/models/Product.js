@@ -78,7 +78,8 @@ class Product {
       .where('products.featured', true)
       .where('products.is_active', true)
       .orderBy('products.created_at', 'desc')
-      .limit(limit);
+      .limit(limit)
+      .timeout(5000);
   }
 
   // Obtener productos en oferta
@@ -89,7 +90,44 @@ class Product {
       .whereNotNull('products.discount_price')
       .where('products.is_active', true)
       .orderBy('products.created_at', 'desc')
-      .limit(limit);
+      .limit(limit)
+      .timeout(5000);
+  }
+
+  // Obtener productos en tendencia
+  static async getTrending(limit = 8) {
+    return await db('products')
+      .select('products.*', 'categories.name as category_name', 'categories.slug as category_slug')
+      .leftJoin('categories', 'products.category_id', 'categories.id')
+      .where('products.is_trending', true)
+      .where('products.is_active', true)
+      .orderBy('products.created_at', 'desc')
+      .limit(limit)
+      .timeout(5000);
+  }
+
+  // Obtener productos más vendidos
+  static async getBestseller(limit = 8) {
+    return await db('products')
+      .select('products.*', 'categories.name as category_name', 'categories.slug as category_slug')
+      .leftJoin('categories', 'products.category_id', 'categories.id')
+      .where('products.is_bestseller', true)
+      .where('products.is_active', true)
+      .orderBy('products.created_at', 'desc')
+      .limit(limit)
+      .timeout(5000);
+  }
+
+  // Obtener productos nuevos
+  static async getNew(limit = 8) {
+    return await db('products')
+      .select('products.*', 'categories.name as category_name', 'categories.slug as category_slug')
+      .leftJoin('categories', 'products.category_id', 'categories.id')
+      .where('products.is_new', true)
+      .where('products.is_active', true)
+      .orderBy('products.created_at', 'desc')
+      .limit(limit)
+      .timeout(5000);
   }
 
   // Obtener productos por categoría

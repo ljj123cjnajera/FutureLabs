@@ -411,71 +411,130 @@ class HomeEngine {
 
 
   // ==========================================
-  // 3. PRODUCTS (Grid & Slider)
-  // ==========================================
-  // ==========================================
-  // 3. PRODUCTS (Grid & Slider)
+  // 3. PRODUCTS (Grid & Slider) - USANDO ENDPOINTS ESPECÍFICOS
   // ==========================================
   async loadProducts() {
-    // Countdown removido - enfocado en productos
-
-    // 🛡️ Get Data (API Only)
-    let products = [];
+    // Cargar cada sección desde su endpoint específico para productos REALES
+    
+    // A. FEATURED PRODUCTS (Slider) - PRIORIDAD ALTA
     try {
-      if (this.api && this.api.getProducts) {
-        const response = await this.api.getProducts();
-        
-        // Manejar diferentes formatos de respuesta de la API
-        if (Array.isArray(response)) {
-          // Respuesta directa como array
-          products = response;
-        } else if (response && response.success && response.data) {
-          // Formato: { success: true, data: { products: [...], total: X } }
-          if (Array.isArray(response.data.products)) {
-            products = response.data.products;
-          } else if (Array.isArray(response.data)) {
-            products = response.data;
-          }
-        } else if (response && Array.isArray(response.data)) {
-          // Formato: { data: [...] }
-          products = response.data;
-        } else if (response && response.products && Array.isArray(response.products)) {
-          // Formato: { products: [...] }
-          products = response.products;
-        }
-        
-        if (products.length > 0) {
-          console.log(`✅ Loaded ${products.length} products from API`);
-        }
+      const featuredResponse = await this.api.getFeaturedProducts(12);
+      let featuredProducts = [];
+      
+      if (featuredResponse && featuredResponse.success && featuredResponse.data) {
+        featuredProducts = Array.isArray(featuredResponse.data.products) 
+          ? featuredResponse.data.products 
+          : Array.isArray(featuredResponse.data) 
+            ? featuredResponse.data 
+            : [];
+      }
+      
+      if (featuredProducts.length > 0) {
+        console.log(`✅ Loaded ${featuredProducts.length} featured products from API`);
+        this.renderProductSlider('featuredProductsGrid', featuredProducts).catch(e => console.error('Error rendering featured:', e));
+      } else {
+        console.warn('⚠️ No featured products found');
+        this.showEmptyState('featuredProductsGrid', 'No hay productos destacados');
       }
     } catch (e) {
-      console.error('❌ API Error in Products:', e);
+      console.error('❌ Error loading featured products:', e);
+      this.showEmptyState('featuredProductsGrid', 'Error al cargar productos destacados');
     }
 
-    // 🛡️ Fallback: Solo si API falló completamente o devolvió 0 productos
-    if (products.length === 0) {
-      console.warn('⚠️ using Fallback Products for Home Page (API returned empty or failed)');
-      products = this.getFallbackProducts();
+    // B. TRENDING PRODUCTS (Slider) - PRIORIDAD ALTA
+    setTimeout(async () => {
+      try {
+        const trendingResponse = await this.api.getTrendingProducts(12);
+        let trendingProducts = [];
+        
+        if (trendingResponse && trendingResponse.success && trendingResponse.data) {
+          trendingProducts = Array.isArray(trendingResponse.data.products) 
+            ? trendingResponse.data.products 
+            : Array.isArray(trendingResponse.data) 
+              ? trendingResponse.data 
+              : [];
+        }
+        
+        if (trendingProducts.length > 0) {
+          console.log(`✅ Loaded ${trendingProducts.length} trending products from API`);
+          // Buscar contenedor de trending o usar featuredProductsGrid si no existe
+          const trendingContainer = document.getElementById('trendingProductsGrid') || document.getElementById('featuredProductsGrid');
+          if (trendingContainer) {
+            this.renderProductSlider(trendingContainer.id, trendingProducts).catch(e => console.error('Error rendering trending:', e));
+          }
+        }
+      } catch (e) {
+        console.error('❌ Error loading trending products:', e);
+      }
+    }, 200);
+
+    // C. ON SALE PRODUCTS (Grid) - PRIORIDAD MEDIA
+    setTimeout(async () => {
+      try {
+        const saleResponse = await this.api.getOnSaleProducts(12);
+        let saleProducts = [];
+        
+        if (saleResponse && saleResponse.success && saleResponse.data) {
+          saleProducts = Array.isArray(saleResponse.data.products) 
+            ? saleResponse.data.products 
+            : Array.isArray(saleResponse.data) 
+              ? saleResponse.data 
+              : [];
+        }
+        
+        if (saleProducts.length > 0) {
+          console.log(`✅ Loaded ${saleProducts.length} on-sale products from API`);
+          this.renderProductGrid('onSaleProductsGrid', saleProducts).catch(e => console.error('Error rendering on sale:', e));
+        } else {
+          console.warn('⚠️ No on-sale products found');
+          this.showEmptyState('onSaleProductsGrid', 'No hay productos en oferta');
+        }
+      } catch (e) {
+        console.error('❌ Error loading on-sale products:', e);
+        this.showEmptyState('onSaleProductsGrid', 'Error al cargar productos en oferta');
+      }
+    }, 400);
+
+    // D. NEW PRODUCTS (Grid) - PRIORIDAD BAJA
+    setTimeout(async () => {
+      try {
+        const newResponse = await this.api.getNewProducts(12);
+        let newProducts = [];
+        
+        if (newResponse && newResponse.success && newResponse.data) {
+          newProducts = Array.isArray(newResponse.data.products) 
+            ? newResponse.data.products 
+            : Array.isArray(newResponse.data) 
+              ? newResponse.data 
+              : [];
+        }
+        
+        if (newProducts.length > 0) {
+          console.log(`✅ Loaded ${newProducts.length} new products from API`);
+          this.renderProductGrid('newProductsGrid', newProducts).catch(e => console.error('Error rendering new products:', e));
+        } else {
+          console.warn('⚠️ No new products found');
+          this.showEmptyState('newProductsGrid', 'No hay productos nuevos');
+        }
+      } catch (e) {
+        console.error('❌ Error loading new products:', e);
+        this.showEmptyState('newProductsGrid', 'Error al cargar productos nuevos');
+      }
+    }, 600);
+  }
+
+  // Helper para mostrar estado vacío
+  showEmptyState(containerId, message) {
+    const container = document.getElementById(containerId);
+    if (container) {
+      container.innerHTML = `
+        <div style="text-align: center; padding: 60px 20px; color: #999;">
+          <i class="fas fa-box-open" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+          <p style="font-size: 16px; margin: 0;">${message}</p>
+          <p style="font-size: 14px; margin-top: 8px; opacity: 0.7;">Agrega productos desde el panel de administración</p>
+        </div>
+      `;
     }
-
-    // Priorizar carga: Trending primero (más visible), luego On Sale, luego New Products
-    // A. TRENDING / FEATURED (Slider) - PRIORIDAD ALTA (renderizar primero)
-    const trending = products.length > 0 ? products.slice(0, 12) : [];
-    this.renderProductSlider('featuredProductsGrid', trending).catch(e => console.error('Error rendering trending:', e));
-
-    // B. ON SALE (Grid) - PRIORIDAD MEDIA (cargar después de trending)
-    const saleProducts = products.filter(p => p.discount_price || p.on_sale || p.discount_percentage).slice(0, 12);
-    setTimeout(() => {
-      this.renderProductGrid('onSaleProductsGrid', saleProducts).catch(e => console.error('Error rendering on sale:', e));
-    }, 200); // Pequeño delay para no bloquear trending
-
-    // C. NEW PRODUCTS (Grid) - PRIORIDAD BAJA (cargar último)
-    const newProducts = products
-      .sort((a, b) => new Date(b.created_at || b.createdAt || 0) - new Date(a.created_at || a.createdAt || 0))
-      .slice(0, 12);
-    setTimeout(() => {
-      this.renderProductGrid('newProductsGrid', newProducts).catch(e => console.error('Error rendering new products:', e));
-    }, 400); // Delay adicional para no bloquear otras secciones
   }
 
   async renderProductGrid(containerId, products) {
