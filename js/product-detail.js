@@ -20,52 +20,64 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         if (!productId) {
             container.innerHTML = `
-    <div style="text-align: center; padding: 100px;">
-        <i class="fas fa-exclamation-triangle fa-3x" style="color: #e74c3c; margin-bottom: 20px;"></i>
-        <h2>Producto no encontrado</h2>
-        <p>El producto que buscas no existe</p>
-    </div>
-`;
+                <div style="text-align: center; padding: 100px;">
+                    <i class="fas fa-exclamation-triangle fa-3x" style="color: #e74c3c; margin-bottom: 20px;"></i>
+                    <h2>Producto no encontrado</h2>
+                    <p>El producto que buscas no existe</p>
+                </div>
+            `;
             return;
         }
 
         try {
+            // 1. API Call
             const response = await window.api.getProduct(productId);
+            let product = null;
 
-            // Guardar producto globalmente
-            window.currentProduct = product;
+            // 2. Parsed Response (Handle various API formats)
+            if (response && response.success && response.data) {
+                product = response.data;
+            } else if (response && response.id) {
+                product = response;
+            } else if (response && response.data && response.data.product) {
+                product = response.data.product;
+            }
 
-            // Render Setup (Shared logic)
-            renderProductDetails(product, container, galleryImages);
+            // 3. Validate Data
+            if (product) {
+                window.currentProduct = product;
 
-        } else {
-            // 404 from API - Try Mock Fallback
-            console.warn('⚠️ Product not found in API. Checking local simulation...');
+                // Normalizar imágenes
+                let galleryImages = [];
+                if (Array.isArray(product.images) && product.images.length > 0) {
+                    galleryImages = product.images;
+                } else if (product.image_url) {
+                    galleryImages = [product.image_url, product.image_url, product.image_url, product.image_url];
+                } else {
+                    galleryImages = ['img/placeholder.jpg'];
+                }
+
+                renderProductDetails(product, container, galleryImages);
+                return;
+            } else {
+                throw new Error('Product Not Found in API');
+            }
+
+        } catch (error) {
+            console.warn('❌ API Error in PDP:', error);
+
+            // 4. Fallback Logic
             const mock = getMockProduct(productId);
             if (mock) {
                 window.currentProduct = mock;
-                // Mock images need array format
                 const imgs = [mock.image_url, mock.image_url, mock.image_url, mock.image_url];
                 renderProductDetails(mock, container, imgs);
-                window.notifications?.info('Modo Simulación: Viendo producto local');
+                if (window.notifications) window.notifications.info('OFFLINE MODE', 'Mostrando versión simulada');
             } else {
                 renderErrorState(container, 'Producto no encontrado');
             }
         }
-    } catch (error) {
-        console.error('❌ API Error in PDP:', error);
-        // Error from API - Try Mock Fallback
-        const mock = getMockProduct(productId);
-        if (mock) {
-            window.currentProduct = mock;
-            const imgs = [mock.image_url, mock.image_url, mock.image_url, mock.image_url];
-            renderProductDetails(mock, container, imgs);
-            window.notifications?.info('Offline: Viendo producto simulado');
-        } else {
-            renderErrorState(container, error.message);
-        }
     }
-}
 
     // --- HELPER: RENDER UI ---
     function renderProductDetails(product, container, galleryImages) {
@@ -201,7 +213,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         ];
         return db.find(p => p.id == id);
     }
-    
+
     function getModalHTML() {
         return `
          <div id="sizeGuideModal" class="modal" style="display: none;">
@@ -212,167 +224,167 @@ document.addEventListener('DOMContentLoaded', async function () {
              </div>
          </div>`;
     }
-    }
+
 
     let selectedSize = null;
 
-function renderSizeOptions(product) {
-    const grid = document.getElementById('sizeSelectorGrid');
-    if (!grid) return;
+    function renderSizeOptions(product) {
+        const grid = document.getElementById('sizeSelectorGrid');
+        if (!grid) return;
 
-    // Standard US Men Sizes
-    const sizes = ['7', '7.5', '8', '8.5', '9', '9.5', '10', '10.5', '11', '12', '13'];
+        // Standard US Men Sizes
+        const sizes = ['7', '7.5', '8', '8.5', '9', '9.5', '10', '10.5', '11', '12', '13'];
 
-    // Logic: If total stock > 0, assume all sizes available (Simple V1)
-    // If stock === 0, all disabled.
-    const hasStock = product.stock_quantity > 0;
+        // Logic: If total stock > 0, assume all sizes available (Simple V1)
+        // If stock === 0, all disabled.
+        const hasStock = product.stock_quantity > 0;
 
-    grid.innerHTML = sizes.map(size => {
-        return `
+        grid.innerHTML = sizes.map(size => {
+            return `
                     <button class="size-option ${!hasStock ? 'disabled' : ''}"
                 onclick = "selectSize('${size}', this)" 
                         ${!hasStock ? 'disabled' : ''}>
                     ${size}
                 </button >
                     `;
-    }).join('');
-}
-
-window.selectSize = function (size, element) {
-    if (element.disabled) return;
-
-    // Remove active class from all
-    document.querySelectorAll('.size-option').forEach(el => el.classList.remove('selected'));
-
-    // Add to clicked
-    element.classList.add('selected');
-    selectedSize = size;
-
-    // Hide error
-    const errorMsg = document.getElementById('sizeValidationMsg');
-    if (errorMsg) errorMsg.classList.remove('visible');
-};
-
-window.openSizeGuideModal = function () {
-    const modal = document.getElementById('sizeGuideModal');
-    if (modal) {
-        modal.style.display = 'block';
-        // Force display block first then add opacity for transition if needed
-        // Simple css display toggle for now
-    }
-};
-
-window.closeSizeGuideModal = function () {
-    const modal = document.getElementById('sizeGuideModal');
-    if (modal) modal.style.display = 'none';
-};
-
-// Close modal when clicking outside
-window.onclick = function (event) {
-    const modal = document.getElementById('sizeGuideModal');
-    if (event.target == modal) {
-        modal.style.display = "none";
-    }
-};
-
-// Agregar al carrito
-window.addToCart = async function () {
-    // Obtener ID del producto de la URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const productId = urlParams.get('id');
-
-    if (!productId) {
-        window.notifications.error('Error: ID de producto no encontrado');
-        return;
+        }).join('');
     }
 
-    // VALIDACIÓN DE TALLA
-    if (!selectedSize) {
+    window.selectSize = function (size, element) {
+        if (element.disabled) return;
+
+        // Remove active class from all
+        document.querySelectorAll('.size-option').forEach(el => el.classList.remove('selected'));
+
+        // Add to clicked
+        element.classList.add('selected');
+        selectedSize = size;
+
+        // Hide error
         const errorMsg = document.getElementById('sizeValidationMsg');
-        const container = document.querySelector('.size-selector-container');
+        if (errorMsg) errorMsg.classList.remove('visible');
+    };
 
-        if (errorMsg) errorMsg.classList.add('visible');
-        if (container) {
-            container.classList.remove('shake-animation');
-            void container.offsetWidth; // trigger reflow
-            container.classList.add('shake-animation');
+    window.openSizeGuideModal = function () {
+        const modal = document.getElementById('sizeGuideModal');
+        if (modal) {
+            modal.style.display = 'block';
+            // Force display block first then add opacity for transition if needed
+            // Simple css display toggle for now
         }
-        return;
-    }
+    };
 
-    // Add size to cart item
-    window.logger?.info('PRODUCT', `Agregando talla: ${selectedSize} `);
+    window.closeSizeGuideModal = function () {
+        const modal = document.getElementById('sizeGuideModal');
+        if (modal) modal.style.display = 'none';
+    };
 
-    // Use the new CartEngine (aliased as cartManager)
-    // It will handle: Saving to LocalStorage, Updating UI, Opening Drawer
-    await window.cartManager.add(productId, 1, { size: selectedSize });
-
-    // Optional: Notification (already handled visually by drawer open, but good for confirmation)
-    window.notifications.success(`Agregado: Talla US ${selectedSize}`);
-}
-
-// Comprar ahora
-window.buyNow = async function () {
-    // Obtener ID del producto de la URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const productId = urlParams.get('id');
-
-    if (!productId) {
-        window.notifications.error('Error: ID de producto no encontrado');
-        return;
-    }
-
-    // VALIDACIÓN DE TALLA
-    if (!selectedSize) {
-        const errorMsg = document.getElementById('sizeValidationMsg');
-        const container = document.querySelector('.size-selector-container');
-
-        if (errorMsg) errorMsg.classList.add('visible');
-        if (container) {
-            container.classList.remove('shake-animation');
-            void container.offsetWidth; // trigger reflow
-            container.classList.add('shake-animation');
+    // Close modal when clicking outside
+    window.onclick = function (event) {
+        const modal = document.getElementById('sizeGuideModal');
+        if (event.target == modal) {
+            modal.style.display = "none";
         }
-        return;
+    };
+
+    // Agregar al carrito
+    window.addToCart = async function () {
+        // Obtener ID del producto de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id');
+
+        if (!productId) {
+            window.notifications.error('Error: ID de producto no encontrado');
+            return;
+        }
+
+        // VALIDACIÓN DE TALLA
+        if (!selectedSize) {
+            const errorMsg = document.getElementById('sizeValidationMsg');
+            const container = document.querySelector('.size-selector-container');
+
+            if (errorMsg) errorMsg.classList.add('visible');
+            if (container) {
+                container.classList.remove('shake-animation');
+                void container.offsetWidth; // trigger reflow
+                container.classList.add('shake-animation');
+            }
+            return;
+        }
+
+        // Add size to cart item
+        window.logger?.info('PRODUCT', `Agregando talla: ${selectedSize} `);
+
+        // Use the new CartEngine (aliased as cartManager)
+        // It will handle: Saving to LocalStorage, Updating UI, Opening Drawer
+        await window.cartManager.add(productId, 1, { size: selectedSize });
+
+        // Optional: Notification (already handled visually by drawer open, but good for confirmation)
+        window.notifications.success(`Agregado: Talla US ${selectedSize}`);
     }
 
-    await window.cartManager.add(productId, 1, { size: selectedSize });
-    window.notifications.success('Redirigiendo al checkout...');
-    setTimeout(() => {
-        window.location.href = 'checkout.html';
-    }, 1000);
-}
+    // Comprar ahora
+    window.buyNow = async function () {
+        // Obtener ID del producto de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id');
 
-const clearRecentlyViewedBtn = document.getElementById('clearRecentlyViewedBtn');
-if (clearRecentlyViewedBtn) {
-    clearRecentlyViewedBtn.addEventListener('click', () => {
-        window.recentlyViewed?.clearAndRender('recentlyViewedGrid', { hideWhenEmpty: true });
-    });
-}
+        if (!productId) {
+            window.notifications.error('Error: ID de producto no encontrado');
+            return;
+        }
 
-if (window.recentlyViewed) {
-    window.recentlyViewed.render('recentlyViewedGrid', { limit: 6, hideWhenEmpty: true });
-}
+        // VALIDACIÓN DE TALLA
+        if (!selectedSize) {
+            const errorMsg = document.getElementById('sizeValidationMsg');
+            const container = document.querySelector('.size-selector-container');
 
-// Actualizar contador de carrito
-document.addEventListener('cartUpdated', (e) => {
-    const cartCount = document.querySelector('.cart-count');
-    if (cartCount) {
-        cartCount.textContent = e.detail.count;
+            if (errorMsg) errorMsg.classList.add('visible');
+            if (container) {
+                container.classList.remove('shake-animation');
+                void container.offsetWidth; // trigger reflow
+                container.classList.add('shake-animation');
+            }
+            return;
+        }
+
+        await window.cartManager.add(productId, 1, { size: selectedSize });
+        window.notifications.success('Redirigiendo al checkout...');
+        setTimeout(() => {
+            window.location.href = 'checkout.html';
+        }, 1000);
     }
-});
 
-// Cargar producto al iniciar
-await loadProduct();
+    const clearRecentlyViewedBtn = document.getElementById('clearRecentlyViewedBtn');
+    if (clearRecentlyViewedBtn) {
+        clearRecentlyViewedBtn.addEventListener('click', () => {
+            window.recentlyViewed?.clearAndRender('recentlyViewedGrid', { hideWhenEmpty: true });
+        });
+    }
 
-if (productId && window.reviewsManager) {
-    await window.reviewsManager.init(productId, {
-        statsContainerId: 'reviewsStats',
-        listContainerId: 'reviewsList',
-        formContainerId: 'reviewFormContainer',
-        filterContainerId: 'reviewsFilterButtons',
-        sortSelectId: 'reviewsSortSelect',
-        writeButtonId: 'writeReviewBtn'
+    if (window.recentlyViewed) {
+        window.recentlyViewed.render('recentlyViewedGrid', { limit: 6, hideWhenEmpty: true });
+    }
+
+    // Actualizar contador de carrito
+    document.addEventListener('cartUpdated', (e) => {
+        const cartCount = document.querySelector('.cart-count');
+        if (cartCount) {
+            cartCount.textContent = e.detail.count;
+        }
     });
-}
+
+    // Cargar producto al iniciar
+    await loadProduct();
+
+    if (productId && window.reviewsManager) {
+        await window.reviewsManager.init(productId, {
+            statsContainerId: 'reviewsStats',
+            listContainerId: 'reviewsList',
+            formContainerId: 'reviewFormContainer',
+            filterContainerId: 'reviewsFilterButtons',
+            sortSelectId: 'reviewsSortSelect',
+            writeButtonId: 'writeReviewBtn'
+        });
+    }
 });
