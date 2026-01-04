@@ -130,6 +130,7 @@ class ProductComparator {
     this.products = this.products.filter(p => String(p.id) !== String(productId));
     this.saveToStorage();
     this.render();
+    this.emitUpdate();
     if (!silent) {
       window.notifications?.success?.('Producto eliminado del comparador');
     }
