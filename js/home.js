@@ -549,34 +549,84 @@ class HomeEngine {
     container.innerHTML = `<div class="product-grid-v3">${skeletonCards}</div>`;
   }
 
-  // Mejorar lazy loading de imágenes
+  // Mejorar lazy loading de imágenes con IntersectionObserver optimizado
   initLazyLoading(container) {
+    if (!('IntersectionObserver' in window)) {
+      // Fallback para navegadores sin soporte
+      const images = container.querySelectorAll('img[loading="lazy"]');
+      images.forEach(img => {
+        if (img.dataset.src) {
+          img.src = img.dataset.src;
+          img.removeAttribute('data-src');
+        }
+      });
+      return;
+    }
+
     const images = container.querySelectorAll('img[loading="lazy"]');
     if (!images.length) return;
 
+    // Configuración optimizada para mejor performance
     const imageObserver = new IntersectionObserver((entries, observer) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           const img = entry.target;
+          
           // Si tiene data-src, usarlo (para carga diferida avanzada)
           if (img.dataset.src) {
             img.src = img.dataset.src;
             img.removeAttribute('data-src');
           }
-          // Agregar clase para animación de fade-in
+          
+          // Agregar decoding async si no está presente
+          if (!img.hasAttribute('decoding')) {
+            img.decoding = 'async';
+          }
+          
+          // Agregar clase para animación de fade-in suave
           img.style.opacity = '0';
-          img.style.transition = 'opacity 0.3s ease';
-          img.onload = () => {
+          img.style.transition = 'opacity 0.3s ease-in-out';
+          
+          // Manejar carga exitosa
+          const handleLoad = () => {
             img.style.opacity = '1';
+            img.removeEventListener('load', handleLoad);
+            img.removeEventListener('error', handleError);
           };
+          
+          // Manejar errores de carga
+          const handleError = () => {
+            img.style.opacity = '1'; // Mostrar placeholder incluso en error
+            img.removeEventListener('load', handleLoad);
+            img.removeEventListener('error', handleError);
+          };
+          
+          img.addEventListener('load', handleLoad);
+          img.addEventListener('error', handleError);
+          
+          // Si la imagen ya está cargada (cached), aplicar opacidad inmediatamente
+          if (img.complete) {
+            img.style.opacity = '1';
+          }
+          
           observer.unobserve(img);
         }
       });
     }, {
-      rootMargin: '50px' // Cargar 50px antes de que sea visible
+      rootMargin: '100px', // Cargar 100px antes de que sea visible (mejor UX)
+      threshold: 0.01 // Trigger cuando al menos 1% es visible
     });
 
-    images.forEach(img => imageObserver.observe(img));
+    images.forEach(img => {
+      // Agregar atributos de performance si no están presentes
+      if (!img.hasAttribute('decoding')) {
+        img.decoding = 'async';
+      }
+      if (!img.hasAttribute('fetchpriority')) {
+        img.fetchPriority = 'low';
+      }
+      imageObserver.observe(img);
+    });
   }
 
   // NEW: Slider Renderer for Trending and Sale

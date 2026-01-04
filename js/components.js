@@ -612,6 +612,8 @@ class Components {
                class="product-image"
                alt="${product.name}" 
                loading="lazy"
+               decoding="async"
+               fetchpriority="low"
                onerror="this.onerror=null; this.src='${placeholderImg}'">
           
           <div class="product-badges">

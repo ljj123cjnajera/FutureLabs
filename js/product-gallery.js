@@ -81,7 +81,12 @@ class ProductGallery {
     // Outputs direct <div>s to be styled by CSS Grid in pdp-brutalist.css
     const html = this.images.map((img, index) => `
         <div class="gallery-image-wrapper" onclick="productGallery.openLightbox(${index})">
-            <img src="${img}" class="gallery-image" alt="${product.name} - View ${index + 1}" loading="lazy">
+            <img src="${img}" 
+                 class="gallery-image" 
+                 alt="${product.name} - View ${index + 1}" 
+                 loading="${index === 0 ? 'eager' : 'lazy'}"
+                 decoding="async"
+                 fetchpriority="${index === 0 ? 'high' : 'low'}">
         </div>
     `).join('');
 
