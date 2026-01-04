@@ -14,7 +14,15 @@ const slowDown = require('express-slow-down');
 const { exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const db = require('./database/config');
+
+// Cargar db de forma lazy para no bloquear el inicio del servidor
+let db;
+try {
+  db = require('./database/config');
+} catch (dbError) {
+  console.error('⚠️  Database config error (non-blocking):', dbError.message);
+  // El servidor iniciará pero las rutas que usen db fallarán
+}
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -28,6 +36,12 @@ if (!fs.existsSync(uploadsDir)) {
 
 // Auto-run seeds if products table is empty (ejecutar DESPUÉS de migraciones)
 async function ensureDataSeeded() {
+  // Verificar que db esté disponible
+  if (!db) {
+    console.log('⚠️  Database not available - skipping seed check');
+    return;
+  }
+  
   try {
     // Reducir delay a 5 segundos después de las migraciones
     // para acelerar el proceso de inicialización
@@ -307,6 +321,12 @@ app.use((err, req, res, next) => {
 // Ejecutar migraciones de forma asíncrona DESPUÉS de que el servidor inicie
 // Usando la instancia de knex directamente para evitar procesos separados
 async function runMigrations() {
+  // Verificar que db esté disponible
+  if (!db) {
+    console.log('⚠️  Database not available - skipping migrations');
+    return;
+  }
+  
   try {
     // Reducir delay a 3 segundos - suficiente para que Railway detecte que el servidor está vivo
     // pero no tanto que cause problemas de inicialización
@@ -355,22 +375,35 @@ async function runMigrations() {
 }
 
 // Iniciar servidor inmediatamente (sin esperar migraciones)
-const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 FutureLabs API corriendo en puerto ${PORT}`);
-  console.log(`📡 Ambiente: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🌐 Escuchando en 0.0.0.0:${PORT}`);
-  console.log(`✅ Server is ready to accept connections`);
-  
-  // Ejecutar migraciones en background después de iniciar (con delay reducido)
-  runMigrations().catch(err => {
-    console.log('⚠️  Migration error:', err.message);
+// CRÍTICO: El servidor DEBE iniciar incluso si hay problemas con la DB
+let server;
+try {
+  server = app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 FutureLabs API corriendo en puerto ${PORT}`);
+    console.log(`📡 Ambiente: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🌐 Escuchando en 0.0.0.0:${PORT}`);
+    console.log(`✅ Server is ready to accept connections`);
+    console.log(`✅ Health check available at /health`);
+    
+    // Solo ejecutar migraciones si db está disponible
+    if (db) {
+      // Ejecutar migraciones en background después de iniciar (con delay reducido)
+      runMigrations().catch(err => {
+        console.log('⚠️  Migration error:', err.message);
+      });
+      
+      // Ejecutar seed check después de iniciar
+      ensureDataSeeded().catch(err => {
+        console.log('⚠️  Seed check error:', err.message);
+      });
+    } else {
+      console.log('⚠️  Database not available - migrations and seeds skipped');
+    }
   });
-  
-  // Ejecutar seed check después de iniciar
-  ensureDataSeeded().catch(err => {
-    console.log('⚠️  Seed check error:', err.message);
-  });
-});
+} catch (serverError) {
+  console.error('❌ Failed to start server:', serverError);
+  process.exit(1);
+}
 
 // Manejar errores del servidor
 server.on('error', (err) => {
