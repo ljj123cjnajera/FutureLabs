@@ -60,8 +60,11 @@ class HomeEngine {
       }
 
       // 2. Load Content with Failsafes
+      // Hero primero (crítico para primera impresión)
+      await this.safeLoad(this.loadHero.bind(this), 'Hero Slider');
+      
+      // Resto en paralelo
       await Promise.all([
-        this.safeLoad(this.loadHero.bind(this), 'Hero Slider'),
         this.safeLoad(this.loadCategories.bind(this), 'Categories'),
         this.safeLoad(this.loadProducts.bind(this), 'Products'),
         this.safeLoad(this.loadBrands.bind(this), 'Brands'),
@@ -174,7 +177,14 @@ class HomeEngine {
   async loadHero() {
     const container = document.getElementById('heroSlidesContainer');
     const dotsContainer = document.getElementById('heroSliderDots');
-    if (!container) return;
+    if (!container) {
+      console.error('❌ Hero container not found');
+      return;
+    }
+    
+    // Asegurar que el contenedor sea visible
+    container.style.display = 'block';
+    container.style.opacity = '1';
 
     // Verificar si ya hay slides estáticos renderizados
     const existingSlides = container.querySelectorAll('.slide');
@@ -209,6 +219,11 @@ class HomeEngine {
       this.startSliderAutoPlay(existingSlides.length);
       this.setupHeroTouch(container, existingSlides.length);
       return; // Salir sin reemplazar el contenido
+    }
+
+    // 2.1 Si no hay slides estáticos y la API falló, asegurar que siempre haya contenido
+    if (!hasStaticSlides && slides.length === 0) {
+      console.warn('⚠️ No hero slides found, using fallback');
     }
 
     // 3. Fallback (Default Premium Slides if API empty AND no static slides)
