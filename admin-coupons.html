@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADMIN COUPONS // FUTURELABS</title>
+
+    <!-- CSS Core -->
+    <link rel="stylesheet" href="css/typography.css">
+    <link rel="stylesheet" href="css/grids.css">
+    <link rel="stylesheet" href="css/buttons.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/notifications.css">
+    <!-- Admin Specific CSS -->
+    <style>
+        .admin-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+
+        .admin-sidebar {
+            background: var(--black);
+            color: var(--white);
+            padding: 40px 20px;
+        }
+
+        .admin-menu {
+            list-style: none;
+            padding: 0;
+            margin-top: 60px;
+        }
+
+        .admin-menu li {
+            margin-bottom: 20px;
+        }
+
+        .admin-menu a {
+            color: #888;
+            text-decoration: none;
+            font-family: 'Koulen';
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            display: block;
+            transition: 0.3s;
+        }
+
+        .admin-menu a:hover,
+        .admin-menu a.active {
+            color: var(--white);
+            padding-left: 10px;
+            border-left: 4px solid var(--white);
+        }
+
+        .admin-content {
+            padding: 60px;
+            background: var(--gray-100);
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            border-bottom: 4px solid var(--black);
+            padding-bottom: 20px;
+        }
+
+        /* Table Brutalist */
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Space Mono', monospace;
+            background: var(--white);
+            border: 2px solid var(--black);
+        }
+
+        .admin-table th {
+            background: var(--black);
+            color: var(--white);
+            text-align: left;
+            padding: 15px;
+            text-transform: uppercase;
+        }
+
+        .admin-table td {
+            padding: 15px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .admin-table tr:hover {
+            background: #f0f0f0;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #eee;
+            border: 1px solid #000;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .badge-info {
+            background: #e0f7fa;
+        }
+
+        /* Actions */
+        .btn-action {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            margin-right: 10px;
+            transition: transform 0.2s;
+        }
+
+        .btn-action:hover {
+            transform: scale(1.2);
+        }
+
+        .btn-edit {
+            color: blue;
+        }
+
+        .btn-delete {
+            color: red;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border: 4px solid black;
+            width: 500px;
+            max-width: 90%;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+    </style>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Koulen&family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <h1 style="font-family: 'Koulen'; font-size: 2rem; line-height: 1;">FUTURELABS<br><span
+                    style="color: #666; font-size: 1rem;">ADMIN CONSOLE</span></h1>
+
+            <ul class="admin-menu">
+                <li><a href="admin.html">DASHBOARD</a></li>
+                <li><a href="admin-products.html">PRODUCTS</a></li>
+                <li><a href="admin-orders.html">ORDERS</a></li>
+                <li><a href="admin-coupons.html" class="active">COUPONS</a></li>
+                <li><a href="index.html" style="margin-top: 40px; font-size: 1rem;"><i class="fas fa-arrow-left"></i>
+                        EXIT</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-content">
+            <div class="admin-header">
+                <div>
+                    <h2 class="section-title" style="margin:0;">COUPON MANAGEMENT</h2>
+                    <p style="margin:0; color: #666;">Create and manage discount codes.</p>
+                </div>
+                <button class="btn btn-black" onclick="window.adminCoupons.openModal()">
+                    <i class="fas fa-plus"></i> NEW COUPON
+                </button>
+            </div>
+
+            <!-- Table -->
+            <div class="table-responsive">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Value</th>
+                            <th>Type</th>
+                            <th>Expires</th>
+                            <th>Usage</th>
+                            <th>Min Purchase</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="couponsTable">
+                        <!-- Injected by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Form -->
+    <div id="couponModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="window.adminCoupons.closeModal()">&times;</span>
+            <h2 id="couponModalTitle" style="font-family: 'Koulen'; margin-bottom: 20px;">CREATE COUPON</h2>
+
+            <form id="couponForm">
+                <input type="hidden" id="couponId">
+
+                <div class="form-group">
+                    <label>COUPON CODE</label>
+                    <input type="text" id="couponCode" required placeholder="Ex: WINTER25"
+                        style="text-transform: uppercase; font-weight: 800;">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label>TYPE</label>
+                        <select id="couponType" required>
+                            <option value="percentage">Percentage (%)</option>
+                            <option value="fixed_amount">Fixed Amount (S/)</option>
+                        </select>
+                    </div>
+                    <div class="form-group half">
+                        <label>VALUE</label>
+                        <input type="number" id="couponValue" required step="0.01" placeholder="10 or 20.00">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>DESCRIPTION (OPTIONAL)</label>
+                    <input type="text" id="couponDescription" placeholder="Campaign details">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label>MIN PURCHASE (S/)</label>
+                        <input type="number" id="couponMinPurchase" value="0">
+                    </div>
+                    <div class="form-group half">
+                        <label>MAX USES</label>
+                        <input type="number" id="couponMaxUses" placeholder="∞">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>EXPIRY DATE</label>
+                    <input type="date" id="couponExpiresAt">
+                </div>
+
+                <div style="margin-top: 30px; display: flex; gap: 10px;">
+                    <button type="button" class="btn btn-outline" style="flex:1"
+                        onclick="window.adminCoupons.closeModal()">CANCEL</button>
+                    <button type="submit" class="btn btn-black" style="flex:1">SAVE COUPON</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/notifications.js"></script>
+    <script>
+        // Init logic for admin
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.adminCoupons) {
+                window.adminCoupons.loadCoupons();
+            }
+        });
+    </script>
+    <script src="js/admin-coupons.js"></script>
+</body>
+
+</html>

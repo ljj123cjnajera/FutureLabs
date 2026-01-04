@@ -209,30 +209,8 @@ class CheckoutManager {
                 if (btn) btn.innerHTML = 'SAVE & CONTINUE';
             }
         } catch (e) {
-            console.error('Address Save Failed (Offline?):', e);
-
-            // 🛡️ FALLBACK: Simulate success for Demo/Offline Mode
-            console.warn('⚠️ Activating Offline Address Protocol...');
-            const id = 'local_' + Date.now();
-            const newAddr = {
-                id: id,
-                ...addressData,
-                is_default: true
-            };
-
-            this.addresses.push(newAddr);
-            this.selectedAddressId = id;
-
-            if (window.notifications) window.notifications.info('OFFLINE MODE', 'Dirección guardada localmente');
-
-            // Proceed
-            await this.loadAddresses(); // Might fail again but we pushed to local array? 
-            // Actually loadAddresses overwrites this.addresses from API.
-            // We should manually update this.addresses if we are failing.
-            // Since loadAddresses failed likely, we rely on the manual push above.
-
-            // Wait, if loadAddresses matches, fine. If not, we rely on what we have.
-            this.renderStep(1);
+            console.error('Address Save Failed:', e);
+            alert('System Error Saving Address. Please check your connection.');
         }
     }
 
@@ -372,25 +350,11 @@ class CheckoutManager {
 
         } catch (e) {
             console.error('Order Error (Real API Failed):', e);
-            console.warn('⚠️ Activating Checkout Backup Protocol...');
-
-            // SIMULATION FALLBACK
-            // If the backend fails, we assume it's a demo/testing scenario.
-            // We simulate a successful order to complete the user journey.
-            setTimeout(() => {
-                const simulatedOrderId = 'DEMO-' + Date.now();
-                console.log('✅ Simulated Order Created:', simulatedOrderId);
-
-                // Clear Cart
-                localStorage.removeItem('cart');
-
-                // Update Badge
-                if (window.Components) window.Components.updateCartCount();
-
-                // Redirect
-                window.location.href = `order-success.html?id=${simulatedOrderId}&simulated=true`;
-            }, 1000);
-
+            alert('Order failed: ' + (e.message || 'Server connection error'));
+            if (btn) {
+                btn.innerHTML = 'PLACE ORDER';
+                btn.disabled = false;
+            }
         }
     }
 
