@@ -546,28 +546,6 @@ class HomeEngine {
   }
 
 
-  initCountdown() {
-    const targetDate = new Date();
-    targetDate.setDate(targetDate.getDate() + 3);
-
-    const updateTimer = () => {
-      const now = new Date();
-      const diff = targetDate - now;
-      if (diff <= 0) return;
-
-      const set = (id, v) => {
-        const el = document.getElementById(id);
-        if (el) el.innerText = v.toString().padStart(2, '0');
-      };
-
-      set('days', Math.floor(diff / (1000 * 60 * 60 * 24)));
-      set('hours', Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
-      set('minutes', Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)));
-      set('seconds', Math.floor((diff % (1000 * 60)) / 1000));
-    };
-    setInterval(updateTimer, 1000);
-    updateTimer();
-  }
 
   toggleLoader(show) {
     const loader = document.getElementById('preloader');
