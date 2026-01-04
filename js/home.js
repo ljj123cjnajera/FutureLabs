@@ -138,7 +138,6 @@ class HomeEngine {
 
 
   initHypeFeatures() {
-    this.startCountdown();
     this.setupScrollReveals();
     this.setupVideoModal();
 
@@ -598,50 +597,6 @@ class HomeEngine {
   // ⚡ INTERACTIONS
   // ==========================================
 
-  // 0. COUNTDOWN TIMER
-  initCountdown() {
-    const countdownEl = document.getElementById('countDownTimer');
-    if (!countdownEl) return;
-
-    // Set target date to 3 days from now (Simulated Drop)
-    const targetDate = new Date();
-    targetDate.setDate(targetDate.getDate() + 3);
-    targetDate.setHours(20, 0, 0, 0); // 8 PM Launch
-
-    // Store in session to keep consistent while browsing
-    let savedTarget = sessionStorage.getItem('nextDropTime');
-    if (savedTarget) {
-      // use saved
-    } else {
-      sessionStorage.setItem('nextDropTime', targetDate.getTime());
-    }
-
-    // Override for simple demo: Always 2 days 14 hours ahead
-    const updateTimer = () => {
-      const now = new Date().getTime();
-      const distance = (parseInt(savedTarget || targetDate.getTime())) - now;
-
-      if (distance < 0) {
-        countdownEl.innerHTML = "DROPPING NOW";
-        return;
-      }
-
-      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-      countdownEl.innerHTML = `
-            <div>${days}<small>D</small></div>
-            <div>${hours}<small>H</small></div>
-            <div>${minutes}<small>M</small></div>
-            <div>${seconds}<small>S</small></div>
-        `;
-    };
-
-    setInterval(updateTimer, 1000);
-    updateTimer();
-  }
 
   quickAdd(id, name) {
     // 1. Update Cart Engine
