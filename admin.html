@@ -52,10 +52,6 @@
                     <i class="fas fa-ticket-alt"></i>
                     <span>Cupones</span>
                 </div>
-                <div class="menu-item" data-section="blog">
-                    <i class="fas fa-newspaper"></i>
-                    <span>Blog</span>
-                </div>
                 <div class="menu-item" data-section="payments">
                     <i class="fas fa-credit-card"></i>
                     <span>Pagos</span>
@@ -273,34 +269,6 @@
                     </div>
                 </div>
 
-                <!-- Blog Section -->
-                <div class="section" id="blog">
-                    <div class="table-container">
-                        <div class="table-header">
-                            <h3>Gestión de Blog</h3>
-                            <button class="btn-primary" onclick="window.adminBlog.openModal()">
-                                <i class="fas fa-plus"></i> Nueva Entrada
-                            </button>
-                        </div>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Imagen</th>
-                                    <th>Título</th>
-                                    <th>Autor</th>
-                                    <th>Estado</th>
-                                    <th>Fecha</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="blogTable">
-                                <tr>
-                                    <td colspan="6" style="text-align: center; padding: 40px;">Cargando...</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
 
                 <!-- Categories Section -->
                 <div class="section" id="categories">
@@ -1400,69 +1368,6 @@
         </div>
     </div>
 
-    <!-- Blog Modal -->
-    <div id="blogModal" class="modal" style="display: none;">
-        <div class="modal-content" style="max-width: 800px;">
-            <div class="modal-header">
-                <h3 id="blogModalTitle">Crear Entrada</h3>
-                <span class="modal-close" onclick="window.adminBlog.closeModal()">&times;</span>
-            </div>
-            <form id="blogForm">
-                <input type="hidden" id="blogId">
-                <div class="form-group">
-                    <label>Título *</label>
-                    <input type="text" id="blogTitle" required>
-                </div>
-                <div class="form-group">
-                    <label>Slug *</label>
-                    <input type="text" id="blogSlug" required>
-                </div>
-                <div class="form-group">
-                    <label>Extracto (Resumen)</label>
-                    <textarea id="blogExcerpt" rows="2"></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Contenido *</label>
-                    <textarea id="blogContent" rows="10" required></textarea>
-                    <small>Soporta HTML básico</small>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Autor</label>
-                        <input type="text" id="blogAuthor" value="Admin">
-                    </div>
-                    <div class="form-group">
-                        <label>Estado</label>
-                        <select id="blogStatus">
-                            <option value="published">Publicado</option>
-                            <option value="draft">Borrador</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Imagen Principal</label>
-                    <div style="margin-bottom: 10px;">
-                        <label class="btn btn-outline"
-                            style="display: inline-block; cursor: pointer; padding: 8px 16px;">
-                            <i class="fas fa-upload"></i> Subir Imagen
-                            <input type="file" id="blogImageFile" accept="image/*" style="display: none;"
-                                onchange="window.adminBlog.previewImage(this)">
-                        </label>
-                        <span id="blogImageFileName" style="margin-left: 10px; color: #666;"></span>
-                    </div>
-                    <div id="blogImagePreviewContainer" style="margin-top: 15px; display: none;">
-                        <img id="blogPreviewImage" src="" alt="Preview"
-                            style="max-width: 200px; max-height: 200px; border-radius: 8px;">
-                    </div>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn-secondary"
-                        onclick="window.adminBlog.closeModal()">Cancelar</button>
-                    <button type="submit" class="btn-primary">Guardar</button>
-                </div>
-            </form>
-        </div>
-    </div>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

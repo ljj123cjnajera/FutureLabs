@@ -19,7 +19,6 @@ Sneakers Shop es una plataforma moderna de e-commerce especializada en calzado y
 - 🎁 **Wishlist** - Lista de favoritos
 - 🎫 **Cupones de descuento** - Con validación
 - 🔍 **Búsqueda y filtros** - Por categoría, precio, marca
-- 📝 **Blog** - Sistema de artículos
 - 👨‍💼 **Panel Admin** - CRUD completo de todos los recursos
 - 📊 **Dashboard** - Estadísticas en tiempo real
 
@@ -153,7 +152,6 @@ npm start
 - `wishlist` - Lista de deseos
 - `coupons` - Cupones de descuento
 - `verification_codes` - Códigos de verificación
-- `blog_posts` - Artículos del blog
 - `loyalty_points` - Sistema de puntos
 
 ## 🔐 Usuarios de Prueba
@@ -173,7 +171,6 @@ npm start
 - `/` - Página de inicio
 - `/products.html` - Catálogo de productos
 - `/product-detail.html` - Detalle de producto
-- `/blog.html` - Blog
 - `/about.html` - Acerca de
 - `/contact.html` - Contacto
 - `/faq.html` - Preguntas frecuentes
@@ -248,7 +245,6 @@ npm start
 | Pagos | 50% 🔴 | Requiere API keys |
 | Admin Panel | 95% ✅ | CRUD completo |
 | Emails | 70% 🟡 | Requiere Resend configurado |
-| Blog | 100% ✅ | Funcional |
 | Chat | 30% 🟡 | Estructura básica |
 | Loyalty | 40% 🟡 | Backend listo |
 
