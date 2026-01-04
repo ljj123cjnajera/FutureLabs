@@ -457,11 +457,13 @@ class HomeEngine {
         
         if (trendingProducts.length > 0) {
           console.log(`✅ Loaded ${trendingProducts.length} trending products from API`);
-          // Buscar contenedor de trending o usar featuredProductsGrid si no existe
-          const trendingContainer = document.getElementById('trendingProductsGrid') || document.getElementById('featuredProductsGrid');
+          const trendingContainer = document.getElementById('trendingProductsGrid');
           if (trendingContainer) {
-            this.renderProductSlider(trendingContainer.id, trendingProducts).catch(e => console.error('Error rendering trending:', e));
+            this.renderProductSlider('trendingProductsGrid', trendingProducts).catch(e => console.error('Error rendering trending:', e));
           }
+        } else {
+          console.warn('⚠️ No trending products found');
+          this.showEmptyState('trendingProductsGrid', 'No hay productos en tendencia');
         }
       } catch (e) {
         console.error('❌ Error loading trending products:', e);
