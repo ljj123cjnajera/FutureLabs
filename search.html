@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEARCH RESULT // FUTURELABS</title>
+    <title>Resultados de Búsqueda - SneakersShop</title>
+    <meta name="description" content="Busca tus zapatillas favoritas en SneakersShop. Encuentra los mejores pares de Nike, Jordan, Adidas y más.">
 
     <!-- CSS Core -->
     <link rel="stylesheet" href="css/typography.css">
@@ -100,16 +101,17 @@
     <!-- Search Header -->
     <div class="search-results-header">
         <div class="container">
-            <h1 class="search-query-display" id="searchTitle">SEARCHING...</h1>
-            <div class="search-count" id="resultsCount">Loading catalog...</div>
+            <h1 class="search-query-display" id="searchTitle">BUSCANDO...</h1>
+            <div class="search-count" id="resultsCount">Cargando catálogo...</div>
 
             <div style="max-width: 600px; margin: 0 auto;">
-                <form id="refineSearchForm" style="display: flex; gap: 0; border: 2px solid black;">
-                    <input type="text" id="refineInput" placeholder="TRY ANOTHER KEYWORD..."
-                        style="flex: 1; border: none; padding: 15px; font-family: 'Space Grotesk'; font-size: 1.1rem; text-transform: uppercase;">
+                <form id="refineSearchForm" style="display: flex; gap: 0; border: 2px solid black;" aria-label="Formulario de búsqueda">
+                    <input type="text" id="refineInput" placeholder="INTRODUCE UNA PALABRA CLAVE..."
+                        style="flex: 1; border: none; padding: 15px; font-family: 'Space Grotesk'; font-size: 1.1rem; text-transform: uppercase;" aria-label="Buscar productos">
                     <button type="submit"
-                        style="border: none; border-left: 2px solid black; background: black; color: white; padding: 0 30px; cursor: pointer; font-family: 'Koulen'; font-size: 1.2rem;">
-                        SEARCH
+                        style="border: none; border-left: 2px solid black; background: black; color: white; padding: 0 30px; cursor: pointer; font-family: 'Koulen'; font-size: 1.2rem;"
+                        aria-label="Buscar">
+                        BUSCAR
                     </button>
                 </form>
             </div>
@@ -119,17 +121,17 @@
     <!-- Filters -->
     <div class="search-filters-bar">
         <div class="filter-group">
-            <span style="font-weight: 700; margin-right: 15px;">SORT BY:</span>
+            <span style="font-weight: 700; margin-right: 15px;">ORDENAR POR:</span>
             <select id="sortSelect"
-                style="border: 2px solid black; padding: 5px 10px; font-family: 'Space Grotesk'; font-weight: 600; text-transform: uppercase;">
-                <option value="newest">NEWEST DROPS</option>
-                <option value="price_asc">PRICE: LOW TO HIGH</option>
-                <option value="price_desc">PRICE: HIGH TO LOW</option>
-                <option value="name_asc">ALPHABETICAL (A-Z)</option>
+                style="border: 2px solid black; padding: 5px 10px; font-family: 'Space Grotesk'; font-weight: 600; text-transform: uppercase;" aria-label="Ordenar resultados">
+                <option value="newest">MÁS RECIENTES</option>
+                <option value="price_asc">PRECIO: MENOR A MAYOR</option>
+                <option value="price_desc">PRECIO: MAYOR A MENOR</option>
+                <option value="name_asc">ALFABÉTICO (A-Z)</option>
             </select>
         </div>
         <div class="view-toggle">
-            <span id="itemsShowing">Showing 0 results</span>
+            <span id="itemsShowing">Mostrando 0 resultados</span>
         </div>
     </div>
 

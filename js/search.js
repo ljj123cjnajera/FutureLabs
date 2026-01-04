@@ -40,7 +40,7 @@ class SearchEngine {
             document.getElementById('refineInput').value = this.query;
             this.performSearch(this.query);
         } else {
-            this.renderEmpty('Type a keyword to start searching.');
+            this.renderEmpty('Escribe una palabra clave para comenzar a buscar.');
         }
 
         // Remove loading class
@@ -71,12 +71,16 @@ class SearchEngine {
 
     async performSearch(query) {
         document.getElementById('searchTitle').textContent = `"${query}"`;
-        document.getElementById('resultsCount').textContent = 'SEARCHING DATABASE...';
+        document.getElementById('resultsCount').textContent = 'Buscando en catálogo...';
 
         const container = document.getElementById('searchResultsGrid');
         if (!container) return;
 
-        window.loadingState.renderLoading(container, 'SCANNING CATALOG...');
+        if (window.loadingState && window.loadingState.renderLoading) {
+            window.loadingState.renderLoading(container, 'Escaneando catálogo...');
+        } else {
+            container.innerHTML = '<div style="text-align: center; padding: 60px;"><div class="loading-spinner"></div><p>Escaneando catálogo...</p></div>';
+        }
 
         try {
             // Real API Call
@@ -91,18 +95,29 @@ class SearchEngine {
                 if (this.results.length > 0) {
                     this.renderResults();
                 } else {
-                    this.renderEmpty(`No matches found for "${query}"`);
+                    this.renderEmpty(`No se encontraron resultados para "${query}"`);
                 }
             } else {
-                this.renderEmpty('Search service unavailable.');
+                this.renderEmpty('Servicio de búsqueda no disponible.');
             }
 
         } catch (e) {
             console.error('Search Failed:', e);
-            // Check if user allowed simulations? NO. 
-            // "no queremos simulaciones" -> Show Error.
-            window.loadingState.renderError(container, 'Unable to connect to Catalog Service.');
-            document.getElementById('resultsCount').textContent = 'ERROR';
+            const countLabel = document.getElementById('resultsCount');
+            if (countLabel) countLabel.textContent = 'ERROR DE CONEXIÓN';
+            
+            if (window.loadingState && window.loadingState.renderError) {
+                window.loadingState.renderError(container, 'No se pudo conectar al servicio de catálogo.');
+            } else {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 60px; grid-column: 1 / -1;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 48px; color: #f00; margin-bottom: 20px;"></i>
+                        <h2>Error de conexión</h2>
+                        <p>No se pudo conectar al servicio de catálogo. Por favor, intenta de nuevo más tarde.</p>
+                        <a href="index.html" class="btn btn-black" style="margin-top: 20px;">Volver al inicio</a>
+                    </div>
+                `;
+            }
         }
     }
 
@@ -111,8 +126,8 @@ class SearchEngine {
         const countLabel = document.getElementById('resultsCount');
         const itemsLabel = document.getElementById('itemsShowing');
 
-        countLabel.textContent = `${this.results.length} RESULTS FOUND`;
-        itemsLabel.textContent = `Showing ${this.results.length} items`;
+        countLabel.textContent = `${this.results.length} ${this.results.length === 1 ? 'RESULTADO ENCONTRADO' : 'RESULTADOS ENCONTRADOS'}`;
+        itemsLabel.textContent = `Mostrando ${this.results.length} ${this.results.length === 1 ? 'producto' : 'productos'}`;
 
         container.innerHTML = this.results.map(product => {
             // Re-use Component logic if possible, or manual build
@@ -141,13 +156,13 @@ class SearchEngine {
         const container = document.getElementById('searchResultsGrid');
         const countLabel = document.getElementById('resultsCount');
 
-        countLabel.textContent = '0 RESULTS';
+        countLabel.textContent = '0 RESULTADOS';
         container.innerHTML = `
             <div class="empty-search" style="grid-column: 1 / -1;">
-                <i class="fas fa-search"></i>
-                <h2>${msg}</h2>
-                <p>Try checking your spelling or use more general keywords.</p>
-                <a href="index.html" class="btn btn-black" style="margin-top: 20px;">BACK TO HOME</a>
+                <i class="fas fa-search" style="font-size: 4rem; margin-bottom: 20px; color: #ccc;"></i>
+                <h2 style="margin-bottom: 10px;">${msg}</h2>
+                <p style="color: #666; margin-bottom: 20px;">Intenta revisar la ortografía o usa palabras clave más generales.</p>
+                <a href="index.html" class="btn btn-black" style="margin-top: 20px;">VOLVER AL INICIO</a>
             </div>
         `;
     }

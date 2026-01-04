@@ -32,26 +32,31 @@
 
     <div class="container">
         <div class="auth-container">
-            <h1 class="auth-title">Join The Club</h1>
+            <h1 class="auth-title">ÚNETE AL CLUB</h1>
             <form class="auth-form" id="registerForm">
                 <div class="form-group">
-                    <label class="form-label">Full Name</label>
-                    <input type="text" class="form-input" required placeholder="JUMPMAN JACK">
+                    <label class="form-label" for="registerFirstName">Nombre</label>
+                    <input type="text" id="registerFirstName" name="first_name" class="form-input" required placeholder="JUAN" autocomplete="given-name" aria-label="Nombre">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Email Address</label>
-                    <input type="email" class="form-input" required placeholder="TU@EMAIL.COM">
+                    <label class="form-label" for="registerLastName">Apellido</label>
+                    <input type="text" id="registerLastName" name="last_name" class="form-input" required placeholder="PÉREZ" autocomplete="family-name" aria-label="Apellido">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Password</label>
-                    <input type="password" class="form-input" required placeholder="••••••••">
+                    <label class="form-label" for="registerEmail">Correo Electrónico</label>
+                    <input type="email" id="registerEmail" name="email" class="form-input" required placeholder="TU@EMAIL.COM" autocomplete="email" aria-label="Correo electrónico">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="registerPassword">Contraseña</label>
+                    <input type="password" id="registerPassword" name="password" class="form-input" required placeholder="••••••••" autocomplete="new-password" aria-label="Contraseña" minlength="6">
+                    <small style="display: block; margin-top: 5px; color: #666; font-size: 0.85rem;">Mínimo 6 caracteres</small>
                 </div>
 
-                <button type="submit" class="btn-auth">Create Account</button>
+                <button type="submit" class="btn-auth" aria-label="Crear cuenta">CREAR CUENTA</button>
             </form>
 
             <div class="auth-links" style="justify-content: center;">
-                <span>Already a member? <a href="login.html" class="auth-link">Sign In</a></span>
+                <span>¿Ya eres miembro? <a href="login.html" class="auth-link">Iniciar Sesión</a></span>
             </div>
         </div>
     </div>
