@@ -76,18 +76,41 @@ function isOriginAllowed(origin) {
   }
   
   // Permitir cualquier subdominio de github.io
-  if (origin.includes('.github.io')) {
+  if (origin && origin.includes('.github.io')) {
     return true;
   }
   
   // Permitir localhost en cualquier puerto
-  if (origin.startsWith('http://localhost:') || origin.startsWith('https://localhost:')) {
+  if (origin && (origin.startsWith('http://localhost:') || origin.startsWith('https://localhost:'))) {
     return true;
   }
   
   return false;
 }
 
+// Middleware CORS personalizado - MANEJA EXPLÍCITAMENTE PREFLIGHT
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  
+  // Establecer headers CORS para todos los orígenes permitidos
+  if (isOriginAllowed(origin)) {
+    res.header('Access-Control-Allow-Origin', origin || '*');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin, Access-Control-Request-Method, Access-Control-Request-Headers');
+    res.header('Access-Control-Expose-Headers', 'Content-Range, X-Content-Range');
+    res.header('Access-Control-Max-Age', '86400');
+  }
+  
+  // Manejar peticiones OPTIONS (preflight) explícitamente
+  if (req.method === 'OPTIONS') {
+    return res.status(204).end();
+  }
+  
+  next();
+});
+
+// También usar el middleware cors de la librería como respaldo
 app.use(cors({
   origin: function (origin, callback) {
     if (isOriginAllowed(origin)) {
@@ -120,9 +143,6 @@ app.use(cors({
   optionsSuccessStatus: 204,
   maxAge: 86400 // Cache preflight por 24 horas
 }));
-
-// Manejar explícitamente peticiones OPTIONS (preflight)
-app.options('*', cors());
 
 // Middleware de seguridad (después de CORS)
 app.use(helmet({
