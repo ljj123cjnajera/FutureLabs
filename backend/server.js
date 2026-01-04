@@ -55,11 +55,7 @@ async function ensureDataSeeded() {
 // Agrega esta línea para el proxy:
 app.set('trust proxy', 1);
 
-// Middleware de seguridad
-app.use(helmet({
-  contentSecurityPolicy: false
-}));
-
+// CORS - DEBE IR ANTES DE HELMET para que funcione correctamente
 // CORS - Permite múltiples orígenes (GitHub Pages + localhost)
 const allowedOrigins = [
   process.env.FRONTEND_URL,
@@ -123,6 +119,15 @@ app.use(cors({
   preflightContinue: false,
   optionsSuccessStatus: 204,
   maxAge: 86400 // Cache preflight por 24 horas
+}));
+
+// Manejar explícitamente peticiones OPTIONS (preflight)
+app.options('*', cors());
+
+// Middleware de seguridad (después de CORS)
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
 
 // Compresión
