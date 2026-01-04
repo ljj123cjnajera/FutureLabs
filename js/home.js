@@ -347,11 +347,56 @@ class HomeEngine {
   }
 
   startCountdown() {
-    // Placeholder for countdown logic if needed in V1
-    const timerElement = document.getElementById('dropTimer');
-    if (timerElement) {
-      timerElement.textContent = "02D 14H 30M";
+    const dropTimer = document.getElementById('dropTimer');
+    if (!dropTimer) return;
+
+    // Set target date to 3 days from now (Simulated Drop)
+    const targetDate = new Date();
+    targetDate.setDate(targetDate.getDate() + 3);
+    targetDate.setHours(20, 0, 0, 0); // 8 PM Launch
+
+    // Store in session to keep consistent while browsing
+    let savedTarget = sessionStorage.getItem('nextDropTime');
+    if (!savedTarget) {
+      sessionStorage.setItem('nextDropTime', targetDate.getTime());
+      savedTarget = targetDate.getTime();
     }
+
+    const updateTimer = () => {
+      const now = new Date().getTime();
+      const distance = parseInt(savedTarget) - now;
+
+      const set = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value.toString().padStart(2, '0');
+      };
+
+      if (distance < 0) {
+        set('days', '00');
+        set('hours', '00');
+        set('minutes', '00');
+        set('seconds', '00');
+        const dropSection = document.getElementById('nextDrop');
+        if (dropSection) {
+          dropSection.querySelector('.drop-badge').textContent = 'LANZAMIENTO ACTIVO';
+        }
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      set('days', days);
+      set('hours', hours);
+      set('minutes', minutes);
+      set('seconds', seconds);
+    };
+
+    // Update immediately and then every second
+    updateTimer();
+    setInterval(updateTimer, 1000);
   }
 
   // ==========================================
@@ -500,7 +545,7 @@ class HomeEngine {
   // 5. JOURNAL (DYNAMIC INJECTION)
   // ==========================================
   async loadJournal() {
-    const container = document.querySelector('.journal-grid');
+    const container = document.getElementById('journalGrid') || document.querySelector('.journal-grid');
     if (!container) return;
 
     // Default Fallback Data (Premium)
@@ -533,26 +578,26 @@ class HomeEngine {
 
     let posts = [];
 
-    // 1. Try API
+    // 1. Try API First
     if (this.api && this.api.getRecentBlogPosts) {
       try {
         const res = await this.api.getRecentBlogPosts(3);
         if (res.success && Array.isArray(res.data) && res.data.length > 0) {
           posts = res.data.map(p => ({
-            category: p.category || 'NEWS',
+            category: p.category || p.tag || 'BLOG',
             title: p.title,
-            desc: p.excerpt || p.content.substring(0, 100) + '...',
-            img: p.image_url || 'img/placeholder-journal.jpg',
-            time: `${Math.ceil((p.content?.length || 1000) / 1000)} MIN READ`,
-            url: `blog-post.html?slug=${p.slug}`
+            desc: p.excerpt || (p.content ? p.content.substring(0, 100) + '...' : 'Lee más sobre este artículo.'),
+            img: p.image_url || p.featured_image || 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?q=80&w=800',
+            time: p.read_time || `${Math.ceil((p.content?.length || 1000) / 1000)} MIN READ`,
+            url: p.slug ? `blog-post.html?slug=${p.slug}` : `blog-post.html?id=${p.id}`
           }));
         }
       } catch (e) {
-        // Silent fail to fallback
+        console.warn('⚠️ Blog API Error, using fallback:', e);
       }
     }
 
-    // 2. Use Fallback if needed
+    // 2. Use Fallback if API failed or returned empty
     if (posts.length === 0) {
       posts = fallbackPosts;
     }
@@ -567,7 +612,7 @@ class HomeEngine {
                 <span class="journal-tag">${post.category}</span>
                 <h3>${post.title}</h3>
                 <p>${post.desc}</p>
-                <a href="${post.url}" class="read-more">PROPAGANDA_V3 <i class="fas fa-arrow-right"></i></a>
+                <a href="${post.url}" class="read-more">Leer más <i class="fas fa-arrow-right"></i></a>
             </div>
         </article>
     `).join('');

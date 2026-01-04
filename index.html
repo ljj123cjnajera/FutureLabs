@@ -493,43 +493,12 @@
                 <h2 class="section-title glitch-text" data-text="ÚLTIMAS DEL BLOG">ÚLTIMAS DEL BLOG</h2>
                 <a href="blog.html" class="link-arrow">Ver el Journal <i class="fas fa-arrow-right"></i></a>
             </div>
-            <div class="journal-grid">
-                <article class="journal-card">
-                    <div class="journal-image">
-                        <img src="https://images.unsplash.com/photo-1608231387042-66d1773070a5?q=80&w=800"
-                            alt="Yeezy Feature" loading="lazy">
-                    </div>
-                    <div class="journal-content">
-                        <span class="journal-tag">RELEASE</span>
-                        <h3>El fin de una era: Yeezy vs Adidas</h3>
-                        <p>Analizamos el impacto en el mercado de reventa y qué esperar del futuro.</p>
-                        <a href="blog-post.html" class="read-more">Leer más</a>
-                    </div>
-                </article>
-                <article class="journal-card">
-                    <div class="journal-image">
-                        <img src="https://images.unsplash.com/photo-1552346154-21d32810aba3?q=80&w=800"
-                            alt="Jordan History" loading="lazy">
-                    </div>
-                    <div class="journal-content">
-                        <span class="journal-tag">CULTURE</span>
-                        <h3>¿Por qué las J1 High nunca mueren?</h3>
-                        <p>La historia detrás de la silueta que inició todo en 1985.</p>
-                        <a href="blog-post.html" class="read-more">Leer más</a>
-                    </div>
-                </article>
-                <article class="journal-card">
-                    <div class="journal-image">
-                        <img src="https://images.unsplash.com/photo-1523398002811-6ce9e490101d?q=80&w=800"
-                            alt="Streetwear Guide" loading="lazy">
-                    </div>
-                    <div class="journal-content">
-                        <span class="journal-tag">STYLE</span>
-                        <h3>Guía de Estilo: Streetwear Verano 2025</h3>
-                        <p>Los esenciales que necesitas en tu rotación esta temporada.</p>
-                        <a href="blog-post.html" class="read-more">Leer más</a>
-                    </div>
-                </article>
+            <div class="journal-grid" id="journalGrid">
+                <!-- Blog posts will be loaded dynamically by JS -->
+                <div class="loading-state" style="grid-column: 1 / -1; padding: 3rem;">
+                    <div class="loading-spinner"></div>
+                    <p>Cargando artículos del blog...</p>
+                </div>
             </div>
         </div>
     </section>
