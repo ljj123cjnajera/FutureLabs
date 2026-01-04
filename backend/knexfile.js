@@ -67,13 +67,20 @@ module.exports = {
       directory: './database/seeds'
     },
     pool: {
-      min: 2, // Mantener mínimo 2 conexiones idle para mejor rendimiento
+      min: 0, // Empezar sin conexiones idle para evitar timeouts al inicio
       max: 4,
-      acquireTimeoutMillis: 60000,
-      createTimeoutMillis: 30000,
+      acquireTimeoutMillis: 30000, // Reducir timeout a 30s
+      createTimeoutMillis: 10000, // Reducir timeout de creación
       idleTimeoutMillis: 30000,
       reapIntervalMillis: 1000,
-      propagateCreateError: false
+      propagateCreateError: false,
+      // Agregar configuración adicional para mejor manejo de errores
+      afterCreate: function(conn, done) {
+        conn.on('error', function(err) {
+          console.log('⚠️ Database connection error:', err);
+        });
+        done(null, conn);
+      }
     }
   }
 };

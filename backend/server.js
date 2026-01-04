@@ -272,22 +272,36 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Iniciar servidor después de que las seeds se ejecuten
-ensureDataSeeded()
-  .then(() => {
-    console.log('✅ Seed check completed, starting server...');
-    app.listen(PORT, '0.0.0.0', () => {
-      console.log(`🚀 FutureLabs API corriendo en puerto ${PORT}`);
-      console.log(`📡 Ambiente: ${process.env.NODE_ENV || 'development'}`);
-      console.log(`🌐 Escuchando en 0.0.0.0:${PORT}`);
+// Ejecutar migraciones de forma asíncrona (no bloquea el inicio)
+async function runMigrations() {
+  try {
+    console.log('🔄 Running database migrations...');
+    const { execSync } = require('child_process');
+    execSync('npx knex migrate:latest', {
+      stdio: 'inherit',
+      cwd: process.cwd(),
+      timeout: 30000 // 30 segundos máximo
     });
-  })
-  .catch((error) => {
-    console.log('⚠️  Seed check failed:', error.message);
-    console.log('⚠️  Starting server anyway...');
-    app.listen(PORT, '0.0.0.0', () => {
-      console.log(`🚀 FutureLabs API corriendo en puerto ${PORT}`);
-      console.log(`📡 Ambiente: ${process.env.NODE_ENV || 'development'}`);
-      console.log(`🌐 Escuchando en 0.0.0.0:${PORT}`);
-    });
+    console.log('✅ Migrations completed');
+  } catch (error) {
+    console.log('⚠️  Migrations failed:', error.message);
+    console.log('⚠️  Server will continue without migrations');
+  }
+}
+
+// Iniciar servidor inmediatamente (sin esperar migraciones)
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 FutureLabs API corriendo en puerto ${PORT}`);
+  console.log(`📡 Ambiente: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🌐 Escuchando en 0.0.0.0:${PORT}`);
+  
+  // Ejecutar migraciones en background después de iniciar
+  runMigrations().catch(err => {
+    console.log('⚠️  Migration error:', err.message);
   });
+  
+  // Ejecutar seed check después de iniciar
+  ensureDataSeeded().catch(err => {
+    console.log('⚠️  Seed check error:', err.message);
+  });
+});
