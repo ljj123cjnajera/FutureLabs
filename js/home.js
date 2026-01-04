@@ -469,32 +469,35 @@ class HomeEngine {
   // ==========================================
   // 4. BRAND MARQUEE (SVG UPGRADE)
   // ==========================================
-  async loadBrands() {
-    const marqueeTrack = document.querySelector('.marquee-track');
-    if (!marqueeTrack) return;
+  async initBrandMarquee() {
+    // DISABLED: Using static HTML for Brutalist Text Design (Phase 211)
+    /*
+    const marqueeContainer = document.querySelector('.marquee-track');
+    if (!marqueeContainer) return;
 
-    // SVG Logos (White, High Quality)
-    // Using verified Wikipedia URLs
+    // Limpiar contenido estático
+    marqueeContainer.innerHTML = '';
     const brands = [
-      { name: 'NIKE', src: 'https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg' },
-      { name: 'JORDAN', src: 'https://upload.wikimedia.org/wikipedia/en/3/37/Jumpman_logo.svg' },
-      { name: 'ADIDAS', src: 'https://upload.wikimedia.org/wikipedia/commons/2/20/Adidas_Logo.svg' },
-      { name: 'YEEZY', src: 'https://upload.wikimedia.org/wikipedia/commons/f/f1/Yeezy_logo.svg' },
-      { name: 'NEW BALANCE', src: 'https://upload.wikimedia.org/wikipedia/commons/e/ea/New_Balance_logo.svg' },
-      { name: 'OFF-WHITE', src: 'https://upload.wikimedia.org/wikipedia/commons/1/19/Off-white_logo.svg' },
-      { name: 'SUPREME', src: 'https://upload.wikimedia.org/wikipedia/commons/2/28/Supreme_Logo.svg' },
-      // Duplicates for infinite scroll
-      { name: 'NIKE', src: 'https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg' },
-      { name: 'JORDAN', src: 'https://upload.wikimedia.org/wikipedia/en/3/37/Jumpman_logo.svg' },
-      { name: 'ADIDAS', src: 'https://upload.wikimedia.org/wikipedia/commons/2/20/Adidas_Logo.svg' }
+        { name: 'NIKE', src: 'https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg' },
+        { name: 'JORDAN', src: 'https://upload.wikimedia.org/wikipedia/en/3/37/Jumpman_logo.svg' },
+        { name: 'ADIDAS', src: 'https://upload.wikimedia.org/wikipedia/commons/2/20/Adidas_Logo.svg' },
+        { name: 'YEEZY', src: 'https://upload.wikimedia.org/wikipedia/commons/f/f1/Yeezy_logo.svg' },
+        { name: 'NEW BALANCE', src: 'https://upload.wikimedia.org/wikipedia/commons/e/ea/New_Balance_logo.svg' },
+        { name: 'OFF-WHITE', src: 'https://upload.wikimedia.org/wikipedia/commons/1/19/Off-white_logo.svg' },
+        { name: 'SUPREME', src: 'https://upload.wikimedia.org/wikipedia/commons/2/28/Supreme_Logo.svg' },
+        // Duplicates for infinite scroll
+        { name: 'NIKE', src: 'https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg' },
+        { name: 'JORDAN', src: 'https://upload.wikimedia.org/wikipedia/en/3/37/Jumpman_logo.svg' },
+        { name: 'ADIDAS', src: 'https://upload.wikimedia.org/wikipedia/commons/2/20/Adidas_Logo.svg' }
     ];
 
-    // Clear text placeholders
-    marqueeTrack.innerHTML = brands.map(b => `
+    marqueeContainer.innerHTML = brands.map(b => `
         <div class="brand-item svg-mode">
             <img src="${b.src}" alt="${b.name}" loading="lazy" width="80" height="40" style="object-fit: contain; filter: brightness(0) invert(1);">
         </div>
     `).join('');
+    */
+    console.log('Brand Marquee: Using Static Text Mode');
   }
 
   // ==========================================
