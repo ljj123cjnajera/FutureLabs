@@ -469,7 +469,7 @@ class HomeEngine {
   // ==========================================
   // 4. BRAND MARQUEE (SVG UPGRADE)
   // ==========================================
-  async initBrandMarquee() {
+  async loadBrands() {
     // DISABLED: Using static HTML for Brutalist Text Design (Phase 211)
     /*
     const marqueeContainer = document.querySelector('.marquee-track');
