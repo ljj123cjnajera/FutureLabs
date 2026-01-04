@@ -51,6 +51,10 @@
         rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Preload Critical Resources -->
+    <link rel="preload" href="https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&q=80&w=1600" as="image" fetchpriority="high">
+    <link rel="dns-prefetch" href="https://futurelabs-production.up.railway.app">
 
     <!-- CSS Unificado (Streetwear Standard V3) -->
     <!-- CSS Unificado (Streetwear Standard V3) -->
@@ -101,21 +105,41 @@
       "url": "https://ljj123cjnajera.github.io/FutureLabs/"
     }
     </script>
+    
+    <!-- BreadcrumbList Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Inicio",
+          "item": "https://ljj123cjnajera.github.io/FutureLabs/"
+        }
+      ]
+    }
+    </script>
 </head>
 
 <body>
+    <!-- Skip to main content (Accessibility) -->
+    <a href="#main-content" class="skip-link" aria-label="Saltar al contenido principal">Saltar al contenido principal</a>
+    
     <!-- IMMERSION ELEMENTS (PHASE 94) -->
-    <div class="noise-overlay"></div>
-    <div class="cursor-follower"></div>
+    <div class="noise-overlay" aria-hidden="true"></div>
+    <div class="cursor-follower" aria-hidden="true"></div>
 
     <!-- Header -->
-    <header id="mainHeader"></header>
+    <header id="mainHeader" role="banner"></header>
 
     <!-- Breadcrumbs -->
-    <nav id="breadcrumbs"></nav>
+    <nav id="breadcrumbs" aria-label="Breadcrumb"></nav>
 
     <!-- Hero Slider -->
-    <section class="hero-section">
+    <main id="main-content">
+    <section class="hero-section" aria-label="Hero slider">
         <div id="heroSlidesContainer" class="hero-slides">
             <!-- Static Slide 1 (Critical Rendering Path) -->
             <div class="slide active hero-bg-1">
@@ -201,11 +225,11 @@
         <div class="container">
             <div class="engine-header">
                 <h2 class="section-title-brutalist">ELIGE TU ESTILO //</h2>
-                <div class="engine-tabs">
-                    <button class="engine-tab active" data-tab="nike">NIKE</button>
-                    <button class="engine-tab" data-tab="jordan">JORDAN</button>
-                    <button class="engine-tab" data-tab="yeezy">YEEZY</button>
-                    <button class="engine-tab" data-tab="adidas">ADIDAS</button>
+                <div class="engine-tabs" role="tablist" aria-label="Filtrar productos por marca">
+                    <button class="engine-tab active" data-tab="nike" role="tab" aria-selected="true" aria-controls="engineGrid">NIKE</button>
+                    <button class="engine-tab" data-tab="jordan" role="tab" aria-selected="false" aria-controls="engineGrid">JORDAN</button>
+                    <button class="engine-tab" data-tab="yeezy" role="tab" aria-selected="false" aria-controls="engineGrid">YEEZY</button>
+                    <button class="engine-tab" data-tab="adidas" role="tab" aria-selected="false" aria-controls="engineGrid">ADIDAS</button>
                 </div>
             </div>
 
@@ -374,8 +398,10 @@
     </section>
 
 
+    </main>
+    
     <!-- Footer -->
-    <footer id="mainFooter" class="footer"></footer>
+    <footer id="mainFooter" class="footer" role="contentinfo"></footer>
 
     <!-- Sticky Promo Bar Mejorado (Fixed to Bottom) -->
     <div class="sticky-footer" id="stickyFooter">
@@ -412,7 +438,7 @@
 
     <!-- PAGE SPECIFIC ENGINE -->
     <script src="js/home.js?v=7.2"></script>
-    <script src="js/autocomplete.js?v=7.2"></script>
+    <script src="js/autocomplete.js?v=7.2" defer></script>
 
     <!-- Quick View Modal (Brutalist Harmonized) -->
     <div id="quickViewModal" class="quick-view-modal">
