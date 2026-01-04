@@ -24,23 +24,26 @@ class ChatWidget {
                 <!-- Chat Window -->
                 <div id="chatWindow" class="chat-window hidden">
                     <div class="chat-header">
-                        <span>SNEAKERS SHOP SUPPORT</span>
-                        <button id="chatClose" class="chat-close"><i class="fas fa-times"></i></button>
+                        <span>SOPORTE SNEAKERS SHOP</span>
+                        <button id="chatClose" class="chat-close" aria-label="Cerrar chat"><i class="fas fa-times"></i></button>
                     </div>
                     <div class="chat-body">
                         <div class="chat-message system">
-                            <strong>SYSTEM:</strong>
-                            <p>WELCOME TO SNEAKERS SHOP. HOW CAN WE HELP?</p>
+                            <strong>SISTEMA:</strong>
+                            <p>BIENVENIDO A SNEAKERS SHOP. ¿CÓMO PODEMOS AYUDARTE?</p>
                         </div>
                         <div class="chat-options">
-                            <button class="chat-option" data-action="track">TRACK ORDER</button>
-                            <button class="chat-option" data-action="shipping">SHIPPING INFO</button>
-                            <button class="chat-option" data-action="human">TALK TO HUMAN</button>
+                            <button class="chat-option" data-action="track">RASTREAR PEDIDO</button>
+                            <button class="chat-option" data-action="shipping">INFO DE ENVÍO</button>
+                            <button class="chat-option" data-action="returns">DEVOLUCIONES</button>
+                            <button class="chat-option" data-action="human">HABLAR CON PERSONA</button>
                         </div>
                     </div>
                     <div class="chat-footer">
-                        <input type="text" placeholder="TYPE HERE..." disabled style="cursor: not-allowed; background: #eee;">
-                        <button disabled><i class="fas fa-arrow-right"></i></button>
+                        <form id="chatForm" style="display: flex; gap: 5px;">
+                            <input type="text" id="chatInput" placeholder="ESCRIBE AQUÍ..." autocomplete="off" aria-label="Escribe tu mensaje">
+                            <button type="submit" id="chatSend" aria-label="Enviar mensaje"><i class="fas fa-arrow-right"></i></button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -188,9 +191,14 @@ class ChatWidget {
         const close = document.getElementById('chatClose');
         const windowEl = document.getElementById('chatWindow');
         const options = document.querySelectorAll('.chat-option');
+        const chatForm = document.getElementById('chatForm');
+        const chatInput = document.getElementById('chatInput');
 
         toggle.addEventListener('click', () => {
             windowEl.classList.toggle('active');
+            if (windowEl.classList.contains('active')) {
+                chatInput.focus();
+            }
         });
 
         close.addEventListener('click', () => {
@@ -203,6 +211,28 @@ class ChatWidget {
                 this.handleAction(action);
             });
         });
+
+        // Enviar mensaje
+        if (chatForm) {
+            chatForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const message = chatInput.value.trim();
+                if (message) {
+                    this.sendMessage(message);
+                    chatInput.value = '';
+                }
+            });
+        }
+
+        // Enter para enviar
+        if (chatInput) {
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    chatForm.dispatchEvent(new Event('submit'));
+                }
+            });
+        }
     }
 
     handleAction(action) {
@@ -210,20 +240,108 @@ class ChatWidget {
         let response = '';
 
         if (action === 'track') {
-            response = "TO TRACK AN ORDER, PLEASE GO TO 'MY PROFILE' > 'HISTORY'.";
+            response = "Para rastrear un pedido, ve a 'MI PERFIL' > 'PEDIDOS'.";
         } else if (action === 'shipping') {
-            response = "WE SHIP VIA OLVA COURIER. LIMA: 24-48H. PROVINCES: 48-72H.";
+            response = "Enviamos vía OLVA COURIER. Lima: 24-48h. Provincias: 48-72h. Envío gratis en compras mayores a S/ 200.";
+        } else if (action === 'returns') {
+            response = "Tienes 30 días para devolver productos sin usar. Ve a 'DEVOLUCIONES' en el footer para más información.";
         } else if (action === 'human') {
-            response = "ALL AGENTS ARE CURRENTLY BUSY. LEAVE A MESSAGE AT CONTACT@SNEAKERSHOP.PE";
+            response = "Todos nuestros agentes están ocupados. Deja un mensaje en contacto@sneakersshop.pe o WhatsApp: +51 987 654 321";
         }
 
         const msgHTML = `
             <div class="chat-message system" style="margin-top: 1rem; border-top: 1px dashed #ccc; padding-top: 0.5rem;">
-                <strong>SYSTEM:</strong>
+                <strong>SISTEMA:</strong>
                 <p>${response}</p>
             </div>
         `;
         body.insertAdjacentHTML('beforeend', msgHTML);
+        this.scrollToBottom();
+    }
+
+    async sendMessage(message) {
+        const body = document.querySelector('.chat-body');
+        
+        // Mostrar mensaje del usuario
+        const userMsgHTML = `
+            <div class="chat-message user" style="margin-top: 1rem; text-align: right;">
+                <strong>TÚ:</strong>
+                <p style="background: #f0f0f0; padding: 0.5rem; display: inline-block; border: 1px solid #000;">${this.escapeHtml(message)}</p>
+            </div>
+        `;
+        body.insertAdjacentHTML('beforeend', userMsgHTML);
+        this.scrollToBottom();
+
+        // Intentar enviar al backend si está disponible
+        try {
+            if (window.api && window.api.sendChatMessage) {
+                const user = window.authManager?.getUser();
+                const response = await window.api.sendChatMessage({
+                    message,
+                    user_id: user?.id || null,
+                    visitor_name: user ? null : 'Visitante',
+                    visitor_email: user ? null : null
+                });
+
+                if (response.success) {
+                    const systemMsgHTML = `
+                        <div class="chat-message system" style="margin-top: 1rem; border-top: 1px dashed #ccc; padding-top: 0.5rem;">
+                            <strong>SISTEMA:</strong>
+                            <p>Mensaje recibido. Te responderemos pronto.</p>
+                        </div>
+                    `;
+                    body.insertAdjacentHTML('beforeend', systemMsgHTML);
+                }
+            } else {
+                // Respuesta automática básica
+                this.handleAutoResponse(message);
+            }
+        } catch (error) {
+            console.error('Error sending chat message:', error);
+            // Respuesta automática en caso de error
+            this.handleAutoResponse(message);
+        }
+
+        this.scrollToBottom();
+    }
+
+    handleAutoResponse(message) {
+        const body = document.querySelector('.chat-body');
+        const lowerMessage = message.toLowerCase();
+        let response = '';
+
+        if (lowerMessage.includes('pedido') || lowerMessage.includes('orden') || lowerMessage.includes('compra')) {
+            response = "Para ver tus pedidos, ve a 'MI PERFIL' > 'PEDIDOS'. Si necesitas ayuda específica, escríbenos a contacto@sneakersshop.pe";
+        } else if (lowerMessage.includes('envío') || lowerMessage.includes('envio') || lowerMessage.includes('entrega')) {
+            response = "Enviamos vía OLVA COURIER. Lima Metropolitana: 24-48h. Provincias: 48-72h. Envío gratis en compras mayores a S/ 200.";
+        } else if (lowerMessage.includes('devolución') || lowerMessage.includes('devolucion') || lowerMessage.includes('cambio')) {
+            response = "Tienes 30 días para devolver productos sin usar. Ve a nuestra página de 'DEVOLUCIONES' para más información.";
+        } else if (lowerMessage.includes('precio') || lowerMessage.includes('costo') || lowerMessage.includes('cuanto')) {
+            response = "Los precios están disponibles en cada producto. También tenemos ofertas especiales y cupones de descuento.";
+        } else {
+            response = "Gracias por tu mensaje. Para atención personalizada, escríbenos a contacto@sneakersshop.pe o WhatsApp: +51 987 654 321";
+        }
+
+        const systemMsgHTML = `
+            <div class="chat-message system" style="margin-top: 1rem; border-top: 1px dashed #ccc; padding-top: 0.5rem;">
+                <strong>SISTEMA:</strong>
+                <p>${response}</p>
+            </div>
+        `;
+        body.insertAdjacentHTML('beforeend', systemMsgHTML);
+    }
+
+    scrollToBottom() {
+        const body = document.querySelector('.chat-body');
+        if (body) {
+            body.scrollTop = body.scrollHeight;
+        }
+    }
+
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
 }
 
