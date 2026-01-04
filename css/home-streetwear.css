@@ -920,8 +920,9 @@ body.loaded #preloader {
     filter: grayscale(100%);
 }
 
-transform: scale(1.1);
-filter: grayscale(0%);
+.bento-item:hover img {
+    transform: scale(1.1);
+    filter: grayscale(0%);
 }
 
 @media (max-width: 768px) {
