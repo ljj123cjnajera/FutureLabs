@@ -9,19 +9,20 @@ class AdminCoupons {
         const tbody = document.getElementById('couponsTable');
         if (!tbody) return;
 
-        window.loadingState.renderLoading(tbody, 'Cargando cupones...', { className: 'text-center p-5' });
+        // Mostrar estado de carga
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;"><div class="loading-spinner"></div><p>Cargando cupones...</p></td></tr>';
 
         try {
             const response = await window.api.getCoupons();
             if (response.success) {
-                this.coupons = response.data.coupons;
+                this.coupons = response.data.coupons || response.data || [];
                 this.renderTable();
             } else {
-                window.loadingState.renderError(tbody, 'Error al cargar cupones');
+                this.renderError('Error al cargar cupones');
             }
         } catch (error) {
             console.error('Error loading coupons:', error);
-            window.loadingState.renderError(tbody, 'Error de conexión');
+            this.renderError('Error de conexión');
         }
     }
 
@@ -30,7 +31,7 @@ class AdminCoupons {
         if (!tbody) return;
 
         if (this.coupons.length === 0) {
-            window.loadingState.renderEmpty(tbody, 'No hay cupones registrados');
+            this.renderEmpty();
             return;
         }
 
@@ -54,6 +55,36 @@ class AdminCoupons {
         `).join('');
     }
 
+    renderEmpty() {
+        const tbody = document.getElementById('couponsTable');
+        if (!tbody) return;
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" style="text-align: center; padding: 60px;">
+                    <i class="fas fa-ticket-alt" style="font-size: 48px; color: #ccc; margin-bottom: 20px; display: block;"></i>
+                    <p style="font-size: 1.1rem; color: #666; margin: 0;">No hay cupones registrados</p>
+                    <p style="font-size: 0.9rem; color: #999; margin-top: 10px;">Crea tu primer cupón usando el botón "NUEVO CUPÓN"</p>
+                </td>
+            </tr>
+        `;
+    }
+
+    renderError(message) {
+        const tbody = document.getElementById('couponsTable');
+        if (!tbody) return;
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" style="text-align: center; padding: 60px;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 48px; color: #f00; margin-bottom: 20px; display: block;"></i>
+                    <p style="font-size: 1.1rem; color: #666; margin: 0;">${message}</p>
+                    <button onclick="window.adminCoupons.loadCoupons()" class="btn btn-black" style="margin-top: 20px;">
+                        <i class="fas fa-redo"></i> Reintentar
+                    </button>
+                </td>
+            </tr>
+        `;
+    }
+
     openModal(couponId = null) {
         const modal = document.getElementById('couponModal');
         const form = document.getElementById('couponForm');
@@ -64,7 +95,7 @@ class AdminCoupons {
         if (couponId) {
             const coupon = this.coupons.find(c => c.id === couponId);
             if (coupon) {
-                document.getElementById('couponModalTitle').textContent = 'Editar Cupón';
+                document.getElementById('couponModalTitle').textContent = 'EDITAR CUPÓN';
                 document.getElementById('couponId').value = coupon.id;
                 document.getElementById('couponCode').value = coupon.code;
                 document.getElementById('couponDescription').value = coupon.description || '';
@@ -77,7 +108,7 @@ class AdminCoupons {
                 }
             }
         } else {
-            document.getElementById('couponModalTitle').textContent = 'Crear Cupón';
+            document.getElementById('couponModalTitle').textContent = 'CREAR CUPÓN';
             // Set defaults if new
             document.getElementById('couponType').value = 'percentage';
         }

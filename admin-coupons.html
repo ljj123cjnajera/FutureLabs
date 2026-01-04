@@ -4,15 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADMIN COUPONS // FUTURELABS</title>
-
+    <title>Gestión de Cupones - Admin SneakersShop</title>
+    <meta name="description" content="Panel de administración para gestionar cupones de descuento">
+    
     <!-- CSS Core -->
-    <link rel="stylesheet" href="css/typography.css">
-    <link rel="stylesheet" href="css/grids.css">
-    <link rel="stylesheet" href="css/buttons.css">
-    <link rel="stylesheet" href="css/layout.css">
-    <link rel="stylesheet" href="css/components.css">
-    <link rel="stylesheet" href="css/notifications.css">
+    <link rel="stylesheet" href="css/home-streetwear.css?v=7.0-CLEAN">
+    <link rel="stylesheet" href="css/header-v3.css?v=7.0-CLEAN">
+    <link rel="stylesheet" href="css/admin.css?v=7.0-CLEAN">
+    <link rel="stylesheet" href="css/notifications.css?v=7.0-CLEAN">
+    <link rel="stylesheet" href="css/animations.css?v=7.0-CLEAN">
     <!-- Admin Specific CSS -->
     <style>
         .admin-layout {
@@ -176,16 +176,16 @@
     <div class="admin-layout">
         <!-- Sidebar -->
         <aside class="admin-sidebar">
-            <h1 style="font-family: 'Koulen'; font-size: 2rem; line-height: 1;">FUTURELABS<br><span
-                    style="color: #666; font-size: 1rem;">ADMIN CONSOLE</span></h1>
+            <h1 style="font-family: 'Koulen'; font-size: 2rem; line-height: 1;">SNEAKERS SHOP<br><span
+                    style="color: #666; font-size: 1rem;">PANEL ADMIN</span></h1>
 
             <ul class="admin-menu">
                 <li><a href="admin.html">DASHBOARD</a></li>
-                <li><a href="admin-products.html">PRODUCTS</a></li>
-                <li><a href="admin-orders.html">ORDERS</a></li>
-                <li><a href="admin-coupons.html" class="active">COUPONS</a></li>
+                <li><a href="admin.html#products">PRODUCTOS</a></li>
+                <li><a href="admin.html#orders">PEDIDOS</a></li>
+                <li><a href="admin-coupons.html" class="active">CUPONES</a></li>
                 <li><a href="index.html" style="margin-top: 40px; font-size: 1rem;"><i class="fas fa-arrow-left"></i>
-                        EXIT</a></li>
+                        SALIR</a></li>
             </ul>
         </aside>
 
@@ -193,11 +193,11 @@
         <main class="admin-content">
             <div class="admin-header">
                 <div>
-                    <h2 class="section-title" style="margin:0;">COUPON MANAGEMENT</h2>
-                    <p style="margin:0; color: #666;">Create and manage discount codes.</p>
+                    <h2 class="section-title" style="margin:0;">GESTIÓN DE CUPONES</h2>
+                    <p style="margin:0; color: #666;">Crea y gestiona códigos de descuento.</p>
                 </div>
                 <button class="btn btn-black" onclick="window.adminCoupons.openModal()">
-                    <i class="fas fa-plus"></i> NEW COUPON
+                    <i class="fas fa-plus"></i> NUEVO CUPÓN
                 </button>
             </div>
 
@@ -206,13 +206,13 @@
                 <table class="admin-table">
                     <thead>
                         <tr>
-                            <th>Code</th>
-                            <th>Value</th>
-                            <th>Type</th>
-                            <th>Expires</th>
-                            <th>Usage</th>
-                            <th>Min Purchase</th>
-                            <th>Actions</th>
+                            <th>Código</th>
+                            <th>Valor</th>
+                            <th>Tipo</th>
+                            <th>Expira</th>
+                            <th>Uso</th>
+                            <th>Compra Mín.</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="couponsTable">
@@ -227,56 +227,56 @@
     <div id="couponModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="window.adminCoupons.closeModal()">&times;</span>
-            <h2 id="couponModalTitle" style="font-family: 'Koulen'; margin-bottom: 20px;">CREATE COUPON</h2>
+            <h2 id="couponModalTitle" style="font-family: 'Koulen'; margin-bottom: 20px;">CREAR CUPÓN</h2>
 
             <form id="couponForm">
                 <input type="hidden" id="couponId">
 
                 <div class="form-group">
-                    <label>COUPON CODE</label>
-                    <input type="text" id="couponCode" required placeholder="Ex: WINTER25"
-                        style="text-transform: uppercase; font-weight: 800;">
+                    <label>CÓDIGO DEL CUPÓN</label>
+                    <input type="text" id="couponCode" required placeholder="Ej: INVIERNO25"
+                        style="text-transform: uppercase; font-weight: 800;" aria-label="Código del cupón">
                 </div>
 
                 <div class="form-row">
                     <div class="form-group half">
-                        <label>TYPE</label>
-                        <select id="couponType" required>
-                            <option value="percentage">Percentage (%)</option>
-                            <option value="fixed_amount">Fixed Amount (S/)</option>
+                        <label>TIPO</label>
+                        <select id="couponType" required aria-label="Tipo de descuento">
+                            <option value="percentage">Porcentaje (%)</option>
+                            <option value="fixed_amount">Monto Fijo (S/)</option>
                         </select>
                     </div>
                     <div class="form-group half">
-                        <label>VALUE</label>
-                        <input type="number" id="couponValue" required step="0.01" placeholder="10 or 20.00">
+                        <label>VALOR</label>
+                        <input type="number" id="couponValue" required step="0.01" placeholder="10 o 20.00" aria-label="Valor del descuento">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label>DESCRIPTION (OPTIONAL)</label>
-                    <input type="text" id="couponDescription" placeholder="Campaign details">
+                    <label>DESCRIPCIÓN (OPCIONAL)</label>
+                    <input type="text" id="couponDescription" placeholder="Detalles de la campaña" aria-label="Descripción del cupón">
                 </div>
 
                 <div class="form-row">
                     <div class="form-group half">
-                        <label>MIN PURCHASE (S/)</label>
-                        <input type="number" id="couponMinPurchase" value="0">
+                        <label>COMPRA MÍNIMA (S/)</label>
+                        <input type="number" id="couponMinPurchase" value="0" aria-label="Compra mínima">
                     </div>
                     <div class="form-group half">
-                        <label>MAX USES</label>
-                        <input type="number" id="couponMaxUses" placeholder="∞">
+                        <label>USOS MÁXIMOS</label>
+                        <input type="number" id="couponMaxUses" placeholder="∞" aria-label="Usos máximos">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label>EXPIRY DATE</label>
-                    <input type="date" id="couponExpiresAt">
+                    <label>FECHA DE EXPIRACIÓN</label>
+                    <input type="date" id="couponExpiresAt" aria-label="Fecha de expiración">
                 </div>
 
                 <div style="margin-top: 30px; display: flex; gap: 10px;">
                     <button type="button" class="btn btn-outline" style="flex:1"
-                        onclick="window.adminCoupons.closeModal()">CANCEL</button>
-                    <button type="submit" class="btn btn-black" style="flex:1">SAVE COUPON</button>
+                        onclick="window.adminCoupons.closeModal()">CANCELAR</button>
+                    <button type="submit" class="btn btn-black" style="flex:1">GUARDAR CUPÓN</button>
                 </div>
             </form>
         </div>
