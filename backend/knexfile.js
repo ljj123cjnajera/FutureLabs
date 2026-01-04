@@ -67,11 +67,11 @@ module.exports = {
       directory: './database/seeds'
     },
     pool: {
-      min: 1, // Mantener al menos 1 conexión para evitar creación constante
-      max: 3, // Reducir máximo para evitar saturación
-      acquireTimeoutMillis: 10000, // Reducir timeout a 10s (fallar rápido)
-      createTimeoutMillis: 5000, // Timeout de creación más corto
-      idleTimeoutMillis: 20000, // Liberar conexiones idle más rápido
+      min: 0, // Empezar sin conexiones para evitar bloqueo al inicio
+      max: 5, // Aumentar máximo pero con mejor manejo
+      acquireTimeoutMillis: 5000, // Reducir timeout a 5s (fallar muy rápido)
+      createTimeoutMillis: 3000, // Timeout de creación muy corto
+      idleTimeoutMillis: 10000, // Liberar conexiones idle muy rápido
       reapIntervalMillis: 1000,
       propagateCreateError: false,
       // Agregar configuración adicional para mejor manejo de errores
@@ -79,22 +79,13 @@ module.exports = {
         // Manejar errores de conexión para evitar conexiones zombie
         conn.on('error', function(err) {
           console.log('⚠️ Database connection error:', err.message);
-          // Cerrar la conexión si hay error
           if (conn && !conn._ending) {
-            conn.end();
+            try {
+              conn.end();
+            } catch (e) {
+              // Ignorar errores al cerrar conexión con error
+            }
           }
-        });
-        
-        // Timeout de conexión para evitar conexiones colgadas
-        const timeout = setTimeout(() => {
-          if (conn && !conn._ending) {
-            console.log('⚠️ Connection timeout, closing...');
-            conn.end();
-          }
-        }, 30000);
-        
-        conn.on('end', () => {
-          clearTimeout(timeout);
         });
         
         done(null, conn);
@@ -102,8 +93,14 @@ module.exports = {
       // Destruir conexiones correctamente
       destroy: function(client) {
         if (client && !client._ending) {
-          return client.end();
+          try {
+            return client.end();
+          } catch (e) {
+            // Ignorar errores al destruir
+            return Promise.resolve();
+          }
         }
+        return Promise.resolve();
       }
     }
   }
