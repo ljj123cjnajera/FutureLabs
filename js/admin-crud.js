@@ -939,6 +939,10 @@ class AdminCRUD {
     const weightInput = document.getElementById('productWeight');
     const dimensionsInput = document.getElementById('productDimensions');
     const isActiveInput = document.getElementById('productIsActive');
+    const featuredInput = document.getElementById('productFeatured');
+    const isNewInput = document.getElementById('productIsNew');
+    const isTrendingInput = document.getElementById('productIsTrending');
+    const isBestsellerInput = document.getElementById('productIsBestseller');
 
     if (!nameInput || !slugInput || !priceInput || !stockInput || !categoryInput) {
       throw new Error('Algunos campos del formulario no se encontraron');
