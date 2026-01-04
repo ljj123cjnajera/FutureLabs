@@ -1084,6 +1084,23 @@ class SneakersAPI {
   async getPaymentNotifications() {
     return this.request('/admin/payments/notifications');
   }
+
+  // ========== CHAT ==========
+
+  async sendChatMessage(data) {
+    return this.request('/chat/send', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  }
+
+  async getChatMessages(conversationId) {
+    return this.request(`/chat/conversation/${conversationId}`);
+  }
+
+  async getChatConversations() {
+    return this.request('/chat/conversations');
+  }
 }
 
 // 🚀 Initialize API Client
