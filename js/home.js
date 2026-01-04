@@ -65,7 +65,6 @@ class HomeEngine {
         this.safeLoad(this.loadCategories.bind(this), 'Categories'),
         this.safeLoad(this.loadProducts.bind(this), 'Products'),
         this.safeLoad(this.loadBrands.bind(this), 'Brands'),
-        this.safeLoad(this.loadJournal.bind(this), 'Journal')
       ]);
 
       this.setupNewsletter();
@@ -123,8 +122,6 @@ class HomeEngine {
       // Mobile Menu Hook
       if (this.setupMobileMenu) this.setupMobileMenu();
 
-      // 4. Load Journal
-      await this.loadJournal();
 
       // 5. Load Brands
       this.renderBrands();
@@ -598,82 +595,6 @@ class HomeEngine {
     console.log('Brand Marquee: Using Static Text Mode');
   }
 
-  // ==========================================
-  // 5. JOURNAL (DYNAMIC INJECTION)
-  // ==========================================
-  async loadJournal() {
-    const container = document.getElementById('journalGrid') || document.querySelector('.journal-grid');
-    if (!container) return;
-
-    // Default Fallback Data (Premium)
-    const fallbackPosts = [
-      {
-        category: 'RELEASE',
-        title: 'El fin de una era: Yeezy vs Adidas',
-        desc: 'Analizamos el impacto en el mercado de reventa y qué esperar del futuro.',
-        img: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?q=80&w=800',
-        time: '5 MIN READ',
-        url: 'blog-post.html'
-      },
-      {
-        category: 'CULTURE',
-        title: '¿Por qué las J1 High nunca mueren?',
-        desc: 'La historia detrás de la silueta que inició todo en 1985.',
-        img: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?q=80&w=800',
-        time: '3 MIN READ',
-        url: 'blog-post.html'
-      },
-      {
-        category: 'STYLE',
-        title: 'Guía de Estilo: Streetwear Verano 2025',
-        desc: 'Los esenciales que necesitas en tu rotación esta temporada.',
-        img: 'https://images.unsplash.com/photo-1523398002811-6ce9e490101d?q=80&w=800',
-        time: '7 MIN READ',
-        url: 'blog-post.html'
-      }
-    ];
-
-    let posts = [];
-
-    // 1. Try API First
-    if (this.api && this.api.getRecentBlogPosts) {
-      try {
-        const res = await this.api.getRecentBlogPosts(3);
-        if (res.success && Array.isArray(res.data) && res.data.length > 0) {
-          posts = res.data.map(p => ({
-            category: p.category || p.tag || 'BLOG',
-            title: p.title,
-            desc: p.excerpt || (p.content ? p.content.substring(0, 100) + '...' : 'Lee más sobre este artículo.'),
-            img: p.image_url || p.featured_image || 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?q=80&w=800',
-            time: p.read_time || `${Math.ceil((p.content?.length || 1000) / 1000)} MIN READ`,
-            url: p.slug ? `blog-post.html?slug=${p.slug}` : `blog-post.html?id=${p.id}`
-          }));
-        }
-      } catch (e) {
-        console.warn('⚠️ Blog API Error, using fallback:', e);
-      }
-    }
-
-    // 2. Use Fallback if API failed or returned empty
-    if (posts.length === 0) {
-      posts = fallbackPosts;
-    }
-
-    container.innerHTML = posts.map(post => `
-        <article class="journal-card" onclick="window.location.href='${post.url}'">
-            <div class="journal-image">
-                <img src="${post.img}" alt="${post.title}" loading="lazy">
-                <span class="read-time-badge"><i class="far fa-clock"></i> ${post.time}</span>
-            </div>
-            <div class="journal-content">
-                <span class="journal-tag">${post.category}</span>
-                <h3>${post.title}</h3>
-                <p>${post.desc}</p>
-                <a href="${post.url}" class="read-more">Leer más <i class="fas fa-arrow-right"></i></a>
-            </div>
-        </article>
-    `).join('');
-  }
 
   initCountdown() {
     const targetDate = new Date();
@@ -948,7 +869,7 @@ class HomeEngine {
     }, observerOptions);
 
     // Select elements to reveal
-    const elementsToReveal = document.querySelectorAll('.section, .bento-item, .product-card, .brand-item, .journal-card, .trust-bar, .newsletter-section, .testimonial-card');
+    const elementsToReveal = document.querySelectorAll('.section, .bento-item, .product-card, .brand-item, .trust-bar, .newsletter-section, .testimonial-card');
 
     elementsToReveal.forEach((el, index) => {
       el.classList.add('reveal-on-scroll');
@@ -1233,7 +1154,7 @@ class HomeEngine {
 
   // 🛡️ FAILSAFE: Force visibility after 2 seconds if observer fails or user turns off JS interactions
   forceReveal() {
-    const elementsToReveal = document.querySelectorAll('.section, .bento-item, .product-card, .brand-item, .journal-card, .trust-bar, .newsletter-section');
+    const elementsToReveal = document.querySelectorAll('.section, .bento-item, .product-card, .brand-item, .trust-bar, .newsletter-section');
     elementsToReveal.forEach(el => {
       if (!el.classList.contains('visible')) {
         el.classList.add('visible');

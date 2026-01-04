@@ -241,7 +241,6 @@ class AdminManager {
       'benefits': 'Beneficios',
       'home-sections': 'Secciones del Home',
       'coupons': 'Gestión de Cupones',
-      'blog': 'Gestión de Blog'
     };
     document.getElementById('pageTitle').textContent = titles[section] || section;
 
@@ -298,11 +297,6 @@ class AdminManager {
       case 'coupons':
         if (window.adminCoupons) {
           await window.adminCoupons.loadCoupons();
-        }
-        break;
-      case 'blog':
-        if (window.adminBlog) {
-          await window.adminBlog.loadPosts();
         }
         break;
     }

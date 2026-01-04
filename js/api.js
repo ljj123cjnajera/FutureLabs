@@ -578,22 +578,6 @@ class SneakersAPI {
     });
   }
 
-  // ===== BLOG =====
-  async getBlogPosts(page = 1, limit = 10) {
-    return this.request(`/blog?page=${page}&limit=${limit}`);
-  }
-
-  async getRecentBlogPosts(limit = 5) {
-    return this.request(`/blog/recent?limit=${limit}`);
-  }
-
-  async getBlogPostBySlug(slug) {
-    return this.request(`/blog/${slug}`);
-  }
-
-  async getBlogPostById(id) {
-    return this.request(`/blog/admin/${id}`);
-  }
 
   // ========== BÚSQUEDA (AUTOCOMPLETE) ==========
   async getSearchSuggestions(query) {
@@ -631,30 +615,6 @@ class SneakersAPI {
     }
   }
 
-  async getAllBlogPosts(filters = {}) {
-    const query = new URLSearchParams(filters).toString();
-    return this.request(`/blog/admin/all?${query}`);
-  }
-
-  async createBlogPost(postData) {
-    return this.request('/blog', {
-      method: 'POST',
-      body: JSON.stringify(postData)
-    });
-  }
-
-  async updateBlogPost(id, postData) {
-    return this.request(`/blog/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(postData)
-    });
-  }
-
-  async deleteBlogPost(id) {
-    return this.request(`/blog/${id}`, {
-      method: 'DELETE'
-    });
-  }
 
   // ===== RELATED PRODUCTS =====
   async getRelatedProducts(productId, limit = 4) {

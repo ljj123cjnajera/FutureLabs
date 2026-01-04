@@ -56,8 +56,6 @@ class Breadcrumbs {
         this.items.push({ name: 'Mi Cuenta', url: null });
       }
 
-    } else if (page === 'blog.html') {
-      this.items.push({ name: 'Blog', url: null });
     } else if (page === 'contact.html') {
       this.items.push({ name: 'Contacto', url: null });
     } else if (page === 'about.html') {
