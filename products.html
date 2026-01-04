@@ -19,19 +19,23 @@
     <meta property="og:description"
         content="Encuentra tu par perfecto. La mejor selección de sneakers originales en Perú.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="http://localhost:8080/products.html">
-    <meta property="og:image" content="http://localhost:8080/assets/images/banners/hero-banner.jpg">
+    <meta property="og:url" content="https://ljj123cjnajera.github.io/FutureLabs/products.html">
+    <meta property="og:image" content="https://ljj123cjnajera.github.io/FutureLabs/assets/images/banners/hero-banner.jpg">
     <meta property="og:locale" content="es_PE">
+    <meta property="og:site_name" content="SneakersShop">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Catálogo Exclusivo - SneakersShop">
     <meta name="twitter:description"
         content="Encuentra tu par perfecto. La mejor selección de sneakers originales en Perú.">
-    <meta name="twitter:image" content="http://localhost:8080/assets/images/banners/hero-banner.jpg">
+    <meta name="twitter:image" content="https://ljj123cjnajera.github.io/FutureLabs/assets/images/banners/hero-banner.jpg">
 
     <!-- Canonical -->
-    <link rel="canonical" href="http://localhost:8080/products.html">
+    <link rel="canonical" href="https://ljj123cjnajera.github.io/FutureLabs/products.html">
+    
+    <!-- Preload Critical Resources -->
+    <link rel="dns-prefetch" href="https://futurelabs-production.up.railway.app">
     <!-- Google Fonts - Fuentes Profesionales -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -51,17 +55,35 @@
 
     <!-- Page Specific -->
     <link rel="stylesheet" href="css/products-streetwear.css?v=7.0-CLEAN">
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": "Catálogo de Productos - SneakersShop",
+      "description": "Explora nuestra colección exclusiva de sneakers y streetwear",
+      "url": "https://ljj123cjnajera.github.io/FutureLabs/products.html",
+      "mainEntity": {
+        "@type": "ItemList",
+        "itemListElement": []
+      }
+    }
+    </script>
 </head>
 
 <body>
+    <!-- Skip to main content (Accessibility) -->
+    <a href="#main-content" class="skip-link" aria-label="Saltar al contenido principal">Saltar al contenido principal</a>
+    
     <!-- Header Dinámico -->
-    <header id="mainHeader"></header>
+    <header id="mainHeader" role="banner"></header>
 
     <!-- Breadcrumbs -->
-    <nav id="breadcrumbs"></nav>
+    <nav id="breadcrumbs" aria-label="Breadcrumb"></nav>
 
     <!-- 🚀 V3 CATALOG: BRUTALIST ENGINE -->
-    <div class="products-page">
+    <main id="main-content" class="products-page">
         <!-- Brutalist Header -->
         <div class="container"
             style="margin-top: 4rem; margin-bottom: 2rem; border-bottom: 4px solid var(--black); padding-bottom: 1rem;">
@@ -72,7 +94,7 @@
                         style="font-size: 4rem; line-height: 0.9; margin: 0; text-transform: uppercase; font-weight: 900;">
                         ACCESO TOTAL</h1>
                 </div>
-                <div class="catalog-stats fw-bold">
+                <div class="catalog-stats fw-bold" aria-live="polite" aria-atomic="true">
                     <span id="productCount">0</span> PRODUCTOS CARGADOS
                 </div>
             </div>
@@ -81,13 +103,15 @@
         <div class="container">
             <!-- V3 Controls -->
             <div class="catalog-controls"
-                style="margin-bottom: 2rem; display: flex; gap: 1rem; border: 2px solid var(--black); padding: 1rem;">
-                <button class="btn-filter" onclick="window.catalogEngine.filter('all')">TODOS</button>
-                <button class="btn-filter" onclick="window.catalogEngine.filter('jordan')">JORDAN</button>
-                <button class="btn-filter" onclick="window.catalogEngine.filter('yeezy')">YEEZY</button>
-                <button class="btn-filter" onclick="window.catalogEngine.filter('nike')">NIKE</button>
+                style="margin-bottom: 2rem; display: flex; gap: 1rem; border: 2px solid var(--black); padding: 1rem;"
+                role="toolbar" aria-label="Filtros y ordenamiento de productos">
+                <button class="btn-filter" onclick="window.catalogEngine.filter('all')" aria-pressed="true" aria-label="Mostrar todos los productos">TODOS</button>
+                <button class="btn-filter" onclick="window.catalogEngine.filter('jordan')" aria-pressed="false" aria-label="Filtrar productos Jordan">JORDAN</button>
+                <button class="btn-filter" onclick="window.catalogEngine.filter('yeezy')" aria-pressed="false" aria-label="Filtrar productos Yeezy">YEEZY</button>
+                <button class="btn-filter" onclick="window.catalogEngine.filter('nike')" aria-pressed="false" aria-label="Filtrar productos Nike">NIKE</button>
                 <div style="margin-left: auto;">
-                    <select id="sortSelect" class="brutalist-select" onchange="window.catalogEngine.sort(this.value)">
+                    <label for="sortSelect" class="sr-only">Ordenar productos por</label>
+                    <select id="sortSelect" class="brutalist-select" onchange="window.catalogEngine.sort(this.value)" aria-label="Ordenar productos">
                         <option value="newest">ÚLTIMO LANZAMIENTO</option>
                         <option value="price-asc">MÁS BARATO</option>
                         <option value="price-desc">MÁS HYPE</option>
@@ -97,39 +121,40 @@
 
             <!-- V3 Grid -->
             <div id="productsContainer" class="product-grid-v3"
-                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem; min-height: 50vh;">
+                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem; min-height: 50vh;"
+                role="region" aria-label="Lista de productos" aria-live="polite">
                 <!-- Injected by CatalogEngine -->
-                <div class="loading-brutalist">LOADING DATA...</div>
+                <div class="loading-brutalist" aria-label="Cargando productos">LOADING DATA...</div>
             </div>
 
             <!-- Pagination (mock) -->
-            <div class="pagination-brutalist"
-                style="margin-top: 4rem; display: flex; justify-content: center; gap: 1rem;">
-                <button class="btn btn-outline" disabled>PREV</button>
-                <button class="btn btn-black">1</button>
-                <button class="btn btn-outline">2</button>
-                <button class="btn btn-outline">NEXT</button>
-            </div>
+            <nav class="pagination-brutalist"
+                style="margin-top: 4rem; display: flex; justify-content: center; gap: 1rem;"
+                aria-label="Navegación de páginas">
+                <button class="btn btn-outline" disabled aria-label="Página anterior">PREV</button>
+                <button class="btn btn-black" aria-label="Página 1" aria-current="page">1</button>
+                <button class="btn btn-outline" aria-label="Página 2">2</button>
+                <button class="btn btn-outline" aria-label="Página siguiente">NEXT</button>
+            </nav>
         </div>
-    </div>
+    </main>
 
     <section id="recentlyViewedProductsSection" class="recently-viewed-section" data-recently-viewed-section
-        style="display:none;">
+        style="display:none;" aria-labelledby="recently-viewed-title">
         <div class="container">
             <div class="section-header">
-                <h2><i class="fas fa-history"></i> Tu historial de productos</h2>
-                <button type="button" class="recently-viewed-clear" id="clearRecentlyViewedProductsBtn">
-                    <i class="fas fa-times"></i> Limpiar historial
+                <h2 id="recently-viewed-title"><i class="fas fa-history" aria-hidden="true"></i> Tu historial de productos</h2>
+                <button type="button" class="recently-viewed-clear" id="clearRecentlyViewedProductsBtn" aria-label="Limpiar historial de productos vistos">
+                    <i class="fas fa-times" aria-hidden="true"></i> Limpiar historial
                 </button>
             </div>
             <div id="recentlyViewedGridProducts" class="recently-viewed-grid"
-                data-section="#recentlyViewedProductsSection"></div>
+                data-section="#recentlyViewedProductsSection" role="region" aria-label="Productos vistos recientemente"></div>
         </div>
     </section>
 
-    <!-- Scripts -->
     <!-- Footer (Will be injected by JS) -->
-    <footer id="mainFooter"></footer>
+    <footer id="mainFooter" role="contentinfo"></footer>
 
     <!-- Scripts del Sistema Integrado -->
     <script src="js/auth-guard.js"></script>
@@ -139,7 +164,7 @@
     <script src="js/cart.js"></script>
 
     <!-- Catalog Engine -->
-    <script src="js/products.js"></script>
+    <script src="js/products.js" defer></script>
 
     <!-- Logic moved to js/products.js -->
 </body>
