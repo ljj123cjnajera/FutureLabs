@@ -1,7 +1,64 @@
-// PROFILE ENGINE V3 (Brutalist)
-// PROFILE ENGINE V3 (Brutalist)
+/**
+ * 👤 PROFILE ENGINE V4 (API Integration + Complete Functionality)
+ * Focus: User Data Loading, Orders, Addresses, Wishlist, Loyalty Points
+ */
 
+// --- CONSTANTS ---
+const LOYALTY_POINTS_TO_CURRENCY_RATE = 100; // 100 puntos = S/ 1.00
 
+const LOYALTY_TIERS = [
+    {
+        id: 'bronze',
+        name: 'Bronce',
+        min: 0,
+        multiplier: 1,
+        gradient: 'linear-gradient(135deg, #8B4513 0%, #A0522D 100%)',
+        textColor: '#ffffff',
+        chipBackground: '#8B4513',
+        chipColor: '#ffffff',
+        icon: 'fas fa-medal',
+        benefits: [
+            '1 punto por cada S/ 1.00 gastado',
+            'Acceso a ofertas exclusivas',
+            'Soporte prioritario'
+        ]
+    },
+    {
+        id: 'silver',
+        name: 'Plata',
+        min: 1000,
+        multiplier: 1.5,
+        gradient: 'linear-gradient(135deg, #C0C0C0 0%, #A8A8A8 100%)',
+        textColor: '#000000',
+        chipBackground: '#C0C0C0',
+        chipColor: '#000000',
+        icon: 'fas fa-medal',
+        benefits: [
+            '1.5 puntos por cada S/ 1.00 gastado',
+            'Ofertas exclusivas de nivel Plata',
+            'Envío gratis en compras S/ 200+',
+            'Soporte prioritario 24/7'
+        ]
+    },
+    {
+        id: 'gold',
+        name: 'Oro',
+        min: 5000,
+        multiplier: 2,
+        gradient: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
+        textColor: '#000000',
+        chipBackground: '#FFD700',
+        chipColor: '#000000',
+        icon: 'fas fa-trophy',
+        benefits: [
+            '2 puntos por cada S/ 1.00 gastado',
+            'Ofertas exclusivas de nivel Oro',
+            'Envío gratis en todas las compras',
+            'Acceso anticipado a nuevos lanzamientos',
+            'Soporte VIP 24/7'
+        ]
+    }
+];
 
 // --- CORE FUNCTIONS ---
 
@@ -25,9 +82,9 @@ async function loadOrders() {
             container.innerHTML = `
                 <div style="padding: 4rem 2rem; border: 2px dashed var(--black); text-align: center; background: var(--gray-100);">
                     <i class="fas fa-box-open" style="font-size: 3rem; margin-bottom: 1rem; color: var(--gray-400);"></i>
-                    <h3 style="font-weight: 900; text-transform: uppercase;">NO ARCHIVED ORDERS</h3>
-                    <p style="margin-bottom: 2rem;">Secure your first pair to start building your history.</p>
-                    <a href="products.html" class="btn btn-primary">START SHOPPING</a>
+                    <h3 style="font-weight: 900; text-transform: uppercase;">NO HAY PEDIDOS</h3>
+                    <p style="margin-bottom: 2rem;">Asegura tu primer par para empezar a construir tu historial.</p>
+                    <a href="products.html" class="btn btn-primary">EMPEZAR A COMPRAR</a>
                 </div>`;
             return;
         }
@@ -42,7 +99,7 @@ async function loadOrders() {
                     <span>${new Date(order.created_at).toLocaleDateString()}</span>
                     <span style="font-weight: 800;">S/ ${parseFloat(order.total).toFixed(2)}</span>
                 </div>
-                <button class="btn-save" style="margin-top: 1rem; font-size: 0.8rem; padding: 0.5rem 1rem;" onclick="window.location.href='order-success.html?id=${order.id}'">VIEW RECEIPT</button>
+                <button class="btn-save" style="margin-top: 1rem; font-size: 0.8rem; padding: 0.5rem 1rem;" onclick="window.location.href='order-success.html?id=${order.id}'">VER RECIBO</button>
             </div>
         `).join('');
 
@@ -51,9 +108,9 @@ async function loadOrders() {
         container.innerHTML = `
             <div style="padding: 2rem; border: 2px dashed var(--error); text-align: center; color: var(--error);">
                 <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
-                <h3>UNABLE TO LOAD HISTORY</h3>
-                <p>System connection failed. Please retry later.</p>
-                <button onclick="loadOrders()" class="btn btn-sm btn-outline-white" style="margin-top:1rem; border-color:var(--error); color:var(--error);">RETRY</button>
+                <h3>NO SE PUDO CARGAR EL HISTORIAL</h3>
+                <p>La conexión del sistema falló. Por favor, inténtalo de nuevo más tarde.</p>
+                <button onclick="loadOrders()" class="btn btn-sm btn-outline-white" style="margin-top:1rem; border-color:var(--error); color:var(--error);">REINTENTAR</button>
             </div>
         `;
     }
@@ -66,24 +123,46 @@ async function loadWishlist() {
     // Real Wishlist Load
     try {
         const res = await window.api.getWishlist();
-        // Assuming API structure, if different we handle it. 
-        // For now, if API fails or is empty, we show empty state.
-        const items = res.data?.items || [];
+        let items = [];
+        
+        // Handle different response formats
+        if (res && res.success && res.data) {
+            if (Array.isArray(res.data)) {
+                items = res.data;
+            } else if (res.data.items) {
+                items = res.data.items;
+            } else if (res.data.lists && Array.isArray(res.data.lists)) {
+                // Flatten lists
+                items = res.data.lists.flatMap(list => list.items || []);
+            }
+        } else if (Array.isArray(res)) {
+            items = res;
+        }
 
-        if (items.length === 0) {
-            // Fallthrough to empty state below
-        } else {
-            container.innerHTML = items.map(item => `
-                <div class="stat-box" style="padding:0; border:2px solid black; position:relative;">
-                    <div style="height:150px; overflow:hidden; border-bottom:2px solid black;">
-                        <img src="${item.image}" style="width:100%; height:100%; object-fit:cover;">
+        if (items.length > 0) {
+            container.innerHTML = items.map(item => {
+                const product = item.product || item;
+                const image = product.image_url || product.image || 'assets/images/products/placeholder.jpg';
+                const name = product.name || 'Producto';
+                const price = parseFloat(product.discount_price || product.price || 0);
+                const productId = product.id || product.product_id;
+                
+                return `
+                    <div class="stat-box" style="padding:0; border:3px solid var(--black); position:relative; background: var(--white); cursor: pointer;" onclick="window.location.href='product-detail.html?id=${productId}'">
+                        <div style="height:200px; overflow:hidden; border-bottom:3px solid var(--black); background: var(--gray-100);">
+                            <img src="${image}" 
+                                 alt="${name}" 
+                                 style="width:100%; height:100%; object-fit:cover;"
+                                 loading="lazy"
+                                 onerror="this.src='assets/images/products/placeholder.jpg'">
+                        </div>
+                        <div style="padding:1rem;">
+                            <h4 style="font-weight:900; font-size:0.9rem; margin-bottom:0.5rem; text-transform: uppercase;">${name}</h4>
+                            <span style="font-weight:800; font-size:1.1rem;">S/ ${price.toFixed(2)}</span>
+                        </div>
                     </div>
-                    <div style="padding:1rem;">
-                        <h4 style="font-weight:900; font-size:0.9rem; margin-bottom:0.5rem;">${item.name}</h4>
-                        <span style="font-weight:mono;">S/ ${item.price}</span>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
             return;
         }
     } catch (e) {
@@ -95,8 +174,8 @@ async function loadWishlist() {
         container.innerHTML = `
             <div style="grid-column: 1 / -1; padding: 4rem 2rem; border: 2px dashed var(--black); text-align: center; background: var(--gray-100);">
                 <i class="far fa-heart" style="font-size: 3rem; margin-bottom: 1rem; color: var(--gray-400);"></i>
-                <h3 style="font-weight: 900; text-transform: uppercase;">YOUR ROTATION IS EMPTY</h3>
-                <p style="margin-bottom: 2rem;">Save items here to track price drops and restocks.</p>
+                <h3 style="font-weight: 900; text-transform: uppercase;">TU LISTA DE DESEOS ESTÁ VACÍA</h3>
+                <p style="margin-bottom: 2rem;">Guarda artículos aquí para seguir caídas de precio y reabastecimientos.</p>
                 <a href="products.html" class="btn btn-primary">EXPLORAR CATÁLOGO</a>
             </div>
         `;
@@ -412,6 +491,8 @@ function switchTab(tabId) {
         loadWishlist();
     } else if (tabId === 'orders') {
         loadOrders();
+    } else if (tabId === 'overview') {
+        loadStats();
     }
 }
 
@@ -428,33 +509,58 @@ async function initializeProfile() {
 
 // Cargar datos del usuario
 async function loadUserData() {
+    const nameEl = document.getElementById('profileName');
+    const emailEl = document.getElementById('profileEmail');
+    
+    if (nameEl) nameEl.textContent = 'Cargando...';
+    if (emailEl) emailEl.textContent = '...';
+
     try {
         const response = await window.api.getProfile();
 
-        if (response.success && response.data.user) {
-            const user = response.data.user;
+        let user = null;
+        
+        // Handle different response formats
+        if (response && response.success && response.data) {
+            user = response.data.user || response.data;
+        } else if (response && response.id) {
+            user = response;
+        } else if (response && response.data && response.data.id) {
+            user = response.data;
+        }
 
-            // Actualizar header
-            document.getElementById('profileName').textContent =
-                `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email || 'Usuario';
-            document.getElementById('profileEmail').textContent = user.email || '';
+        if (user) {
+            const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim();
+            const displayName = fullName || user.name || user.email || 'Usuario';
 
-            // Actualizar avatar
-            const avatar = document.getElementById('profileAvatar');
-            const initials = `${(user.first_name || 'U')[0]}${(user.last_name || '')[0]}`.toUpperCase() || 'U';
-            avatar.textContent = initials;
+            // Update sidebar
+            if (nameEl) nameEl.textContent = displayName;
+            if (emailEl) emailEl.textContent = user.email || '';
 
-            // Llenar formulario
-            document.getElementById('firstName').value = user.first_name || '';
-            document.getElementById('lastName').value = user.last_name || '';
-            document.getElementById('email').value = user.email || '';
-            document.getElementById('phone').value = user.phone || '';
+            // Update settings form if exists
+            const firstNameInput = document.getElementById('firstName');
+            const lastNameInput = document.getElementById('lastName');
+            const emailInput = document.getElementById('email');
+            const phoneInput = document.getElementById('phone');
+
+            if (firstNameInput) firstNameInput.value = user.first_name || '';
+            if (lastNameInput) lastNameInput.value = user.last_name || '';
+            if (emailInput) emailInput.value = user.email || '';
+            if (phoneInput) phoneInput.value = user.phone || '';
         } else {
-            window.notifications.error('Error al cargar datos del perfil');
+            if (nameEl) nameEl.textContent = 'Error al cargar';
+            if (emailEl) emailEl.textContent = '';
+            if (window.notifications) {
+                window.notifications.error('Error', 'No se pudieron cargar los datos del perfil');
+            }
         }
     } catch (error) {
         console.error('Error loading user data:', error);
-        window.notifications.error('Error al cargar datos del perfil');
+        if (nameEl) nameEl.textContent = 'Error';
+        if (emailEl) emailEl.textContent = '';
+        if (window.notifications) {
+            window.notifications.error('Error', 'No se pudieron cargar los datos del perfil');
+        }
     }
 }
 
@@ -463,101 +569,123 @@ async function loadStats() {
     try {
         // Cargar pedidos
         const ordersResponse = await window.api.getOrders();
-        if (ordersResponse.success) {
-            const orders = ordersResponse.data.orders || [];
-            const totalOrdersEl = document.getElementById('totalOrders');
-            if (totalOrdersEl) {
-                animateCounter(totalOrdersEl, orders.length);
-            }
-
-            const totalSpent = orders.reduce((sum, order) => sum + parseFloat(order.total || 0), 0);
-            const totalSpentEl = document.getElementById('totalSpent');
-            if (totalSpentEl) {
-                animateCounter(totalSpentEl, totalSpent, {
-                    formatter: value => currencyFormatter.format(value)
-                });
-            }
+        let orders = [];
+        if (ordersResponse && ordersResponse.success && ordersResponse.data) {
+            orders = ordersResponse.data.orders || ordersResponse.data || [];
+        } else if (Array.isArray(ordersResponse)) {
+            orders = ordersResponse;
+        } else if (ordersResponse && ordersResponse.data && Array.isArray(ordersResponse.data)) {
+            orders = ordersResponse.data;
         }
 
-        // Cargar wishlist
-        const wishlistResponse = await window.api.getWishlist();
-        if (wishlistResponse.success) {
-            const lists = wishlistResponse.data.lists || [];
-            const wishlistTotal = lists.reduce((sum, list) => sum + (list.items?.length || 0), 0);
+        const totalOrdersEl = document.getElementById('totalOrders');
+        if (totalOrdersEl) {
+            totalOrdersEl.textContent = orders.length;
+        }
+
+        const totalSpent = orders.reduce((sum, order) => sum + parseFloat(order.total || 0), 0);
+        const totalSpentEl = document.getElementById('totalSpent');
+        if (totalSpentEl) {
+            totalSpentEl.textContent = `S/ ${totalSpent.toFixed(2)}`;
+        }
+
+        // Cargar wishlist (opcional, si existe el elemento)
+        try {
+            const wishlistResponse = await window.api.getWishlist();
+            let wishlistTotal = 0;
+            
+            if (wishlistResponse && wishlistResponse.success && wishlistResponse.data) {
+                const lists = wishlistResponse.data.lists || wishlistResponse.data || [];
+                wishlistTotal = lists.reduce((sum, list) => sum + (list.items?.length || 0), 0);
+            } else if (Array.isArray(wishlistResponse)) {
+                wishlistTotal = wishlistResponse.length;
+            }
+            
             const wishlistCountEl = document.getElementById('wishlistCount');
             if (wishlistCountEl) {
-                animateCounter(wishlistCountEl, wishlistTotal);
+                wishlistCountEl.textContent = wishlistTotal;
             }
+        } catch (e) {
+            // Silent fail for wishlist
         }
     } catch (error) {
         console.error('Error loading stats:', error);
     }
 }
 
-// Cargar direcciones
-async function loadAddresses() {
-    const container = document.getElementById('addressesList');
-    if (!container) return;
+    // Cargar direcciones
+    async function loadAddresses() {
+        const container = document.getElementById('addressList');
+        if (!container) return;
 
-    window.loadingState.renderLoading(container, 'Cargando direcciones...');
+        // Show loading state
+        container.innerHTML = '<div class="loading-brutalist">CARGANDO DIRECCIONES...</div>';
 
     try {
         const response = await window.api.getAddresses();
 
-        if (response.success && response.data.addresses) {
-            const addresses = response.data.addresses;
+        let addresses = [];
+        if (response && response.success) {
+            addresses = response.data?.addresses || response.data || [];
+        } else if (Array.isArray(response)) {
+            addresses = response;
+        } else if (response && response.data) {
+            addresses = Array.isArray(response.data) ? response.data : response.data.addresses || [];
+        }
 
-            if (addresses.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <h3>No tienes direcciones guardadas</h3>
-                        <p>Agrega una dirección para facilitar tus compras</p>
-                        <button class="btn btn-primary" onclick="openAddressModal()">
-                            <i class="fas fa-plus"></i> Agregar Dirección
+        if (addresses.length === 0) {
+            container.innerHTML = `
+                <div style="grid-column: 1/-1; padding: 4rem 2rem; border: 2px dashed var(--black); text-align: center; background: var(--gray-100);">
+                    <i class="fas fa-map-marker-alt" style="font-size: 3rem; margin-bottom: 1rem; color: var(--gray-400);"></i>
+                    <h3 style="font-weight: 900; text-transform: uppercase; margin-bottom: 1rem;">NO HAY DIRECCIONES GUARDADAS</h3>
+                    <p style="margin-bottom: 2rem;">Agrega una dirección para facilitar tus compras.</p>
+                    <button class="btn btn-primary" onclick="toggleAddressForm()">
+                        <i class="fas fa-plus"></i> AGREGAR DIRECCIÓN
+                    </button>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = addresses.map(addr => {
+            const street = addr.street || addr.street_address || '';
+            const city = addr.city || '';
+            const region = addr.region || '';
+            const postal = addr.postal_code || '';
+            const country = addr.country || 'Perú';
+            const name = `${addr.first_name || ''} ${addr.last_name || ''}`.trim() || 'Dirección';
+            const phone = addr.phone_number || addr.phone || '';
+            
+            return `
+                <div class="address-card" style="border: 3px solid var(--black); padding: 1.5rem; position: relative; background: var(--white);">
+                    ${addr.is_default ? '<span class="badge" style="position: absolute; top: 10px; right: 10px; background: var(--black); color: white; padding: 4px 8px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">PREDETERMINADA</span>' : ''}
+                    <div style="font-weight: 900; margin-bottom: 0.5rem; text-transform: uppercase; font-size: 1.1rem;">${name}</div>
+                    <div style="margin-bottom: 0.5rem;">${street}</div>
+                    <div style="margin-bottom: 0.5rem;">${city}${region ? ', ' + region : ''}</div>
+                    <div style="margin-bottom: 0.5rem;">${postal} ${country}</div>
+                    ${phone ? `<div style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;"><i class="fas fa-phone"></i> ${phone}</div>` : ''}
+                    
+                    <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                        <button onclick="editAddress(${addr.id})" style="flex: 1; padding: 0.5rem; background: var(--white); border: 2px solid var(--black); font-weight: 700; cursor: pointer; text-transform: uppercase; font-size: 0.8rem;">
+                            <i class="fas fa-edit"></i> EDITAR
+                        </button>
+                        <button onclick="deleteAddress(${addr.id})" style="flex: 1; padding: 0.5rem; background: var(--white); border: 2px solid #dc3545; color: #dc3545; font-weight: 700; cursor: pointer; text-transform: uppercase; font-size: 0.8rem;">
+                            <i class="fas fa-trash"></i> ELIMINAR
                         </button>
                     </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = addresses.map(addr => `
-                <div class="address-item ${addr.is_default ? 'default' : ''}">
-                    <div class="address-item-header">
-                        <div class="address-item-title">
-                            <i class="fas fa-${addr.type === 'home' ? 'home' : addr.type === 'work' ? 'briefcase' : 'map-marker-alt'}"></i>
-                            <span>${addr.type === 'home' ? 'Casa' : addr.type === 'work' ? 'Trabajo' : 'Otra'}</span>
-                            ${addr.is_default ? '<span class="default-badge"><i class="fas fa-check"></i> Predeterminada</span>' : ''}
-                        </div>
-                        <div class="address-item-actions">
-                            <button class="btn btn-sm btn-ghost" onclick="editAddress('${addr.id}')">
-                                <i class="fas fa-edit"></i> Editar
-                            </button>
-                            <button class="btn btn-sm btn-error" onclick="deleteAddress('${addr.id}')">
-                                <i class="fas fa-trash"></i> Eliminar
-                            </button>
-                        </div>
-                    </div>
-                    <div class="address-item-content">
-                        ${addr.street}<br>
-                        ${addr.city}, ${addr.region}<br>
-                        ${addr.postal_code || ''} ${addr.country}
-                    </div>
                 </div>
-            `).join('');
-        } else {
-            window.loadingState.renderError(container, response.message || 'Error al cargar direcciones', {
-                className: 'loading-state loading-state-error',
-                spinner: false
-            });
-        }
+            `;
+        }).join('');
     } catch (error) {
         console.error('Addresses API Error:', error);
-        window.loadingState.renderError(container, 'No se pudieron cargar las direcciones. Verifique su conexión.', {
-            className: 'loading-state loading-state-error',
-            spinner: false,
-            retry: () => loadAddresses()
-        });
+        container.innerHTML = `
+            <div style="grid-column: 1/-1; padding: 2rem; border: 2px dashed #dc3545; text-align: center; color: #dc3545;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                <h3>ERROR AL CARGAR DIRECCIONES</h3>
+                <p>No se pudieron cargar las direcciones. Verifica tu conexión.</p>
+                <button onclick="loadAddresses()" class="btn btn-outline" style="margin-top: 1rem; border-color: #dc3545; color: #dc3545;">REINTENTAR</button>
+            </div>
+        `;
     }
 }
 
@@ -608,8 +736,8 @@ async function loadLoyaltyTransactions() {
 }
 
 async function loadLoyaltyTransactionsInContainer(container) {
-
-    window.loadingState.renderLoading(container, 'Cargando transacciones de puntos...');
+    // Show loading state
+    container.innerHTML = '<div class="loading-brutalist">CARGANDO TRANSACCIONES...</div>';
 
     try {
         const response = await window.api.getLoyaltyTransactions();
@@ -642,16 +770,23 @@ async function loadLoyaltyTransactionsInContainer(container) {
                 </div>
             `).join('');
         } else {
-            window.loadingState.renderError(container, response.message || 'Error al cargar transacciones', {
-                className: 'loading-state loading-state-error',
-                spinner: false
-            });
+            container.innerHTML = `
+                <div style="padding: 2rem; text-align: center; color: #dc3545;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>${response.message || 'Error al cargar transacciones'}</p>
+                    <button onclick="loadLoyaltyTransactions()" class="btn btn-outline" style="margin-top: 1rem;">REINTENTAR</button>
+                </div>
+            `;
         }
     } catch (error) {
-        window.loadingState.renderError(container, error.message || 'Error al cargar transacciones', {
-            className: 'loading-state loading-state-error',
-            spinner: false
-        });
+        console.error('Error loading loyalty transactions:', error);
+        container.innerHTML = `
+            <div style="padding: 2rem; text-align: center; color: #dc3545;">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>Error al cargar transacciones. Por favor, intenta de nuevo.</p>
+                <button onclick="loadLoyaltyTransactions()" class="btn btn-outline" style="margin-top: 1rem;">REINTENTAR</button>
+            </div>
+        `;
     }
 }
 
@@ -873,42 +1008,8 @@ window.scrollToSection = function (sectionId) {
     }
 };
 
-// --- ADDRESS MANAGER ---
-async function loadAddresses() {
-    const list = document.getElementById('addressList');
-    if (!list) return;
-
-    try {
-        const res = await window.api.getAddresses();
-        const addresses = res.data?.addresses || res.data || [];
-
-        if (addresses.length === 0) {
-            list.innerHTML = `
-                <div style="grid-column: 1/-1; padding: 2rem; border: 2px dashed #ccc; text-align: center;">
-                    NO SAVED ADDRESSES
-                </div>
-            `;
-            return;
-        }
-
-        list.innerHTML = addresses.map(addr => `
-            <div class="address-card" style="border: 1px solid #ddd; padding: 1rem; position: relative;">
-                ${addr.is_default ? '<span class="badge" style="background:black; color:white; padding:2px 6px; font-size:0.7rem;">DEFAULT</span>' : ''}
-                <div style="font-weight: 800; margin-top: 0.5rem;">${addr.first_name} ${addr.last_name}</div>
-                <div>${addr.street_address}</div>
-                <div>${addr.city}, ${addr.postal_code}</div>
-                <div>${addr.country}</div>
-                <div style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">${addr.phone_number}</div>
-                
-                <button onclick="deleteAddress('${addr.id}')" style="margin-top: 1rem; background: none; border: none; color: red; font-size: 0.8rem; cursor: pointer; text-decoration: underline;">REMOVE</button>
-            </div>
-        `).join('');
-
-    } catch (e) {
-        console.error('Address Load Error:', e);
-        list.innerHTML = 'Error loading addresses.';
-    }
-}
+// --- ADDRESS MANAGER (Consolidated) ---
+// loadAddresses() is already defined above, this duplicate is removed
 
 window.toggleAddressForm = function () {
     const el = document.getElementById('addressFormContainer');
@@ -919,22 +1020,38 @@ window.handleSaveAddress = async function (e) {
     e.preventDefault();
     const btn = e.target.querySelector('button[type="submit"]');
     const originalText = btn.textContent;
-    btn.textContent = 'SAVING...';
+    btn.textContent = 'GUARDANDO...';
     btn.disabled = true;
 
     try {
         const formData = new FormData(e.target);
-        const data = Object.fromEntries(formData);
+        const data = {
+            first_name: formData.get('first_name'),
+            last_name: formData.get('last_name'),
+            street_address: formData.get('street_address'),
+            city: formData.get('city'),
+            postal_code: formData.get('postal_code'),
+            country: formData.get('country') || 'Perú',
+            phone_number: formData.get('phone_number')
+        };
 
-        await window.api.createAddress(data);
-
-        // Reset and Reload
-        e.target.reset();
-        toggleAddressForm();
-        loadAddresses();
-
+        const response = await window.api.createAddress(data);
+        
+        if (response && response.success) {
+            if (window.notifications) {
+                window.notifications.success('Dirección Guardada', 'La dirección fue agregada correctamente');
+            }
+            e.target.reset();
+            toggleAddressForm();
+            await loadAddresses();
+        } else {
+            throw new Error(response?.message || 'Error al guardar dirección');
+        }
     } catch (err) {
-        alert('Failed to save address: ' + err.message);
+        console.error('Error saving address:', err);
+        if (window.notifications) {
+            window.notifications.error('Error', err.message || 'No se pudo guardar la dirección');
+        }
     } finally {
         btn.textContent = originalText;
         btn.disabled = false;
@@ -942,12 +1059,24 @@ window.handleSaveAddress = async function (e) {
 };
 
 window.deleteAddress = async function (id) {
-    if (!confirm('Are you sure you want to delete this address?')) return;
+    if (!confirm('¿Estás seguro de eliminar esta dirección?')) return;
 
     try {
-        await window.api.deleteAddress(id);
-        loadAddresses();
+        const response = await window.api.deleteAddress(id);
+        if (response && response.success) {
+            if (window.notifications) {
+                window.notifications.success('Dirección Eliminada', 'La dirección fue eliminada correctamente');
+            }
+            await loadAddresses();
+        } else {
+            if (window.notifications) {
+                window.notifications.error('Error', 'No se pudo eliminar la dirección');
+            }
+        }
     } catch (e) {
-        alert('Could not delete address');
+        console.error('Error deleting address:', e);
+        if (window.notifications) {
+            window.notifications.error('Error', 'No se pudo eliminar la dirección. Por favor, intenta de nuevo.');
+        }
     }
 };
