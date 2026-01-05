@@ -1228,6 +1228,18 @@ class HomeEngine {
   }
 }
 
+// Global function for closing newsletter popup
+window.closeNewsletterPopup = function() {
+  const popup = document.getElementById('newsletterPopup');
+  if (popup) {
+    popup.classList.remove('visible', 'active');
+    setTimeout(() => {
+      popup.style.display = 'none';
+      localStorage.setItem('newsletter_dismissed', 'true');
+    }, 300);
+  }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
   window.homeEngine = new HomeEngine();
 
