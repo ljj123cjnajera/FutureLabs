@@ -178,6 +178,8 @@ class CatalogEngine {
 
             this.render(products);
             this.updatePagination();
+            this.updateURL();
+            
             if (countLabel) countLabel.textContent = total;
             
         } catch (e) {
