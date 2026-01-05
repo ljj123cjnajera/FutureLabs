@@ -1176,13 +1176,15 @@ class HomeEngine {
 
       } catch (err) {
         console.warn('❌ Engine Error:', err);
-        // Fallback on error - Force Mock Data
-        products = this.getFallbackProducts(category);
-        if (products.length > 0) {
-          grid.innerHTML = products.map(p => window.Components.getProductCard(p)).join('');
-        } else {
-          grid.innerHTML = `<div class="p-4 text-center border border-red-500 text-red-500">SYSTEM_OFFLINE // RETRYing...</div>`;
-        }
+        // Mostrar estado vacío en lugar de productos mock
+        grid.innerHTML = `
+          <div class="engine-error-state" style="grid-column: 1 / -1; padding: 3rem; text-align: center; border: 2px solid #e0e0e0;">
+            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ff9800; margin-bottom: 1rem;"></i>
+            <h3 style="font-weight: 900; text-transform: uppercase; margin-bottom: 0.5rem;">Error al cargar productos</h3>
+            <p style="color: #666; margin-bottom: 1.5rem;">No se pudieron cargar los productos de ${category.toUpperCase()}</p>
+            <button onclick="location.reload()" class="btn btn-black">RECARGAR</button>
+          </div>
+        `;
       } finally {
         // 5. Reveal
         if (loader) loader.style.display = 'none';
@@ -1204,50 +1206,7 @@ class HomeEngine {
     });
   }
 
-  // Fallbacks removed for production.
-
-
-  // 🛡️ DATA FAILSAFE: Hardcoded mocks to ensure layout never breaks
-  getFallbackProducts(category = null) {
-    const mocks = {
-      'nike': [
-        { id: 101, name: 'NIKE DUNK LOW RETRO', price: 110, image_url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=600', badge: 'BESTSELLER' },
-        { id: 102, name: 'AIR FORCE 1 07', price: 100, image_url: 'https://images.unsplash.com/photo-1491553895911-0055eca6402d?auto=format&fit=crop&q=80&w=600' },
-        { id: 103, name: 'AIR MAX 90', price: 130, image_url: 'https://images.unsplash.com/photo-1514989940723-e8875ea6ab7d?auto=format&fit=crop&q=80&w=600' },
-        { id: 104, name: 'BLAZER MID 77', price: 105, image_url: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&q=80&w=600', badge: 'CLASSIC' }
-      ],
-      'jordan': [
-        { id: 201, name: 'AIR JORDAN 1 HIGH', price: 180, image_url: 'https://images.unsplash.com/photo-1516478177764-9fe5bd7e9717?auto=format&fit=crop&q=80&w=600', badge: 'GRAIL' },
-        { id: 202, name: 'JORDAN 4 RETRO', price: 210, image_url: 'https://images.unsplash.com/photo-1584735175315-9d5df23860e6?auto=format&fit=crop&q=80&w=600', badge: 'HYPED' },
-        { id: 203, name: 'JORDAN 1 LOW', price: 140, image_url: 'https://images.unsplash.com/photo-1593081891731-fda0877988da?auto=format&fit=crop&q=80&w=600' },
-        { id: 204, name: 'JORDAN 3', price: 200, image_url: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&q=80&w=600' }
-      ],
-      'yeezy': [
-        { id: 301, name: 'YEEZY BOOST 350 V2', price: 230, image_url: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&q=80&w=600', badge: 'RESTOCKED' },
-        { id: 302, name: 'YEEZY SLIDE', price: 70, image_url: 'https://images.unsplash.com/photo-1605812853380-34ad68a253f3?auto=format&fit=crop&q=80&w=600' },
-        { id: 303, name: 'YEEZY 700', price: 300, image_url: 'https://images.unsplash.com/photo-1565883017726-d249f056dcb5?auto=format&fit=crop&q=80&w=600' },
-        { id: 304, name: 'YEEZY FOAM RNR', price: 90, image_url: 'https://images.unsplash.com/photo-1617267571626-829db2d558d6?auto=format&fit=crop&q=80&w=600' }
-      ],
-      'adidas': [
-        { id: 401, name: 'ADIDAS FORUM LOW', price: 100, image_url: 'https://images.unsplash.com/photo-1518002171953-a080ee817e1f?auto=format&fit=crop&q=80&w=600', badge: 'TENDENCIA' },
-        { id: 402, name: 'ADIDAS SAMBA', price: 100, image_url: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?auto=format&fit=crop&q=80&w=600' },
-        { id: 403, name: 'ULTRABOOST', price: 180, image_url: 'https://images.unsplash.com/photo-1603808033192-082d6919d3e1?auto=format&fit=crop&q=80&w=600' },
-        { id: 404, name: 'GAZELLE', price: 95, image_url: 'https://images.unsplash.com/photo-1616124619460-c9fa42f7481f?auto=format&fit=crop&q=80&w=600' }
-      ]
-    };
-
-    if (category && mocks[category]) {
-      return mocks[category];
-    }
-
-    // If no category (GLOBAL CALL), return a flattened mix
-    return [
-      ...mocks['jordan'].slice(0, 2),
-      ...mocks['yeezy'].slice(0, 2),
-      ...mocks['nike'].slice(0, 2),
-      ...mocks['adidas'].slice(0, 2)
-    ];
-  }
+  // Productos mock eliminados - solo usar datos reales de la API
 
   // 🛡️ FAILSAFE: Force visibility after 2 seconds if observer fails or user turns off JS interactions
   forceReveal() {

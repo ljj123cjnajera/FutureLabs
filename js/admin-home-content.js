@@ -1105,6 +1105,10 @@ function previewBenefitImage(input) {
   }
 }
 
-// Instanciar y hacer global
-window.adminHomeContent = new AdminHomeContent();
+// Instanciar y hacer global cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', () => {
+    if (!window.adminHomeContent) {
+        window.adminHomeContent = new AdminHomeContent();
+    }
+});
 

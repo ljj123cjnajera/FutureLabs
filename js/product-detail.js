@@ -69,15 +69,9 @@ document.addEventListener('DOMContentLoaded', async function () {
             // Mostrar error real al usuario
             renderErrorState(container, `Error al cargar producto: ${error.message || 'Error de conexión'}`);
             
-            // Solo usar fallback si realmente no hay conexión (no para errores 404, etc)
-            if (error.message && error.message.includes('Failed to fetch')) {
-                const mock = getMockProduct(productId);
-                if (mock) {
-                    window.currentProduct = mock;
-                    const imgs = [mock.image_url, mock.image_url, mock.image_url, mock.image_url];
-                    renderProductDetails(mock, container, imgs);
-                    if (window.notifications) window.notifications.warning('MODO OFFLINE', 'No hay conexión. Mostrando versión simulada.');
-                }
+            // No usar productos mock - solo mostrar error
+            if (window.notifications) {
+                window.notifications.error('Error de conexión', 'No se pudo cargar el producto. Por favor, intenta de nuevo.');
             }
         }
     }
@@ -309,28 +303,6 @@ document.addEventListener('DOMContentLoaded', async function () {
         }, 20000 + Math.random() * 10000);
     }
     
-    // --- MOCK DATABASE ---
-    function getMockProduct(id) {
-        const db = [
-            { id: 101, name: 'NIKE DUNK LOW RETRO', price: 110, image_url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff', brand: 'Nike', description: 'Real. Leather. Icons. The Dunk Low.' },
-            { id: 102, name: 'AIR FORCE 1 07', price: 100, image_url: 'https://images.unsplash.com/photo-1491553895911-0055eca6402d', brand: 'Nike' },
-            { id: 103, name: 'AIR MAX 90', price: 130, image_url: 'https://images.unsplash.com/photo-1514989940723-e8875ea6ab7d', brand: 'Nike' },
-            { id: 104, name: 'BLAZER MID 77', price: 105, image_url: 'https://images.unsplash.com/photo-1552346154-21d32810aba3', brand: 'Nike' },
-            { id: 201, name: 'AIR JORDAN 1 HIGH', price: 180, image_url: 'https://images.unsplash.com/photo-1516478177764-9fe5bd7e9717', brand: 'Jordan' },
-            { id: 202, name: 'JORDAN 4 RETRO', price: 210, image_url: 'https://images.unsplash.com/photo-1584735175315-9d5df23860e6', brand: 'Jordan' },
-            { id: 203, name: 'JORDAN 1 LOW', price: 140, image_url: 'https://images.unsplash.com/photo-1593081891731-fda0877988da', brand: 'Jordan' },
-            { id: 204, name: 'JORDAN 3', price: 200, image_url: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a', brand: 'Jordan' },
-            { id: 301, name: 'YEEZY BOOST 350 V2', price: 230, image_url: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5', brand: 'Yeezy' },
-            { id: 302, name: 'YEEZY SLIDE', price: 70, image_url: 'https://images.unsplash.com/photo-1605812853380-34ad68a253f3', brand: 'Yeezy' },
-            { id: 303, name: 'YEEZY 700', price: 300, image_url: 'https://images.unsplash.com/photo-1565883017726-d249f056dcb5', brand: 'Yeezy' },
-            { id: 304, name: 'YEEZY FOAM RNR', price: 90, image_url: 'https://images.unsplash.com/photo-1617267571626-829db2d558d6', brand: 'Yeezy' },
-            { id: 401, name: 'ADIDAS FORUM LOW', price: 100, image_url: 'https://images.unsplash.com/photo-1518002171953-a080ee817e1f', brand: 'Adidas' },
-            { id: 402, name: 'ADIDAS SAMBA', price: 100, image_url: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa', brand: 'Adidas' },
-            { id: 403, name: 'ULTRABOOST', price: 180, image_url: 'https://images.unsplash.com/photo-1603808033192-082d6919d3e1', brand: 'Adidas' },
-            { id: 404, name: 'GAZELLE', price: 95, image_url: 'https://images.unsplash.com/photo-1616124619460-c9fa42f7481f', brand: 'Adidas' }
-        ];
-        return db.find(p => p.id == id);
-    }
 
     function getModalHTML() {
         return `
