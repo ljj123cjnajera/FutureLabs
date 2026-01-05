@@ -1,17 +1,15 @@
 /**
- * Legal Pages Logic (Terms, Privacy, Returns, Warranty)
- * Handles: Header/Footer injection, Table of Contents (TOC) ScrollSpy, and Smooth Scrolling.
+ * Legal Pages Common Logic
+ * Handles initialization for warranty, terms, returns, privacy pages
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Initialize Global Components
+    // 1. Initialize Components
     if (window.Components) {
         const header = document.getElementById('mainHeader');
         if (header && !header.innerHTML.trim()) {
             header.innerHTML = window.Components.getHeader(true, true);
             if (window.Components.initHeader) window.Components.initHeader();
-            if (window.Components.initSearch) window.Components.initSearch();
-            if (window.Components.initCartCounter) window.Components.initCartCounter();
         }
 
         const footer = document.getElementById('mainFooter');
@@ -20,71 +18,35 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 2. Table of Contents (TOC) Logic
-    initTOC();
-
-    // 3. Update "Last Updated" Date if element exists (Optional dynamic tweak)
-    const dateLabel = document.getElementById('legalUpdatedLabel');
-    if (dateLabel && !dateLabel.textContent.includes('2025')) {
-        dateLabel.textContent = '16 Oct 2025';
+    // 2. Initialize Navigation Enhanced if available
+    if (window.NavigationEnhanced) {
+        const nav = new window.NavigationEnhanced();
+        nav.init();
     }
-});
 
-function initTOC() {
-    const tocLinks = Array.from(document.querySelectorAll('.legal-toc a[href^="#"]'));
-    if (tocLinks.length === 0) return;
-
-    // A. Smooth Scroll on Click
-    tocLinks.forEach(link => {
-        link.addEventListener('click', event => {
-            event.preventDefault();
-            const targetId = link.getAttribute('href');
-            const target = document.querySelector(targetId);
-            if (!target) return;
-
-            // Offset for fixed header
-            const headerOffset = 100;
-            const elementPosition = target.getBoundingClientRect().top;
-            const offsetPosition = elementPosition + window.scrollY - headerOffset;
-
-            window.scrollTo({
-                top: offsetPosition,
-                behavior: "smooth"
-            });
-
-            // Update active class immediately
-            tocLinks.forEach(item => item.classList.remove('is-active'));
-            link.classList.add('is-active');
+    // 3. Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+            if (href === '#') return;
+            
+            e.preventDefault();
+            const target = document.querySelector(href);
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
         });
     });
 
-    // B. ScrollSpy (Intersection Observer)
-    const sections = tocLinks
-        .map(link => document.querySelector(link.getAttribute('href')))
-        .filter(Boolean);
-
-    if (sections.length > 0) {
-        const observerOptions = {
-            root: null,
-            rootMargin: '-20% 0px -60% 0px', // Active when element is in top-middle of viewport
-            threshold: 0
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const activeId = entry.target.getAttribute('id');
-                    tocLinks.forEach(link => {
-                        const href = link.getAttribute('href').replace('#', '');
-                        if (href === activeId) {
-                            tocLinks.forEach(item => item.classList.remove('is-active'));
-                            link.classList.add('is-active');
-                        }
-                    });
-                }
-            });
-        }, observerOptions);
-
-        sections.forEach(section => observer.observe(section));
+    // 4. Add table of contents if needed (for long legal pages)
+    const legalContent = document.querySelector('.legal-content');
+    if (legalContent) {
+        const headings = legalContent.querySelectorAll('h2, h3');
+        if (headings.length > 3) {
+            // Could add a TOC here if needed
+        }
     }
-}
+});
