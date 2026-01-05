@@ -98,21 +98,49 @@
         </div>
 
         <div class="container">
+            <!-- Search Bar -->
+            <div class="catalog-search" style="margin-bottom: 2rem;">
+                <div class="search-container" style="position: relative; max-width: 600px; margin: 0 auto;">
+                    <input type="text" 
+                           id="productSearchInput" 
+                           class="brutalist-search-input" 
+                           placeholder="BUSCAR PRODUCTOS..." 
+                           aria-label="Buscar productos"
+                           style="width: 100%; padding: 1rem 3rem 1rem 1rem; border: 3px solid var(--black); font-size: 1rem; font-weight: 700;">
+                    <button type="button" 
+                            onclick="window.catalogEngine.search(document.getElementById('productSearchInput').value)"
+                            class="search-submit-btn"
+                            aria-label="Buscar"
+                            style="position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%); background: var(--black); color: var(--white); border: none; padding: 0.75rem 1.5rem; cursor: pointer; font-weight: 900;">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+
             <!-- V3 Controls -->
             <div class="catalog-controls"
-                style="margin-bottom: 2rem; display: flex; gap: 1rem; border: 2px solid var(--black); padding: 1rem;"
+                style="margin-bottom: 2rem; display: flex; gap: 1rem; flex-wrap: wrap; border: 2px solid var(--black); padding: 1rem;"
                 role="toolbar" aria-label="Filtros y ordenamiento de productos">
-                <button class="btn-filter" onclick="window.catalogEngine.filter('all')" aria-pressed="true" aria-label="Mostrar todos los productos">TODOS</button>
-                <button class="btn-filter" onclick="window.catalogEngine.filter('jordan')" aria-pressed="false" aria-label="Filtrar productos Jordan">JORDAN</button>
-                <button class="btn-filter" onclick="window.catalogEngine.filter('yeezy')" aria-pressed="false" aria-label="Filtrar productos Yeezy">YEEZY</button>
-                <button class="btn-filter" onclick="window.catalogEngine.filter('nike')" aria-pressed="false" aria-label="Filtrar productos Nike">NIKE</button>
-                <div style="margin-left: auto;">
+                <div class="filter-group" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <button class="btn-filter active" onclick="window.catalogEngine.filter('all')" aria-pressed="true" aria-label="Mostrar todos los productos">TODOS</button>
+                    <button class="btn-filter" onclick="window.catalogEngine.filter('jordan')" aria-pressed="false" aria-label="Filtrar productos Jordan">JORDAN</button>
+                    <button class="btn-filter" onclick="window.catalogEngine.filter('yeezy')" aria-pressed="false" aria-label="Filtrar productos Yeezy">YEEZY</button>
+                    <button class="btn-filter" onclick="window.catalogEngine.filter('nike')" aria-pressed="false" aria-label="Filtrar productos Nike">NIKE</button>
+                    <button class="btn-filter" onclick="window.catalogEngine.filter('adidas')" aria-pressed="false" aria-label="Filtrar productos Adidas">ADIDAS</button>
+                    <button class="btn-filter" onclick="window.catalogEngine.toggleSaleFilter()" aria-pressed="false" aria-label="Mostrar solo ofertas">OFERTAS</button>
+                </div>
+                <div style="margin-left: auto; display: flex; gap: 1rem; align-items: center;">
                     <label for="sortSelect" class="sr-only">Ordenar productos por</label>
-                    <select id="sortSelect" class="brutalist-select" onchange="window.catalogEngine.sort(this.value)" aria-label="Ordenar productos">
+                    <select id="sortSelect" class="brutalist-select" onchange="window.catalogEngine.sort(this.value)" aria-label="Ordenar productos" style="padding: 0.75rem; border: 2px solid var(--black); font-weight: 700; background: var(--white);">
                         <option value="newest">ÚLTIMO LANZAMIENTO</option>
-                        <option value="price-asc">MÁS BARATO</option>
-                        <option value="price-desc">MÁS HYPE</option>
+                        <option value="price-asc">PRECIO: MENOR A MAYOR</option>
+                        <option value="price-desc">PRECIO: MAYOR A MENOR</option>
+                        <option value="name-asc">NOMBRE: A-Z</option>
+                        <option value="name-desc">NOMBRE: Z-A</option>
                     </select>
+                    <button class="btn btn-outline" onclick="window.catalogEngine.clearFilters()" aria-label="Limpiar filtros" style="padding: 0.75rem 1.5rem; font-weight: 700;">
+                        <i class="fas fa-times"></i> LIMPIAR
+                    </button>
                 </div>
             </div>
 
@@ -124,14 +152,11 @@
                 <div class="loading-brutalist" aria-label="Cargando productos">LOADING DATA...</div>
             </div>
 
-            <!-- Pagination (mock) -->
+            <!-- Pagination (Real Implementation) -->
             <nav class="pagination-brutalist"
-                style="margin-top: 4rem; display: flex; justify-content: center; gap: 1rem;"
+                style="margin-top: 4rem; display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap;"
                 aria-label="Navegación de páginas">
-                <button class="btn btn-outline" disabled aria-label="Página anterior">PREV</button>
-                <button class="btn btn-black" aria-label="Página 1" aria-current="page">1</button>
-                <button class="btn btn-outline" aria-label="Página 2">2</button>
-                <button class="btn btn-outline" aria-label="Página siguiente">NEXT</button>
+                <!-- Will be populated by JavaScript -->
             </nav>
         </div>
     </main>

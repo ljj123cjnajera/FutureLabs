@@ -6,10 +6,22 @@
 class CatalogEngine {
     constructor() {
         this.api = window.api;
-        this.allProducts = []; // Store for client-side filtering (perf optimization)
-
-        this.api = window.api;
-        this.allProducts = []; // Store for client-side filtering (perf optimization)
+        this.allProducts = [];
+        this.filteredProducts = [];
+        this.currentPage = 1;
+        this.itemsPerPage = 12;
+        this.totalPages = 1;
+        this.totalProducts = 0;
+        this.currentFilters = {
+            brand: null,
+            category: null,
+            minPrice: null,
+            maxPrice: null,
+            onSale: false,
+            inStock: true,
+            search: null
+        };
+        this.currentSort = 'newest';
         this.init();
     }
 
@@ -29,74 +41,188 @@ class CatalogEngine {
             }
         }
 
-        await this.loadProducts();
-
         // 🚀 URL PARAMETER HANDLING
         this.applyInitialFilters();
+        
+        // Load products after applying filters
+        await this.loadProducts(this.currentPage);
+
+        // Setup search input
+        const searchInput = document.getElementById('productSearchInput');
+        if (searchInput) {
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    this.search(e.target.value);
+                }
+            });
+        }
     }
 
     applyInitialFilters() {
         const urlParams = new URLSearchParams(window.location.search);
         const category = urlParams.get('category');
-        const brand = urlParams.get('brand'); // Alias for category often used
-        const filter = urlParams.get('filter'); // e.g. 'new', 'sale'
+        const brand = urlParams.get('brand');
+        const filter = urlParams.get('filter');
         const search = urlParams.get('search');
+        const page = urlParams.get('page');
+        const sort = urlParams.get('sort');
+
+        if (page) {
+            this.currentPage = parseInt(page) || 1;
+        }
+
+        if (sort) {
+            this.currentSort = sort;
+            const sortSelect = document.getElementById('sortSelect');
+            if (sortSelect) sortSelect.value = sort;
+        }
 
         if (search) {
-            // If search exists, wait for search engine or simple filter
-            const query = search.toLowerCase();
-            const filtered = this.allProducts.filter(p =>
-                p.name.toLowerCase().includes(query) ||
-                p.brand.toLowerCase().includes(query)
-            );
-            this.render(filtered);
-            // Update UI to show search term
-            const titleEl = document.querySelector('.section-header h2');
-            if (titleEl) titleEl.textContent = `SEARCH: "${search}"`;
-            return;
+            this.currentFilters.search = search;
+            const searchInput = document.getElementById('productSearchInput');
+            if (searchInput) searchInput.value = search;
         }
 
         if (category || brand) {
             const target = (category || brand).toLowerCase();
-            this.filter(target);
-            // Highlight active category in UI if exists
-            return;
+            this.currentFilters.brand = target;
+            this.updateFilterButtons(target);
         }
 
         if (filter) {
-            if (filter === 'new' || filter === 'new-arrivals') {
-                // Mock logic for 'new'
-                const filtered = this.allProducts.filter(p => p.badge === 'NEW' || p.is_new);
-                if (filtered.length > 0) this.render(filtered);
+            if (filter === 'sale' || filter === 'on-sale') {
+                this.currentFilters.onSale = true;
             }
-            if (filter === 'sale') {
-                const filtered = this.allProducts.filter(p => p.discount_price || p.badge === 'SALE');
-                if (filtered.length > 0) this.render(filtered);
+            if (filter === 'new' || filter === 'new-arrivals') {
+                // Will be handled by API or client-side
             }
         }
     }
 
-    async loadProducts() {
+    async loadProducts(page = 1) {
         const container = document.getElementById('productsContainer');
         const countLabel = document.getElementById('productCount');
+        
+        // Show loading state
+        if (container) {
+            container.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 4rem;">
+                    <div class="loading-brutalist">CARGANDO PRODUCTOS...</div>
+                </div>
+            `;
+        }
 
         try {
-            // Try API
-            const response = await this.api.getProducts();
-            if (response && response.length > 0) {
-                this.allProducts = response;
-            } else {
-                // API Empty implies strict empty state
-                this.allProducts = [];
+            // Build API filters
+            const apiFilters = {
+                page: page,
+                limit: this.itemsPerPage,
+                sort_by: this.getSortField(),
+                sort_order: this.getSortOrder()
+            };
+
+            if (this.currentFilters.brand && this.currentFilters.brand !== 'all') {
+                apiFilters.brand = this.currentFilters.brand;
             }
+            if (this.currentFilters.category) {
+                apiFilters.category_id = this.currentFilters.category;
+            }
+            if (this.currentFilters.minPrice) {
+                apiFilters.min_price = this.currentFilters.minPrice;
+            }
+            if (this.currentFilters.maxPrice) {
+                apiFilters.max_price = this.currentFilters.maxPrice;
+            }
+            if (this.currentFilters.search) {
+                apiFilters.search = this.currentFilters.search;
+            }
+            if (this.currentFilters.onSale) {
+                // Will filter client-side for now
+            }
+
+            // Call API with filters
+            const response = await this.api.getProducts(apiFilters);
+            
+            // Handle different response formats
+            let products = [];
+            let total = 0;
+            
+            if (Array.isArray(response)) {
+                products = response;
+                total = response.length;
+            } else if (response && response.data) {
+                products = response.data.products || response.data || [];
+                total = response.data.total || products.length;
+                this.totalPages = response.data.pages || Math.ceil(total / this.itemsPerPage);
+            } else if (response && response.products) {
+                products = response.products;
+                total = response.total || products.length;
+            } else {
+                products = [];
+                total = 0;
+            }
+
+            // Apply client-side filters if needed
+            if (this.currentFilters.onSale) {
+                products = products.filter(p => p.discount_price || p.on_sale);
+            }
+            if (this.currentFilters.inStock) {
+                products = products.filter(p => (p.stock_quantity || 0) > 0);
+            }
+
+            this.allProducts = products;
+            this.filteredProducts = products;
+            this.totalProducts = total;
+            this.currentPage = page;
+            this.totalPages = Math.ceil(total / this.itemsPerPage);
+
+            this.render(products);
+            this.updatePagination();
+            if (countLabel) countLabel.textContent = total;
+            
         } catch (e) {
             console.error('⚠️ [CatalogEngine] API Failed', e);
             this.allProducts = [];
-            if (window.notifications) window.notifications.error('Connection Failed', 'Could not load products.');
+            this.filteredProducts = [];
+            if (container) {
+                container.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 4rem; border: 2px dashed var(--gray-300);">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--gray-400); margin-bottom: 1rem;"></i>
+                        <h2 class="text-2xl font-black uppercase mb-2">ERROR DE CONEXIÓN</h2>
+                        <p class="text-gray-600 mb-4">No se pudieron cargar los productos.</p>
+                        <button onclick="location.reload()" class="btn btn-black">RECARGAR</button>
+                    </div>
+                `;
+            }
+            if (window.notifications) window.notifications.error('Error de Conexión', 'No se pudieron cargar los productos.');
         }
+    }
 
-        this.render(this.allProducts);
-        if (countLabel) countLabel.textContent = this.allProducts.length;
+    getSortField() {
+        switch(this.currentSort) {
+            case 'price-asc':
+            case 'price-desc':
+                return 'price';
+            case 'name-asc':
+            case 'name-desc':
+                return 'name';
+            case 'newest':
+            default:
+                return 'created_at';
+        }
+    }
+
+    getSortOrder() {
+        switch(this.currentSort) {
+            case 'price-asc':
+            case 'name-asc':
+                return 'asc';
+            case 'price-desc':
+            case 'name-desc':
+            case 'newest':
+            default:
+                return 'desc';
+        }
     }
 
     render(products) {
@@ -145,20 +271,163 @@ class CatalogEngine {
 
     // ⚡ INTERACTION LOGIC
     filter(brand) {
-        if (brand === 'all') {
-            this.render(this.allProducts);
-        } else {
-            const filtered = this.allProducts.filter(p => p.brand.toLowerCase() === brand.toLowerCase());
-            this.render(filtered);
-        }
+        this.currentFilters.brand = brand;
+        this.currentPage = 1;
+        this.updateFilterButtons(brand);
+        this.loadProducts(1);
+    }
+
+    updateFilterButtons(activeBrand) {
+        document.querySelectorAll('.btn-filter').forEach(btn => {
+            const btnBrand = btn.getAttribute('onclick')?.match(/filter\(['"](.*?)['"]\)/)?.[1];
+            if (btnBrand === activeBrand) {
+                btn.setAttribute('aria-pressed', 'true');
+                btn.classList.add('active');
+            } else {
+                btn.setAttribute('aria-pressed', 'false');
+                btn.classList.remove('active');
+            }
+        });
     }
 
     sort(criteria) {
-        let sorted = [...this.allProducts];
-        if (criteria === 'price-asc') sorted.sort((a, b) => a.price - b.price);
-        if (criteria === 'price-desc') sorted.sort((a, b) => b.price - a.price);
-        // newest logic omitted for brevity in mock
-        this.render(sorted);
+        this.currentSort = criteria;
+        this.currentPage = 1;
+        this.loadProducts(1);
+    }
+
+    setPriceFilter(min, max) {
+        this.currentFilters.minPrice = min || null;
+        this.currentFilters.maxPrice = max || null;
+        this.currentPage = 1;
+        this.loadProducts(1);
+    }
+
+    setCategoryFilter(categoryId) {
+        this.currentFilters.category = categoryId;
+        this.currentPage = 1;
+        this.loadProducts(1);
+    }
+
+    toggleSaleFilter() {
+        this.currentFilters.onSale = !this.currentFilters.onSale;
+        this.currentPage = 1;
+        this.loadProducts(1);
+    }
+
+    toggleStockFilter() {
+        this.currentFilters.inStock = !this.currentFilters.inStock;
+        this.currentPage = 1;
+        this.loadProducts(1);
+    }
+
+    search(query) {
+        this.currentFilters.search = query;
+        this.currentPage = 1;
+        this.loadProducts(1);
+    }
+
+    clearFilters() {
+        this.currentFilters = {
+            brand: null,
+            category: null,
+            minPrice: null,
+            maxPrice: null,
+            onSale: false,
+            inStock: true,
+            search: null
+        };
+        this.currentSort = 'newest';
+        this.currentPage = 1;
+        this.updateFilterButtons('all');
+        document.getElementById('sortSelect').value = 'newest';
+        this.loadProducts(1);
+    }
+
+    goToPage(page) {
+        if (page >= 1 && page <= this.totalPages) {
+            this.currentPage = page;
+            this.loadProducts(page);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+
+    updatePagination() {
+        const paginationContainer = document.querySelector('.pagination-brutalist');
+        if (!paginationContainer) return;
+
+        if (this.totalPages <= 1) {
+            paginationContainer.style.display = 'none';
+            return;
+        }
+
+        paginationContainer.style.display = 'flex';
+        
+        let paginationHTML = '';
+        
+        // Previous button
+        paginationHTML += `
+            <button class="btn btn-outline" 
+                    ${this.currentPage === 1 ? 'disabled' : ''} 
+                    onclick="window.catalogEngine.goToPage(${this.currentPage - 1})"
+                    aria-label="Página anterior">
+                PREV
+            </button>
+        `;
+
+        // Page numbers
+        const maxVisible = 5;
+        let startPage = Math.max(1, this.currentPage - Math.floor(maxVisible / 2));
+        let endPage = Math.min(this.totalPages, startPage + maxVisible - 1);
+        
+        if (endPage - startPage < maxVisible - 1) {
+            startPage = Math.max(1, endPage - maxVisible + 1);
+        }
+
+        if (startPage > 1) {
+            paginationHTML += `
+                <button class="btn btn-outline" onclick="window.catalogEngine.goToPage(1)" aria-label="Página 1">1</button>
+            `;
+            if (startPage > 2) {
+                paginationHTML += `<span class="pagination-ellipsis">...</span>`;
+            }
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            paginationHTML += `
+                <button class="btn ${i === this.currentPage ? 'btn-black' : 'btn-outline'}" 
+                        onclick="window.catalogEngine.goToPage(${i})"
+                        aria-label="Página ${i}"
+                        ${i === this.currentPage ? 'aria-current="page"' : ''}>
+                    ${i}
+                </button>
+            `;
+        }
+
+        if (endPage < this.totalPages) {
+            if (endPage < this.totalPages - 1) {
+                paginationHTML += `<span class="pagination-ellipsis">...</span>`;
+            }
+            paginationHTML += `
+                <button class="btn btn-outline" 
+                        onclick="window.catalogEngine.goToPage(${this.totalPages})" 
+                        aria-label="Página ${this.totalPages}">
+                    ${this.totalPages}
+                </button>
+            `;
+        }
+
+        // Next button
+        paginationHTML += `
+            <button class="btn btn-outline" 
+                    ${this.currentPage === this.totalPages ? 'disabled' : ''} 
+                    onclick="window.catalogEngine.goToPage(${this.currentPage + 1})"
+                    aria-label="Página siguiente">
+                NEXT
+            </button>
+        `;
+
+        paginationContainer.innerHTML = paginationHTML;
     }
 
     quickAdd(id, name) {
