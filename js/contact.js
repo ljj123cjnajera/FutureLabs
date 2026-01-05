@@ -30,22 +30,61 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
             btn.disabled = true;
 
-            // Mock API call
-            setTimeout(() => {
+            // Obtener datos del formulario
+            const formData = {
+                name: form.querySelector('input[type="text"]').value.trim(),
+                email: form.querySelector('input[type="email"]').value.trim(),
+                message: form.querySelector('textarea').value.trim()
+            };
+
+            // Validación básica
+            if (!formData.name || !formData.email || !formData.message) {
                 if (window.notifications) {
-                    window.notifications.show('Mensaje enviado. Te contactaremos pronto.', 'success');
-                } else {
-                    alert('Mensaje enviado. Te contactaremos pronto.');
+                    window.notifications.error('Error', 'Por favor completa todos los campos');
                 }
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                return;
+            }
 
-                form.reset();
-                btn.innerHTML = 'Mensaje Enviado';
+            // Validar email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(formData.email)) {
+                if (window.notifications) {
+                    window.notifications.error('Error', 'Por favor ingresa un email válido');
+                }
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                return;
+            }
 
+            // Intentar enviar al backend si existe endpoint, sino mostrar mensaje
+            try {
+                // TODO: Implementar endpoint /api/contact en backend
+                // Por ahora, simular envío exitoso
                 setTimeout(() => {
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                }, 3000);
-            }, 1500);
+                    if (window.notifications) {
+                        window.notifications.success('Mensaje enviado', 'Te contactaremos pronto a ' + formData.email);
+                    } else {
+                        alert('Mensaje enviado. Te contactaremos pronto.');
+                    }
+
+                    form.reset();
+                    btn.innerHTML = 'Mensaje Enviado ✓';
+
+                    setTimeout(() => {
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    }, 3000);
+                }, 1500);
+            } catch (error) {
+                console.error('Error sending contact form:', error);
+                if (window.notifications) {
+                    window.notifications.error('Error', 'No se pudo enviar el mensaje. Por favor intenta de nuevo.');
+                }
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
         });
     }
 });
