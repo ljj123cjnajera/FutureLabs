@@ -948,7 +948,23 @@ class HomeEngine {
 
     // 2. Popup Logic (Exit Intent / Time Delay)
     const popup = document.getElementById('newsletterPopup');
-    if (popup && !localStorage.getItem('newsletter_subscribed') && !sessionStorage.getItem('newsletter_dismissed')) {
+    if (popup && !localStorage.getItem('newsletter_subscribed') && !localStorage.getItem('newsletter_dismissed')) {
+      
+      // Exit Intent Detection
+      let exitIntentTriggered = false;
+      document.addEventListener('mouseout', (e) => {
+        if (!exitIntentTriggered && !e.toElement && !e.relatedTarget && e.clientY < 10) {
+          exitIntentTriggered = true;
+          this.showNewsletterPopup();
+        }
+      });
+
+      // Time-based trigger (30 seconds)
+      setTimeout(() => {
+        if (!exitIntentTriggered && !popup.classList.contains('active')) {
+          this.showNewsletterPopup();
+        }
+      }, 30000); !sessionStorage.getItem('newsletter_dismissed')) {
       setTimeout(() => {
         popup.style.display = 'flex';
         // Force reflow for fade in
