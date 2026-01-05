@@ -790,60 +790,82 @@ async function loadLoyaltyTransactionsInContainer(container) {
     }
 }
 
-// Guardar datos personales
-document.getElementById('personalDataForm').addEventListener('submit', async function (e) {
-    e.preventDefault();
+// Guardar datos personales (si el formulario existe)
+const personalDataForm = document.getElementById('personalDataForm');
+if (personalDataForm) {
+    personalDataForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
 
-    const data = {
-        first_name: document.getElementById('firstName').value,
-        last_name: document.getElementById('lastName').value,
-        email: document.getElementById('email').value,
-        phone: document.getElementById('phone').value
-    };
+        const data = {
+            first_name: document.getElementById('firstName')?.value || '',
+            last_name: document.getElementById('lastName')?.value || '',
+            email: document.getElementById('email')?.value || '',
+            phone: document.getElementById('phone')?.value || ''
+        };
 
-    try {
-        const response = await window.api.updateProfile(data);
+        try {
+            const response = await window.api.updateProfile(data);
 
-        if (response.success) {
-            window.notifications.success('Perfil actualizado correctamente');
-            await loadUserData();
-        } else {
-            window.notifications.error(response.message || 'Error al actualizar perfil');
+            if (response && response.success) {
+                if (window.notifications) {
+                    window.notifications.success('Perfil Actualizado', 'Tu perfil se actualizó correctamente');
+                }
+                await loadUserData();
+            } else {
+                if (window.notifications) {
+                    window.notifications.error('Error', response?.message || 'Error al actualizar perfil');
+                }
+            }
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            if (window.notifications) {
+                window.notifications.error('Error', 'No se pudo actualizar el perfil. Por favor, intenta de nuevo.');
+            }
         }
-    } catch (error) {
-        window.notifications.error('Error al actualizar perfil');
-    }
-});
+    });
+}
 
-// Cambiar contraseña
-document.getElementById('changePasswordForm').addEventListener('submit', async function (e) {
-    e.preventDefault();
+// Cambiar contraseña (si el formulario existe)
+const changePasswordForm = document.getElementById('changePasswordForm');
+if (changePasswordForm) {
+    changePasswordForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
 
-    const currentPassword = document.getElementById('currentPassword').value;
-    const newPassword = document.getElementById('newPassword').value;
-    const confirmPassword = document.getElementById('confirmPassword').value;
+        const currentPassword = document.getElementById('currentPassword')?.value;
+        const newPassword = document.getElementById('newPassword')?.value;
+        const confirmPassword = document.getElementById('confirmPassword')?.value;
 
-    if (newPassword !== confirmPassword) {
-        window.notifications.error('Las contraseñas no coinciden');
-        return;
-    }
-
-    try {
-        const response = await window.api.changePassword({
-            current_password: currentPassword,
-            new_password: newPassword
-        });
-
-        if (response.success) {
-            window.notifications.success('Contraseña cambiada correctamente');
-            document.getElementById('changePasswordForm').reset();
-        } else {
-            window.notifications.error(response.message || 'Error al cambiar contraseña');
+        if (newPassword !== confirmPassword) {
+            if (window.notifications) {
+                window.notifications.error('Error', 'Las contraseñas no coinciden');
+            }
+            return;
         }
-    } catch (error) {
-        window.notifications.error('Error al cambiar contraseña');
-    }
-});
+
+        try {
+            const response = await window.api.changePassword({
+                current_password: currentPassword,
+                new_password: newPassword
+            });
+
+            if (response && response.success) {
+                if (window.notifications) {
+                    window.notifications.success('Contraseña Cambiada', 'Tu contraseña se cambió correctamente');
+                }
+                changePasswordForm.reset();
+            } else {
+                if (window.notifications) {
+                    window.notifications.error('Error', response?.message || 'Error al cambiar contraseña');
+                }
+            }
+        } catch (error) {
+            console.error('Error changing password:', error);
+            if (window.notifications) {
+                window.notifications.error('Error', 'No se pudo cambiar la contraseña. Por favor, intenta de nuevo.');
+            }
+        }
+    });
+}
 
 // Gestión de direcciones
 async function openAddressModal(addressId = null) {
