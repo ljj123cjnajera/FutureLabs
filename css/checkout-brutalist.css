@@ -145,6 +145,49 @@
     font-weight: 600;
 }
 
+/* Trust Badges Row */
+.checkout-trust-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--gray-700);
+}
+
+.checkout-trust-icon {
+    color: var(--accent);
+    margin-right: 0.5rem;
+}
+
+/* Urgency Banner (if stock is low) */
+.checkout-urgency-banner {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    color: var(--white);
+    padding: 1rem 1.5rem;
+    margin-bottom: 2rem;
+    border: 3px solid var(--black);
+    box-shadow: 6px 6px 0 var(--black);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+.checkout-urgency-banner i {
+    font-size: 1.5rem;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
 .summary-total {
     border-top: 2px solid var(--black);
     margin-top: 1.5rem;
