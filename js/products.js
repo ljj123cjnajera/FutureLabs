@@ -248,21 +248,28 @@ class CatalogEngine {
             container.innerHTML = products.map(p => `
                 <div class="product-card" onclick="window.location.href='product-detail.html?id=${p.id}'">
                     <div class="product-image-container">
-                        <img src="${p.image_url}" class="product-image" alt="${p.name}" loading="lazy">
+                        <img src="${p.image_url || 'assets/images/products/placeholder.jpg'}" 
+                             class="product-image" 
+                             alt="${p.name}" 
+                             loading="lazy"
+                             onerror="this.src='assets/images/products/placeholder.jpg'">
                         ${p.badge ? `<div class="product-badges"><span class="product-badge">${p.badge}</span></div>` : ''}
+                        ${(p.stock_quantity || 0) === 0 ? '<div class="product-badges"><span class="product-badge sold-out">AGOTADO</span></div>' : ''}
                     </div>
                     <div class="product-content">
-                        <span class="product-category">${p.brand}</span>
+                        <span class="product-category">${p.brand || 'SNEAKERS'}</span>
                         <h3 class="product-title">${p.name}</h3>
                         
                         <div class="product-price-container">
-                             <span class="product-price-current">S/ ${p.price.toFixed(2)}</span>
-                             <button class="btn-quick-add" onclick="event.stopPropagation(); window.catalogEngine.quickAdd(${p.id}, '${p.name}')">
-                                <i class="fas fa-plus"></i>
-                             </button>
+                             <span class="product-price-current">S/ ${(p.discount_price || p.price || 0).toFixed(2)}</span>
+                             ${p.discount_price && p.discount_price < p.price ? `<span class="product-price-old" style="text-decoration: line-through; color: var(--gray-500); margin-left: 0.5rem; font-size: 0.9rem;">S/ ${p.price.toFixed(2)}</span>` : ''}
                         </div>
                         
-                        <button class="product-btn">ADD TO CART</button>
+                        <button class="product-btn" 
+                                onclick="event.stopPropagation(); window.catalogEngine.quickAdd(${p.id}, '${p.name}', event)"
+                                ${(p.stock_quantity || 0) === 0 ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
+                            <i class="fas fa-shopping-cart"></i> ${(p.stock_quantity || 0) === 0 ? 'AGOTADO' : 'AGREGAR AL CARRITO'}
+                        </button>
                     </div>
                 </div>
             `).join('');
