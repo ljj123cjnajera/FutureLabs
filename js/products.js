@@ -352,6 +352,31 @@ class CatalogEngine {
         }
     }
 
+    updateURL() {
+        const url = new URL(window.location);
+        if (this.currentFilters.brand && this.currentFilters.brand !== 'all') {
+            url.searchParams.set('brand', this.currentFilters.brand);
+        } else {
+            url.searchParams.delete('brand');
+        }
+        if (this.currentFilters.search) {
+            url.searchParams.set('search', this.currentFilters.search);
+        } else {
+            url.searchParams.delete('search');
+        }
+        if (this.currentPage > 1) {
+            url.searchParams.set('page', this.currentPage);
+        } else {
+            url.searchParams.delete('page');
+        }
+        if (this.currentSort !== 'newest') {
+            url.searchParams.set('sort', this.currentSort);
+        } else {
+            url.searchParams.delete('sort');
+        }
+        window.history.pushState({}, '', url);
+    }
+
     updatePagination() {
         const paginationContainer = document.querySelector('.pagination-brutalist');
         if (!paginationContainer) return;
