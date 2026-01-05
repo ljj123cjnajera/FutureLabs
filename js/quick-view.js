@@ -163,8 +163,6 @@ class QuickView {
             >
               <i class="far fa-heart"></i>
             </button>
-              <i class="fas fa-balance-scale"></i>
-            </button>
           </div>
 
           <div class="quick-view-footer">
