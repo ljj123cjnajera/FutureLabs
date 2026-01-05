@@ -430,13 +430,24 @@ class CatalogEngine {
         paginationContainer.innerHTML = paginationHTML;
     }
 
-    quickAdd(id, name) {
+    quickAdd(id, name, event) {
+        if (event) event.stopPropagation();
+        
         if (window.cartManager) {
             window.cartManager.add(id, 1);
-            if (window.notifications) window.notifications.success('AÑADIDO', `${name} al carrito`);
+            if (window.notifications) {
+                window.notifications.success('AÑADIDO AL CARRITO', `${name} se agregó correctamente`);
+            }
+        } else if (window.CartEngine) {
+            // Try alternative cart engine
+            const cartEngine = new window.CartEngine();
+            cartEngine.addToCart(id, 1);
+            if (window.notifications) {
+                window.notifications.success('AÑADIDO AL CARRITO', `${name} se agregó correctamente`);
+            }
         } else {
-            // Fallback if cartManager not ready
-            if (window.notifications) window.notifications.error('ERROR', 'Cart System Unavailable');
+            // Fallback: redirect to product detail
+            window.location.href = `product-detail.html?id=${id}`;
         }
     }
 }
