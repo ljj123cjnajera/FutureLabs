@@ -964,21 +964,14 @@ class HomeEngine {
         if (!exitIntentTriggered && !popup.classList.contains('active')) {
           this.showNewsletterPopup();
         }
-      }, 30000); !sessionStorage.getItem('newsletter_dismissed')) {
-      setTimeout(() => {
-        popup.style.display = 'flex';
-        // Force reflow for fade in
-        setTimeout(() => popup.classList.add('visible'), 10);
-      }, 5000); // Show after 5 seconds
+      }, 30000);
 
+      // Setup close handlers
       const closeBtn = popup.querySelector('.close-modal');
       const closeLink = popup.querySelector('.close-link');
 
       const closeAction = () => {
-        popup.classList.remove('visible');
-        setTimeout(() => popup.style.display = 'none', 500);
-        // Don't show again for this session
-        sessionStorage.setItem('newsletter_dismissed', 'true');
+        window.closeNewsletterPopup();
       };
 
       if (closeBtn) closeBtn.onclick = closeAction;
