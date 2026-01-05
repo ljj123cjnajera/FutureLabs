@@ -379,12 +379,28 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     // Agregar al carrito
     window.addToCart = async function () {
-        // Obtener ID del producto de la URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const productId = urlParams.get('id');
+        const product = window.currentProduct;
+        if (!product) {
+            if (window.notifications) {
+                window.notifications.error('Error', 'Producto no disponible');
+            }
+            return;
+        }
 
+        const productId = product.id || product.product_id;
         if (!productId) {
-            window.notifications.error('Error: ID de producto no encontrado');
+            if (window.notifications) {
+                window.notifications.error('Error', 'ID de producto no encontrado');
+            }
+            return;
+        }
+
+        // VALIDACIÓN DE STOCK
+        const stock = product.stock_quantity;
+        if (stock !== undefined && stock === 0) {
+            if (window.notifications) {
+                window.notifications.warning('Producto Agotado', 'Este producto no está disponible en este momento.');
+            }
             return;
         }
 
@@ -399,28 +415,54 @@ document.addEventListener('DOMContentLoaded', async function () {
                 void container.offsetWidth; // trigger reflow
                 container.classList.add('shake-animation');
             }
+            if (window.notifications) {
+                window.notifications.warning('Selecciona una Talla', 'Por favor, selecciona una talla antes de agregar al carrito.');
+            }
             return;
         }
 
-        // Add size to cart item
-        window.logger?.info('PRODUCT', `Agregando talla: ${selectedSize} `);
-
-        // Use the new CartEngine (aliased as cartManager)
-        // It will handle: Saving to LocalStorage, Updating UI, Opening Drawer
-        await window.cartManager.add(productId, 1, { size: selectedSize });
-
-        // Optional: Notification (already handled visually by drawer open, but good for confirmation)
-        window.notifications.success(`Agregado: Talla US ${selectedSize}`);
+        try {
+            // Use the new CartEngine (aliased as cartManager)
+            // It will handle: Saving to LocalStorage/API, Updating UI, Opening Drawer
+            const success = await window.cartManager?.add(productId, 1, { size: selectedSize });
+            
+            if (success !== false) {
+                if (window.notifications) {
+                    window.notifications.success('Agregado al Carrito', `Talla US ${selectedSize} agregada correctamente`);
+                }
+            }
+        } catch (e) {
+            console.error('Error adding to cart:', e);
+            if (window.notifications) {
+                window.notifications.error('Error', 'No se pudo agregar el producto. Por favor, intenta de nuevo.');
+            }
+        }
     }
 
     // Comprar ahora
     window.buyNow = async function () {
-        // Obtener ID del producto de la URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const productId = urlParams.get('id');
+        const product = window.currentProduct;
+        if (!product) {
+            if (window.notifications) {
+                window.notifications.error('Error', 'Producto no disponible');
+            }
+            return;
+        }
 
+        const productId = product.id || product.product_id;
         if (!productId) {
-            window.notifications.error('Error: ID de producto no encontrado');
+            if (window.notifications) {
+                window.notifications.error('Error', 'ID de producto no encontrado');
+            }
+            return;
+        }
+
+        // VALIDACIÓN DE STOCK
+        const stock = product.stock_quantity;
+        if (stock !== undefined && stock === 0) {
+            if (window.notifications) {
+                window.notifications.warning('Producto Agotado', 'Este producto no está disponible en este momento.');
+            }
             return;
         }
 
@@ -435,14 +477,28 @@ document.addEventListener('DOMContentLoaded', async function () {
                 void container.offsetWidth; // trigger reflow
                 container.classList.add('shake-animation');
             }
+            if (window.notifications) {
+                window.notifications.warning('Selecciona una Talla', 'Por favor, selecciona una talla antes de comprar.');
+            }
             return;
         }
 
-        await window.cartManager.add(productId, 1, { size: selectedSize });
-        window.notifications.success('Redirigiendo al checkout...');
-        setTimeout(() => {
-            window.location.href = 'checkout.html';
-        }, 1000);
+        try {
+            const success = await window.cartManager?.add(productId, 1, { size: selectedSize });
+            if (success !== false) {
+                if (window.notifications) {
+                    window.notifications.success('Redirigiendo al checkout...', 'El producto se agregó al carrito');
+                }
+                setTimeout(() => {
+                    window.location.href = 'checkout.html';
+                }, 1000);
+            }
+        } catch (e) {
+            console.error('Error in buyNow:', e);
+            if (window.notifications) {
+                window.notifications.error('Error', 'No se pudo agregar el producto. Por favor, intenta de nuevo.');
+            }
+        }
     }
 
     const clearRecentlyViewedBtn = document.getElementById('clearRecentlyViewedBtn');
