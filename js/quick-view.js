@@ -163,7 +163,6 @@ class QuickView {
             >
               <i class="far fa-heart"></i>
             </button>
-            <button class="btn btn-ghost btn-lg" onclick="quickView.addToCompare('${product.id}')">
               <i class="fas fa-balance-scale"></i>
             </button>
           </div>
@@ -243,14 +242,6 @@ class QuickView {
     window.location.href = `product-detail.html?id=${productId}`;
   }
 
-  addToCompare(productId) {
-    if (window.comparator) {
-      window.comparator.addProduct(productId);
-      if (window.notifications) {
-        window.notifications.success('Producto agregado al comparador');
-      }
-    }
-  }
 }
 
 // Inicializar Quick View globalmente
