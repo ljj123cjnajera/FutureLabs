@@ -95,6 +95,9 @@ document.addEventListener('DOMContentLoaded', async function () {
         // 2. In the catch/else blocks, if mock exists, just assign `response = { success: true, data: { product: mock } }` effectively? 
         // No, let's keep it explicit.
 
+        // Update live viewers count (simulated for conversion)
+        updateLiveViewers(product.id);
+        
         // SEO ENGINE UPDATE
         if (window.SeoManager) {
             window.SeoManager.updateProductSEO({
@@ -286,6 +289,26 @@ document.addEventListener('DOMContentLoaded', async function () {
         `;
     }
 
+    // --- LIVE VIEWERS SIMULATION (Conversion Optimization) ---
+    function updateLiveViewers(productId) {
+        const viewerElement = document.getElementById('viewerCount');
+        if (!viewerElement) return;
+        
+        // Simulate realistic viewer count (8-25 people)
+        const baseCount = 12;
+        const variation = Math.floor(Math.random() * 17) + 1;
+        const viewerCount = baseCount + variation;
+        
+        viewerElement.textContent = viewerCount;
+        
+        // Update every 15-30 seconds to simulate real activity
+        setInterval(() => {
+            const change = Math.floor(Math.random() * 5) - 2; // -2 to +2
+            const newCount = Math.max(8, Math.min(30, viewerCount + change));
+            viewerElement.textContent = newCount;
+        }, 20000 + Math.random() * 10000);
+    }
+    
     // --- MOCK DATABASE ---
     function getMockProduct(id) {
         const db = [
