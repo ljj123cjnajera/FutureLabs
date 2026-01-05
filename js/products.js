@@ -8,6 +8,7 @@ class CatalogEngine {
         this.api = window.api;
         this.allProducts = [];
         this.filteredProducts = [];
+        this.categories = [];
         this.currentPage = 1;
         this.itemsPerPage = 12;
         this.totalPages = 1;
@@ -22,6 +23,7 @@ class CatalogEngine {
             search: null
         };
         this.currentSort = 'newest';
+        this.viewMode = 'grid';
         this.init();
     }
 
@@ -41,6 +43,9 @@ class CatalogEngine {
             }
         }
 
+        // Load categories for filter
+        await this.loadCategories();
+
         // 🚀 URL PARAMETER HANDLING
         this.applyInitialFilters();
         
@@ -56,6 +61,10 @@ class CatalogEngine {
                 }
             });
         }
+
+        // Setup view mode from localStorage
+        const savedView = localStorage.getItem('productsViewMode') || 'grid';
+        this.setViewMode(savedView);
     }
 
     applyInitialFilters() {
@@ -179,6 +188,7 @@ class CatalogEngine {
             this.render(products);
             this.updatePagination();
             this.updateURL();
+            this.updateCounts();
             
             if (countLabel) countLabel.textContent = total;
             
@@ -361,6 +371,18 @@ class CatalogEngine {
         }
     }
 
+    updateCounts() {
+        const resultsCount = document.getElementById('resultsCount');
+        const totalCount = document.getElementById('totalCount');
+        
+        if (resultsCount) {
+            resultsCount.textContent = this.allProducts.length;
+        }
+        if (totalCount) {
+            totalCount.textContent = this.totalProducts;
+        }
+    }
+
     updateURL() {
         const url = new URL(window.location);
         if (this.currentFilters.brand && this.currentFilters.brand !== 'all') {
@@ -464,8 +486,75 @@ class CatalogEngine {
         paginationContainer.innerHTML = paginationHTML;
     }
 
+    async loadCategories() {
+        try {
+            const response = await this.api.getCategories();
+            let categories = [];
+            
+            if (Array.isArray(response)) {
+                categories = response;
+            } else if (response && response.data) {
+                categories = response.data.categories || response.data || [];
+            } else if (response && response.categories) {
+                categories = response.categories;
+            }
+
+            this.categories = categories;
+            this.renderCategoriesFilter();
+        } catch (e) {
+            console.error('Error loading categories:', e);
+        }
+    }
+
+    renderCategoriesFilter() {
+        const container = document.getElementById('categoriesFilter');
+        if (!container || !this.categories.length) return;
+
+        container.innerHTML = this.categories.map(cat => `
+            <label class="filter-checkbox">
+                <input type="radio" 
+                       name="category" 
+                       value="${cat.id}" 
+                       onchange="window.catalogEngine.setCategoryFilter(${cat.id})">
+                <span>${cat.name}</span>
+            </label>
+        `).join('');
+    }
+
+    setViewMode(mode) {
+        this.viewMode = mode;
+        localStorage.setItem('productsViewMode', mode);
+        
+        const container = document.getElementById('productsContainer');
+        if (container) {
+            if (mode === 'list') {
+                container.classList.add('list-view');
+            } else {
+                container.classList.remove('list-view');
+            }
+        }
+
+        // Update view toggle buttons
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            if (btn.dataset.view === mode) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+    }
+
     quickAdd(id, name, event) {
         if (event) event.stopPropagation();
+        
+        // Find product to check stock
+        const product = this.allProducts.find(p => p.id === id);
+        if (product && (product.stock_quantity || 0) === 0) {
+            if (window.notifications) {
+                window.notifications.warning('Producto Agotado', 'Este producto no está disponible en este momento.');
+            }
+            return;
+        }
         
         if (window.cartManager) {
             window.cartManager.add(id, 1);
@@ -485,6 +574,28 @@ class CatalogEngine {
         }
     }
 }
+
+// Global functions
+window.toggleFiltersSidebar = function() {
+    const sidebar = document.getElementById('productsSidebar');
+    if (sidebar) {
+        sidebar.classList.toggle('active');
+    }
+};
+
+window.setViewMode = function(mode) {
+    if (window.catalogEngine) {
+        window.catalogEngine.setViewMode(mode);
+    }
+};
+
+window.applyPriceFilter = function() {
+    const min = document.getElementById('minPrice')?.value;
+    const max = document.getElementById('maxPrice')?.value;
+    if (window.catalogEngine) {
+        window.catalogEngine.setPriceFilter(min || null, max || null);
+    }
+};
 
 document.addEventListener('DOMContentLoaded', () => {
     window.catalogEngine = new CatalogEngine();
