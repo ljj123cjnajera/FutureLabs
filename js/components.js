@@ -243,7 +243,7 @@ class Components {
                     <li class="nav-item"><a href="products.html?category=jordan" class="nav-link">JORDAN</a></li>
                     <li class="nav-item"><a href="products.html?category=yeezy" class="nav-link">YEEZY</a></li>
                     <li class="nav-item"><a href="products.html?category=nike" class="nav-link">NIKE</a></li>
-                    <li class="nav-item"><a href="products.html?filter=sale" class="nav-link" style="color: var(--accent);">OFERTAS</a></li>
+                    <li class="nav-item nav-item-featured"><a href="products.html?filter=sale" class="nav-link nav-link-sale" style="color: var(--accent);">OFERTAS</a></li>
                 </ul>
             </nav>
             ` : ''}
