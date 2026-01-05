@@ -399,20 +399,41 @@ document.addEventListener('DOMContentLoaded', async function () {
         footerContainer.innerHTML = window.Components.getFooter();
     }
 
-    // Verificar autenticación con retry
+    // Verificar autenticación con retry mejorado
     let retries = 0;
-    const maxRetries = 5;
+    const maxRetries = 10; // Aumentado para dar más tiempo
 
-    const checkAuth = setInterval(() => {
+    const checkAuth = setInterval(async () => {
         retries++;
-        if (window.authManager && window.authManager.isAuthenticated()) {
+        
+        // Verificar token primero
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+            if (retries >= 3) {
+                clearInterval(checkAuth);
+                window.location.href = 'login.html';
+                return;
+            }
+            return;
+        }
+
+        // Si hay token, intentar inicializar aunque authManager no esté listo
+        if (token && (window.authManager?.isAuthenticated() || retries >= 5)) {
             clearInterval(checkAuth);
-            initializeProfile();
+            try {
+                await initializeProfile();
+            } catch (error) {
+                console.error('Error initializing profile:', error);
+                // Continuar de todas formas para mostrar la UI
+            }
         } else if (retries >= maxRetries) {
             clearInterval(checkAuth);
-            window.location.href = 'index.html';
+            // Si después de muchos intentos no hay authManager, redirigir
+            if (!window.authManager) {
+                window.location.href = 'login.html';
+            }
         }
-    }, 200);
+    }, 300);
 
     setupLoyaltyButtons();
     updateLoyaltyUI(0);
@@ -420,8 +441,16 @@ document.addEventListener('DOMContentLoaded', async function () {
     // Inicializar tabs
     document.querySelectorAll('.profile-tab').forEach(tab => {
         tab.addEventListener('click', function () {
-            const tabId = this.dataset.tab;
-            switchTab(tabId);
+            // Obtener tabId del onclick o del texto del botón
+            const onclick = this.getAttribute('onclick');
+            let tabId = null;
+            if (onclick) {
+                const match = onclick.match(/switchTab\(['"]([^'"]+)['"]\)/);
+                if (match) tabId = match[1];
+            }
+            if (tabId) {
+                switchTab(tabId);
+            }
         });
 
         // Navegación por teclado (Arrow keys)
@@ -454,31 +483,30 @@ document.addEventListener('DOMContentLoaded', async function () {
 });
 
 // Cambiar de tab
-function switchTab(tabId) {
-    // Actualizar tabs
-    document.querySelectorAll('.profile-tab').forEach(tab => {
-        tab.classList.remove('active');
-        tab.setAttribute('aria-selected', 'false');
-        tab.setAttribute('tabindex', '-1');
+window.switchTab = function (tabId) {
+    // Actualizar botones de navegación
+    document.querySelectorAll('.account-nav-btn').forEach(btn => {
+        btn.classList.remove('active');
     });
 
-    const activeTab = document.querySelector(`[data-tab="${tabId}"]`);
-    if (activeTab) {
-        activeTab.classList.add('active');
-        activeTab.setAttribute('aria-selected', 'true');
-        activeTab.setAttribute('tabindex', '0');
-    }
+    // Encontrar el botón activo por su onclick
+    document.querySelectorAll('.account-nav-btn').forEach(btn => {
+        const onclick = btn.getAttribute('onclick');
+        if (onclick && onclick.includes(`switchTab('${tabId}')`)) {
+            btn.classList.add('active');
+        }
+    });
 
-    // Actualizar secciones
-    document.querySelectorAll('.profile-section').forEach(section => {
+    // Actualizar secciones (account-section en lugar de profile-section)
+    document.querySelectorAll('.account-section').forEach(section => {
         section.classList.remove('active');
-        section.setAttribute('hidden', '');
+        section.style.display = 'none';
     });
 
     const activeSection = document.getElementById(tabId);
     if (activeSection) {
         activeSection.classList.add('active');
-        activeSection.removeAttribute('hidden');
+        activeSection.style.display = 'block';
     }
 
     // Cargar datos específicos de la sección
@@ -498,13 +526,19 @@ function switchTab(tabId) {
 
 // Inicializar perfil
 async function initializeProfile() {
-    await Promise.all([
-        loadUserData(),
-        loadStats(),
-        loadAddresses(),
-        loadOrders(),
-        loadLoyaltyPoints()
-    ]);
+    console.log('🔵 Inicializando perfil...');
+    
+    // Cargar datos en paralelo pero con manejo de errores individual
+    const promises = [
+        loadUserData().catch(e => console.error('Error loading user data:', e)),
+        loadStats().catch(e => console.error('Error loading stats:', e)),
+        loadAddresses().catch(e => console.error('Error loading addresses:', e)),
+        loadOrders().catch(e => console.error('Error loading orders:', e)),
+        loadLoyaltyPoints().catch(e => console.error('Error loading loyalty points:', e))
+    ];
+
+    await Promise.allSettled(promises);
+    console.log('✅ Perfil inicializado');
 }
 
 // Cargar datos del usuario
@@ -616,13 +650,20 @@ async function loadStats() {
     // Cargar direcciones
     async function loadAddresses() {
         const container = document.getElementById('addressList');
-        if (!container) return;
+        if (!container) {
+            console.warn('⚠️ addressList container not found');
+            return;
+        }
 
         // Show loading state
         container.innerHTML = '<div class="loading-brutalist">CARGANDO DIRECCIONES...</div>';
 
-    try {
-        const response = await window.api.getAddresses();
+        try {
+            if (!window.api) {
+                throw new Error('API no disponible');
+            }
+
+            const response = await window.api.getAddresses();
 
         let addresses = [];
         if (response && response.success) {
@@ -736,10 +777,19 @@ async function loadLoyaltyTransactions() {
 }
 
 async function loadLoyaltyTransactionsInContainer(container) {
+    if (!container) {
+        console.warn('⚠️ Loyalty history container not found');
+        return;
+    }
+
     // Show loading state
     container.innerHTML = '<div class="loading-brutalist">CARGANDO TRANSACCIONES...</div>';
 
     try {
+        if (!window.api) {
+            throw new Error('API no disponible');
+        }
+
         const response = await window.api.getLoyaltyTransactions();
 
         if (response.success && response.data.transactions) {
@@ -791,7 +841,50 @@ async function loadLoyaltyTransactionsInContainer(container) {
 }
 
 // Guardar datos personales (si el formulario existe)
-const personalDataForm = document.getElementById('personalDataForm');
+// Esperar a que el DOM esté listo
+let personalDataForm = null;
+let profileForm = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+    personalDataForm = document.getElementById('personalDataForm');
+    profileForm = document.getElementById('profileForm');
+    
+    if (profileForm) {
+        profileForm.addEventListener('submit', handleProfileUpdate);
+    }
+});
+
+async function handleProfileUpdate(e) {
+    e.preventDefault();
+
+    const data = {
+        first_name: document.getElementById('firstName')?.value || '',
+        last_name: document.getElementById('lastName')?.value || '',
+        email: document.getElementById('email')?.value || '',
+        phone: document.getElementById('phone')?.value || ''
+    };
+
+    try {
+        const response = await window.api?.updateProfile(data);
+
+        if (response && response.success) {
+            if (window.notifications) {
+                window.notifications.success('Perfil Actualizado', 'Tu perfil se actualizó correctamente');
+            }
+            await loadUserData();
+        } else {
+            if (window.notifications) {
+                window.notifications.error('Error', response?.message || 'Error al actualizar perfil');
+            }
+        }
+    } catch (error) {
+        console.error('Error updating profile:', error);
+        if (window.notifications) {
+            window.notifications.error('Error', 'No se pudo actualizar el perfil. Por favor, intenta de nuevo.');
+        }
+    }
+}
+
 if (personalDataForm) {
     personalDataForm.addEventListener('submit', async function (e) {
         e.preventDefault();

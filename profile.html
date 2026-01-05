@@ -112,42 +112,42 @@
                         <form id="newAddressForm" onsubmit="handleSaveAddress(event)">
                             <div class="form-row">
                                 <div class="form-group half">
-                                    <label>FIRST NAME</label>
+                                    <label>NOMBRE</label>
                                     <input type="text" name="first_name" class="form-input" required>
                                 </div>
                                 <div class="form-group half">
-                                    <label>LAST NAME</label>
+                                    <label>APELLIDO</label>
                                     <input type="text" name="last_name" class="form-input" required>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label>STREET ADDRESS</label>
+                                <label>DIRECCIÓN</label>
                                 <input type="text" name="street_address" class="form-input" required>
                             </div>
                             <div class="form-row">
                                 <div class="form-group half">
-                                    <label>CITY</label>
+                                    <label>CIUDAD</label>
                                     <input type="text" name="city" class="form-input" required>
                                 </div>
                                 <div class="form-group half">
-                                    <label>ZIP CODE</label>
+                                    <label>CÓDIGO POSTAL</label>
                                     <input type="text" name="postal_code" class="form-input" required>
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group half">
-                                    <label>COUNTRY</label>
-                                    <input type="text" name="country" class="form-input" value="Peru" required>
+                                    <label>PAÍS</label>
+                                    <input type="text" name="country" class="form-input" value="Perú" required>
                                 </div>
                                 <div class="form-group half">
-                                    <label>PHONE</label>
+                                    <label>TELÉFONO</label>
                                     <input type="tel" name="phone_number" class="form-input" required>
                                 </div>
                             </div>
                             <div class="form-actions">
                                 <button type="button" class="btn btn-outline"
-                                    onclick="toggleAddressForm()">CANCEL</button>
-                                <button type="submit" class="btn btn-black">SAVE ADDRESS</button>
+                                    onclick="toggleAddressForm()">CANCELAR</button>
+                                <button type="submit" class="btn btn-black">GUARDAR DIRECCIÓN</button>
                             </div>
                         </form>
                     </div>
@@ -183,7 +183,7 @@
                     style="grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));">
                     <!-- Items injected via JS -->
                     <div style="grid-column: 1/-1; padding: 2rem; border: 2px dashed #000; text-align: center;">
-                        YOUR WISHLIST IS EMPTY
+                        TU LISTA DE DESEOS ESTÁ VACÍA
                     </div>
                 </div>
             </section>
@@ -192,15 +192,25 @@
             <section id="settings" class="account-section">
                 <h1 class="section-title">CONFIGURACIÓN</h1>
                 <form class="brutalist-form" id="profileForm">
-                    <div class="form-group">
-                        <label>FULL NAME</label>
-                        <input type="text" class="form-input" id="firstName">
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label>NOMBRE</label>
+                            <input type="text" class="form-input" id="firstName" required>
+                        </div>
+                        <div class="form-group half">
+                            <label>APELLIDO</label>
+                            <input type="text" class="form-input" id="lastName" required>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label>EMAIL</label>
                         <input type="email" class="form-input" id="email" disabled style="background: #eee;">
                     </div>
-                    <button type="button" class="btn-save">UPDATE PROFILE</button>
+                    <div class="form-group">
+                        <label>TELÉFONO</label>
+                        <input type="tel" class="form-input" id="phone">
+                    </div>
+                    <button type="submit" class="btn-save">ACTUALIZAR PERFIL</button>
                 </form>
             </section>
         </main>
