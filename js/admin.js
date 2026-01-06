@@ -172,37 +172,47 @@ class AdminManager {
       this.charts.topProducts = new Chart(ctxProducts, {
         type: 'bar',
         data: {
-          labels: ['Jordan 1', 'Yeezy 350', 'Nike Dunk', 'Adidas Forum', 'NB 550'],
+          labels: topProducts.map(p => (p.product_name || 'Sin nombre').substring(0, 20)),
           datasets: [{
             label: 'Unidades',
-            data: [65, 59, 80, 81, 56],
+            data: topProducts.map(p => parseInt(p.total_sold) || 0),
             backgroundColor: '#000',
             borderRadius: 4
           }]
         },
-        options: { responsive: true, scales: { y: { beginAtZero: true } } }
-      });
-    }
-
-    // 4. PAYMENTS (Pie)
-    const ctxPayments = document.getElementById('paymentMethodsChart');
-    if (ctxPayments) {
-      this.charts.payments = new Chart(ctxPayments, {
-        type: 'pie',
-        data: {
-          labels: ['Tarjeta', 'PayPal', 'Yape/Plin'],
-          datasets: [{
-            data: [300, 50, 100],
-            backgroundColor: ['#333', '#00457C', '#D500F9'],
-            borderWidth: 0
-          }]
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          indexAxis: 'y',
+          scales: { y: { beginAtZero: true } }
         }
       });
     }
 
-    // 🚀 Start Simulation
-    // 🚀 Load Real Data
-    this.refreshDashboardData();
+    // 4. PAYMENTS (Pie) - Usar datos reales
+    const ctxPayments = document.getElementById('paymentMethodsChart');
+    if (ctxPayments && window.Chart) {
+      // Destruir gráfico anterior si existe
+      if (this.charts.payments) {
+        this.charts.payments.destroy();
+      }
+
+      this.charts.payments = new Chart(ctxPayments, {
+        type: 'pie',
+        data: {
+          labels: paymentMethods.map(p => p.payment_method || 'Desconocido'),
+          datasets: [{
+            data: paymentMethods.map(p => parseInt(p.count) || 0),
+            backgroundColor: ['#333', '#00457C', '#D500F9', '#43e97b', '#f093fb'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false
+        }
+      });
+    }
   }
 
   // Este método ya no es necesario, loadDashboard() maneja todo
