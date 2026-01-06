@@ -63,50 +63,113 @@ class AdminManager {
     this.renderCharts();
   }
 
-  renderCharts() {
+  renderCharts(ordersByStatus = [], topProducts = [], salesByDay = [], paymentMethods = []) {
+    // Si no hay datos, usar datos por defecto vacíos
+    if (!ordersByStatus || ordersByStatus.length === 0) {
+      ordersByStatus = [
+        { status: 'pending', count: 0 },
+        { status: 'processing', count: 0 },
+        { status: 'shipped', count: 0 },
+        { status: 'delivered', count: 0 }
+      ];
+    }
+
+    if (!salesByDay || salesByDay.length === 0) {
+      // Generar últimos 7 días con datos en 0
+      const last7Days = [];
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        last7Days.push({
+          date: date.toISOString().split('T')[0],
+          total: 0
+        });
+      }
+      salesByDay = last7Days;
+    }
+
+    if (!topProducts || topProducts.length === 0) {
+      topProducts = [];
+    }
+
+    if (!paymentMethods || paymentMethods.length === 0) {
+      paymentMethods = [];
+    }
+
     this.charts = {};
 
-    // 1. SALES CHART (Line)
+    // 1. SALES CHART (Line) - Usar datos reales
     const ctxSales = document.getElementById('salesChart');
-    if (ctxSales) {
+    if (ctxSales && window.Chart) {
+      // Destruir gráfico anterior si existe
+      if (this.charts.sales) {
+        this.charts.sales.destroy();
+      }
+
       this.charts.sales = new Chart(ctxSales, {
         type: 'line',
         data: {
-          labels: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
+          labels: salesByDay.map(s => new Date(s.date).toLocaleDateString('es-PE', { month: 'short', day: 'numeric' })),
           datasets: [{
             label: 'Ventas (S/)',
-            data: [1200, 1900, 3000, 5000, 2300, 6000, 8500],
+            data: salesByDay.map(s => parseFloat(s.total) || 0),
             borderColor: '#000',
             backgroundColor: 'rgba(0,0,0,0.1)',
             tension: 0.4,
             fill: true
           }]
         },
-        options: { responsive: true, plugins: { legend: { display: false } } }
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } }
+        }
       });
     }
 
-    // 2. ORDER STATUS (Doughnut)
+    // 2. ORDER STATUS (Doughnut) - Usar datos reales
     const ctxStatus = document.getElementById('ordersStatusChart');
-    if (ctxStatus) {
+    if (ctxStatus && window.Chart) {
+      // Destruir gráfico anterior si existe
+      if (this.charts.status) {
+        this.charts.status.destroy();
+      }
+
+      const statusLabels = {
+        'pending': 'Pendiente',
+        'processing': 'Procesando',
+        'shipped': 'Enviado',
+        'delivered': 'Entregado',
+        'cancelled': 'Cancelado'
+      };
+
       this.charts.status = new Chart(ctxStatus, {
         type: 'doughnut',
         data: {
-          labels: ['Pendiente', 'Procesando', 'Enviado', 'Entregado'],
+          labels: ordersByStatus.map(s => statusLabels[s.status] || s.status),
           datasets: [{
-            data: [12, 19, 3, 5],
-            backgroundColor: ['#ff9800', '#2196f3', '#9c27b0', '#4caf50'],
+            data: ordersByStatus.map(s => parseInt(s.count) || 0),
+            backgroundColor: ['#ff9800', '#2196f3', '#9c27b0', '#4caf50', '#f44336'],
             borderWidth: 0
           }]
         },
-        options: { responsive: true, cutout: '70%' }
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '70%'
+        }
       });
     }
 
-    // 3. TOP PRODUCTS (Bar)
+    // 3. TOP PRODUCTS (Bar) - Usar datos reales
     const ctxProducts = document.getElementById('topProductsChart');
-    if (ctxProducts) {
-      new Chart(ctxProducts, {
+    if (ctxProducts && window.Chart) {
+      // Destruir gráfico anterior si existe
+      if (this.charts.topProducts) {
+        this.charts.topProducts.destroy();
+      }
+
+      this.charts.topProducts = new Chart(ctxProducts, {
         type: 'bar',
         data: {
           labels: ['Jordan 1', 'Yeezy 350', 'Nike Dunk', 'Adidas Forum', 'NB 550'],
@@ -142,27 +205,7 @@ class AdminManager {
     this.refreshDashboardData();
   }
 
-  async refreshDashboardData() {
-    console.log('📡 Fetching Real Dashboard Data...');
-    try {
-      // Parallel Fetch for Speed
-      const [ordersRes, usersRes, productsRes] = await Promise.all([
-        window.api.request('/admin/orders'),
-        window.api.request('/admin/users'),
-        window.api.getProducts({ limit: 1000 })
-      ]);
-
-      const orders = ordersRes.data?.orders || [];
-      const users = usersRes.data?.users || [];
-      const products = productsRes.data?.products || [];
-
-      // Update Stats Cards
-      document.getElementById('totalOrders').textContent = orders.length;
-      document.getElementById('totalUsers').textContent = users.length;
-      document.getElementById('totalProducts').textContent = products.length;
-
-      // Calculate Revenue (Real)
-      const totalRevenue = orders.reduce((sum, order) => sum + parseFloat(order.total), 0);
+  // Este método ya no es necesario, loadDashboard() maneja todo
       const revenueEl = document.querySelector('.metric-card:first-child .metric-value');
       if (revenueEl) revenueEl.textContent = `S/ ${totalRevenue.toFixed(2)}`;
 

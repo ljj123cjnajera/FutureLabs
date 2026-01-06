@@ -28,7 +28,7 @@ class CheckoutManager {
         }
 
         // 2. Load Data
-        this.loadCart();
+        await this.loadCart();
         await this.loadAddresses();
 
         // 3. Render
@@ -36,13 +36,49 @@ class CheckoutManager {
         this.renderStep(1);
     }
 
-    loadCart() {
-        const stored = localStorage.getItem('cart');
-        if (stored) {
-            this.cart = JSON.parse(stored);
-        }
-        if (this.cart.length === 0) {
-            window.location.href = 'cart.html';
+    async loadCart() {
+        try {
+            // Intentar cargar desde API primero
+            if (window.authManager && window.authManager.isAuthenticated() && window.api) {
+                const response = await window.api.getCart();
+                if (response && response.success && response.data && response.data.items) {
+                    this.cart = response.data.items;
+                } else if (response && Array.isArray(response)) {
+                    this.cart = response;
+                } else {
+                    // Fallback a localStorage
+                    const stored = localStorage.getItem('cart') || localStorage.getItem('brutalist_cart');
+                    if (stored) {
+                        this.cart = JSON.parse(stored);
+                    }
+                }
+            } else {
+                // Usuario no autenticado, usar localStorage
+                const stored = localStorage.getItem('cart') || localStorage.getItem('brutalist_cart');
+                if (stored) {
+                    this.cart = JSON.parse(stored);
+                }
+            }
+
+            if (!this.cart || this.cart.length === 0) {
+                if (window.notifications) {
+                    window.notifications.warning('Tu carrito está vacío', 'Agrega productos antes de continuar');
+                }
+                setTimeout(() => {
+                    window.location.href = 'cart.html';
+                }, 2000);
+                return;
+            }
+        } catch (error) {
+            console.error('Error loading cart:', error);
+            // Fallback a localStorage
+            const stored = localStorage.getItem('cart') || localStorage.getItem('brutalist_cart');
+            if (stored) {
+                this.cart = JSON.parse(stored);
+            }
+            if (!this.cart || this.cart.length === 0) {
+                window.location.href = 'cart.html';
+            }
         }
     }
 
