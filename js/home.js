@@ -10,7 +10,6 @@ class HomeEngine {
       banners: [],
       categories: [],
       trending: [],
-      blog: [],
       newsletterSubscribed: false
     };
 
