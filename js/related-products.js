@@ -65,9 +65,7 @@ class RelatedProducts {
       </div>
     `;
 
-    if (window.productComparator) {
-      window.productComparator.updateCompareButtons();
-    }
+    // Comparador eliminado - código removido
 
     window.wishlistManager?.syncToggleButtons?.(container);
   }

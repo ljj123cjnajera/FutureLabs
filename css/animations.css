@@ -612,15 +612,7 @@
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
-/* Efectos de hover para comparador */
-.comparator-hover-effect {
-    transition: all 0.3s ease;
-}
-
-.comparator-hover-effect:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-}
+/* Comparador eliminado - código removido */
 
 /* Efectos de hover para ordenes */
 .order-hover-effect {
