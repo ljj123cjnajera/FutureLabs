@@ -3,11 +3,7 @@
 /* ============================================
    0. GLOBAL LAYOUT & STRUCTURE (STRICT GRID)
    ============================================ */
-:root {
-    --spacing-4xl: 5rem;
-    /* Reduced from 8rem for better density */
-    --container-width: 1400px;
-}
+/* Variables ahora en variables.css */
 
 /* HARDENED GRID DEFINITIONS */
 .product-grid-v3 {

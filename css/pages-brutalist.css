@@ -34,7 +34,7 @@
 
 .hero-eyebrow {
     display: block;
-    color: var(--accent-color);
+    color: var(--accent);
     font-size: 0.875rem;
     font-weight: 800;
     text-transform: uppercase;
