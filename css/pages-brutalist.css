@@ -2,21 +2,8 @@
    PAGES BRUTALIST CSS
    v1.0 - Unification of Text-Heavy Pages (About, Contact, Terms)
    --------------------------------------------------------------
+   Variables ahora en variables.css
 */
-
-:root {
-    --text-primary: #000000;
-    --text-secondary: #666666;
-    --bg-primary: #ffffff;
-    --bg-secondary: #f4f4f4;
-    --accent-color: #ff0000;
-    --border-color: #e0e0e0;
-    --spacing-xs: 0.5rem;
-    --spacing-sm: 1rem;
-    --spacing-md: 2rem;
-    --spacing-lg: 4rem;
-    --spacing-xl: 6rem;
-}
 
 /* --- HERO SECTION --- */
 .page-hero {
