@@ -108,7 +108,7 @@
 }
 
 .info-card-icon.accent {
-    background: var(--accent-color);
+    background: var(--accent);
 }
 
 .info-card h3 {
@@ -119,13 +119,13 @@
 }
 
 .info-card p {
-    color: var(--text-secondary);
+    color: var(--gray-600);
     line-height: 1.6;
 }
 
 /* --- VALUES GRID --- */
 .values-section {
-    background: var(--bg-secondary);
+    background: var(--gray-100);
     padding: var(--spacing-xl) 0;
 }
 
@@ -215,5 +215,5 @@ textarea.form-control {
 }
 
 .btn-submit:hover {
-    background: var(--accent-color);
+    background: var(--accent);
 }
