@@ -88,7 +88,7 @@ class CartEngine {
         total = subtotal;
       }
     } catch (e) {
-      console.error('Error loading cart:', e);
+      if (window.Logger) window.Logger.error('Error loading cart:', e);
       // Fallback to localStorage
       if (!this.isAuthenticated) {
         const localCart = JSON.parse(localStorage.getItem('brutalist_cart') || '[]');
@@ -274,7 +274,7 @@ class CartEngine {
         window.notifications.success('Carrito Actualizado', 'La cantidad se actualizó correctamente');
       }
     } catch (e) {
-      console.error('Error updating cart:', e);
+      if (window.Logger) window.Logger.error('Error updating cart:', e);
       if (window.notifications) {
         window.notifications.error('Error', 'No se pudo actualizar la cantidad. Por favor, intenta de nuevo.');
       }
@@ -299,7 +299,7 @@ class CartEngine {
         window.notifications.success('Producto Eliminado', 'El producto fue removido del carrito');
       }
     } catch (e) {
-      console.error('Error removing from cart:', e);
+      if (window.Logger) window.Logger.error('Error removing from cart:', e);
       if (window.notifications) {
         window.notifications.error('Error', 'No se pudo eliminar el producto. Por favor, intenta de nuevo.');
       }
@@ -363,7 +363,7 @@ class CartEngine {
 
       return true;
     } catch (e) {
-      console.error('Error adding to cart:', e);
+      if (window.Logger) window.Logger.error('Error adding to cart:', e);
       if (window.notifications) {
         window.notifications.error('Error', 'No se pudo agregar el producto. Por favor, intenta de nuevo.');
       }

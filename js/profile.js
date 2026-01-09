@@ -104,7 +104,7 @@ async function loadOrders() {
         `).join('');
 
     } catch (e) {
-        console.error('Orders API Error:', e);
+        if (window.Logger) window.Logger.error('Orders API Error:', e);
         container.innerHTML = `
             <div style="padding: 2rem; border: 2px dashed var(--error); text-align: center; color: var(--error);">
                 <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
@@ -166,7 +166,7 @@ async function loadWishlist() {
             return;
         }
     } catch (e) {
-        console.warn("Wishlist load failed", e);
+        if (window.Logger) window.Logger.warn("Wishlist load failed", e);
     }
 
     // Default Empty State
@@ -423,7 +423,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             try {
                 await initializeProfile();
             } catch (error) {
-                console.error('Error initializing profile:', error);
+                if (window.Logger) window.Logger.error('Error initializing profile:', error);
                 // Continuar de todas formas para mostrar la UI
             }
         } else if (retries >= maxRetries) {
@@ -526,19 +526,19 @@ window.switchTab = function (tabId) {
 
 // Inicializar perfil
 async function initializeProfile() {
-    console.log('🔵 Inicializando perfil...');
+    if (window.Logger) window.Logger.log('🔵 Inicializando perfil...');
     
     // Cargar datos en paralelo pero con manejo de errores individual
     const promises = [
-        loadUserData().catch(e => console.error('Error loading user data:', e)),
-        loadStats().catch(e => console.error('Error loading stats:', e)),
-        loadAddresses().catch(e => console.error('Error loading addresses:', e)),
-        loadOrders().catch(e => console.error('Error loading orders:', e)),
-        loadLoyaltyPoints().catch(e => console.error('Error loading loyalty points:', e))
+        loadUserData().catch(e => { if (window.Logger) window.Logger.error('Error loading user data:', e); }),
+        loadStats().catch(e => { if (window.Logger) window.Logger.error('Error loading stats:', e); }),
+        loadAddresses().catch(e => { if (window.Logger) window.Logger.error('Error loading addresses:', e); }),
+        loadOrders().catch(e => { if (window.Logger) window.Logger.error('Error loading orders:', e); }),
+        loadLoyaltyPoints().catch(e => { if (window.Logger) window.Logger.error('Error loading loyalty points:', e); })
     ];
 
     await Promise.allSettled(promises);
-    console.log('✅ Perfil inicializado');
+    if (window.Logger) window.Logger.log('✅ Perfil inicializado');
 }
 
 // Cargar datos del usuario
@@ -589,7 +589,7 @@ async function loadUserData() {
             }
         }
     } catch (error) {
-        console.error('Error loading user data:', error);
+        if (window.Logger) window.Logger.error('Error loading user data:', error);
         if (nameEl) nameEl.textContent = 'Error';
         if (emailEl) emailEl.textContent = '';
         if (window.notifications) {
@@ -643,7 +643,7 @@ async function loadStats() {
             // Silent fail for wishlist
         }
     } catch (error) {
-        console.error('Error loading stats:', error);
+        if (window.Logger) window.Logger.error('Error loading stats:', error);
     }
 }
 
@@ -651,7 +651,7 @@ async function loadStats() {
     async function loadAddresses() {
         const container = document.getElementById('addressList');
         if (!container) {
-            console.warn('⚠️ addressList container not found');
+            if (window.Logger) window.Logger.warn('⚠️ addressList container not found');
             return;
         }
 
@@ -718,7 +718,7 @@ async function loadStats() {
             `;
         }).join('');
     } catch (error) {
-        console.error('Addresses API Error:', error);
+        if (window.Logger) window.Logger.error('Addresses API Error:', error);
         container.innerHTML = `
             <div style="grid-column: 1/-1; padding: 2rem; border: 2px dashed #dc3545; text-align: center; color: #dc3545;">
                 <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>

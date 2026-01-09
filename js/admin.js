@@ -6,22 +6,22 @@ class AdminManager {
   }
 
   async init() {
-    console.log('🔧 AdminManager init() - Iniciando...');
+    if (window.Logger) window.Logger.log('🔧 AdminManager init() - Iniciando...');
 
     // Verificar si hay token en localStorage
     const token = localStorage.getItem('auth_token');
     if (!token) {
-      console.log('❌ No hay token en localStorage, redirigiendo a login...');
+      if (window.Logger) window.Logger.log('❌ No hay token en localStorage, redirigiendo a login...');
       window.location.href = 'admin-login.html';
       return;
     }
 
-    console.log('✅ Token encontrado en localStorage');
+    if (window.Logger) window.Logger.log('✅ Token encontrado en localStorage');
 
     // Obtener usuario guardado en localStorage (desde admin-login.html)
     const adminUserStr = localStorage.getItem('admin_user');
     if (!adminUserStr) {
-      console.log('❌ No hay información de usuario guardada, redirigiendo a login...');
+      if (window.Logger) window.Logger.log('❌ No hay información de usuario guardada, redirigiendo a login...');
       window.location.href = 'admin-login.html';
       return;
     }
@@ -29,16 +29,16 @@ class AdminManager {
     let user;
     try {
       user = JSON.parse(adminUserStr);
-      console.log('✅ Usuario cargado de localStorage:', user.email);
+      if (window.Logger) window.Logger.log('✅ Usuario cargado de localStorage:', user.email);
     } catch (error) {
-      console.error('Error parseando usuario:', error);
+      if (window.Logger) window.Logger.error('Error parseando usuario:', error);
       window.location.href = 'admin-login.html';
       return;
     }
 
     // Verificar rol
     if (user.role !== 'admin' && user.role !== 'moderator') {
-      console.log('❌ Usuario sin permisos de admin:', user.role);
+      if (window.Logger) window.Logger.log('❌ Usuario sin permisos de admin:', user.role);
       if (window.notifications) {
         window.notifications.error('No tienes permisos de administrador');
       }
@@ -48,7 +48,7 @@ class AdminManager {
       return;
     }
 
-    console.log('✅ Usuario admin autenticado correctamente');
+    if (window.Logger) window.Logger.log('✅ Usuario admin autenticado correctamente');
 
     // Actualizar UI del usuario
     this.updateUserInfo(user);
@@ -223,7 +223,7 @@ class AdminManager {
       this.updateCharts(orders);
 
     } catch (e) {
-      console.error('Dashboard Sync Error:', e);
+      if (window.Logger) window.Logger.error('Dashboard Sync Error:', e);
     }
   }
 
@@ -376,7 +376,7 @@ class AdminManager {
         await this.loadRecentOrders();
       }
     } catch (error) {
-      console.error('Error loading dashboard:', error);
+      if (window.Logger) window.Logger.error('Error loading dashboard:', error);
       window.notifications.error('Error al cargar dashboard');
     }
   }
@@ -505,7 +505,7 @@ class AdminManager {
         `).join('');
       }
     } catch (error) {
-      console.error('Error loading recent orders:', error);
+      if (window.Logger) window.Logger.error('Error loading recent orders:', error);
     }
   }
 
@@ -568,7 +568,7 @@ class AdminManager {
         await this.loadCategoriesForProductModal();
       }
     } catch (error) {
-      console.error('Error loading products:', error);
+      if (window.Logger) window.Logger.error('Error loading products:', error);
       const errorMsg = error.message || error.status === 401 ? 'Sesión expirada. Por favor, inicia sesión nuevamente.' : 'Error desconocido al cargar productos';
       tbody.innerHTML = `
         <tr>
@@ -600,7 +600,7 @@ class AdminManager {
           categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
       }
     } catch (error) {
-      console.error('Error loading categories for modal:', error);
+      if (window.Logger) window.Logger.error('Error loading categories for modal:', error);
     }
   }
 
@@ -657,7 +657,7 @@ class AdminManager {
             `).join('');
       }
     } catch (error) {
-      console.error('Error loading categories:', error);
+      if (window.Logger) window.Logger.error('Error loading categories:', error);
       const errorMsg = error.message || error.status === 401 ? 'Sesión expirada. Por favor, inicia sesión nuevamente.' : 'Error desconocido al cargar categorías';
       tbody.innerHTML = `
         <tr>
@@ -808,7 +808,7 @@ class AdminManager {
         window.notifications?.success(`Se cargaron ${users.length} usuario${users.length !== 1 ? 's' : ''}`);
       }
     } catch (error) {
-      console.error('Error loading users:', error);
+      if (window.Logger) window.Logger.error('Error loading users:', error);
       const errorMsg = error.message || error.status === 401 ? 'Sesión expirada. Por favor, inicia sesión nuevamente.' : 'Error desconocido al cargar usuarios';
       tbody.innerHTML = `
         <tr>
@@ -879,7 +879,7 @@ class AdminManager {
         window.notifications?.success(`Se cargaron ${reviews.length} reseña${reviews.length !== 1 ? 's' : ''}`);
       }
     } catch (error) {
-      console.error('Error loading reviews:', error);
+      if (window.Logger) window.Logger.error('Error loading reviews:', error);
       const errorMsg = error.message || error.status === 401 ? 'Sesión expirada. Por favor, inicia sesión nuevamente.' : 'Error desconocido al cargar reseñas';
       tbody.innerHTML = `
         <tr>

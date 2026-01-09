@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
 
         } catch (error) {
-            console.error('❌ API Error in PDP:', error);
+            if (window.Logger) window.Logger.error('❌ API Error in PDP:', error);
             
             // Mostrar error real al usuario
             renderErrorState(container, `Error al cargar producto: ${error.message || 'Error de conexión'}`);
@@ -432,7 +432,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 }
             }
         } catch (e) {
-            console.error('Error adding to cart:', e);
+            if (window.Logger) window.Logger.error('Error adding to cart:', e);
             if (window.notifications) {
                 window.notifications.error('Error', 'No se pudo agregar el producto. Por favor, intenta de nuevo.');
             }
@@ -494,7 +494,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 }, 1000);
             }
         } catch (e) {
-            console.error('Error in buyNow:', e);
+            if (window.Logger) window.Logger.error('Error in buyNow:', e);
             if (window.notifications) {
                 window.notifications.error('Error', 'No se pudo agregar el producto. Por favor, intenta de nuevo.');
             }

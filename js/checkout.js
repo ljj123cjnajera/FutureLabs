@@ -19,7 +19,7 @@ class CheckoutManager {
     }
 
     async init() {
-        console.log('💳 CheckoutManager V2 Starting...');
+        if (window.Logger) window.Logger.log('💳 CheckoutManager V2 Starting...');
 
         // 1. Auth Guard
         if (!window.authManager || !window.authManager.isAuthenticated()) {
@@ -70,7 +70,7 @@ class CheckoutManager {
                 return;
             }
         } catch (error) {
-            console.error('Error loading cart:', error);
+            if (window.Logger) window.Logger.error('Error loading cart:', error);
             // Fallback a localStorage
             const stored = localStorage.getItem('cart') || localStorage.getItem('brutalist_cart');
             if (stored) {
@@ -93,7 +93,7 @@ class CheckoutManager {
                 else if (this.addresses.length > 0) this.selectedAddressId = this.addresses[0].id;
             }
         } catch (e) {
-            console.error('Failed to load addresses:', e);
+            if (window.Logger) window.Logger.error('Failed to load addresses:', e);
         }
     }
 
@@ -245,7 +245,7 @@ class CheckoutManager {
                 if (btn) btn.innerHTML = 'SAVE & CONTINUE';
             }
         } catch (e) {
-            console.error('Address Save Failed:', e);
+            if (window.Logger) window.Logger.error('Address Save Failed:', e);
             alert('System Error Saving Address. Please check your connection.');
         }
     }
@@ -368,7 +368,7 @@ class CheckoutManager {
             const response = await window.api.createOrder(orderData);
 
             if (response.success) {
-                console.log('✅ Order Created');
+                if (window.Logger) window.Logger.log('✅ Order Created');
 
                 // Clear Cart
                 localStorage.removeItem('cart');
@@ -385,7 +385,7 @@ class CheckoutManager {
             }
 
         } catch (e) {
-            console.error('Order Error (Real API Failed):', e);
+            if (window.Logger) window.Logger.error('Order Error (Real API Failed):', e);
             alert('Order failed: ' + (e.message || 'Server connection error'));
             if (btn) {
                 btn.innerHTML = 'PLACE ORDER';
