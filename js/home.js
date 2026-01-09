@@ -14,7 +14,7 @@ class HomeEngine {
     };
 
     this.init();
-    console.log('🚀 HomeEngine v7.3-REAL-DATA Loaded');
+    if (window.Logger) window.Logger.log('🚀 HomeEngine v7.3-REAL-DATA Loaded');
   }
 
 
@@ -80,7 +80,7 @@ class HomeEngine {
       this.initStickyFooter();
       this.initTabbedEngine();
     } catch (err) {
-      console.error('⚠️ [HomeEngine] Partial Load Error:', err);
+      if (window.Logger) window.Logger.error('⚠️ [HomeEngine] Partial Load Error:', err);
       // Ensure loader is removed even if error occurs
       this.toggleLoader(false);
     }
@@ -112,7 +112,7 @@ class HomeEngine {
         if (window.Components.initSearch) window.Components.initSearch();
         if (window.Components.initCartCounter) window.Components.initCartCounter();
       } else {
-        console.warn("⚠️ Header container missing or Components not ready.");
+        if (window.Logger) window.Logger.warn("⚠️ Header container missing or Components not ready.");
       }
 
       // Footer
@@ -128,9 +128,9 @@ class HomeEngine {
       // 5. Load Brands
       this.renderBrands();
 
-      console.log('✅ HomeEngine Initialized');
+      if (window.Logger) window.Logger.log('✅ HomeEngine Initialized');
     } catch (e) {
-      console.error('HomeEngine Init Error:', e);
+      if (window.Logger) window.Logger.error('HomeEngine Init Error:', e);
     }
   }
 
@@ -177,7 +177,7 @@ class HomeEngine {
     const container = document.getElementById('heroSlidesContainer');
     const dotsContainer = document.getElementById('heroSliderDots');
     if (!container) {
-      console.error('❌ Hero container not found');
+      if (window.Logger) window.Logger.error('❌ Hero container not found');
       return;
     }
     
@@ -201,13 +201,13 @@ class HomeEngine {
           shouldUpdate = true; // Solo actualizar si hay datos nuevos de la API
         }
       } catch (e) {
-        console.error('❌ Hero API Error:', e);
+        if (window.Logger) window.Logger.error('❌ Hero API Error:', e);
       }
     }
 
     // 2. Si no hay datos de API y ya hay slides estáticos, NO actualizar
     if (!shouldUpdate && hasStaticSlides) {
-      console.log('✅ Using static hero slides from HTML');
+      if (window.Logger) window.Logger.log('✅ Using static hero slides from HTML');
       // Solo inicializar el slider con los slides existentes
       if (dotsContainer) {
         const slideCount = existingSlides.length;
@@ -222,7 +222,7 @@ class HomeEngine {
 
     // 2.1 Si no hay slides estáticos y la API falló, asegurar que siempre haya contenido
     if (!hasStaticSlides && slides.length === 0) {
-      console.warn('⚠️ No hero slides found, using fallback');
+      if (window.Logger) window.Logger.warn('⚠️ No hero slides found, using fallback');
     }
 
     // 3. Fallback (Default Premium Slides if API empty AND no static slides)
@@ -368,7 +368,7 @@ class HomeEngine {
         if (res.success && Array.isArray(res.data)) {
           categories = res.data;
         }
-      } catch (e) { console.error('Categories API Error:', e); }
+      } catch (e) { if (window.Logger) window.Logger.error('Categories API Error:', e); }
     }
 
     // 2. Fallback (Premium Data)
@@ -429,14 +429,14 @@ class HomeEngine {
       }
       
       if (featuredProducts.length > 0) {
-        console.log(`✅ Loaded ${featuredProducts.length} featured products from API`);
-        this.renderProductSlider('featuredProductsGrid', featuredProducts).catch(e => console.error('Error rendering featured:', e));
+        if (window.Logger) window.Logger.log(`✅ Loaded ${featuredProducts.length} featured products from API`);
+        this.renderProductSlider('featuredProductsGrid', featuredProducts).catch(e => { if (window.Logger) window.Logger.error('Error rendering featured:', e); });
       } else {
-        console.warn('⚠️ No featured products found');
+        if (window.Logger) window.Logger.warn('⚠️ No featured products found');
         this.showEmptyState('featuredProductsGrid', 'No hay productos destacados');
       }
     } catch (e) {
-      console.error('❌ Error loading featured products:', e);
+      if (window.Logger) window.Logger.error('❌ Error loading featured products:', e);
       this.showEmptyState('featuredProductsGrid', 'Error al cargar productos destacados');
     }
 
@@ -455,17 +455,17 @@ class HomeEngine {
         }
         
         if (trendingProducts.length > 0) {
-          console.log(`✅ Loaded ${trendingProducts.length} trending products from API`);
+          if (window.Logger) window.Logger.log(`✅ Loaded ${trendingProducts.length} trending products from API`);
           const trendingContainer = document.getElementById('trendingProductsGrid');
           if (trendingContainer) {
-            this.renderProductSlider('trendingProductsGrid', trendingProducts).catch(e => console.error('Error rendering trending:', e));
+            this.renderProductSlider('trendingProductsGrid', trendingProducts).catch(e => { if (window.Logger) window.Logger.error('Error rendering trending:', e); });
           }
         } else {
-          console.warn('⚠️ No trending products found');
+          if (window.Logger) window.Logger.warn('⚠️ No trending products found');
           this.showEmptyState('trendingProductsGrid', 'No hay productos en tendencia');
         }
       } catch (e) {
-        console.error('❌ Error loading trending products:', e);
+        if (window.Logger) window.Logger.error('❌ Error loading trending products:', e);
       }
     }, 200);
 
@@ -484,14 +484,14 @@ class HomeEngine {
         }
         
         if (saleProducts.length > 0) {
-          console.log(`✅ Loaded ${saleProducts.length} on-sale products from API`);
-          this.renderProductGrid('onSaleProductsGrid', saleProducts).catch(e => console.error('Error rendering on sale:', e));
+          if (window.Logger) window.Logger.log(`✅ Loaded ${saleProducts.length} on-sale products from API`);
+          this.renderProductGrid('onSaleProductsGrid', saleProducts).catch(e => { if (window.Logger) window.Logger.error('Error rendering on sale:', e); });
         } else {
-          console.warn('⚠️ No on-sale products found');
+          if (window.Logger) window.Logger.warn('⚠️ No on-sale products found');
           this.showEmptyState('onSaleProductsGrid', 'No hay productos en oferta');
         }
       } catch (e) {
-        console.error('❌ Error loading on-sale products:', e);
+        if (window.Logger) window.Logger.error('❌ Error loading on-sale products:', e);
         this.showEmptyState('onSaleProductsGrid', 'Error al cargar productos en oferta');
       }
     }, 400);
@@ -511,14 +511,14 @@ class HomeEngine {
         }
         
         if (newProducts.length > 0) {
-          console.log(`✅ Loaded ${newProducts.length} new products from API`);
-          this.renderProductGrid('newProductsGrid', newProducts).catch(e => console.error('Error rendering new products:', e));
+          if (window.Logger) window.Logger.log(`✅ Loaded ${newProducts.length} new products from API`);
+          this.renderProductGrid('newProductsGrid', newProducts).catch(e => { if (window.Logger) window.Logger.error('Error rendering new products:', e); });
         } else {
-          console.warn('⚠️ No new products found');
+          if (window.Logger) window.Logger.warn('⚠️ No new products found');
           this.showEmptyState('newProductsGrid', 'No hay productos nuevos');
         }
       } catch (e) {
-        console.error('❌ Error loading new products:', e);
+        if (window.Logger) window.Logger.error('❌ Error loading new products:', e);
         this.showEmptyState('newProductsGrid', 'Error al cargar productos nuevos');
       }
     }, 600);
@@ -789,7 +789,7 @@ class HomeEngine {
         </div>
     `).join('');
     */
-    console.log('Brand Marquee: Using Static Text Mode');
+    if (window.Logger) window.Logger.log('Brand Marquee: Using Static Text Mode');
   }
 
 
@@ -856,7 +856,7 @@ class HomeEngine {
         if (window.QuickView) {
           window.QuickView.open(productId);
         } else {
-          console.warn('QuickView module not loaded');
+          if (window.Logger) window.Logger.warn('QuickView module not loaded');
           // Fallback: Redirect
           window.location.href = `product-detail.html?id=${productId}`;
         }

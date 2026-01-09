@@ -28,7 +28,7 @@ class CatalogEngine {
     }
 
     async init() {
-        console.log('📦 [CatalogEngine] V3 Initialized');
+        if (window.Logger) window.Logger.log('📦 [CatalogEngine] V3 Initialized');
 
         // Init Globals immediately
         if (window.Components) {
@@ -193,7 +193,7 @@ class CatalogEngine {
             if (countLabel) countLabel.textContent = total;
             
         } catch (e) {
-            console.error('⚠️ [CatalogEngine] API Failed', e);
+            if (window.Logger) window.Logger.error('⚠️ [CatalogEngine] API Failed', e);
             this.allProducts = [];
             this.filteredProducts = [];
             if (container) {
@@ -502,7 +502,7 @@ class CatalogEngine {
             this.categories = categories;
             this.renderCategoriesFilter();
         } catch (e) {
-            console.error('Error loading categories:', e);
+            if (window.Logger) window.Logger.error('Error loading categories:', e);
         }
     }
 
