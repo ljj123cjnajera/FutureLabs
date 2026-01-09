@@ -14,7 +14,7 @@ class WishlistManager {
         this.syncToggleButtons();
 
         if (!window.authManager?.isAuthenticated()) {
-            console.log('⏳ Usuario no autenticado, wishlist no disponible');
+            if (window.Logger) window.Logger.log('⏳ Usuario no autenticado, wishlist no disponible');
             return;
         }
 
@@ -42,7 +42,7 @@ class WishlistManager {
                 this.emitUpdate();
             }
         } catch (error) {
-            console.error('❌ Error al cargar wishlist:', error);
+            if (window.Logger) window.Logger.error('❌ Error al cargar wishlist:', error);
         } finally {
             this.isLoading = false;
         }
@@ -115,7 +115,7 @@ class WishlistManager {
             window.notifications?.success?.('Producto agregado a tu wishlist');
             return true;
         } catch (error) {
-            console.error('❌ Error al agregar a wishlist:', error);
+            if (window.Logger) window.Logger.error('❌ Error al agregar a wishlist:', error);
             window.notifications?.error?.(error.message || 'Error al agregar a tu wishlist');
             return false;
         }
@@ -135,7 +135,7 @@ class WishlistManager {
             window.notifications?.success?.('Producto eliminado de tu wishlist');
             return true;
         } catch (error) {
-            console.error('❌ Error al eliminar de wishlist:', error);
+            if (window.Logger) window.Logger.error('❌ Error al eliminar de wishlist:', error);
             window.notifications?.error?.(error.message || 'Error al eliminar de tu wishlist');
             return false;
         }
@@ -180,7 +180,7 @@ class WishlistManager {
             window.notifications?.success?.('Producto agregado al carrito');
             return true;
         } catch (error) {
-            console.error('❌ Error al mover a carrito:', error);
+            if (window.Logger) window.Logger.error('❌ Error al mover a carrito:', error);
             window.notifications?.error?.(error.message || 'Error al mover al carrito');
             return false;
         }
@@ -198,7 +198,7 @@ class WishlistManager {
 
             throw new Error(response.message || 'Error al crear la lista');
         } catch (error) {
-            console.error('❌ Error al crear lista:', error);
+            if (window.Logger) window.Logger.error('❌ Error al crear lista:', error);
             window.notifications?.error?.(error.message || 'No se pudo crear la lista');
             throw error;
         }
@@ -216,7 +216,7 @@ class WishlistManager {
 
             throw new Error(response.message || 'Error al actualizar la lista');
         } catch (error) {
-            console.error('❌ Error al renombrar lista:', error);
+            if (window.Logger) window.Logger.error('❌ Error al renombrar lista:', error);
             window.notifications?.error?.(error.message || 'No se pudo actualizar la lista');
             throw error;
         }
@@ -232,7 +232,7 @@ class WishlistManager {
             window.notifications?.success?.('Lista eliminada correctamente');
             return true;
         } catch (error) {
-            console.error('❌ Error al eliminar lista:', error);
+            if (window.Logger) window.Logger.error('❌ Error al eliminar lista:', error);
             window.notifications?.error?.(error.message || 'No se pudo eliminar la lista');
             return false;
         }
@@ -245,7 +245,7 @@ class WishlistManager {
             window.notifications?.success?.('Lista establecida como predeterminada');
             return true;
         } catch (error) {
-            console.error('❌ Error al establecer lista predeterminada:', error);
+            if (window.Logger) window.Logger.error('❌ Error al establecer lista predeterminada:', error);
             window.notifications?.error?.(error.message || 'No se pudo actualizar la lista');
             return false;
         }
@@ -258,7 +258,7 @@ class WishlistManager {
             window.notifications?.success?.('Producto movido a la otra lista');
             return true;
         } catch (error) {
-            console.error('❌ Error al mover producto de lista:', error);
+            if (window.Logger) window.Logger.error('❌ Error al mover producto de lista:', error);
             window.notifications?.error?.(error.message || 'No se pudo mover el producto');
             return false;
         }
@@ -387,7 +387,7 @@ class WishlistManager {
         const listId = button.dataset.listId || null;
 
         if (!productId) {
-            console.warn('⚠️ Botón de wishlist sin data-product-id');
+            if (window.Logger) window.Logger.warn('⚠️ Botón de wishlist sin data-product-id');
             return;
         }
 

@@ -173,7 +173,7 @@ class SneakersAPI {
         try {
           response = await fetch(url, config);
         } catch (netError) {
-          console.error('❌ Backend Connection Failed (Real API):', netError);
+          if (window.Logger) window.Logger.error('❌ Backend Connection Failed (Real API):', netError);
           // NO FALLBACK TO MOCK - User requested strict backend connection
           throw netError;
         }
@@ -206,7 +206,7 @@ class SneakersAPI {
         return parseResponse(response);
 
       } catch (error) {
-        console.error('❌ Error API:', error);
+        if (window.Logger) window.Logger.error('❌ Error API:', error);
         throw error;
       } finally {
         window.pageProgress?.end?.();
@@ -249,24 +249,24 @@ class SneakersAPI {
   }
 
   async logout() {
-    console.log('🚪 API.logout() - Iniciando...');
+    if (window.Logger) window.Logger.log('🚪 API.logout() - Iniciando...');
     try {
       // Solo intentar logout en el backend si hay token
       if (this.token) {
-        console.log('📤 Enviando petición de logout al backend...');
+        if (window.Logger) window.Logger.log('📤 Enviando petición de logout al backend...');
         await this.request('/auth/logout', {
           method: 'POST'
         });
-        console.log('✅ Respuesta del backend recibida');
+        if (window.Logger) window.Logger.log('✅ Respuesta del backend recibida');
       } else {
-        console.log('⚠️ No hay token, saltando petición al backend');
+        if (window.Logger) window.Logger.log('⚠️ No hay token, saltando petición al backend');
       }
 
       // Siempre limpiar el token local
       this.setToken(null);
-      console.log('✅ Logout completado en API');
+      if (window.Logger) window.Logger.log('✅ Logout completado en API');
     } catch (error) {
-      console.error('❌ Error en API.logout():', error);
+      if (window.Logger) window.Logger.error('❌ Error en API.logout():', error);
       // Aún así, limpiar el token local
       this.setToken(null);
       throw error;
@@ -622,7 +622,7 @@ class SneakersAPI {
       }
       return response;
     } catch (e) {
-      console.error("Error en getSearchSuggestions:", e);
+      if (window.Logger) window.Logger.error("Error en getSearchSuggestions:", e);
       return { success: false, message: e.message };
     }
   }
@@ -882,7 +882,7 @@ class SneakersAPI {
 
       return data;
     } catch (error) {
-      console.error('Error uploading image:', error);
+      if (window.Logger) window.Logger.error('Error uploading image:', error);
       return {
         success: false,
         message: error.message || 'Error al subir imagen'
@@ -1108,7 +1108,7 @@ window.api = new SneakersAPI();
 
 // Inicializar con token si existe
 if (window.api.token) {
-  console.log('✅ API inicializada con token');
+  if (window.Logger) window.Logger.log('✅ API inicializada con token');
 } else {
-  console.log('⚠️ API inicializada sin token (modo invitado)');
+  if (window.Logger) window.Logger.log('⚠️ API inicializada sin token (modo invitado)');
 }

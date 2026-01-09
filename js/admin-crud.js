@@ -10,7 +10,7 @@ class AdminCRUD {
   init() {
     // Prevenir múltiples inicializaciones
     if (this.isInitialized) {
-      console.warn('AdminCRUD ya está inicializado');
+      if (window.Logger) window.Logger.warn('AdminCRUD ya está inicializado');
       return;
     }
 
@@ -100,7 +100,7 @@ class AdminCRUD {
 
   closeModal(modal) {
     if (!modal) return;
-    console.log('🔻 closeModal llamado para', modal.id, new Error().stack);
+    if (window.Logger) window.Logger.log('🔻 closeModal llamado para', modal.id, new Error().stack);
     this.hideModal(modal);
     // Limpiar errores de validación al cerrar
     modal.querySelectorAll('.error-message').forEach(err => err.remove());
@@ -196,7 +196,7 @@ class AdminCRUD {
 
       // Validar que el ID existe
       if (!id) {
-        console.error('ID de producto no proporcionado');
+        if (window.Logger) window.Logger.error('ID de producto no proporcionado');
         window.notifications?.error('Error: ID de producto no válido');
         return;
       }
@@ -260,7 +260,7 @@ class AdminCRUD {
 
         // Verificar que el modal sigue abierto
         if (modal.style.display !== 'flex') {
-          console.warn('Modal se cerró antes de agregar overlay');
+          if (window.Logger) window.Logger.warn('Modal se cerró antes de agregar overlay');
           this.isLoading = false;
           return;
         }
@@ -271,7 +271,7 @@ class AdminCRUD {
         // Forzar que el modal permanezca visible durante la carga
         const keepModalOpen = () => {
           if (modal.style.display !== 'flex') {
-            console.warn('⚠️ Modal se cerró, reabriendo...');
+            if (window.Logger) window.Logger.warn('⚠️ Modal se cerró, reabriendo...');
             this.showModal(modal);
           }
         };
@@ -283,10 +283,10 @@ class AdminCRUD {
 
           // Verificar nuevamente que el modal sigue abierto
           if (modal.style.display !== 'flex') {
-            console.warn('⚠️ Modal se cerró durante la carga, reabriendo...');
+            if (window.Logger) window.Logger.warn('⚠️ Modal se cerró durante la carga, reabriendo...');
             this.showModal(modal);
           }
-          console.log('✅ Producto cargado en modal');
+          if (window.Logger) window.Logger.log('✅ Producto cargado en modal');
 
           // Remover loading overlay
           const overlay = document.getElementById('productModalLoading');
@@ -298,7 +298,7 @@ class AdminCRUD {
           throw loadError;
         }
       } catch (error) {
-        console.error('Error loading product for edit:', error);
+        if (window.Logger) window.Logger.error('Error loading product for edit:', error);
         const overlay = document.getElementById('productModalLoading');
         if (overlay) {
           overlay.innerHTML = `
@@ -312,7 +312,7 @@ class AdminCRUD {
             </div>
           `;
         }
-        console.error('Error stack:', error?.stack || error);
+        if (window.Logger) window.Logger.error('Error stack:', error?.stack || error);
         window.notifications?.error('Error al cargar producto: ' + (error.message || 'Error desconocido'));
       } finally {
         this.isLoading = false;
@@ -347,7 +347,7 @@ class AdminCRUD {
 
       const modal = document.getElementById('categoryModal');
       if (!modal) {
-        console.error('Modal de categoría no encontrado');
+        if (window.Logger) window.Logger.error('Modal de categoría no encontrado');
         return;
       }
 
@@ -376,7 +376,7 @@ class AdminCRUD {
       this.isLoading = true;
       const modal = document.getElementById('categoryModal');
       if (!modal) {
-        console.error('Modal de categoría no encontrado');
+        if (window.Logger) window.Logger.error('Modal de categoría no encontrado');
         this.isLoading = false;
         return;
       }

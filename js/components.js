@@ -17,7 +17,7 @@ class Components {
         }
       });
     } catch (e) {
-      console.warn('Components: Could not update cart count', e);
+      if (window.Logger) window.Logger.warn('Components: Could not update cart count', e);
     }
   }
 
@@ -122,7 +122,7 @@ class Components {
       this.initLoyaltyBadge();
       this.updateCartCount();
     } else {
-      console.warn('Components.loadHeader: #mainHeader element not found');
+      if (window.Logger) window.Logger.warn('Components.loadHeader: #mainHeader element not found');
     }
   }
 
@@ -439,7 +439,7 @@ class Components {
         }
       }
     } catch (error) {
-      console.error('Error checking admin status:', error);
+      if (window.Logger) window.Logger.error('Error checking admin status:', error);
     }
   }
 
@@ -682,7 +682,7 @@ class Components {
         if (pointsSpan) pointsSpan.textContent = `${points} PTS`;
       }
     } catch (e) {
-      console.warn('Loyalty Badge Error:', e);
+      if (window.Logger) window.Logger.warn('Loyalty Badge Error:', e);
     }
   }
 }
@@ -747,7 +747,7 @@ window.MobileMenu = {
         document.body.style.overflow = '';
       }
     } else {
-      console.error('Mobile Menu element not found');
+      if (window.Logger) window.Logger.error('Mobile Menu element not found');
     }
   }
 };
