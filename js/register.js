@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     throw new Error(response.message || 'Error al registrar');
                 }
             } catch (error) {
-                console.error('Registration error:', error);
+                if (window.Logger) window.Logger.error('Registration error:', error);
                 if (window.notifications) window.notifications.error('Error de Registro', error.message || 'Intente nuevamente');
                 if (btn) {
                     btn.disabled = false;

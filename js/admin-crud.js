@@ -417,7 +417,7 @@ class AdminCRUD {
         await this.loadCategoryForEdit(id);
 
         if (modal.style.display !== 'flex') {
-          console.warn('Modal se cerró durante la carga de datos');
+          if (window.Logger) window.Logger.warn('Modal se cerró durante la carga de datos');
           return;
         }
 
@@ -425,7 +425,7 @@ class AdminCRUD {
         const overlay = document.getElementById('categoryModalLoading');
         if (overlay) overlay.remove();
       } catch (error) {
-        console.error('Error loading category for edit:', error);
+        if (window.Logger) window.Logger.error('Error loading category for edit:', error);
         const overlay = document.getElementById('categoryModalLoading');
         if (overlay) overlay.remove();
         this.hideModal(modal);
@@ -464,7 +464,7 @@ class AdminCRUD {
       this.isLoading = true;
       const modal = document.getElementById('userModal');
       if (!modal) {
-        console.error('Modal de usuario no encontrado');
+        if (window.Logger) window.Logger.error('Modal de usuario no encontrado');
         this.isLoading = false;
         return;
       }
@@ -505,7 +505,7 @@ class AdminCRUD {
         await this.loadUserForEdit(id);
 
         if (modal.style.display !== 'flex') {
-          console.warn('Modal se cerró durante la carga de datos');
+          if (window.Logger) window.Logger.warn('Modal se cerró durante la carga de datos');
           return;
         }
 
@@ -513,7 +513,7 @@ class AdminCRUD {
         const overlay = document.getElementById('userModalLoading');
         if (overlay) overlay.remove();
       } catch (error) {
-        console.error('Error loading user for edit:', error);
+        if (window.Logger) window.Logger.error('Error loading user for edit:', error);
         const overlay = document.getElementById('userModalLoading');
         if (overlay) overlay.remove();
         this.hideModal(modal);
@@ -533,7 +533,7 @@ class AdminCRUD {
       this.isLoading = true;
       const modal = document.getElementById('reviewModal');
       if (!modal) {
-        console.error('Modal de reseña no encontrado');
+        if (window.Logger) window.Logger.error('Modal de reseña no encontrado');
         this.isLoading = false;
         return;
       }
@@ -574,7 +574,7 @@ class AdminCRUD {
         await this.loadReviewForEdit(id);
 
         if (modal.style.display !== 'flex') {
-          console.warn('Modal se cerró durante la carga de datos');
+          if (window.Logger) window.Logger.warn('Modal se cerró durante la carga de datos');
           return;
         }
 
@@ -582,7 +582,7 @@ class AdminCRUD {
         const overlay = document.getElementById('reviewModalLoading');
         if (overlay) overlay.remove();
       } catch (error) {
-        console.error('Error loading review for edit:', error);
+        if (window.Logger) window.Logger.error('Error loading review for edit:', error);
         const overlay = document.getElementById('reviewModalLoading');
         if (overlay) overlay.remove();
         this.hideModal(modal);
@@ -738,7 +738,7 @@ class AdminCRUD {
             data.image_url = uploadRes.url || uploadRes.data.url;
           }
         } catch (e) {
-          console.error("Image upload failed", e);
+          if (window.Logger) window.Logger.error("Image upload failed", e);
           window.notifications?.warning('Error subiendo imagen, continuando con URL texto...');
         }
       }
@@ -760,7 +760,7 @@ class AdminCRUD {
         throw new Error(response.message || 'Error al guardar');
       }
     } catch (error) {
-      console.error('Save Product Error:', error);
+      if (window.Logger) window.Logger.error('Save Product Error:', error);
       window.notifications?.error(error.message || 'Error al guardar producto');
     } finally {
       this.isLoading = false;
@@ -861,13 +861,13 @@ class AdminCRUD {
   // ===== PRODUCTS =====
   async loadProductForEdit(id, options = {}) {
     try {
-      console.log('🔍 Loading product for edit:', id);
+      if (window.Logger) window.Logger.log('🔍 Loading product for edit:', id);
 
       const product = await this.fetchProductForEdit(id);
 
       this.populateProductForm(product);
     } catch (error) {
-      console.error('Error loading product for edit:', error);
+      if (window.Logger) window.Logger.error('Error loading product for edit:', error);
       throw error; // Re-lanzar para que el caller maneje el error
     }
   }
@@ -884,7 +884,7 @@ class AdminCRUD {
       throw new Error('Producto no encontrado en la respuesta');
     }
 
-    console.log('📦 Product fetched from API:', product);
+    if (window.Logger) window.Logger.log('📦 Product fetched from API:', product);
 
     return product;
   }
@@ -901,7 +901,7 @@ class AdminCRUD {
       const retryOverlay = document.getElementById('productModalLoading');
       if (retryOverlay) retryOverlay.remove();
     } catch (error) {
-      console.error('❌ Falló el reintento de carga de producto:', error);
+      if (window.Logger) window.Logger.error('❌ Falló el reintento de carga de producto:', error);
       if (overlay) {
         overlay.innerHTML = `
           <div style="text-align:center; max-width: 280px; color:#ef4444;">

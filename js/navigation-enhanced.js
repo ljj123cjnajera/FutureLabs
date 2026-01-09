@@ -55,7 +55,7 @@ class NavigationEnhanced {
                     this.categoryCounts[category] = count;
                     this.featuredProducts[category] = featured.slice(0, 4);
                 } catch (e) {
-                    console.warn(`Error loading ${category}:`, e);
+                    if (window.Logger) window.Logger.warn(`Error loading ${category}:`, e);
                     this.categoryCounts[category] = 0;
                     this.featuredProducts[category] = [];
                 }
@@ -77,7 +77,7 @@ class NavigationEnhanced {
             }
             
         } catch (error) {
-            console.error('Error loading category data:', error);
+            if (window.Logger) window.Logger.error('Error loading category data:', error);
         }
     }
 
@@ -187,7 +187,7 @@ class NavigationEnhanced {
                     products = response.data?.products || response.data || [];
                 }
             } catch (e) {
-                console.warn('Error loading dropdown products:', e);
+                if (window.Logger) window.Logger.warn('Error loading dropdown products:', e);
             }
         }
         
@@ -261,4 +261,6 @@ document.addEventListener('DOMContentLoaded', () => {
         window.NavigationEnhanced = new NavigationEnhanced();
     }
 });
+
+
 

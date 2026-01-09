@@ -78,7 +78,7 @@ class QuickView {
         this.showError('Error al cargar el producto');
       }
     } catch (error) {
-      console.error('Error en Quick View:', error);
+      if (window.Logger) window.Logger.error('Error en Quick View:', error);
       this.showError('Error al cargar el producto');
     }
   }
@@ -228,7 +228,7 @@ class QuickView {
         setTimeout(() => this.close(), 500);
       }
     } catch (error) {
-      console.error('Error agregando al carrito:', error);
+      if (window.Logger) window.Logger.error('Error agregando al carrito:', error);
       if (window.notifications) {
         window.notifications.error('Error al agregar producto');
       }
