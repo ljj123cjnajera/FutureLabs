@@ -991,7 +991,7 @@ function editProduct(productId, event) {
       window.adminCRUD.editProduct(productId);
     }, 10);
   } else {
-    console.error('adminCRUD no está disponible');
+    if (window.Logger) window.Logger.error('adminCRUD no está disponible');
     window.notifications?.error('Error: El sistema de administración no está inicializado');
   }
 }
@@ -1014,7 +1014,7 @@ window.confirmPayment = async function (transactionId) {
       throw new Error(response.message || 'Error al confirmar pago');
     }
   } catch (error) {
-    console.error('Error confirmando pago:', error);
+    if (window.Logger) window.Logger.error('Error confirmando pago:', error);
     window.notifications?.error('Error al confirmar pago: ' + (error.message || 'Error desconocido'));
   }
 };
@@ -1113,7 +1113,7 @@ window.viewPaymentDetails = async function (transactionId) {
       throw new Error(response.message || 'Error al cargar detalles');
     }
   } catch (error) {
-    console.error('Error cargando detalles de pago:', error);
+    if (window.Logger) window.Logger.error('Error cargando detalles de pago:', error);
     window.notifications?.error('Error al cargar detalles: ' + (error.message || 'Error desconocido'));
   }
 };
@@ -1199,7 +1199,7 @@ async function exportSalesReport() {
       throw new Error('Error al generar reporte');
     }
   } catch (error) {
-    console.error('Error exporting sales report:', error);
+    if (window.Logger) window.Logger.error('Error exporting sales report:', error);
     window.notifications.error('Error al exportar reporte de ventas');
   }
 }
@@ -1225,7 +1225,7 @@ async function exportProductsReport() {
       throw new Error('Error al generar reporte');
     }
   } catch (error) {
-    console.error('Error exporting products report:', error);
+    if (window.Logger) window.Logger.error('Error exporting products report:', error);
     window.notifications.error('Error al exportar reporte de productos');
   }
 }
@@ -1248,7 +1248,7 @@ async function exportCustomersReport() {
       throw new Error('Error al generar reporte');
     }
   } catch (error) {
-    console.error('Error exporting customers report:', error);
+    if (window.Logger) window.Logger.error('Error exporting customers report:', error);
     window.notifications.error('Error al exportar reporte de clientes');
   }
 }
