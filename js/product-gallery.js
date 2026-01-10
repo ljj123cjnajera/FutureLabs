@@ -71,7 +71,7 @@ class ProductGallery {
 
     const container = document.getElementById(this.containerId);
     if (!container) {
-      console.error('Product gallery container not found:', this.containerId);
+      if (window.Logger) window.Logger.error('Product gallery container not found:', this.containerId);
       return;
     }
 

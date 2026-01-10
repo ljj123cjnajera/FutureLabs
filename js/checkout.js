@@ -19,7 +19,7 @@ class CheckoutManager {
     }
 
     async init() {
-        console.log('💳 CheckoutManager V2 Starting...');
+        if (window.Logger) window.Logger.log('💳 CheckoutManager V2 Starting...');
 
         // 1. Auth Guard
         if (!window.authManager || !window.authManager.isAuthenticated()) {
@@ -28,7 +28,7 @@ class CheckoutManager {
         }
 
         // 2. Load Data
-        this.loadCart();
+        await this.loadCart();
         await this.loadAddresses();
 
         // 3. Render
@@ -36,13 +36,49 @@ class CheckoutManager {
         this.renderStep(1);
     }
 
-    loadCart() {
-        const stored = localStorage.getItem('cart');
-        if (stored) {
-            this.cart = JSON.parse(stored);
-        }
-        if (this.cart.length === 0) {
-            window.location.href = 'cart.html';
+    async loadCart() {
+        try {
+            // Intentar cargar desde API primero
+            if (window.authManager && window.authManager.isAuthenticated() && window.api) {
+                const response = await window.api.getCart();
+                if (response && response.success && response.data && response.data.items) {
+                    this.cart = response.data.items;
+                } else if (response && Array.isArray(response)) {
+                    this.cart = response;
+                } else {
+                    // Fallback a localStorage
+                    const stored = localStorage.getItem('cart') || localStorage.getItem('brutalist_cart');
+                    if (stored) {
+                        this.cart = JSON.parse(stored);
+                    }
+                }
+            } else {
+                // Usuario no autenticado, usar localStorage
+                const stored = localStorage.getItem('cart') || localStorage.getItem('brutalist_cart');
+                if (stored) {
+                    this.cart = JSON.parse(stored);
+                }
+            }
+
+            if (!this.cart || this.cart.length === 0) {
+                if (window.notifications) {
+                    window.notifications.warning('Tu carrito está vacío', 'Agrega productos antes de continuar');
+                }
+                setTimeout(() => {
+                    window.location.href = 'cart.html';
+                }, 2000);
+                return;
+            }
+        } catch (error) {
+            if (window.Logger) window.Logger.error('Error loading cart:', error);
+            // Fallback a localStorage
+            const stored = localStorage.getItem('cart') || localStorage.getItem('brutalist_cart');
+            if (stored) {
+                this.cart = JSON.parse(stored);
+            }
+            if (!this.cart || this.cart.length === 0) {
+                window.location.href = 'cart.html';
+            }
         }
     }
 
@@ -57,7 +93,7 @@ class CheckoutManager {
                 else if (this.addresses.length > 0) this.selectedAddressId = this.addresses[0].id;
             }
         } catch (e) {
-            console.error('Failed to load addresses:', e);
+            if (window.Logger) window.Logger.error('Failed to load addresses:', e);
         }
     }
 
@@ -209,7 +245,7 @@ class CheckoutManager {
                 if (btn) btn.innerHTML = 'SAVE & CONTINUE';
             }
         } catch (e) {
-            console.error('Address Save Failed:', e);
+            if (window.Logger) window.Logger.error('Address Save Failed:', e);
             alert('System Error Saving Address. Please check your connection.');
         }
     }
@@ -332,7 +368,7 @@ class CheckoutManager {
             const response = await window.api.createOrder(orderData);
 
             if (response.success) {
-                console.log('✅ Order Created');
+                if (window.Logger) window.Logger.log('✅ Order Created');
 
                 // Clear Cart
                 localStorage.removeItem('cart');
@@ -349,7 +385,7 @@ class CheckoutManager {
             }
 
         } catch (e) {
-            console.error('Order Error (Real API Failed):', e);
+            if (window.Logger) window.Logger.error('Order Error (Real API Failed):', e);
             alert('Order failed: ' + (e.message || 'Server connection error'));
             if (btn) {
                 btn.innerHTML = 'PLACE ORDER';
@@ -392,7 +428,7 @@ class CheckoutManager {
 // Init
 document.addEventListener('DOMContentLoaded', () => {
     window.checkoutManager = new CheckoutManager();
-    console.log('Secure Checkout Initialized');
+    if (window.Logger) window.Logger.log('Secure Checkout Initialized');
 });
 
 window.scrollToOrderSummary = function () {

@@ -72,18 +72,18 @@
                             <h2>Envíanos un mensaje</h2>
                             <form id="contactForm">
                                 <div class="form-group">
-                                    <label>Nombre</label>
-                                    <input type="text" class="form-control" required>
+                                    <label for="contactName">Nombre</label>
+                                    <input type="text" id="contactName" name="name" class="form-control" required aria-required="true">
                                 </div>
                                 <div class="form-group">
-                                    <label>Email</label>
-                                    <input type="email" class="form-control" required>
+                                    <label for="contactEmail">Email</label>
+                                    <input type="email" id="contactEmail" name="email" class="form-control" required aria-required="true">
                                 </div>
                                 <div class="form-group">
-                                    <label>Mensaje</label>
-                                    <textarea class="form-control" rows="4" required></textarea>
+                                    <label for="contactMessage">Mensaje</label>
+                                    <textarea id="contactMessage" name="message" class="form-control" rows="4" required aria-required="true"></textarea>
                                 </div>
-                                <button type="submit" class="btn-submit">Enviar Mensaje</button>
+                                <button type="submit" class="btn-submit" aria-label="Enviar mensaje de contacto">Enviar Mensaje</button>
                             </form>
                         </div>
                     </div>
@@ -101,8 +101,8 @@
     <script src="js/auth.js"></script>
     <script src="js/cart.js"></script>
     <script src="js/components.js"></script>
-    <script src="js/home.js"></script>
-
+    <script src="js/navigation-enhanced.js"></script>
+    <script src="js/notifications.js"></script>
     <script src="js/contact.js"></script>
 </body>
 

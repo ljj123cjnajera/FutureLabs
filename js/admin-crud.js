@@ -10,7 +10,7 @@ class AdminCRUD {
   init() {
     // Prevenir múltiples inicializaciones
     if (this.isInitialized) {
-      console.warn('AdminCRUD ya está inicializado');
+      if (window.Logger) window.Logger.warn('AdminCRUD ya está inicializado');
       return;
     }
 
@@ -100,7 +100,7 @@ class AdminCRUD {
 
   closeModal(modal) {
     if (!modal) return;
-    console.log('🔻 closeModal llamado para', modal.id, new Error().stack);
+    if (window.Logger) window.Logger.log('🔻 closeModal llamado para', modal.id, new Error().stack);
     this.hideModal(modal);
     // Limpiar errores de validación al cerrar
     modal.querySelectorAll('.error-message').forEach(err => err.remove());
@@ -172,7 +172,7 @@ class AdminCRUD {
       document.getElementById('productModalTitle').textContent = 'Crear Producto';
       const modal = document.getElementById('productModal');
       if (!modal) {
-        console.error('Modal de producto no encontrado');
+        if (window.Logger) window.Logger.error('Modal de producto no encontrado');
         return;
       }
       this.showModal(modal);
@@ -196,7 +196,7 @@ class AdminCRUD {
 
       // Validar que el ID existe
       if (!id) {
-        console.error('ID de producto no proporcionado');
+        if (window.Logger) window.Logger.error('ID de producto no proporcionado');
         window.notifications?.error('Error: ID de producto no válido');
         return;
       }
@@ -204,7 +204,7 @@ class AdminCRUD {
       this.isLoading = true;
       const modal = document.getElementById('productModal');
       if (!modal) {
-        console.error('Modal de producto no encontrado');
+        if (window.Logger) window.Logger.error('Modal de producto no encontrado');
         this.isLoading = false;
         return;
       }
@@ -260,7 +260,7 @@ class AdminCRUD {
 
         // Verificar que el modal sigue abierto
         if (modal.style.display !== 'flex') {
-          console.warn('Modal se cerró antes de agregar overlay');
+          if (window.Logger) window.Logger.warn('Modal se cerró antes de agregar overlay');
           this.isLoading = false;
           return;
         }
@@ -271,7 +271,7 @@ class AdminCRUD {
         // Forzar que el modal permanezca visible durante la carga
         const keepModalOpen = () => {
           if (modal.style.display !== 'flex') {
-            console.warn('⚠️ Modal se cerró, reabriendo...');
+            if (window.Logger) window.Logger.warn('⚠️ Modal se cerró, reabriendo...');
             this.showModal(modal);
           }
         };
@@ -283,10 +283,10 @@ class AdminCRUD {
 
           // Verificar nuevamente que el modal sigue abierto
           if (modal.style.display !== 'flex') {
-            console.warn('⚠️ Modal se cerró durante la carga, reabriendo...');
+            if (window.Logger) window.Logger.warn('⚠️ Modal se cerró durante la carga, reabriendo...');
             this.showModal(modal);
           }
-          console.log('✅ Producto cargado en modal');
+          if (window.Logger) window.Logger.log('✅ Producto cargado en modal');
 
           // Remover loading overlay
           const overlay = document.getElementById('productModalLoading');
@@ -298,7 +298,7 @@ class AdminCRUD {
           throw loadError;
         }
       } catch (error) {
-        console.error('Error loading product for edit:', error);
+        if (window.Logger) window.Logger.error('Error loading product for edit:', error);
         const overlay = document.getElementById('productModalLoading');
         if (overlay) {
           overlay.innerHTML = `
@@ -312,7 +312,7 @@ class AdminCRUD {
             </div>
           `;
         }
-        console.error('Error stack:', error?.stack || error);
+        if (window.Logger) window.Logger.error('Error stack:', error?.stack || error);
         window.notifications?.error('Error al cargar producto: ' + (error.message || 'Error desconocido'));
       } finally {
         this.isLoading = false;
@@ -347,7 +347,7 @@ class AdminCRUD {
 
       const modal = document.getElementById('categoryModal');
       if (!modal) {
-        console.error('Modal de categoría no encontrado');
+        if (window.Logger) window.Logger.error('Modal de categoría no encontrado');
         return;
       }
 
@@ -376,7 +376,7 @@ class AdminCRUD {
       this.isLoading = true;
       const modal = document.getElementById('categoryModal');
       if (!modal) {
-        console.error('Modal de categoría no encontrado');
+        if (window.Logger) window.Logger.error('Modal de categoría no encontrado');
         this.isLoading = false;
         return;
       }
@@ -410,14 +410,14 @@ class AdminCRUD {
         modalContent.appendChild(loadingOverlay);
 
         if (modal.style.display !== 'flex') {
-          console.warn('Modal se cerró antes de cargar datos');
+          if (window.Logger) window.Logger.warn('Modal se cerró antes de cargar datos');
           return;
         }
 
         await this.loadCategoryForEdit(id);
 
         if (modal.style.display !== 'flex') {
-          console.warn('Modal se cerró durante la carga de datos');
+          if (window.Logger) window.Logger.warn('Modal se cerró durante la carga de datos');
           return;
         }
 
@@ -425,7 +425,7 @@ class AdminCRUD {
         const overlay = document.getElementById('categoryModalLoading');
         if (overlay) overlay.remove();
       } catch (error) {
-        console.error('Error loading category for edit:', error);
+        if (window.Logger) window.Logger.error('Error loading category for edit:', error);
         const overlay = document.getElementById('categoryModalLoading');
         if (overlay) overlay.remove();
         this.hideModal(modal);
@@ -464,7 +464,7 @@ class AdminCRUD {
       this.isLoading = true;
       const modal = document.getElementById('userModal');
       if (!modal) {
-        console.error('Modal de usuario no encontrado');
+        if (window.Logger) window.Logger.error('Modal de usuario no encontrado');
         this.isLoading = false;
         return;
       }
@@ -498,14 +498,14 @@ class AdminCRUD {
         modalContent.appendChild(loadingOverlay);
 
         if (modal.style.display !== 'flex') {
-          console.warn('Modal se cerró antes de cargar datos');
+          if (window.Logger) window.Logger.warn('Modal se cerró antes de cargar datos');
           return;
         }
 
         await this.loadUserForEdit(id);
 
         if (modal.style.display !== 'flex') {
-          console.warn('Modal se cerró durante la carga de datos');
+          if (window.Logger) window.Logger.warn('Modal se cerró durante la carga de datos');
           return;
         }
 
@@ -513,7 +513,7 @@ class AdminCRUD {
         const overlay = document.getElementById('userModalLoading');
         if (overlay) overlay.remove();
       } catch (error) {
-        console.error('Error loading user for edit:', error);
+        if (window.Logger) window.Logger.error('Error loading user for edit:', error);
         const overlay = document.getElementById('userModalLoading');
         if (overlay) overlay.remove();
         this.hideModal(modal);
@@ -533,7 +533,7 @@ class AdminCRUD {
       this.isLoading = true;
       const modal = document.getElementById('reviewModal');
       if (!modal) {
-        console.error('Modal de reseña no encontrado');
+        if (window.Logger) window.Logger.error('Modal de reseña no encontrado');
         this.isLoading = false;
         return;
       }
@@ -567,14 +567,14 @@ class AdminCRUD {
         modalContent.appendChild(loadingOverlay);
 
         if (modal.style.display !== 'flex') {
-          console.warn('Modal se cerró antes de cargar datos');
+          if (window.Logger) window.Logger.warn('Modal se cerró antes de cargar datos');
           return;
         }
 
         await this.loadReviewForEdit(id);
 
         if (modal.style.display !== 'flex') {
-          console.warn('Modal se cerró durante la carga de datos');
+          if (window.Logger) window.Logger.warn('Modal se cerró durante la carga de datos');
           return;
         }
 
@@ -582,7 +582,7 @@ class AdminCRUD {
         const overlay = document.getElementById('reviewModalLoading');
         if (overlay) overlay.remove();
       } catch (error) {
-        console.error('Error loading review for edit:', error);
+        if (window.Logger) window.Logger.error('Error loading review for edit:', error);
         const overlay = document.getElementById('reviewModalLoading');
         if (overlay) overlay.remove();
         this.hideModal(modal);
@@ -738,7 +738,7 @@ class AdminCRUD {
             data.image_url = uploadRes.url || uploadRes.data.url;
           }
         } catch (e) {
-          console.error("Image upload failed", e);
+          if (window.Logger) window.Logger.error("Image upload failed", e);
           window.notifications?.warning('Error subiendo imagen, continuando con URL texto...');
         }
       }
@@ -760,7 +760,7 @@ class AdminCRUD {
         throw new Error(response.message || 'Error al guardar');
       }
     } catch (error) {
-      console.error('Save Product Error:', error);
+      if (window.Logger) window.Logger.error('Save Product Error:', error);
       window.notifications?.error(error.message || 'Error al guardar producto');
     } finally {
       this.isLoading = false;
@@ -861,13 +861,13 @@ class AdminCRUD {
   // ===== PRODUCTS =====
   async loadProductForEdit(id, options = {}) {
     try {
-      console.log('🔍 Loading product for edit:', id);
+      if (window.Logger) window.Logger.log('🔍 Loading product for edit:', id);
 
       const product = await this.fetchProductForEdit(id);
 
       this.populateProductForm(product);
     } catch (error) {
-      console.error('Error loading product for edit:', error);
+      if (window.Logger) window.Logger.error('Error loading product for edit:', error);
       throw error; // Re-lanzar para que el caller maneje el error
     }
   }
@@ -884,7 +884,7 @@ class AdminCRUD {
       throw new Error('Producto no encontrado en la respuesta');
     }
 
-    console.log('📦 Product fetched from API:', product);
+    if (window.Logger) window.Logger.log('📦 Product fetched from API:', product);
 
     return product;
   }
@@ -901,7 +901,7 @@ class AdminCRUD {
       const retryOverlay = document.getElementById('productModalLoading');
       if (retryOverlay) retryOverlay.remove();
     } catch (error) {
-      console.error('❌ Falló el reintento de carga de producto:', error);
+      if (window.Logger) window.Logger.error('❌ Falló el reintento de carga de producto:', error);
       if (overlay) {
         overlay.innerHTML = `
           <div style="text-align:center; max-width: 280px; color:#ef4444;">

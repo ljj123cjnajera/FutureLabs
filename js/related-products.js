@@ -26,7 +26,7 @@ class RelatedProducts {
         this.renderRelatedProducts(response.data.related_products);
       }
     } catch (error) {
-      console.error('Error loading related products:', error);
+      if (window.Logger) window.Logger.error('Error loading related products:', error);
     }
   }
 
@@ -65,9 +65,7 @@ class RelatedProducts {
       </div>
     `;
 
-    if (window.productComparator) {
-      window.productComparator.updateCompareButtons();
-    }
+    // Comparador eliminado - código removido
 
     window.wishlistManager?.syncToggleButtons?.(container);
   }

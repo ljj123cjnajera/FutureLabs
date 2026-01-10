@@ -13,7 +13,7 @@ class RecentlyViewed {
       if (!Array.isArray(parsed)) return [];
       return parsed;
     } catch (error) {
-      console.error('Error leyendo productos vistos recientemente:', error);
+      if (window.Logger) window.Logger.error('Error leyendo productos vistos recientemente:', error);
       return [];
     }
   }
@@ -22,7 +22,7 @@ class RecentlyViewed {
     try {
       localStorage.setItem(this.storageKey, JSON.stringify(products));
     } catch (error) {
-      console.error('Error guardando productos vistos recientemente:', error);
+      if (window.Logger) window.Logger.error('Error guardando productos vistos recientemente:', error);
     }
   }
 

@@ -50,7 +50,7 @@ class SeoManager {
         this.updateMeta('name', 'twitter:image', data.image);
         this.updateMeta('name', 'twitter:card', 'summary_large_image');
 
-        console.log(`✅ [SEO] Updated tags for: ${data.title}`);
+        if (window.Logger) window.Logger.log(`✅ [SEO] Updated tags for: ${data.title}`);
     }
 }
 

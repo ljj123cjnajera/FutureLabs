@@ -21,7 +21,7 @@ class AdminCoupons {
                 this.renderError('Error al cargar cupones');
             }
         } catch (error) {
-            console.error('Error loading coupons:', error);
+            if (window.Logger) window.Logger.error('Error loading coupons:', error);
             this.renderError('Error de conexión');
         }
     }
@@ -151,7 +151,7 @@ class AdminCoupons {
                 window.notifications.error(response.message || 'Error al guardar cupón');
             }
         } catch (error) {
-            console.error('Error saving coupon:', error);
+            if (window.Logger) window.Logger.error('Error saving coupon:', error);
             window.notifications.error('Error al guardar cupón');
         }
     }
@@ -168,7 +168,7 @@ class AdminCoupons {
                 window.notifications.error(response.message || 'Error al eliminar cupón');
             }
         } catch (error) {
-            console.error('Error deleting coupon:', error);
+            if (window.Logger) window.Logger.error('Error deleting coupon:', error);
             window.notifications.error('Error al eliminar cupón');
         }
     }

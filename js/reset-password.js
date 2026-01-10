@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.notifications?.error?.(response.message || 'Error al restablecer contraseña');
             }
         } catch (error) {
-            console.error('Error en resetPassword:', error);
+            if (window.Logger) window.Logger.error('Error en resetPassword:', error);
             window.notifications?.error?.('Error al conectar con el servidor');
         } finally {
             submitBtn.disabled = false;

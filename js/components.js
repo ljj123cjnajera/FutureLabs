@@ -17,7 +17,7 @@ class Components {
         }
       });
     } catch (e) {
-      console.warn('Components: Could not update cart count', e);
+      if (window.Logger) window.Logger.warn('Components: Could not update cart count', e);
     }
   }
 
@@ -122,7 +122,7 @@ class Components {
       this.initLoyaltyBadge();
       this.updateCartCount();
     } else {
-      console.warn('Components.loadHeader: #mainHeader element not found');
+      if (window.Logger) window.Logger.warn('Components.loadHeader: #mainHeader element not found');
     }
   }
 
@@ -243,7 +243,7 @@ class Components {
                     <li class="nav-item"><a href="products.html?category=jordan" class="nav-link">JORDAN</a></li>
                     <li class="nav-item"><a href="products.html?category=yeezy" class="nav-link">YEEZY</a></li>
                     <li class="nav-item"><a href="products.html?category=nike" class="nav-link">NIKE</a></li>
-                    <li class="nav-item"><a href="products.html?filter=sale" class="nav-link" style="color: var(--accent);">OFERTAS</a></li>
+                    <li class="nav-item nav-item-featured"><a href="products.html?filter=sale" class="nav-link nav-link-sale" style="color: var(--accent);">OFERTAS</a></li>
                 </ul>
             </nav>
             ` : ''}
@@ -318,16 +318,34 @@ class Components {
 
   // Inject Cart Logic
   static initCartDrawer() {
+    const cartDrawer = document.getElementById('cartDrawer');
+    const cartDrawerOverlay = document.getElementById('cartDrawerOverlay');
+    
+    if (!cartDrawer || !cartDrawerOverlay) {
+      if (window.Logger) window.Logger.warn('⚠️ Cart drawer elements not found. Make sure getHeader() is called first.');
+      return;
+    }
+    
     window.CartDrawer = {
       open: () => {
-        document.getElementById('cartDrawer').classList.add('active');
-        document.getElementById('cartDrawerOverlay').classList.add('active');
-        document.body.style.overflow = 'hidden';
+        const drawer = document.getElementById('cartDrawer');
+        const overlay = document.getElementById('cartDrawerOverlay');
+        if (drawer && overlay) {
+          drawer.classList.add('active');
+          overlay.classList.add('active');
+          document.body.style.overflow = 'hidden';
+        } else if (window.Logger) {
+          window.Logger.warn('⚠️ Cart drawer elements not found when trying to open');
+        }
       },
       close: () => {
-        document.getElementById('cartDrawer').classList.remove('active');
-        document.getElementById('cartDrawerOverlay').classList.remove('active');
-        document.body.style.overflow = '';
+        const drawer = document.getElementById('cartDrawer');
+        const overlay = document.getElementById('cartDrawerOverlay');
+        if (drawer && overlay) {
+          drawer.classList.remove('active');
+          overlay.classList.remove('active');
+          document.body.style.overflow = '';
+        }
       }
     };
   }
@@ -366,7 +384,15 @@ class Components {
   static initHeader() {
     if (window.headerInitialized) return;
     window.headerInitialized = true;
-    // console.log('🔵 [COMPONENTS] initHeader() executed');
+    if (window.Logger) window.Logger.log('🔵 [COMPONENTS] initHeader() executed');
+
+    // Initialize Cart Drawer (must be done after header HTML is injected)
+    this.initCartDrawer();
+    
+    // Initialize Search Overlay
+    this.initSearchOverlay();
+    
+    // MobileMenu is initialized globally below (line 763), no need to init here
 
     // Ticker Animation Logic - Mensajes más convincentes
     const messages = [
@@ -439,7 +465,7 @@ class Components {
         }
       }
     } catch (error) {
-      console.error('Error checking admin status:', error);
+      if (window.Logger) window.Logger.error('Error checking admin status:', error);
     }
   }
 
@@ -523,7 +549,7 @@ class Components {
       document
         .querySelector('script[data-verification-script]')
         .addEventListener('load', () => {
-          console.log('🔵 [COMPONENTS] verification assets loaded (existing)');
+          if (window.Logger) window.Logger.log('🔵 [COMPONENTS] verification assets loaded (existing)');
         }, { once: true });
       return;
     }
@@ -682,7 +708,7 @@ class Components {
         if (pointsSpan) pointsSpan.textContent = `${points} PTS`;
       }
     } catch (e) {
-      console.warn('Loyalty Badge Error:', e);
+      if (window.Logger) window.Logger.warn('Loyalty Badge Error:', e);
     }
   }
 }
@@ -747,7 +773,7 @@ window.MobileMenu = {
         document.body.style.overflow = '';
       }
     } else {
-      console.error('Mobile Menu element not found');
+      if (window.Logger) window.Logger.error('Mobile Menu element not found');
     }
   }
 };

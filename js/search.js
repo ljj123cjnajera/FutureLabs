@@ -11,7 +11,7 @@ class SearchEngine {
     }
 
     init() {
-        console.log('🔍 Search Engine Initializing...');
+        if (window.Logger) window.Logger.log('🔍 Search Engine Initializing...');
 
         // 1. Headers & Footers
         if (window.Components) {
@@ -102,7 +102,7 @@ class SearchEngine {
             }
 
         } catch (e) {
-            console.error('Search Failed:', e);
+            if (window.Logger) window.Logger.error('Search Failed:', e);
             const countLabel = document.getElementById('resultsCount');
             if (countLabel) countLabel.textContent = 'ERROR DE CONEXIÓN';
             

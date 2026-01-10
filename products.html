@@ -81,58 +81,197 @@
 
     <!-- 🚀 V3 CATALOG: BRUTALIST ENGINE -->
     <main id="main-content" class="products-page">
-        <!-- Brutalist Header -->
-        <div class="container"
-            style="margin-top: 4rem; margin-bottom: 2rem; border-bottom: 4px solid var(--black); padding-bottom: 1rem;">
-            <div class="d-flex justify-content-between align-items-end flex-wrap gap-4">
-                <div>
-                    <span class="text-uppercase fw-bold" style="letter-spacing: 2px;">Catálogo v3.0</span>
-                    <h1
-                        style="font-size: 4rem; line-height: 0.9; margin: 0; text-transform: uppercase; font-weight: 900;">
-                        ACCESO TOTAL</h1>
-                </div>
-                <div class="catalog-stats fw-bold" aria-live="polite" aria-atomic="true">
-                    <span id="productCount">0</span> PRODUCTOS CARGADOS
-                </div>
-            </div>
-        </div>
-
-        <div class="container">
-            <!-- V3 Controls -->
-            <div class="catalog-controls"
-                style="margin-bottom: 2rem; display: flex; gap: 1rem; border: 2px solid var(--black); padding: 1rem;"
-                role="toolbar" aria-label="Filtros y ordenamiento de productos">
-                <button class="btn-filter" onclick="window.catalogEngine.filter('all')" aria-pressed="true" aria-label="Mostrar todos los productos">TODOS</button>
-                <button class="btn-filter" onclick="window.catalogEngine.filter('jordan')" aria-pressed="false" aria-label="Filtrar productos Jordan">JORDAN</button>
-                <button class="btn-filter" onclick="window.catalogEngine.filter('yeezy')" aria-pressed="false" aria-label="Filtrar productos Yeezy">YEEZY</button>
-                <button class="btn-filter" onclick="window.catalogEngine.filter('nike')" aria-pressed="false" aria-label="Filtrar productos Nike">NIKE</button>
-                <div style="margin-left: auto;">
-                    <label for="sortSelect" class="sr-only">Ordenar productos por</label>
-                    <select id="sortSelect" class="brutalist-select" onchange="window.catalogEngine.sort(this.value)" aria-label="Ordenar productos">
-                        <option value="newest">ÚLTIMO LANZAMIENTO</option>
-                        <option value="price-asc">MÁS BARATO</option>
-                        <option value="price-desc">MÁS HYPE</option>
-                    </select>
+        <!-- Modern Header -->
+        <section class="products-hero-section">
+            <div class="container">
+                <div class="products-hero-content">
+                    <div class="hero-text">
+                        <span class="hero-eyebrow">CATÁLOGO EXCLUSIVO</span>
+                        <h1 class="hero-title">ENCUENTRA TU PAR PERFECTO</h1>
+                        <p class="hero-description">Explora nuestra colección completa de sneakers auténticos. Los mejores drops, las mejores marcas.</p>
+                    </div>
+                    <div class="hero-stats" aria-live="polite">
+                        <div class="stat-item">
+                            <span class="stat-value" id="productCount">0</span>
+                            <span class="stat-label">PRODUCTOS</span>
+                        </div>
+                    </div>
                 </div>
             </div>
+        </section>
 
-            <!-- V3 Grid -->
-            <div id="productsContainer" class="product-grid-v3"
-                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem; min-height: 50vh;"
-                role="region" aria-label="Lista de productos" aria-live="polite">
-                <!-- Injected by CatalogEngine -->
-                <div class="loading-brutalist" aria-label="Cargando productos">LOADING DATA...</div>
+        <div class="container products-layout">
+            <!-- Sidebar de Filtros -->
+            <aside class="products-sidebar" id="productsSidebar" role="complementary" aria-label="Filtros de productos">
+                <div class="sidebar-header">
+                    <h2>FILTROS</h2>
+                    <button class="sidebar-toggle-mobile" onclick="toggleFiltersSidebar()" aria-label="Cerrar filtros">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <!-- Búsqueda -->
+                <div class="filter-section">
+                    <h3 class="filter-title">BUSCAR</h3>
+                    <div class="search-container">
+                        <input type="text" 
+                               id="productSearchInput" 
+                               class="filter-search-input" 
+                               placeholder="Buscar productos..." 
+                               aria-label="Buscar productos">
+                        <button type="button" 
+                                onclick="window.catalogEngine.search(document.getElementById('productSearchInput').value)"
+                                class="search-btn"
+                                aria-label="Buscar">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Categorías -->
+                <div class="filter-section">
+                    <h3 class="filter-title">CATEGORÍAS</h3>
+                    <div id="categoriesFilter" class="filter-options">
+                        <!-- Will be populated by JS -->
+                        <div class="loading-small">Cargando...</div>
+                    </div>
+                </div>
+
+                <!-- Marcas -->
+                <div class="filter-section">
+                    <h3 class="filter-title">MARCAS</h3>
+                    <div class="filter-options">
+                        <label class="filter-checkbox">
+                            <input type="radio" name="brand" value="all" checked onchange="window.catalogEngine.filter('all')">
+                            <span>TODAS</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="radio" name="brand" value="jordan" onchange="window.catalogEngine.filter('jordan')">
+                            <span>JORDAN</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="radio" name="brand" value="yeezy" onchange="window.catalogEngine.filter('yeezy')">
+                            <span>YEEZY</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="radio" name="brand" value="nike" onchange="window.catalogEngine.filter('nike')">
+                            <span>NIKE</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="radio" name="brand" value="adidas" onchange="window.catalogEngine.filter('adidas')">
+                            <span>ADIDAS</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Rango de Precio -->
+                <div class="filter-section">
+                    <h3 class="filter-title">PRECIO</h3>
+                    <div class="price-range">
+                        <div class="price-inputs">
+                            <input type="number" 
+                                   id="minPrice" 
+                                   class="price-input" 
+                                   placeholder="Mín" 
+                                   min="0" 
+                                   aria-label="Precio mínimo">
+                            <span>-</span>
+                            <input type="number" 
+                                   id="maxPrice" 
+                                   class="price-input" 
+                                   placeholder="Máx" 
+                                   min="0" 
+                                   aria-label="Precio máximo">
+                        </div>
+                        <button type="button" 
+                                class="btn-filter-apply" 
+                                onclick="applyPriceFilter()">
+                            APLICAR
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Ofertas -->
+                <div class="filter-section">
+                    <h3 class="filter-title">OFERTAS</h3>
+                    <label class="filter-checkbox">
+                        <input type="checkbox" 
+                               id="onSaleFilter" 
+                               onchange="window.catalogEngine.toggleSaleFilter()">
+                        <span>Solo productos en oferta</span>
+                    </label>
+                </div>
+
+                <!-- Stock -->
+                <div class="filter-section">
+                    <h3 class="filter-title">DISPONIBILIDAD</h3>
+                    <label class="filter-checkbox">
+                        <input type="checkbox" 
+                               id="inStockFilter" 
+                               checked 
+                               onchange="window.catalogEngine.toggleStockFilter()">
+                        <span>Solo con stock disponible</span>
+                    </label>
+                </div>
+
+                <!-- Limpiar Filtros -->
+                <div class="filter-section">
+                    <button class="btn-clear-filters" onclick="window.catalogEngine.clearFilters()">
+                        <i class="fas fa-times"></i> LIMPIAR FILTROS
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Contenido Principal -->
+            <div class="products-main">
+                <!-- Toolbar Superior -->
+                <div class="products-toolbar">
+                    <div class="toolbar-left">
+                        <button class="btn-toggle-filters" onclick="toggleFiltersSidebar()" aria-label="Mostrar filtros">
+                            <i class="fas fa-filter"></i> FILTROS
+                        </button>
+                        <span class="results-count" aria-live="polite">
+                            Mostrando <strong id="resultsCount">0</strong> de <strong id="totalCount">0</strong> productos
+                        </span>
+                    </div>
+                    <div class="toolbar-right">
+                        <div class="view-toggle">
+                            <button class="view-btn active" data-view="grid" onclick="setViewMode('grid')" aria-label="Vista de cuadrícula">
+                                <i class="fas fa-th"></i>
+                            </button>
+                            <button class="view-btn" data-view="list" onclick="setViewMode('list')" aria-label="Vista de lista">
+                                <i class="fas fa-list"></i>
+                            </button>
+                        </div>
+                        <select id="sortSelect" 
+                                class="sort-select" 
+                                onchange="window.catalogEngine.sort(this.value)" 
+                                aria-label="Ordenar productos">
+                            <option value="newest">Último Lanzamiento</option>
+                            <option value="price-asc">Precio: Menor a Mayor</option>
+                            <option value="price-desc">Precio: Mayor a Menor</option>
+                            <option value="name-asc">Nombre: A-Z</option>
+                            <option value="name-desc">Nombre: Z-A</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Grid de Productos -->
+                <div id="productsContainer" 
+                     class="product-grid-v3" 
+                     role="region" 
+                     aria-label="Lista de productos" 
+                     aria-live="polite">
+                    <!-- Injected by CatalogEngine -->
+                    <div class="loading-brutalist" aria-label="Cargando productos">CARGANDO PRODUCTOS...</div>
+                </div>
+
+                <!-- Pagination -->
+                <nav class="pagination-brutalist"
+                     aria-label="Navegación de páginas">
+                    <!-- Will be populated by JavaScript -->
+                </nav>
             </div>
-
-            <!-- Pagination (mock) -->
-            <nav class="pagination-brutalist"
-                style="margin-top: 4rem; display: flex; justify-content: center; gap: 1rem;"
-                aria-label="Navegación de páginas">
-                <button class="btn btn-outline" disabled aria-label="Página anterior">PREV</button>
-                <button class="btn btn-black" aria-label="Página 1" aria-current="page">1</button>
-                <button class="btn btn-outline" aria-label="Página 2">2</button>
-                <button class="btn btn-outline" aria-label="Página siguiente">NEXT</button>
-            </nav>
         </div>
     </main>
 
@@ -155,8 +294,10 @@
 
     <!-- Scripts del Sistema Integrado -->
     <!-- Core scripts (critical for page functionality) -->
+    <script src="js/logger.js?v=1.0"></script>
     <script src="js/api.js"></script>
-    <script src="js/components.js"></script> <!-- Vital for Header/Footer -->
+    <script src="js/components.js"></script>
+    <script src="js/navigation-enhanced.js"></script> <!-- Vital for Header/Footer -->
     <script src="js/auth.js"></script>
     <script src="js/notifications.js"></script>
     <script src="js/cart.js"></script>

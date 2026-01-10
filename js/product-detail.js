@@ -64,20 +64,14 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
 
         } catch (error) {
-            console.error('❌ API Error in PDP:', error);
+            if (window.Logger) window.Logger.error('❌ API Error in PDP:', error);
             
             // Mostrar error real al usuario
             renderErrorState(container, `Error al cargar producto: ${error.message || 'Error de conexión'}`);
             
-            // Solo usar fallback si realmente no hay conexión (no para errores 404, etc)
-            if (error.message && error.message.includes('Failed to fetch')) {
-                const mock = getMockProduct(productId);
-                if (mock) {
-                    window.currentProduct = mock;
-                    const imgs = [mock.image_url, mock.image_url, mock.image_url, mock.image_url];
-                    renderProductDetails(mock, container, imgs);
-                    if (window.notifications) window.notifications.warning('MODO OFFLINE', 'No hay conexión. Mostrando versión simulada.');
-                }
+            // No usar productos mock - solo mostrar error
+            if (window.notifications) {
+                window.notifications.error('Error de conexión', 'No se pudo cargar el producto. Por favor, intenta de nuevo.');
             }
         }
     }
@@ -95,6 +89,9 @@ document.addEventListener('DOMContentLoaded', async function () {
         // 2. In the catch/else blocks, if mock exists, just assign `response = { success: true, data: { product: mock } }` effectively? 
         // No, let's keep it explicit.
 
+        // Update live viewers count (simulated for conversion)
+        updateLiveViewers(product.id);
+        
         // SEO ENGINE UPDATE
         if (window.SeoManager) {
             window.SeoManager.updateProductSEO({
@@ -286,28 +283,26 @@ document.addEventListener('DOMContentLoaded', async function () {
         `;
     }
 
-    // --- MOCK DATABASE ---
-    function getMockProduct(id) {
-        const db = [
-            { id: 101, name: 'NIKE DUNK LOW RETRO', price: 110, image_url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff', brand: 'Nike', description: 'Real. Leather. Icons. The Dunk Low.' },
-            { id: 102, name: 'AIR FORCE 1 07', price: 100, image_url: 'https://images.unsplash.com/photo-1491553895911-0055eca6402d', brand: 'Nike' },
-            { id: 103, name: 'AIR MAX 90', price: 130, image_url: 'https://images.unsplash.com/photo-1514989940723-e8875ea6ab7d', brand: 'Nike' },
-            { id: 104, name: 'BLAZER MID 77', price: 105, image_url: 'https://images.unsplash.com/photo-1552346154-21d32810aba3', brand: 'Nike' },
-            { id: 201, name: 'AIR JORDAN 1 HIGH', price: 180, image_url: 'https://images.unsplash.com/photo-1516478177764-9fe5bd7e9717', brand: 'Jordan' },
-            { id: 202, name: 'JORDAN 4 RETRO', price: 210, image_url: 'https://images.unsplash.com/photo-1584735175315-9d5df23860e6', brand: 'Jordan' },
-            { id: 203, name: 'JORDAN 1 LOW', price: 140, image_url: 'https://images.unsplash.com/photo-1593081891731-fda0877988da', brand: 'Jordan' },
-            { id: 204, name: 'JORDAN 3', price: 200, image_url: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a', brand: 'Jordan' },
-            { id: 301, name: 'YEEZY BOOST 350 V2', price: 230, image_url: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5', brand: 'Yeezy' },
-            { id: 302, name: 'YEEZY SLIDE', price: 70, image_url: 'https://images.unsplash.com/photo-1605812853380-34ad68a253f3', brand: 'Yeezy' },
-            { id: 303, name: 'YEEZY 700', price: 300, image_url: 'https://images.unsplash.com/photo-1565883017726-d249f056dcb5', brand: 'Yeezy' },
-            { id: 304, name: 'YEEZY FOAM RNR', price: 90, image_url: 'https://images.unsplash.com/photo-1617267571626-829db2d558d6', brand: 'Yeezy' },
-            { id: 401, name: 'ADIDAS FORUM LOW', price: 100, image_url: 'https://images.unsplash.com/photo-1518002171953-a080ee817e1f', brand: 'Adidas' },
-            { id: 402, name: 'ADIDAS SAMBA', price: 100, image_url: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa', brand: 'Adidas' },
-            { id: 403, name: 'ULTRABOOST', price: 180, image_url: 'https://images.unsplash.com/photo-1603808033192-082d6919d3e1', brand: 'Adidas' },
-            { id: 404, name: 'GAZELLE', price: 95, image_url: 'https://images.unsplash.com/photo-1616124619460-c9fa42f7481f', brand: 'Adidas' }
-        ];
-        return db.find(p => p.id == id);
+    // --- LIVE VIEWERS SIMULATION (Conversion Optimization) ---
+    function updateLiveViewers(productId) {
+        const viewerElement = document.getElementById('viewerCount');
+        if (!viewerElement) return;
+        
+        // Simulate realistic viewer count (8-25 people)
+        const baseCount = 12;
+        const variation = Math.floor(Math.random() * 17) + 1;
+        const viewerCount = baseCount + variation;
+        
+        viewerElement.textContent = viewerCount;
+        
+        // Update every 15-30 seconds to simulate real activity
+        setInterval(() => {
+            const change = Math.floor(Math.random() * 5) - 2; // -2 to +2
+            const newCount = Math.max(8, Math.min(30, viewerCount + change));
+            viewerElement.textContent = newCount;
+        }, 20000 + Math.random() * 10000);
     }
+    
 
     function getModalHTML() {
         return `
@@ -384,12 +379,28 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     // Agregar al carrito
     window.addToCart = async function () {
-        // Obtener ID del producto de la URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const productId = urlParams.get('id');
+        const product = window.currentProduct;
+        if (!product) {
+            if (window.notifications) {
+                window.notifications.error('Error', 'Producto no disponible');
+            }
+            return;
+        }
 
+        const productId = product.id || product.product_id;
         if (!productId) {
-            window.notifications.error('Error: ID de producto no encontrado');
+            if (window.notifications) {
+                window.notifications.error('Error', 'ID de producto no encontrado');
+            }
+            return;
+        }
+
+        // VALIDACIÓN DE STOCK
+        const stock = product.stock_quantity;
+        if (stock !== undefined && stock === 0) {
+            if (window.notifications) {
+                window.notifications.warning('Producto Agotado', 'Este producto no está disponible en este momento.');
+            }
             return;
         }
 
@@ -404,28 +415,54 @@ document.addEventListener('DOMContentLoaded', async function () {
                 void container.offsetWidth; // trigger reflow
                 container.classList.add('shake-animation');
             }
+            if (window.notifications) {
+                window.notifications.warning('Selecciona una Talla', 'Por favor, selecciona una talla antes de agregar al carrito.');
+            }
             return;
         }
 
-        // Add size to cart item
-        window.logger?.info('PRODUCT', `Agregando talla: ${selectedSize} `);
-
-        // Use the new CartEngine (aliased as cartManager)
-        // It will handle: Saving to LocalStorage, Updating UI, Opening Drawer
-        await window.cartManager.add(productId, 1, { size: selectedSize });
-
-        // Optional: Notification (already handled visually by drawer open, but good for confirmation)
-        window.notifications.success(`Agregado: Talla US ${selectedSize}`);
+        try {
+            // Use the new CartEngine (aliased as cartManager)
+            // It will handle: Saving to LocalStorage/API, Updating UI, Opening Drawer
+            const success = await window.cartManager?.add(productId, 1, { size: selectedSize });
+            
+            if (success !== false) {
+                if (window.notifications) {
+                    window.notifications.success('Agregado al Carrito', `Talla US ${selectedSize} agregada correctamente`);
+                }
+            }
+        } catch (e) {
+            if (window.Logger) window.Logger.error('Error adding to cart:', e);
+            if (window.notifications) {
+                window.notifications.error('Error', 'No se pudo agregar el producto. Por favor, intenta de nuevo.');
+            }
+        }
     }
 
     // Comprar ahora
     window.buyNow = async function () {
-        // Obtener ID del producto de la URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const productId = urlParams.get('id');
+        const product = window.currentProduct;
+        if (!product) {
+            if (window.notifications) {
+                window.notifications.error('Error', 'Producto no disponible');
+            }
+            return;
+        }
 
+        const productId = product.id || product.product_id;
         if (!productId) {
-            window.notifications.error('Error: ID de producto no encontrado');
+            if (window.notifications) {
+                window.notifications.error('Error', 'ID de producto no encontrado');
+            }
+            return;
+        }
+
+        // VALIDACIÓN DE STOCK
+        const stock = product.stock_quantity;
+        if (stock !== undefined && stock === 0) {
+            if (window.notifications) {
+                window.notifications.warning('Producto Agotado', 'Este producto no está disponible en este momento.');
+            }
             return;
         }
 
@@ -440,14 +477,28 @@ document.addEventListener('DOMContentLoaded', async function () {
                 void container.offsetWidth; // trigger reflow
                 container.classList.add('shake-animation');
             }
+            if (window.notifications) {
+                window.notifications.warning('Selecciona una Talla', 'Por favor, selecciona una talla antes de comprar.');
+            }
             return;
         }
 
-        await window.cartManager.add(productId, 1, { size: selectedSize });
-        window.notifications.success('Redirigiendo al checkout...');
-        setTimeout(() => {
-            window.location.href = 'checkout.html';
-        }, 1000);
+        try {
+            const success = await window.cartManager?.add(productId, 1, { size: selectedSize });
+            if (success !== false) {
+                if (window.notifications) {
+                    window.notifications.success('Redirigiendo al checkout...', 'El producto se agregó al carrito');
+                }
+                setTimeout(() => {
+                    window.location.href = 'checkout.html';
+                }, 1000);
+            }
+        } catch (e) {
+            if (window.Logger) window.Logger.error('Error in buyNow:', e);
+            if (window.notifications) {
+                window.notifications.error('Error', 'No se pudo agregar el producto. Por favor, intenta de nuevo.');
+            }
+        }
     }
 
     const clearRecentlyViewedBtn = document.getElementById('clearRecentlyViewedBtn');

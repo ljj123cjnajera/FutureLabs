@@ -40,7 +40,7 @@ class AuthManager {
           document.dispatchEvent(new Event('authStateChanged'));
         }
       } catch (error) {
-        console.error('Auth Error:', error.message);
+        if (window.Logger) window.Logger.error('Auth Error:', error.message);
         this.currentUser = null;
 
         if (error.status === 401 || error.status === 403) {
@@ -72,7 +72,7 @@ class AuthManager {
       }
       return false;
     } catch (error) {
-      console.error('Login Error:', error);
+      if (window.Logger) window.Logger.error('Login Error:', error);
       if (error.message && error.message.includes('verifica tu email')) {
         if (window.verificationManager) {
           window.verificationManager.showModal(email);
@@ -108,7 +108,7 @@ class AuthManager {
       }
       return false;
     } catch (error) {
-      console.error('Register Error:', error);
+      if (window.Logger) window.Logger.error('Register Error:', error);
       this.showNotification(error.message, 'error');
       return false;
     }
@@ -126,7 +126,7 @@ class AuthManager {
       this.showNotification('Sesión cerrada', 'info');
       return true;
     } catch (error) {
-      console.error('Logout Error:', error);
+      if (window.Logger) window.Logger.error('Logout Error:', error);
       this.currentUser = null;
       localStorage.removeItem('auth_token');
       document.dispatchEvent(new Event('authStateChanged'));
@@ -161,7 +161,7 @@ class AuthManager {
     if (typeof window.notifications !== 'undefined') {
       window.notifications.show(message, type);
     } else {
-      console.log(`[${type.toUpperCase()}] ${message}`);
+      if (window.Logger) window.Logger.log(`[${type.toUpperCase()}] ${message}`);
     }
   }
 }

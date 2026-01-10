@@ -42,7 +42,7 @@ class ReviewsManager {
 
   async init(productId, options = {}) {
     if (!productId) {
-      console.warn('ReviewsManager: productId requerido');
+      if (window.Logger) window.Logger.warn('ReviewsManager: productId requerido');
       return;
     }
 
@@ -74,7 +74,7 @@ class ReviewsManager {
         this.stats = this.calculateStatsFromReviews();
       }
     } catch (error) {
-      console.error('❌ Error cargando reviews:', error);
+      if (window.Logger) window.Logger.error('❌ Error cargando reviews:', error);
       this.reviews = [];
       this.stats = this.calculateStatsFromReviews();
     }
@@ -493,7 +493,7 @@ class ReviewsManager {
 
       await this.refresh();
     } catch (error) {
-      console.error('❌ Error enviando review:', error);
+      if (window.Logger) window.Logger.error('❌ Error enviando review:', error);
       window.notifications?.error?.(
         error.message || 'Ocurrió un problema al guardar tu review'
       );

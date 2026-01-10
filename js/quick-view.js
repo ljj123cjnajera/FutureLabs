@@ -78,7 +78,7 @@ class QuickView {
         this.showError('Error al cargar el producto');
       }
     } catch (error) {
-      console.error('Error en Quick View:', error);
+      if (window.Logger) window.Logger.error('Error en Quick View:', error);
       this.showError('Error al cargar el producto');
     }
   }
@@ -163,9 +163,6 @@ class QuickView {
             >
               <i class="far fa-heart"></i>
             </button>
-            <button class="btn btn-ghost btn-lg" onclick="quickView.addToCompare('${product.id}')">
-              <i class="fas fa-balance-scale"></i>
-            </button>
           </div>
 
           <div class="quick-view-footer">
@@ -231,7 +228,7 @@ class QuickView {
         setTimeout(() => this.close(), 500);
       }
     } catch (error) {
-      console.error('Error agregando al carrito:', error);
+      if (window.Logger) window.Logger.error('Error agregando al carrito:', error);
       if (window.notifications) {
         window.notifications.error('Error al agregar producto');
       }
@@ -243,14 +240,6 @@ class QuickView {
     window.location.href = `product-detail.html?id=${productId}`;
   }
 
-  addToCompare(productId) {
-    if (window.comparator) {
-      window.comparator.addProduct(productId);
-      if (window.notifications) {
-        window.notifications.success('Producto agregado al comparador');
-      }
-    }
-  }
 }
 
 // Inicializar Quick View globalmente

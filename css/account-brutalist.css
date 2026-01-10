@@ -1,16 +1,10 @@
 /* ACCOUNT / PROFILE - BRUTALIST V3 */
-:root {
-    --black: #000000;
-    --white: #ffffff;
-    --gray-light: #f5f5f5;
-    --font-heading: 'Poppins', sans-serif;
-    --font-body: 'Inter', sans-serif;
-}
+/* Variables ahora en variables.css */
 
 body {
     background-color: var(--white);
     color: var(--black);
-    font-family: var(--font-body);
+    font-family: var(--font-primary);
 }
 
 .account-container {

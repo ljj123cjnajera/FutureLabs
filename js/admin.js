@@ -6,22 +6,22 @@ class AdminManager {
   }
 
   async init() {
-    console.log('🔧 AdminManager init() - Iniciando...');
+    if (window.Logger) window.Logger.log('🔧 AdminManager init() - Iniciando...');
 
     // Verificar si hay token en localStorage
     const token = localStorage.getItem('auth_token');
     if (!token) {
-      console.log('❌ No hay token en localStorage, redirigiendo a login...');
+      if (window.Logger) window.Logger.log('❌ No hay token en localStorage, redirigiendo a login...');
       window.location.href = 'admin-login.html';
       return;
     }
 
-    console.log('✅ Token encontrado en localStorage');
+    if (window.Logger) window.Logger.log('✅ Token encontrado en localStorage');
 
     // Obtener usuario guardado en localStorage (desde admin-login.html)
     const adminUserStr = localStorage.getItem('admin_user');
     if (!adminUserStr) {
-      console.log('❌ No hay información de usuario guardada, redirigiendo a login...');
+      if (window.Logger) window.Logger.log('❌ No hay información de usuario guardada, redirigiendo a login...');
       window.location.href = 'admin-login.html';
       return;
     }
@@ -29,16 +29,16 @@ class AdminManager {
     let user;
     try {
       user = JSON.parse(adminUserStr);
-      console.log('✅ Usuario cargado de localStorage:', user.email);
+      if (window.Logger) window.Logger.log('✅ Usuario cargado de localStorage:', user.email);
     } catch (error) {
-      console.error('Error parseando usuario:', error);
+      if (window.Logger) window.Logger.error('Error parseando usuario:', error);
       window.location.href = 'admin-login.html';
       return;
     }
 
     // Verificar rol
     if (user.role !== 'admin' && user.role !== 'moderator') {
-      console.log('❌ Usuario sin permisos de admin:', user.role);
+      if (window.Logger) window.Logger.log('❌ Usuario sin permisos de admin:', user.role);
       if (window.notifications) {
         window.notifications.error('No tienes permisos de administrador');
       }
@@ -48,7 +48,7 @@ class AdminManager {
       return;
     }
 
-    console.log('✅ Usuario admin autenticado correctamente');
+    if (window.Logger) window.Logger.log('✅ Usuario admin autenticado correctamente');
 
     // Actualizar UI del usuario
     this.updateUserInfo(user);
@@ -63,106 +63,159 @@ class AdminManager {
     this.renderCharts();
   }
 
-  renderCharts() {
+  renderCharts(ordersByStatus = [], topProducts = [], salesByDay = [], paymentMethods = []) {
+    // Si no hay datos, usar datos por defecto vacíos
+    if (!ordersByStatus || ordersByStatus.length === 0) {
+      ordersByStatus = [
+        { status: 'pending', count: 0 },
+        { status: 'processing', count: 0 },
+        { status: 'shipped', count: 0 },
+        { status: 'delivered', count: 0 }
+      ];
+    }
+
+    if (!salesByDay || salesByDay.length === 0) {
+      // Generar últimos 7 días con datos en 0
+      const last7Days = [];
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        last7Days.push({
+          date: date.toISOString().split('T')[0],
+          total: 0
+        });
+      }
+      salesByDay = last7Days;
+    }
+
+    if (!topProducts || topProducts.length === 0) {
+      topProducts = [];
+    }
+
+    if (!paymentMethods || paymentMethods.length === 0) {
+      paymentMethods = [];
+    }
+
     this.charts = {};
 
-    // 1. SALES CHART (Line)
+    // 1. SALES CHART (Line) - Usar datos reales
     const ctxSales = document.getElementById('salesChart');
-    if (ctxSales) {
+    if (ctxSales && window.Chart) {
+      // Destruir gráfico anterior si existe
+      if (this.charts.sales) {
+        this.charts.sales.destroy();
+      }
+
       this.charts.sales = new Chart(ctxSales, {
         type: 'line',
         data: {
-          labels: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
+          labels: salesByDay.map(s => new Date(s.date).toLocaleDateString('es-PE', { month: 'short', day: 'numeric' })),
           datasets: [{
             label: 'Ventas (S/)',
-            data: [1200, 1900, 3000, 5000, 2300, 6000, 8500],
+            data: salesByDay.map(s => parseFloat(s.total) || 0),
             borderColor: '#000',
             backgroundColor: 'rgba(0,0,0,0.1)',
             tension: 0.4,
             fill: true
           }]
         },
-        options: { responsive: true, plugins: { legend: { display: false } } }
-      });
-    }
-
-    // 2. ORDER STATUS (Doughnut)
-    const ctxStatus = document.getElementById('ordersStatusChart');
-    if (ctxStatus) {
-      this.charts.status = new Chart(ctxStatus, {
-        type: 'doughnut',
-        data: {
-          labels: ['Pendiente', 'Procesando', 'Enviado', 'Entregado'],
-          datasets: [{
-            data: [12, 19, 3, 5],
-            backgroundColor: ['#ff9800', '#2196f3', '#9c27b0', '#4caf50'],
-            borderWidth: 0
-          }]
-        },
-        options: { responsive: true, cutout: '70%' }
-      });
-    }
-
-    // 3. TOP PRODUCTS (Bar)
-    const ctxProducts = document.getElementById('topProductsChart');
-    if (ctxProducts) {
-      new Chart(ctxProducts, {
-        type: 'bar',
-        data: {
-          labels: ['Jordan 1', 'Yeezy 350', 'Nike Dunk', 'Adidas Forum', 'NB 550'],
-          datasets: [{
-            label: 'Unidades',
-            data: [65, 59, 80, 81, 56],
-            backgroundColor: '#000',
-            borderRadius: 4
-          }]
-        },
-        options: { responsive: true, scales: { y: { beginAtZero: true } } }
-      });
-    }
-
-    // 4. PAYMENTS (Pie)
-    const ctxPayments = document.getElementById('paymentMethodsChart');
-    if (ctxPayments) {
-      this.charts.payments = new Chart(ctxPayments, {
-        type: 'pie',
-        data: {
-          labels: ['Tarjeta', 'PayPal', 'Yape/Plin'],
-          datasets: [{
-            data: [300, 50, 100],
-            backgroundColor: ['#333', '#00457C', '#D500F9'],
-            borderWidth: 0
-          }]
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } }
         }
       });
     }
 
-    // 🚀 Start Simulation
-    // 🚀 Load Real Data
-    this.refreshDashboardData();
+    // 2. ORDER STATUS (Doughnut) - Usar datos reales
+    const ctxStatus = document.getElementById('ordersStatusChart');
+    if (ctxStatus && window.Chart) {
+      // Destruir gráfico anterior si existe
+      if (this.charts.status) {
+        this.charts.status.destroy();
+      }
+
+      const statusLabels = {
+        'pending': 'Pendiente',
+        'processing': 'Procesando',
+        'shipped': 'Enviado',
+        'delivered': 'Entregado',
+        'cancelled': 'Cancelado'
+      };
+
+      this.charts.status = new Chart(ctxStatus, {
+        type: 'doughnut',
+        data: {
+          labels: ordersByStatus.map(s => statusLabels[s.status] || s.status),
+          datasets: [{
+            data: ordersByStatus.map(s => parseInt(s.count) || 0),
+            backgroundColor: ['#ff9800', '#2196f3', '#9c27b0', '#4caf50', '#f44336'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '70%'
+        }
+      });
+    }
+
+    // 3. TOP PRODUCTS (Bar) - Usar datos reales
+    const ctxProducts = document.getElementById('topProductsChart');
+    if (ctxProducts && window.Chart) {
+      // Destruir gráfico anterior si existe
+      if (this.charts.topProducts) {
+        this.charts.topProducts.destroy();
+      }
+
+      this.charts.topProducts = new Chart(ctxProducts, {
+        type: 'bar',
+        data: {
+          labels: topProducts.map(p => (p.product_name || 'Sin nombre').substring(0, 20)),
+          datasets: [{
+            label: 'Unidades',
+            data: topProducts.map(p => parseInt(p.total_sold) || 0),
+            backgroundColor: '#000',
+            borderRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          indexAxis: 'y',
+          scales: { y: { beginAtZero: true } }
+        }
+      });
+    }
+
+    // 4. PAYMENTS (Pie) - Usar datos reales
+    const ctxPayments = document.getElementById('paymentMethodsChart');
+    if (ctxPayments && window.Chart) {
+      // Destruir gráfico anterior si existe
+      if (this.charts.payments) {
+        this.charts.payments.destroy();
+      }
+
+      this.charts.payments = new Chart(ctxPayments, {
+        type: 'pie',
+        data: {
+          labels: paymentMethods.map(p => p.payment_method || 'Desconocido'),
+          datasets: [{
+            data: paymentMethods.map(p => parseInt(p.count) || 0),
+            backgroundColor: ['#333', '#00457C', '#D500F9', '#43e97b', '#f093fb'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false
+        }
+      });
+    }
   }
 
-  async refreshDashboardData() {
-    console.log('📡 Fetching Real Dashboard Data...');
-    try {
-      // Parallel Fetch for Speed
-      const [ordersRes, usersRes, productsRes] = await Promise.all([
-        window.api.request('/admin/orders'),
-        window.api.request('/admin/users'),
-        window.api.getProducts({ limit: 1000 })
-      ]);
-
-      const orders = ordersRes.data?.orders || [];
-      const users = usersRes.data?.users || [];
-      const products = productsRes.data?.products || [];
-
-      // Update Stats Cards
-      document.getElementById('totalOrders').textContent = orders.length;
-      document.getElementById('totalUsers').textContent = users.length;
-      document.getElementById('totalProducts').textContent = products.length;
-
-      // Calculate Revenue (Real)
-      const totalRevenue = orders.reduce((sum, order) => sum + parseFloat(order.total), 0);
+  // Este método ya no es necesario, loadDashboard() maneja todo
       const revenueEl = document.querySelector('.metric-card:first-child .metric-value');
       if (revenueEl) revenueEl.textContent = `S/ ${totalRevenue.toFixed(2)}`;
 
@@ -170,7 +223,7 @@ class AdminManager {
       this.updateCharts(orders);
 
     } catch (e) {
-      console.error('Dashboard Sync Error:', e);
+      if (window.Logger) window.Logger.error('Dashboard Sync Error:', e);
     }
   }
 
@@ -323,7 +376,7 @@ class AdminManager {
         await this.loadRecentOrders();
       }
     } catch (error) {
-      console.error('Error loading dashboard:', error);
+      if (window.Logger) window.Logger.error('Error loading dashboard:', error);
       window.notifications.error('Error al cargar dashboard');
     }
   }
@@ -452,7 +505,7 @@ class AdminManager {
         `).join('');
       }
     } catch (error) {
-      console.error('Error loading recent orders:', error);
+      if (window.Logger) window.Logger.error('Error loading recent orders:', error);
     }
   }
 
@@ -515,7 +568,7 @@ class AdminManager {
         await this.loadCategoriesForProductModal();
       }
     } catch (error) {
-      console.error('Error loading products:', error);
+      if (window.Logger) window.Logger.error('Error loading products:', error);
       const errorMsg = error.message || error.status === 401 ? 'Sesión expirada. Por favor, inicia sesión nuevamente.' : 'Error desconocido al cargar productos';
       tbody.innerHTML = `
         <tr>
@@ -547,7 +600,7 @@ class AdminManager {
           categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
       }
     } catch (error) {
-      console.error('Error loading categories for modal:', error);
+      if (window.Logger) window.Logger.error('Error loading categories for modal:', error);
     }
   }
 
@@ -604,7 +657,7 @@ class AdminManager {
             `).join('');
       }
     } catch (error) {
-      console.error('Error loading categories:', error);
+      if (window.Logger) window.Logger.error('Error loading categories:', error);
       const errorMsg = error.message || error.status === 401 ? 'Sesión expirada. Por favor, inicia sesión nuevamente.' : 'Error desconocido al cargar categorías';
       tbody.innerHTML = `
         <tr>
@@ -679,7 +732,7 @@ class AdminManager {
         window.notifications?.success(`Se cargaron ${orders.length} pedido${orders.length !== 1 ? 's' : ''}`);
       }
     } catch (error) {
-      console.error('Error loading orders:', error);
+      if (window.Logger) window.Logger.error('Error loading orders:', error);
       const errorMsg = error.message || error.status === 401 ? 'Sesión expirada. Por favor, inicia sesión nuevamente.' : 'Error desconocido al cargar pedidos';
       tbody.innerHTML = `
         <tr>
@@ -755,7 +808,7 @@ class AdminManager {
         window.notifications?.success(`Se cargaron ${users.length} usuario${users.length !== 1 ? 's' : ''}`);
       }
     } catch (error) {
-      console.error('Error loading users:', error);
+      if (window.Logger) window.Logger.error('Error loading users:', error);
       const errorMsg = error.message || error.status === 401 ? 'Sesión expirada. Por favor, inicia sesión nuevamente.' : 'Error desconocido al cargar usuarios';
       tbody.innerHTML = `
         <tr>
@@ -826,7 +879,7 @@ class AdminManager {
         window.notifications?.success(`Se cargaron ${reviews.length} reseña${reviews.length !== 1 ? 's' : ''}`);
       }
     } catch (error) {
-      console.error('Error loading reviews:', error);
+      if (window.Logger) window.Logger.error('Error loading reviews:', error);
       const errorMsg = error.message || error.status === 401 ? 'Sesión expirada. Por favor, inicia sesión nuevamente.' : 'Error desconocido al cargar reseñas';
       tbody.innerHTML = `
         <tr>
@@ -938,7 +991,7 @@ function editProduct(productId, event) {
       window.adminCRUD.editProduct(productId);
     }, 10);
   } else {
-    console.error('adminCRUD no está disponible');
+    if (window.Logger) window.Logger.error('adminCRUD no está disponible');
     window.notifications?.error('Error: El sistema de administración no está inicializado');
   }
 }
@@ -961,7 +1014,7 @@ window.confirmPayment = async function (transactionId) {
       throw new Error(response.message || 'Error al confirmar pago');
     }
   } catch (error) {
-    console.error('Error confirmando pago:', error);
+    if (window.Logger) window.Logger.error('Error confirmando pago:', error);
     window.notifications?.error('Error al confirmar pago: ' + (error.message || 'Error desconocido'));
   }
 };
@@ -1060,7 +1113,7 @@ window.viewPaymentDetails = async function (transactionId) {
       throw new Error(response.message || 'Error al cargar detalles');
     }
   } catch (error) {
-    console.error('Error cargando detalles de pago:', error);
+    if (window.Logger) window.Logger.error('Error cargando detalles de pago:', error);
     window.notifications?.error('Error al cargar detalles: ' + (error.message || 'Error desconocido'));
   }
 };
@@ -1146,7 +1199,7 @@ async function exportSalesReport() {
       throw new Error('Error al generar reporte');
     }
   } catch (error) {
-    console.error('Error exporting sales report:', error);
+    if (window.Logger) window.Logger.error('Error exporting sales report:', error);
     window.notifications.error('Error al exportar reporte de ventas');
   }
 }
@@ -1172,7 +1225,7 @@ async function exportProductsReport() {
       throw new Error('Error al generar reporte');
     }
   } catch (error) {
-    console.error('Error exporting products report:', error);
+    if (window.Logger) window.Logger.error('Error exporting products report:', error);
     window.notifications.error('Error al exportar reporte de productos');
   }
 }
@@ -1195,7 +1248,7 @@ async function exportCustomersReport() {
       throw new Error('Error al generar reporte');
     }
   } catch (error) {
-    console.error('Error exporting customers report:', error);
+    if (window.Logger) window.Logger.error('Error exporting customers report:', error);
     window.notifications.error('Error al exportar reporte de clientes');
   }
 }

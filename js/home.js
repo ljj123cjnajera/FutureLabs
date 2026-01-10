@@ -10,12 +10,11 @@ class HomeEngine {
       banners: [],
       categories: [],
       trending: [],
-      blog: [],
       newsletterSubscribed: false
     };
 
     this.init();
-    console.log('🚀 HomeEngine v7.3-REAL-DATA Loaded');
+    if (window.Logger) window.Logger.log('🚀 HomeEngine v7.3-REAL-DATA Loaded');
   }
 
 
@@ -81,7 +80,7 @@ class HomeEngine {
       this.initStickyFooter();
       this.initTabbedEngine();
     } catch (err) {
-      console.error('⚠️ [HomeEngine] Partial Load Error:', err);
+      if (window.Logger) window.Logger.error('⚠️ [HomeEngine] Partial Load Error:', err);
       // Ensure loader is removed even if error occurs
       this.toggleLoader(false);
     }
@@ -113,7 +112,7 @@ class HomeEngine {
         if (window.Components.initSearch) window.Components.initSearch();
         if (window.Components.initCartCounter) window.Components.initCartCounter();
       } else {
-        console.warn("⚠️ Header container missing or Components not ready.");
+        if (window.Logger) window.Logger.warn("⚠️ Header container missing or Components not ready.");
       }
 
       // Footer
@@ -129,9 +128,9 @@ class HomeEngine {
       // 5. Load Brands
       this.renderBrands();
 
-      console.log('✅ HomeEngine Initialized');
+      if (window.Logger) window.Logger.log('✅ HomeEngine Initialized');
     } catch (e) {
-      console.error('HomeEngine Init Error:', e);
+      if (window.Logger) window.Logger.error('HomeEngine Init Error:', e);
     }
   }
 
@@ -178,7 +177,7 @@ class HomeEngine {
     const container = document.getElementById('heroSlidesContainer');
     const dotsContainer = document.getElementById('heroSliderDots');
     if (!container) {
-      console.error('❌ Hero container not found');
+      if (window.Logger) window.Logger.error('❌ Hero container not found');
       return;
     }
     
@@ -202,13 +201,13 @@ class HomeEngine {
           shouldUpdate = true; // Solo actualizar si hay datos nuevos de la API
         }
       } catch (e) {
-        console.error('❌ Hero API Error:', e);
+        if (window.Logger) window.Logger.error('❌ Hero API Error:', e);
       }
     }
 
     // 2. Si no hay datos de API y ya hay slides estáticos, NO actualizar
     if (!shouldUpdate && hasStaticSlides) {
-      console.log('✅ Using static hero slides from HTML');
+      if (window.Logger) window.Logger.log('✅ Using static hero slides from HTML');
       // Solo inicializar el slider con los slides existentes
       if (dotsContainer) {
         const slideCount = existingSlides.length;
@@ -223,7 +222,7 @@ class HomeEngine {
 
     // 2.1 Si no hay slides estáticos y la API falló, asegurar que siempre haya contenido
     if (!hasStaticSlides && slides.length === 0) {
-      console.warn('⚠️ No hero slides found, using fallback');
+      if (window.Logger) window.Logger.warn('⚠️ No hero slides found, using fallback');
     }
 
     // 3. Fallback (Default Premium Slides if API empty AND no static slides)
@@ -369,7 +368,7 @@ class HomeEngine {
         if (res.success && Array.isArray(res.data)) {
           categories = res.data;
         }
-      } catch (e) { console.error('Categories API Error:', e); }
+      } catch (e) { if (window.Logger) window.Logger.error('Categories API Error:', e); }
     }
 
     // 2. Fallback (Premium Data)
@@ -430,14 +429,14 @@ class HomeEngine {
       }
       
       if (featuredProducts.length > 0) {
-        console.log(`✅ Loaded ${featuredProducts.length} featured products from API`);
-        this.renderProductSlider('featuredProductsGrid', featuredProducts).catch(e => console.error('Error rendering featured:', e));
+        if (window.Logger) window.Logger.log(`✅ Loaded ${featuredProducts.length} featured products from API`);
+        this.renderProductSlider('featuredProductsGrid', featuredProducts).catch(e => { if (window.Logger) window.Logger.error('Error rendering featured:', e); });
       } else {
-        console.warn('⚠️ No featured products found');
+        if (window.Logger) window.Logger.warn('⚠️ No featured products found');
         this.showEmptyState('featuredProductsGrid', 'No hay productos destacados');
       }
     } catch (e) {
-      console.error('❌ Error loading featured products:', e);
+      if (window.Logger) window.Logger.error('❌ Error loading featured products:', e);
       this.showEmptyState('featuredProductsGrid', 'Error al cargar productos destacados');
     }
 
@@ -456,17 +455,17 @@ class HomeEngine {
         }
         
         if (trendingProducts.length > 0) {
-          console.log(`✅ Loaded ${trendingProducts.length} trending products from API`);
+          if (window.Logger) window.Logger.log(`✅ Loaded ${trendingProducts.length} trending products from API`);
           const trendingContainer = document.getElementById('trendingProductsGrid');
           if (trendingContainer) {
-            this.renderProductSlider('trendingProductsGrid', trendingProducts).catch(e => console.error('Error rendering trending:', e));
+            this.renderProductSlider('trendingProductsGrid', trendingProducts).catch(e => { if (window.Logger) window.Logger.error('Error rendering trending:', e); });
           }
         } else {
-          console.warn('⚠️ No trending products found');
+          if (window.Logger) window.Logger.warn('⚠️ No trending products found');
           this.showEmptyState('trendingProductsGrid', 'No hay productos en tendencia');
         }
       } catch (e) {
-        console.error('❌ Error loading trending products:', e);
+        if (window.Logger) window.Logger.error('❌ Error loading trending products:', e);
       }
     }, 200);
 
@@ -485,14 +484,14 @@ class HomeEngine {
         }
         
         if (saleProducts.length > 0) {
-          console.log(`✅ Loaded ${saleProducts.length} on-sale products from API`);
-          this.renderProductGrid('onSaleProductsGrid', saleProducts).catch(e => console.error('Error rendering on sale:', e));
+          if (window.Logger) window.Logger.log(`✅ Loaded ${saleProducts.length} on-sale products from API`);
+          this.renderProductGrid('onSaleProductsGrid', saleProducts).catch(e => { if (window.Logger) window.Logger.error('Error rendering on sale:', e); });
         } else {
-          console.warn('⚠️ No on-sale products found');
+          if (window.Logger) window.Logger.warn('⚠️ No on-sale products found');
           this.showEmptyState('onSaleProductsGrid', 'No hay productos en oferta');
         }
       } catch (e) {
-        console.error('❌ Error loading on-sale products:', e);
+        if (window.Logger) window.Logger.error('❌ Error loading on-sale products:', e);
         this.showEmptyState('onSaleProductsGrid', 'Error al cargar productos en oferta');
       }
     }, 400);
@@ -512,14 +511,14 @@ class HomeEngine {
         }
         
         if (newProducts.length > 0) {
-          console.log(`✅ Loaded ${newProducts.length} new products from API`);
-          this.renderProductGrid('newProductsGrid', newProducts).catch(e => console.error('Error rendering new products:', e));
+          if (window.Logger) window.Logger.log(`✅ Loaded ${newProducts.length} new products from API`);
+          this.renderProductGrid('newProductsGrid', newProducts).catch(e => { if (window.Logger) window.Logger.error('Error rendering new products:', e); });
         } else {
-          console.warn('⚠️ No new products found');
+          if (window.Logger) window.Logger.warn('⚠️ No new products found');
           this.showEmptyState('newProductsGrid', 'No hay productos nuevos');
         }
       } catch (e) {
-        console.error('❌ Error loading new products:', e);
+        if (window.Logger) window.Logger.error('❌ Error loading new products:', e);
         this.showEmptyState('newProductsGrid', 'Error al cargar productos nuevos');
       }
     }, 600);
@@ -790,7 +789,7 @@ class HomeEngine {
         </div>
     `).join('');
     */
-    console.log('Brand Marquee: Using Static Text Mode');
+    if (window.Logger) window.Logger.log('Brand Marquee: Using Static Text Mode');
   }
 
 
@@ -857,7 +856,7 @@ class HomeEngine {
         if (window.QuickView) {
           window.QuickView.open(productId);
         } else {
-          console.warn('QuickView module not loaded');
+          if (window.Logger) window.Logger.warn('QuickView module not loaded');
           // Fallback: Redirect
           window.location.href = `product-detail.html?id=${productId}`;
         }
@@ -886,9 +885,9 @@ class HomeEngine {
   async safeLoad(fn, name) {
     try {
       await fn();
-      console.log(`✅ [HomeEngine] ${name} Loaded`);
+      if (window.Logger) window.Logger.log(`✅ [HomeEngine] ${name} Loaded`);
     } catch (e) {
-      console.error(`❌ [HomeEngine] ${name} Failed`, e);
+      if (window.Logger) window.Logger.error(`❌ [HomeEngine] ${name} Failed`, e);
     }
   }
 
@@ -948,21 +947,30 @@ class HomeEngine {
 
     // 2. Popup Logic (Exit Intent / Time Delay)
     const popup = document.getElementById('newsletterPopup');
-    if (popup && !localStorage.getItem('newsletter_subscribed') && !sessionStorage.getItem('newsletter_dismissed')) {
-      setTimeout(() => {
-        popup.style.display = 'flex';
-        // Force reflow for fade in
-        setTimeout(() => popup.classList.add('visible'), 10);
-      }, 5000); // Show after 5 seconds
+    if (popup && !localStorage.getItem('newsletter_subscribed') && !localStorage.getItem('newsletter_dismissed')) {
+      
+      // Exit Intent Detection
+      let exitIntentTriggered = false;
+      document.addEventListener('mouseout', (e) => {
+        if (!exitIntentTriggered && !e.toElement && !e.relatedTarget && e.clientY < 10) {
+          exitIntentTriggered = true;
+          this.showNewsletterPopup();
+        }
+      });
 
+      // Time-based trigger (30 seconds)
+      setTimeout(() => {
+        if (!exitIntentTriggered && !popup.classList.contains('active')) {
+          this.showNewsletterPopup();
+        }
+      }, 30000);
+
+      // Setup close handlers
       const closeBtn = popup.querySelector('.close-modal');
       const closeLink = popup.querySelector('.close-link');
 
       const closeAction = () => {
-        popup.classList.remove('visible');
-        setTimeout(() => popup.style.display = 'none', 500);
-        // Don't show again for this session
-        sessionStorage.setItem('newsletter_dismissed', 'true');
+        window.closeNewsletterPopup();
       };
 
       if (closeBtn) closeBtn.onclick = closeAction;
@@ -1160,7 +1168,7 @@ class HomeEngine {
 
         // 3. Fallback / Render
         if (!products || products.length === 0) {
-          console.warn(`⚠️ API returned no products for ${category}, utilizing fallback.`);
+          if (window.Logger) window.Logger.warn(`⚠️ API returned no products for ${category}, utilizing fallback.`);
           products = this.getFallbackProducts(category); // Guaranteed data
         }
 
@@ -1175,14 +1183,16 @@ class HomeEngine {
         if (seeAll) seeAll.href = `products.html?category=${category}`;
 
       } catch (err) {
-        console.warn('❌ Engine Error:', err);
-        // Fallback on error - Force Mock Data
-        products = this.getFallbackProducts(category);
-        if (products.length > 0) {
-          grid.innerHTML = products.map(p => window.Components.getProductCard(p)).join('');
-        } else {
-          grid.innerHTML = `<div class="p-4 text-center border border-red-500 text-red-500">SYSTEM_OFFLINE // RETRYing...</div>`;
-        }
+        if (window.Logger) window.Logger.warn('❌ Engine Error:', err);
+        // Mostrar estado vacío en lugar de productos mock
+        grid.innerHTML = `
+          <div class="engine-error-state" style="grid-column: 1 / -1; padding: 3rem; text-align: center; border: 2px solid #e0e0e0;">
+            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ff9800; margin-bottom: 1rem;"></i>
+            <h3 style="font-weight: 900; text-transform: uppercase; margin-bottom: 0.5rem;">Error al cargar productos</h3>
+            <p style="color: #666; margin-bottom: 1.5rem;">No se pudieron cargar los productos de ${category.toUpperCase()}</p>
+            <button onclick="location.reload()" class="btn btn-black">RECARGAR</button>
+          </div>
+        `;
       } finally {
         // 5. Reveal
         if (loader) loader.style.display = 'none';
@@ -1204,50 +1214,7 @@ class HomeEngine {
     });
   }
 
-  // Fallbacks removed for production.
-
-
-  // 🛡️ DATA FAILSAFE: Hardcoded mocks to ensure layout never breaks
-  getFallbackProducts(category = null) {
-    const mocks = {
-      'nike': [
-        { id: 101, name: 'NIKE DUNK LOW RETRO', price: 110, image_url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=600', badge: 'BESTSELLER' },
-        { id: 102, name: 'AIR FORCE 1 07', price: 100, image_url: 'https://images.unsplash.com/photo-1491553895911-0055eca6402d?auto=format&fit=crop&q=80&w=600' },
-        { id: 103, name: 'AIR MAX 90', price: 130, image_url: 'https://images.unsplash.com/photo-1514989940723-e8875ea6ab7d?auto=format&fit=crop&q=80&w=600' },
-        { id: 104, name: 'BLAZER MID 77', price: 105, image_url: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&q=80&w=600', badge: 'CLASSIC' }
-      ],
-      'jordan': [
-        { id: 201, name: 'AIR JORDAN 1 HIGH', price: 180, image_url: 'https://images.unsplash.com/photo-1516478177764-9fe5bd7e9717?auto=format&fit=crop&q=80&w=600', badge: 'GRAIL' },
-        { id: 202, name: 'JORDAN 4 RETRO', price: 210, image_url: 'https://images.unsplash.com/photo-1584735175315-9d5df23860e6?auto=format&fit=crop&q=80&w=600', badge: 'HYPED' },
-        { id: 203, name: 'JORDAN 1 LOW', price: 140, image_url: 'https://images.unsplash.com/photo-1593081891731-fda0877988da?auto=format&fit=crop&q=80&w=600' },
-        { id: 204, name: 'JORDAN 3', price: 200, image_url: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&q=80&w=600' }
-      ],
-      'yeezy': [
-        { id: 301, name: 'YEEZY BOOST 350 V2', price: 230, image_url: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&q=80&w=600', badge: 'RESTOCKED' },
-        { id: 302, name: 'YEEZY SLIDE', price: 70, image_url: 'https://images.unsplash.com/photo-1605812853380-34ad68a253f3?auto=format&fit=crop&q=80&w=600' },
-        { id: 303, name: 'YEEZY 700', price: 300, image_url: 'https://images.unsplash.com/photo-1565883017726-d249f056dcb5?auto=format&fit=crop&q=80&w=600' },
-        { id: 304, name: 'YEEZY FOAM RNR', price: 90, image_url: 'https://images.unsplash.com/photo-1617267571626-829db2d558d6?auto=format&fit=crop&q=80&w=600' }
-      ],
-      'adidas': [
-        { id: 401, name: 'ADIDAS FORUM LOW', price: 100, image_url: 'https://images.unsplash.com/photo-1518002171953-a080ee817e1f?auto=format&fit=crop&q=80&w=600', badge: 'TENDENCIA' },
-        { id: 402, name: 'ADIDAS SAMBA', price: 100, image_url: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?auto=format&fit=crop&q=80&w=600' },
-        { id: 403, name: 'ULTRABOOST', price: 180, image_url: 'https://images.unsplash.com/photo-1603808033192-082d6919d3e1?auto=format&fit=crop&q=80&w=600' },
-        { id: 404, name: 'GAZELLE', price: 95, image_url: 'https://images.unsplash.com/photo-1616124619460-c9fa42f7481f?auto=format&fit=crop&q=80&w=600' }
-      ]
-    };
-
-    if (category && mocks[category]) {
-      return mocks[category];
-    }
-
-    // If no category (GLOBAL CALL), return a flattened mix
-    return [
-      ...mocks['jordan'].slice(0, 2),
-      ...mocks['yeezy'].slice(0, 2),
-      ...mocks['nike'].slice(0, 2),
-      ...mocks['adidas'].slice(0, 2)
-    ];
-  }
+  // Productos mock eliminados - solo usar datos reales de la API
 
   // 🛡️ FAILSAFE: Force visibility after 2 seconds if observer fails or user turns off JS interactions
   forceReveal() {
@@ -1259,6 +1226,18 @@ class HomeEngine {
     });
   }
 }
+
+// Global function for closing newsletter popup
+window.closeNewsletterPopup = function() {
+  const popup = document.getElementById('newsletterPopup');
+  if (popup) {
+    popup.classList.remove('visible', 'active');
+    setTimeout(() => {
+      popup.style.display = 'none';
+      localStorage.setItem('newsletter_dismissed', 'true');
+    }, 300);
+  }
+};
 
 document.addEventListener('DOMContentLoaded', () => {
   window.homeEngine = new HomeEngine();

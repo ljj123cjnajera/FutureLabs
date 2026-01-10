@@ -34,7 +34,7 @@ class CouponsManager {
 
     if (!this.availableCouponsLoaded && !this.availableCouponsLoading) {
       this.loadAvailableCoupons().catch((error) =>
-        console.error('Error inicializando cupones:', error)
+        if (window.Logger) window.Logger.error('Error inicializando cupones:', error)
       );
     }
   }
@@ -70,7 +70,7 @@ class CouponsManager {
 
       this.availableCouponsLoaded = true;
     } catch (error) {
-      console.error('Error cargando cupones disponibles:', error);
+      if (window.Logger) window.Logger.error('Error cargando cupones disponibles:', error);
       this.availableCoupons = [];
       this.availableCouponsLoaded = true;
       this.setStatus('No pudimos cargar los cupones disponibles en este momento.', 'warning');
@@ -125,7 +125,7 @@ class CouponsManager {
 
       throw new Error(response?.message || 'Cupón inválido');
     } catch (error) {
-      console.error('Error al aplicar cupón:', error);
+      if (window.Logger) window.Logger.error('Error al aplicar cupón:', error);
 
       if (!silent) {
         const message = error?.message || 'Error al aplicar el cupón';

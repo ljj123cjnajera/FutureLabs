@@ -33,22 +33,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             if (window.authManager) {
-                console.log('🔐 Attempting login for:', email);
+                if (window.Logger) window.Logger.log('🔐 Attempting login for:', email);
                 const success = await window.authManager.login(email, password);
 
                 if (success) {
-                    console.log('✅ Login successful, redirecting to:', returnUrl);
+                    if (window.Logger) window.Logger.log('✅ Login successful, redirecting to:', returnUrl);
                     // AuthManager handles notifications and token storage
                     setTimeout(() => {
                         window.location.href = returnUrl;
                     }, 500); // 500ms delay
                 } else {
-                    console.warn('❌ Login failed');
+                    if (window.Logger) window.Logger.warn('❌ Login failed');
                     btn.innerHTML = originalText;
                     btn.disabled = false;
                 }
             } else {
-                console.error('AuthManager not loaded');
+                if (window.Logger) window.Logger.error('AuthManager not loaded');
                 btn.innerHTML = 'System Error';
             }
         });

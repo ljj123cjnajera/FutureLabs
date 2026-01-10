@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (user.role === 'admin' || user.role === 'moderator') {
                     // Guardar token en localStorage
                     localStorage.setItem('auth_token', response.data.token);
-                    console.log('✅ Token guardado en localStorage');
+                    if (window.Logger) window.Logger.log('✅ Token guardado en localStorage');
 
                     // Guardar información del usuario en localStorage para admin.html
                     localStorage.setItem('admin_user', JSON.stringify({
@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(response.message || 'Authentication Failed');
             }
         } catch (error) {
-            console.error('Login Error:', error);
+            if (window.Logger) window.Logger.error('Login Error:', error);
             alertBox.style.display = 'block';
             alertBox.style.background = '#ffebee';
             alertBox.style.color = '#c62828';

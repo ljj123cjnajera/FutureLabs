@@ -297,7 +297,7 @@ class ChatWidget {
                 this.handleAutoResponse(message);
             }
         } catch (error) {
-            console.error('Error sending chat message:', error);
+            if (window.Logger) window.Logger.error('Error sending chat message:', error);
             // Respuesta automática en caso de error
             this.handleAutoResponse(message);
         }
