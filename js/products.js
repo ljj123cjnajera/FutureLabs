@@ -142,7 +142,10 @@ class CatalogEngine {
         
         // Show loading state using LoadingStates
         if (container && window.LoadingStates) {
-            window.LoadingStates.show('productsContainer', 'loading', 'Cargando productos...');
+            window.LoadingStates.show('productsContainer', {
+                message: 'Cargando productos...',
+                type: 'spinner'
+            });
         } else if (container) {
             container.innerHTML = `
                 <div style="grid-column: 1 / -1; text-align: center; padding: 4rem;">
@@ -261,8 +264,11 @@ class CatalogEngine {
             
             // Show error state using LoadingStates
             if (container && window.LoadingStates) {
-                window.LoadingStates.renderError('productsContainer', 'Error al cargar productos', 'No se pudieron cargar los productos. Por favor, intenta de nuevo.', () => {
-                    this.loadProducts(page);
+                window.LoadingStates.error('productsContainer', {
+                    title: 'Error al cargar productos',
+                    message: 'No se pudieron cargar los productos. Por favor, intenta de nuevo.',
+                    retryLabel: 'Reintentar',
+                    retryCallback: `window.catalogEngine.loadProducts(${page})`
                 });
             } else if (container) {
                 container.innerHTML = `
@@ -311,7 +317,11 @@ class CatalogEngine {
         // Use LoadingStates for empty state
         if (products.length === 0) {
             if (window.LoadingStates) {
-                window.LoadingStates.renderEmpty('productsContainer', 'No se encontraron productos', 'Intenta ajustar tus filtros o busca algo diferente.');
+                window.LoadingStates.empty('productsContainer', {
+                    title: 'No se encontraron productos',
+                    message: 'Intenta ajustar tus filtros o busca algo diferente.',
+                    icon: 'fas fa-box-open'
+                });
             } else {
                 container.innerHTML = `
                     <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; border: 2px dashed var(--gray-300);">
