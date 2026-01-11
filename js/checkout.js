@@ -477,9 +477,10 @@ class CheckoutManager {
                     window.notifications.error('Error al Procesar', errorMsg);
                 }
             }
-            alert('Order failed: ' + (e.message || 'Server connection error'));
+        } finally {
+            // Restaurar botón
             if (btn) {
-                btn.innerHTML = 'PLACE ORDER';
+                btn.innerHTML = originalBtnText;
                 btn.disabled = false;
             }
         }
