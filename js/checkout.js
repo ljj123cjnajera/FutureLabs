@@ -37,6 +37,14 @@ class CheckoutManager {
     }
 
     async loadCart() {
+        // Mostrar loading state
+        if (window.LoadingStates && this.formContainer) {
+            window.LoadingStates.show(this.formContainer, { 
+                message: 'Cargando carrito...',
+                type: 'spinner'
+            });
+        }
+
         try {
             // Intentar cargar desde API primero
             if (window.authManager && window.authManager.isAuthenticated() && window.api) {
@@ -61,6 +69,15 @@ class CheckoutManager {
             }
 
             if (!this.cart || this.cart.length === 0) {
+                if (window.LoadingStates && this.formContainer) {
+                    window.LoadingStates.empty(this.formContainer, {
+                        icon: 'fas fa-shopping-cart',
+                        title: 'Carrito Vacío',
+                        message: 'Agrega productos antes de continuar',
+                        actionLabel: 'Ver Productos',
+                        actionUrl: 'products.html'
+                    });
+                }
                 if (window.notifications) {
                     window.notifications.warning('Tu carrito está vacío', 'Agrega productos antes de continuar');
                 }
@@ -70,7 +87,26 @@ class CheckoutManager {
                 return;
             }
         } catch (error) {
-            if (window.Logger) window.Logger.error('Error loading cart:', error);
+            // Usar error handler si está disponible
+            if (window.ErrorHandler) {
+                window.ErrorHandler.api(error, 'loadCart', 'No se pudo cargar el carrito');
+            } else {
+                if (window.Logger) window.Logger.error('Error loading cart:', error);
+                if (window.notifications) {
+                    window.notifications.error('Error', 'No se pudo cargar el carrito. Por favor, intenta de nuevo.');
+                }
+            }
+
+            // Mostrar estado de error
+            if (window.LoadingStates && this.formContainer) {
+                window.LoadingStates.error(this.formContainer, {
+                    title: 'Error al Cargar',
+                    message: 'No se pudo cargar el carrito. Por favor, intenta de nuevo.',
+                    retryLabel: 'Reintentar',
+                    retryCallback: 'window.checkoutManager.loadCart()'
+                });
+            }
+
             // Fallback a localStorage
             const stored = localStorage.getItem('cart') || localStorage.getItem('brutalist_cart');
             if (stored) {
@@ -78,6 +114,11 @@ class CheckoutManager {
             }
             if (!this.cart || this.cart.length === 0) {
                 window.location.href = 'cart.html';
+            }
+        } finally {
+            // Ocultar loading state
+            if (window.LoadingStates && this.formContainer) {
+                window.LoadingStates.hide(this.formContainer, false);
             }
         }
     }
@@ -91,9 +132,19 @@ class CheckoutManager {
                 const defaultAddr = this.addresses.find(a => a.is_default);
                 if (defaultAddr) this.selectedAddressId = defaultAddr.id;
                 else if (this.addresses.length > 0) this.selectedAddressId = this.addresses[0].id;
+            } else {
+                // Si no hay direcciones, inicializar array vacío
+                this.addresses = [];
             }
         } catch (e) {
-            if (window.Logger) window.Logger.error('Failed to load addresses:', e);
+            // Usar error handler si está disponible
+            if (window.ErrorHandler) {
+                window.ErrorHandler.api(e, 'loadAddresses', 'No se pudieron cargar las direcciones');
+            } else {
+                if (window.Logger) window.Logger.error('Failed to load addresses:', e);
+            }
+            // Inicializar array vacío en caso de error
+            this.addresses = [];
         }
     }
 
@@ -343,28 +394,51 @@ class CheckoutManager {
 
     async placeOrder() {
         const btn = document.querySelector('.btn-green');
+        const originalBtnText = btn ? btn.innerHTML : '';
+        
         if (btn) {
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESSING...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESANDO...';
             btn.disabled = true;
+        }
+
+        // Validaciones antes de procesar
+        if (!this.selectedAddressId) {
+            if (window.notifications) {
+                window.notifications.warning('Dirección Requerida', 'Por favor, selecciona una dirección de envío');
+            }
+            this.renderStep(1);
+            if (btn) {
+                btn.innerHTML = originalBtnText;
+                btn.disabled = false;
+            }
+            return;
+        }
+
+        if (!this.cart || this.cart.length === 0) {
+            if (window.notifications) {
+                window.notifications.warning('Carrito Vacío', 'Tu carrito está vacío');
+            }
+            window.location.href = 'cart.html';
+            return;
         }
 
         try {
             // Prepare Payload
             const orderData = {
                 items: this.cart.map(item => ({
-                    product_id: item.id,
+                    product_id: item.product_id || item.id,
                     quantity: item.quantity,
-                    price: item.price // Optional, backend might verify
+                    price: item.discount_price || item.price // Optional, backend might verify
                 })),
                 shipping_address_id: this.selectedAddressId,
-                payment_method: 'credit_card', // Mapping 'card' to backend enum if needed
+                payment_method: this.paymentMethod === 'card' ? 'credit_card' : this.paymentMethod,
                 payment_details: {
                     provider: 'stripe',
                     transaction_id: 'tx_' + Date.now() // Placeholder for actual gateway integration
                 }
             };
 
-            // console.log('📤 Placing Order:', orderData);
+            if (window.Logger) window.Logger.log('📤 Placing Order:', orderData);
             const response = await window.api.createOrder(orderData);
 
             if (response.success) {
@@ -372,20 +446,37 @@ class CheckoutManager {
 
                 // Clear Cart
                 localStorage.removeItem('cart');
+                localStorage.removeItem('brutalist_cart');
                 localStorage.removeItem('cart_expires'); // If used
 
                 // Update Badge
                 if (window.Components) window.Components.updateCartCount();
 
+                // Show success notification
+                if (window.notifications) {
+                    window.notifications.success('Pedido Creado', 'Tu pedido se ha procesado correctamente');
+                }
+
                 // Redirect to Success Page
                 const orderId = response.data.order ? response.data.order.id : (response.data.id || 'CONFIRMED');
-                window.location.href = `order-success.html?id=${orderId}`;
+                setTimeout(() => {
+                    window.location.href = `order-success.html?id=${orderId}`;
+                }, 1000);
             } else {
                 throw new Error(response.message || 'Failed to create order');
             }
 
         } catch (e) {
-            if (window.Logger) window.Logger.error('Order Error (Real API Failed):', e);
+            // Usar error handler si está disponible
+            if (window.ErrorHandler) {
+                window.ErrorHandler.api(e, 'placeOrder', 'No se pudo procesar el pedido. Por favor, intenta de nuevo.');
+            } else {
+                if (window.Logger) window.Logger.error('Order Error:', e);
+                if (window.notifications) {
+                    const errorMsg = e.message || e.response?.data?.message || 'No se pudo procesar el pedido. Por favor, intenta de nuevo.';
+                    window.notifications.error('Error al Procesar', errorMsg);
+                }
+            }
             alert('Order failed: ' + (e.message || 'Server connection error'));
             if (btn) {
                 btn.innerHTML = 'PLACE ORDER';
