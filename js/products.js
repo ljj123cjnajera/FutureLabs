@@ -9,6 +9,7 @@ class CatalogEngine {
         this.allProducts = [];
         this.filteredProducts = [];
         this.categories = [];
+        this.brands = [];
         this.currentPage = 1;
         this.itemsPerPage = 12;
         this.totalPages = 1;
@@ -24,6 +25,7 @@ class CatalogEngine {
         };
         this.currentSort = 'newest';
         this.viewMode = 'grid';
+        this.searchDebounceTimer = null;
         this.init();
     }
 
@@ -43,8 +45,9 @@ class CatalogEngine {
             }
         }
 
-        // Load categories for filter
+        // Load categories and brands for filter
         await this.loadCategories();
+        await this.loadBrands();
 
         // 🚀 URL PARAMETER HANDLING
         this.applyInitialFilters();
@@ -52,12 +55,21 @@ class CatalogEngine {
         // Load products after applying filters
         await this.loadProducts(this.currentPage);
 
-        // Setup search input
+        // Setup search input with debounce
         const searchInput = document.getElementById('productSearchInput');
         if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.trim();
+                clearTimeout(this.searchDebounceTimer);
+                this.searchDebounceTimer = setTimeout(() => {
+                    this.search(query);
+                }, 500);
+            });
             searchInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
-                    this.search(e.target.value);
+                    e.preventDefault();
+                    clearTimeout(this.searchDebounceTimer);
+                    this.search(e.target.value.trim());
                 }
             });
         }
@@ -112,8 +124,10 @@ class CatalogEngine {
         const container = document.getElementById('productsContainer');
         const countLabel = document.getElementById('productCount');
         
-        // Show loading state
-        if (container) {
+        // Show loading state using LoadingStates
+        if (container && window.LoadingStates) {
+            window.LoadingStates.show('productsContainer', 'loading', 'Cargando productos...');
+        } else if (container) {
             container.innerHTML = `
                 <div style="grid-column: 1 / -1; text-align: center; padding: 4rem;">
                     <div class="loading-brutalist">CARGANDO PRODUCTOS...</div>
@@ -183,7 +197,18 @@ class CatalogEngine {
             this.filteredProducts = products;
             this.totalProducts = total;
             this.currentPage = page;
-            this.totalPages = Math.ceil(total / this.itemsPerPage);
+            
+            // Calculate total pages correctly
+            if (response && response.data && response.data.pages) {
+                this.totalPages = response.data.pages;
+            } else {
+                this.totalPages = Math.ceil(total / this.itemsPerPage);
+            }
+
+            // Hide loading state
+            if (window.LoadingStates) {
+                window.LoadingStates.hide('productsContainer');
+            }
 
             this.render(products);
             this.updatePagination();
@@ -193,10 +218,21 @@ class CatalogEngine {
             if (countLabel) countLabel.textContent = total;
             
         } catch (e) {
-            if (window.Logger) window.Logger.error('⚠️ [CatalogEngine] API Failed', e);
+            if (window.ErrorHandler) {
+                window.ErrorHandler.api(e, 'loadProducts', 'No se pudieron cargar los productos. Por favor, intenta de nuevo.');
+            } else {
+                if (window.Logger) window.Logger.error('⚠️ [CatalogEngine] API Failed', e);
+            }
+            
             this.allProducts = [];
             this.filteredProducts = [];
-            if (container) {
+            
+            // Show error state using LoadingStates
+            if (container && window.LoadingStates) {
+                window.LoadingStates.renderError('productsContainer', 'Error al cargar productos', 'No se pudieron cargar los productos. Por favor, intenta de nuevo.', () => {
+                    this.loadProducts(page);
+                });
+            } else if (container) {
                 container.innerHTML = `
                     <div style="grid-column: 1 / -1; text-align: center; padding: 4rem; border: 2px dashed var(--gray-300);">
                         <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--gray-400); margin-bottom: 1rem;"></i>
@@ -206,7 +242,6 @@ class CatalogEngine {
                     </div>
                 `;
             }
-            if (window.notifications) window.notifications.error('Error de Conexión', 'No se pudieron cargar los productos.');
         }
     }
 
@@ -241,16 +276,27 @@ class CatalogEngine {
         const container = document.getElementById('productsContainer');
         if (!container) return;
 
-        // Use Global Standard Card Generator
+        // Use LoadingStates for empty state
         if (products.length === 0) {
-            container.innerHTML = `
-                <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; border: 2px dashed var(--gray-300);">
-                    <i class="fas fa-box-open" style="font-size: 3rem; color: var(--gray-400); margin-bottom: 1rem;"></i>
-                    <h2 class="text-2xl font-black uppercase mb-2">NO PRODUCTS FOUND</h2>
-                    <p class="text-gray-600">Check back later for new drops.</p>
-                </div>
-             `;
+            if (window.LoadingStates) {
+                window.LoadingStates.renderEmpty('productsContainer', 'No se encontraron productos', 'Intenta ajustar tus filtros o busca algo diferente.');
+            } else {
+                container.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; border: 2px dashed var(--gray-300);">
+                        <i class="fas fa-box-open" style="font-size: 3rem; color: var(--gray-400); margin-bottom: 1rem;"></i>
+                        <h2 class="text-2xl font-black uppercase mb-2">NO SE ENCONTRARON PRODUCTOS</h2>
+                        <p class="text-gray-600">Intenta ajustar tus filtros o busca algo diferente.</p>
+                    </div>
+                 `;
+            }
             return;
+        }
+
+        // Apply view mode class
+        if (this.viewMode === 'list') {
+            container.classList.add('list-view');
+        } else {
+            container.classList.remove('list-view');
         }
 
         if (window.Components && window.Components.getProductCard) {
@@ -297,6 +343,17 @@ class CatalogEngine {
     }
 
     updateFilterButtons(activeBrand) {
+        // Update radio buttons
+        const brandRadios = document.querySelectorAll('input[name="brand"]');
+        brandRadios.forEach(radio => {
+            if (radio.value === activeBrand || (activeBrand === 'all' && radio.value === 'all')) {
+                radio.checked = true;
+            } else {
+                radio.checked = false;
+            }
+        });
+        
+        // Also update any button filters if they exist
         document.querySelectorAll('.btn-filter').forEach(btn => {
             const btnBrand = btn.getAttribute('onclick')?.match(/filter\(['"](.*?)['"]\)/)?.[1];
             if (btnBrand === activeBrand) {
@@ -358,8 +415,43 @@ class CatalogEngine {
         };
         this.currentSort = 'newest';
         this.currentPage = 1;
+        
+        // Reset all filter inputs
+        const sortSelect = document.getElementById('sortSelect');
+        if (sortSelect) sortSelect.value = 'newest';
+        
+        const searchInput = document.getElementById('productSearchInput');
+        if (searchInput) searchInput.value = '';
+        
+        const minPriceInput = document.getElementById('minPrice');
+        if (minPriceInput) minPriceInput.value = '';
+        
+        const maxPriceInput = document.getElementById('maxPrice');
+        if (maxPriceInput) maxPriceInput.value = '';
+        
+        const onSaleFilter = document.getElementById('onSaleFilter');
+        if (onSaleFilter) onSaleFilter.checked = false;
+        
+        const inStockFilter = document.getElementById('inStockFilter');
+        if (inStockFilter) inStockFilter.checked = true;
+        
+        // Reset brand radio buttons
+        const brandRadios = document.querySelectorAll('input[name="brand"]');
+        brandRadios.forEach(radio => {
+            if (radio.value === 'all') {
+                radio.checked = true;
+            } else {
+                radio.checked = false;
+            }
+        });
+        
+        // Reset category radio buttons
+        const categoryRadios = document.querySelectorAll('input[name="category"]');
+        categoryRadios.forEach(radio => {
+            radio.checked = false;
+        });
+        
         this.updateFilterButtons('all');
-        document.getElementById('sortSelect').value = 'newest';
         this.loadProducts(1);
     }
 
@@ -375,8 +467,16 @@ class CatalogEngine {
         const resultsCount = document.getElementById('resultsCount');
         const totalCount = document.getElementById('totalCount');
         
+        // Show current page results count
+        const start = (this.currentPage - 1) * this.itemsPerPage + 1;
+        const end = Math.min(this.currentPage * this.itemsPerPage, this.totalProducts);
+        
         if (resultsCount) {
-            resultsCount.textContent = this.allProducts.length;
+            if (this.totalProducts > 0) {
+                resultsCount.textContent = `${start}-${end}`;
+            } else {
+                resultsCount.textContent = '0';
+            }
         }
         if (totalCount) {
             totalCount.textContent = this.totalProducts;
@@ -503,7 +603,67 @@ class CatalogEngine {
             this.renderCategoriesFilter();
         } catch (e) {
             if (window.Logger) window.Logger.error('Error loading categories:', e);
+            if (window.ErrorHandler) {
+                window.ErrorHandler.api(e, 'loadCategories', 'No se pudieron cargar las categorías.');
+            }
         }
+    }
+
+    async loadBrands() {
+        try {
+            // Load brands from products
+            const response = await this.api.getProducts({ limit: 1000 });
+            let products = [];
+            
+            if (Array.isArray(response)) {
+                products = response;
+            } else if (response && response.data) {
+                products = response.data.products || response.data || [];
+            } else if (response && response.products) {
+                products = response.products;
+            }
+
+            // Extract unique brands
+            const brandsSet = new Set();
+            products.forEach(p => {
+                if (p.brand) {
+                    brandsSet.add(p.brand.toLowerCase());
+                }
+            });
+            
+            this.brands = Array.from(brandsSet).sort();
+            this.renderBrandsFilter();
+        } catch (e) {
+            if (window.Logger) window.Logger.error('Error loading brands:', e);
+            // Don't show error to user, just use default brands
+            this.brands = ['jordan', 'yeezy', 'nike', 'adidas'];
+            this.renderBrandsFilter();
+        }
+    }
+
+    renderBrandsFilter() {
+        const container = document.querySelector('.filter-section:nth-of-type(3) .filter-options');
+        if (!container) return;
+
+        // Keep "TODAS" option and add dynamic brands
+        const allOption = `
+            <label class="filter-checkbox">
+                <input type="radio" name="brand" value="all" checked onchange="window.catalogEngine.filter('all')">
+                <span>TODAS</span>
+            </label>
+        `;
+
+        const brandOptions = this.brands.map(brand => {
+            const brandName = brand.charAt(0).toUpperCase() + brand.slice(1);
+            return `
+                <label class="filter-checkbox">
+                    <input type="radio" name="brand" value="${brand}" onchange="window.catalogEngine.filter('${brand}')">
+                    <span>${brandName.toUpperCase()}</span>
+                </label>
+            `;
+        }).join('');
+
+        container.innerHTML = allOption + brandOptions;
     }
 
     renderCategoriesFilter() {
@@ -532,14 +692,21 @@ class CatalogEngine {
             } else {
                 container.classList.remove('list-view');
             }
+            
+            // Re-render to apply view mode changes
+            if (this.allProducts.length > 0) {
+                this.render(this.allProducts);
+            }
         }
 
         // Update view toggle buttons
         document.querySelectorAll('.view-btn').forEach(btn => {
             if (btn.dataset.view === mode) {
                 btn.classList.add('active');
+                btn.setAttribute('aria-pressed', 'true');
             } else {
                 btn.classList.remove('active');
+                btn.setAttribute('aria-pressed', 'false');
             }
         });
     }
@@ -578,8 +745,36 @@ class CatalogEngine {
 // Global functions
 window.toggleFiltersSidebar = function() {
     const sidebar = document.getElementById('productsSidebar');
+    const overlay = document.querySelector('.products-sidebar-overlay');
+    
     if (sidebar) {
+        const isActive = sidebar.classList.contains('active');
         sidebar.classList.toggle('active');
+        
+        // Create or toggle overlay
+        if (!overlay) {
+            const newOverlay = document.createElement('div');
+            newOverlay.className = 'products-sidebar-overlay';
+            newOverlay.onclick = window.toggleFiltersSidebar;
+            document.body.appendChild(newOverlay);
+            setTimeout(() => newOverlay.classList.add('active'), 10);
+        } else {
+            overlay.classList.toggle('active');
+            if (!sidebar.classList.contains('active')) {
+                setTimeout(() => {
+                    if (overlay && !overlay.classList.contains('active')) {
+                        overlay.remove();
+                    }
+                }, 300);
+            }
+        }
+        
+        // Prevent body scroll when sidebar is open
+        if (sidebar.classList.contains('active')) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
     }
 };
 
