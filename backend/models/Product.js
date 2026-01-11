@@ -45,9 +45,13 @@ class Product {
     }
 
     try {
-      return await query.timeout(5000); // 5 segundos máximo
+      return await query.timeout(20000); // 20 segundos máximo (aumentado para queries complejas)
     } catch (error) {
       console.error('Error en Product.getAll:', error.message);
+      // Si es un error de timeout de conexión, intentar liberar recursos
+      if (error.message && error.message.includes('Timeout acquiring a connection')) {
+        console.error('⚠️ Pool de conexiones saturado. Considera aumentar el tamaño del pool o reducir peticiones concurrentes.');
+      }
       throw error;
     }
   }

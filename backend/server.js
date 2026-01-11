@@ -49,10 +49,10 @@ async function ensureDataSeeded() {
     
     console.log('🔍 Checking if products exist...');
     
-    // Usar Promise.race para timeout de 5 segundos
-    const checkPromise = db('products').select('id').limit(1).timeout(5000);
+    // Usar Promise.race para timeout de 10 segundos (aumentado)
+    const checkPromise = db('products').select('id').limit(1).timeout(10000);
     const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Query timeout')), 5000)
+      setTimeout(() => reject(new Error('Query timeout')), 10000)
     );
     
     try {

@@ -7,7 +7,7 @@ class Category {
       return await db('categories')
         .select('*')
         .orderBy('sort_order', 'asc')
-        .timeout(5000); // 5 segundos máximo
+        .timeout(20000); // 20 segundos máximo (aumentado)
     } catch (error) {
       console.error('Error en Category.getAll:', error.message);
       throw error;

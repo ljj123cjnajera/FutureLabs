@@ -54,11 +54,11 @@ if (dbUrl && !isPlaceholder) {
       migrations: baseEnvConfig.migrations || {},
       seeds: baseEnvConfig.seeds || {},
       pool: {
-        min: 0, // Empezar sin conexiones para evitar bloqueo al inicio
-        max: 5, // Aumentar máximo pero con mejor manejo
-        acquireTimeoutMillis: 5000, // Reducir timeout a 5s (fallar muy rápido)
-        createTimeoutMillis: 3000, // Timeout de creación muy corto
-        idleTimeoutMillis: 10000, // Liberar conexiones idle muy rápido
+        min: 2, // Mantener al menos 2 conexiones activas
+        max: 20, // Aumentar significativamente para manejar peticiones concurrentes
+        acquireTimeoutMillis: 30000, // Aumentar timeout a 30s para dar más tiempo
+        createTimeoutMillis: 10000, // Timeout de creación más largo
+        idleTimeoutMillis: 30000, // Mantener conexiones idle más tiempo
         reapIntervalMillis: 1000,
         propagateCreateError: false,
         afterCreate: function(conn, done) {
