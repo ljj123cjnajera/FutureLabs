@@ -19,20 +19,33 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <link rel="stylesheet" href="css/404.css">
+    <link rel="stylesheet" href="css/404-improved.css?v=1.0">
+    <link rel="stylesheet" href="css/404-improved.css?v=1.0">
 </head>
 
 <body>
     <header id="mainHeader"></header>
 
-    <div class="container">
-        <div class="error-container">
-            <h1 class="error-code">404</h1>
-            <div class="error-msg">Lost in the Hype</div>
-            <p class="error-desc">Parece que esta página fue droppeada o nunca existió. Regresa a la base antes de que
-                se agote todo.</p>
-            <a href="index.html" class="btn-home">Back to Base</a>
+    <main class="error-page">
+        <div class="container">
+            <div class="error-container">
+                <div class="error-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h1 class="error-code">404</h1>
+                <div class="error-msg">PÁGINA NO ENCONTRADA</div>
+                <p class="error-desc">Parece que esta página fue eliminada o nunca existió. Regresa a la base antes de que se agote todo.</p>
+                <div class="error-actions">
+                    <a href="index.html" class="btn btn-primary">
+                        <i class="fas fa-home"></i> VOLVER AL INICIO
+                    </a>
+                    <a href="products.html" class="btn btn-outline">
+                        <i class="fas fa-shopping-bag"></i> VER PRODUCTOS
+                    </a>
+                </div>
+            </div>
         </div>
-    </div>
+    </main>
 
     <!-- Footer -->
     <footer id="mainFooter" role="contentinfo"></footer>
@@ -40,6 +53,8 @@
     <!-- Scripts -->
     <!-- Core scripts (critical for page functionality) -->
     <script src="js/logger.js?v=1.0"></script>
+    <script src="js/error-handler.js?v=1.0"></script>
+    <script src="js/loading-states.js?v=1.0"></script>
     <script src="js/api.js"></script>
     <script src="js/components.js"></script>
     <script src="js/navigation-enhanced.js"></script>
