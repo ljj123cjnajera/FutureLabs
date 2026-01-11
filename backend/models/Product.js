@@ -83,7 +83,7 @@ class Product {
       .where('products.is_active', true)
       .orderBy('products.created_at', 'desc')
       .limit(limit)
-      .timeout(5000);
+      .timeout(20000); // 20 segundos máximo (aumentado)
   }
 
   // Obtener productos en oferta
@@ -95,7 +95,7 @@ class Product {
       .where('products.is_active', true)
       .orderBy('products.created_at', 'desc')
       .limit(limit)
-      .timeout(5000);
+      .timeout(20000); // 20 segundos máximo (aumentado)
   }
 
   // Obtener productos en tendencia
@@ -107,7 +107,7 @@ class Product {
       .where('products.is_active', true)
       .orderBy('products.created_at', 'desc')
       .limit(limit)
-      .timeout(5000);
+      .timeout(20000); // 20 segundos máximo (aumentado)
   }
 
   // Obtener productos más vendidos
@@ -119,7 +119,7 @@ class Product {
       .where('products.is_active', true)
       .orderBy('products.created_at', 'desc')
       .limit(limit)
-      .timeout(5000);
+      .timeout(20000); // 20 segundos máximo (aumentado)
   }
 
   // Obtener productos nuevos
@@ -131,7 +131,7 @@ class Product {
       .where('products.is_active', true)
       .orderBy('products.created_at', 'desc')
       .limit(limit)
-      .timeout(5000);
+      .timeout(20000); // 20 segundos máximo (aumentado)
   }
 
   // Obtener productos por categoría
