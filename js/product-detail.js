@@ -58,6 +58,8 @@ document.addEventListener('DOMContentLoaded', async function () {
                 }
 
                 renderProductDetails(product, container, galleryImages);
+                // Render size options after product details are rendered
+                await renderSizeOptions(product);
                 return;
             } else {
                 throw new Error('Product Not Found in API');
@@ -318,26 +320,70 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     let selectedSize = null;
 
-    function renderSizeOptions(product) {
+    async function renderSizeOptions(product) {
         const grid = document.getElementById('sizeSelectorGrid');
         if (!grid) return;
 
-        // Standard US Men Sizes
-        const sizes = ['7', '7.5', '8', '8.5', '9', '9.5', '10', '10.5', '11', '12', '13'];
+        // Try to get sizes from API (product.variants or product.sizes)
+        let availableSizes = [];
+        let sizeStockMap = {};
+        
+        if (product.variants && Array.isArray(product.variants)) {
+            // If product has variants with sizes
+            availableSizes = product.variants
+                .filter(v => v.size && v.stock_quantity > 0)
+                .map(v => ({ size: v.size, stock: v.stock_quantity }));
+            sizeStockMap = product.variants.reduce((acc, v) => {
+                if (v.size) acc[v.size] = v.stock_quantity || 0;
+                return acc;
+            }, {});
+        } else if (product.sizes && Array.isArray(product.sizes)) {
+            // If product has sizes array
+            availableSizes = product.sizes
+                .filter(s => s.stock_quantity > 0)
+                .map(s => ({ size: s.size || s.name, stock: s.stock_quantity }));
+            sizeStockMap = product.sizes.reduce((acc, s) => {
+                const sizeName = s.size || s.name;
+                if (sizeName) acc[sizeName] = s.stock_quantity || 0;
+                return acc;
+            }, {});
+        } else if (product.stock_by_size && typeof product.stock_by_size === 'object') {
+            // If product has stock_by_size object
+            sizeStockMap = product.stock_by_size;
+            availableSizes = Object.keys(sizeStockMap)
+                .filter(size => sizeStockMap[size] > 0)
+                .map(size => ({ size, stock: sizeStockMap[size] }));
+        }
 
-        // Logic: If total stock > 0, assume all sizes available (Simple V1)
-        // If stock === 0, all disabled.
-        const hasStock = product.stock_quantity > 0;
+        // Fallback to standard sizes if no API data
+        const standardSizes = ['7', '7.5', '8', '8.5', '9', '9.5', '10', '10.5', '11', '12', '13'];
+        const sizesToRender = availableSizes.length > 0 
+            ? availableSizes.map(s => s.size)
+            : standardSizes;
 
-        grid.innerHTML = sizes.map(size => {
+        // Check if product has stock at all
+        const hasStock = product.stock_quantity > 0 || availableSizes.length > 0;
+
+        grid.innerHTML = sizesToRender.map(size => {
+            const stockForSize = sizeStockMap[size] !== undefined ? sizeStockMap[size] : 
+                               (product.stock_quantity !== undefined ? product.stock_quantity : null);
+            const isAvailable = stockForSize !== null ? stockForSize > 0 : hasStock;
+            const isLowStock = stockForSize !== null && stockForSize > 0 && stockForSize <= 3;
+            
             return `
-                    <button class="size-option ${!hasStock ? 'disabled' : ''}"
-                onclick = "selectSize('${size}', this)" 
-                        ${!hasStock ? 'disabled' : ''}>
+                <button class="size-option ${!isAvailable ? 'disabled' : ''} ${isLowStock ? 'low-stock' : ''}"
+                        onclick="selectSize('${size}', this)" 
+                        ${!isAvailable ? 'disabled' : ''}
+                        data-stock="${stockForSize !== null ? stockForSize : ''}"
+                        title="${stockForSize !== null ? `${stockForSize} disponibles` : ''}">
                     ${size}
-                </button >
-                    `;
+                    ${isLowStock && isAvailable ? '<span class="low-stock-indicator">!</span>' : ''}
+                </button>
+            `;
         }).join('');
+
+        // Store size stock map globally for validation
+        window.productSizeStock = sizeStockMap;
     }
 
     window.selectSize = function (size, element) {
@@ -395,7 +441,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             return;
         }
 
-        // VALIDACIÓN DE STOCK
+        // VALIDACIÓN DE STOCK GENERAL
         const stock = product.stock_quantity;
         if (stock !== undefined && stock === 0) {
             if (window.notifications) {
@@ -419,6 +465,23 @@ document.addEventListener('DOMContentLoaded', async function () {
                 window.notifications.warning('Selecciona una Talla', 'Por favor, selecciona una talla antes de agregar al carrito.');
             }
             return;
+        }
+
+        // VALIDACIÓN DE STOCK POR TALLA
+        if (window.productSizeStock && window.productSizeStock[selectedSize] !== undefined) {
+            const sizeStock = window.productSizeStock[selectedSize];
+            if (sizeStock === 0) {
+                if (window.notifications) {
+                    window.notifications.warning('Talla Agotada', `La talla US ${selectedSize} no está disponible en este momento.`);
+                }
+                return;
+            }
+            if (sizeStock < 1) {
+                if (window.notifications) {
+                    window.notifications.warning('Stock Insuficiente', `Solo hay ${sizeStock} unidades disponibles en talla US ${selectedSize}.`);
+                }
+                return;
+            }
         }
 
         try {
@@ -457,7 +520,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             return;
         }
 
-        // VALIDACIÓN DE STOCK
+        // VALIDACIÓN DE STOCK GENERAL
         const stock = product.stock_quantity;
         if (stock !== undefined && stock === 0) {
             if (window.notifications) {
@@ -481,6 +544,23 @@ document.addEventListener('DOMContentLoaded', async function () {
                 window.notifications.warning('Selecciona una Talla', 'Por favor, selecciona una talla antes de comprar.');
             }
             return;
+        }
+
+        // VALIDACIÓN DE STOCK POR TALLA
+        if (window.productSizeStock && window.productSizeStock[selectedSize] !== undefined) {
+            const sizeStock = window.productSizeStock[selectedSize];
+            if (sizeStock === 0) {
+                if (window.notifications) {
+                    window.notifications.warning('Talla Agotada', `La talla US ${selectedSize} no está disponible en este momento.`);
+                }
+                return;
+            }
+            if (sizeStock < 1) {
+                if (window.notifications) {
+                    window.notifications.warning('Stock Insuficiente', `Solo hay ${sizeStock} unidades disponibles en talla US ${selectedSize}.`);
+                }
+                return;
+            }
         }
 
         try {

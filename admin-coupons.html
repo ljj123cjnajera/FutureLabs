@@ -283,8 +283,12 @@
     </div>
 
     <!-- Scripts -->
+    <!-- Core scripts (critical for page functionality) -->
+    <script src="js/logger.js?v=1.0"></script>
     <script src="js/api.js"></script>
     <script src="js/notifications.js"></script>
+    <!-- Page-specific script -->
+    <script src="js/admin-coupons.js"></script>
     <script>
         // Init logic for admin
         document.addEventListener('DOMContentLoaded', () => {
@@ -293,7 +297,6 @@
             }
         });
     </script>
-    <script src="js/admin-coupons.js"></script>
 </body>
 
 </html>

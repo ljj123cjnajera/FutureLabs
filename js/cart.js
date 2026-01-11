@@ -110,9 +110,17 @@ class CartEngine {
   }
 
   render(container, items, subtotal, total) {
-    // Calculate shipping (free over S/ 150)
-    const shipping = subtotal >= 150 ? 0 : 15;
-    const finalTotal = total + shipping;
+    // Get applied coupon discount if any
+    const appliedCoupon = window.couponsManager?.appliedCoupon || null;
+    const couponDiscount = window.couponsManager?.discount || 0;
+    
+    // Calculate subtotal after coupon
+    const subtotalAfterCoupon = Math.max(0, subtotal - couponDiscount);
+    
+    // Calculate shipping (free over S/ 150, based on subtotal after coupon)
+    const shippingThreshold = 150;
+    const shipping = subtotalAfterCoupon >= shippingThreshold ? 0 : 15;
+    const finalTotal = subtotalAfterCoupon + shipping;
 
     container.innerHTML = `
             <div class="cart-grid-v3">
@@ -199,13 +207,26 @@ class CartEngine {
                         <span>SUBTOTAL</span>
                         <span>S/ ${subtotal.toFixed(2)}</span>
                     </div>
+                    ${appliedCoupon ? `
+                    <div class="summary-row" style="color: var(--success, #28a745);">
+                        <span>
+                            <i class="fas fa-tag"></i> CUPÓN: ${appliedCoupon.code}
+                            <button onclick="window.cartEngine.removeCoupon()" 
+                                    style="margin-left: 0.5rem; background: transparent; border: none; color: inherit; cursor: pointer; font-size: 0.8rem;"
+                                    aria-label="Remover cupón">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </span>
+                        <span>-S/ ${couponDiscount.toFixed(2)}</span>
+                    </div>
+                    ` : ''}
                     <div class="summary-row">
                         <span>ENVÍO</span>
                         <span>${shipping === 0 ? 'GRATIS' : `S/ ${shipping.toFixed(2)}`}</span>
                     </div>
-                    ${subtotal < 150 ? `
+                    ${subtotalAfterCoupon < shippingThreshold ? `
                     <div class="summary-shipping-note" style="font-size: 0.85rem; color: #666; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #eee;">
-                        <i class="fas fa-info-circle"></i> Agrega S/ ${(150 - subtotal).toFixed(2)} más para envío gratis
+                        <i class="fas fa-info-circle"></i> Agrega S/ ${(shippingThreshold - subtotalAfterCoupon).toFixed(2)} más para envío gratis
                     </div>
                     ` : ''}
 
@@ -219,6 +240,24 @@ class CartEngine {
                             ${items.some(item => (item.stock_quantity !== undefined && item.stock_quantity === 0)) ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
                         <i class="fas fa-lock"></i> PROCEDER AL PAGO
                     </button>
+                    
+                    <!-- Coupon Section -->
+                    <div id="cartCouponSection" style="margin-top: 1rem; padding-top: 1rem; border-top: 2px solid var(--black);">
+                        ${appliedCoupon ? '' : `
+                        <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                            <input type="text" 
+                                   id="couponCodeInput" 
+                                   placeholder="CÓDIGO DE CUPÓN" 
+                                   style="flex: 1; padding: 0.75rem; border: 2px solid var(--black); font-weight: 600; text-transform: uppercase;"
+                                   onkeypress="if(event.key==='Enter') window.cartEngine.applyCoupon()">
+                            <button onclick="window.cartEngine.applyCoupon()" 
+                                    class="btn btn-black" 
+                                    style="padding: 0.75rem 1.5rem; white-space: nowrap;">
+                                APLICAR
+                            </button>
+                        </div>
+                        `}
+                    </div>
                     
                     ${!this.isAuthenticated ? `
                     <div style="margin-top: 1rem; padding: 1rem; background: #fff3cd; border: 2px solid #ffc107; text-align: center;">
@@ -255,6 +294,15 @@ class CartEngine {
     }
 
     try {
+      // Validate stock before updating
+      const stockInfo = await this.validateStock(productId, newQty);
+      if (!stockInfo.available) {
+        if (window.notifications) {
+          window.notifications.warning('Stock Insuficiente', stockInfo.message || 'No hay suficiente stock disponible');
+        }
+        return;
+      }
+
       if (this.isAuthenticated) {
         await this.api.updateCartItem(productId, newQty);
       } else {
@@ -262,6 +310,13 @@ class CartEngine {
         let cart = JSON.parse(localStorage.getItem('brutalist_cart') || '[]');
         const item = cart.find(i => (i.id === productId || i.product_id === productId));
         if (item) {
+          // Validate stock in localStorage item
+          if (item.stock_quantity !== undefined && newQty > item.stock_quantity) {
+            if (window.notifications) {
+              window.notifications.warning('Stock Insuficiente', `Solo hay ${item.stock_quantity} unidades disponibles`);
+            }
+            return;
+          }
           item.quantity = newQty;
           localStorage.setItem('brutalist_cart', JSON.stringify(cart));
         }
@@ -276,8 +331,36 @@ class CartEngine {
     } catch (e) {
       if (window.Logger) window.Logger.error('Error updating cart:', e);
       if (window.notifications) {
-        window.notifications.error('Error', 'No se pudo actualizar la cantidad. Por favor, intenta de nuevo.');
+        const errorMsg = e.response?.data?.message || e.message || 'No se pudo actualizar la cantidad. Por favor, intenta de nuevo.';
+        window.notifications.error('Error', errorMsg);
       }
+    }
+  }
+
+  async validateStock(productId, quantity) {
+    try {
+      // Try to get product info from API
+      if (this.api && this.api.getProduct) {
+        const product = await this.api.getProduct(productId);
+        if (product && product.success && product.data) {
+          const stock = product.data.stock_quantity;
+          if (stock !== undefined) {
+            if (stock === 0) {
+              return { available: false, message: 'Este producto está agotado' };
+            }
+            if (stock < quantity) {
+              return { available: false, message: `Solo hay ${stock} unidades disponibles` };
+            }
+            return { available: true };
+          }
+        }
+      }
+      // If validation fails, allow the operation (fallback)
+      return { available: true };
+    } catch (e) {
+      if (window.Logger) window.Logger.warn('Error validating stock:', e);
+      // On error, allow the operation (fail open)
+      return { available: true };
     }
   }
 
@@ -308,7 +391,16 @@ class CartEngine {
 
   async add(productId, quantity = 1, options = {}) {
     try {
-      // Validate stock if product data available
+      // Validate stock before adding
+      const stockInfo = await this.validateStock(productId, quantity);
+      if (!stockInfo.available) {
+        if (window.notifications) {
+          window.notifications.warning('Stock Insuficiente', stockInfo.message || 'No hay suficiente stock disponible');
+        }
+        return false;
+      }
+
+      // Additional validation from currentProduct if available
       if (window.currentProduct) {
         const stock = window.currentProduct.stock_quantity;
         if (stock !== undefined && stock === 0) {
@@ -317,16 +409,39 @@ class CartEngine {
           }
           return false;
         }
+        if (stock !== undefined && stock < quantity) {
+          if (window.notifications) {
+            window.notifications.warning('Stock Insuficiente', `Solo hay ${stock} unidades disponibles`);
+          }
+          return false;
+        }
       }
 
       if (this.isAuthenticated) {
-        await this.api.addToCart(productId, quantity);
+        const response = await this.api.addToCart(productId, quantity);
+        // Check if API returned an error about stock
+        if (response && !response.success && response.message) {
+          if (window.notifications) {
+            window.notifications.warning('Error', response.message);
+          }
+          return false;
+        }
       } else {
         // Add to localStorage
         let cart = JSON.parse(localStorage.getItem('brutalist_cart') || '[]');
         const existing = cart.find(i => (i.id === productId || i.product_id === productId));
 
         if (existing) {
+          // Check stock before increasing quantity
+          if (existing.stock_quantity !== undefined) {
+            const newQty = existing.quantity + quantity;
+            if (newQty > existing.stock_quantity) {
+              if (window.notifications) {
+                window.notifications.warning('Stock Insuficiente', `Solo puedes agregar ${existing.stock_quantity - existing.quantity} unidades más`);
+              }
+              return false;
+            }
+          }
           existing.quantity += quantity;
         } else {
           const product = window.currentProduct || { 
@@ -334,7 +449,8 @@ class CartEngine {
             name: 'Producto ' + productId, 
             price: 0, 
             image_url: 'assets/images/products/placeholder.jpg', 
-            brand: 'Marca' 
+            brand: 'Marca',
+            stock_quantity: undefined
           };
 
           cart.push({
@@ -344,7 +460,8 @@ class CartEngine {
             price: parseFloat(product.discount_price || product.price || 0),
             quantity: quantity,
             image_url: product.image_url,
-            brand: product.brand
+            brand: product.brand,
+            stock_quantity: product.stock_quantity
           });
         }
 
@@ -365,10 +482,97 @@ class CartEngine {
     } catch (e) {
       if (window.Logger) window.Logger.error('Error adding to cart:', e);
       if (window.notifications) {
-        window.notifications.error('Error', 'No se pudo agregar el producto. Por favor, intenta de nuevo.');
+        const errorMsg = e.response?.data?.message || e.message || 'No se pudo agregar el producto. Por favor, intenta de nuevo.';
+        window.notifications.error('Error', errorMsg);
       }
       return false;
     }
+  }
+
+  async applyCoupon() {
+    const input = document.getElementById('couponCodeInput');
+    if (!input) return;
+    
+    const code = input.value.trim().toUpperCase();
+    if (!code) {
+      if (window.notifications) {
+        window.notifications.warning('Cupón Inválido', 'Por favor ingresa un código de cupón');
+      }
+      return;
+    }
+
+    try {
+      // Get current cart total
+      const container = document.getElementById('cartContainer');
+      const items = container ? Array.from(container.querySelectorAll('.cart-item')).map(item => {
+        const productId = item.dataset.productId || null;
+        const quantity = parseInt(item.querySelector('.quantity-input')?.value || 1);
+        return { product_id: productId, quantity };
+      }) : [];
+
+      const response = await this.api.validateCoupon(code, this.getCurrentSubtotal(), items);
+      
+      if (response && response.success) {
+        // Initialize coupons manager if not already
+        if (!window.couponsManager) {
+          if (window.CouponsManager) {
+            window.couponsManager = new window.CouponsManager();
+          } else {
+            if (window.Logger) window.Logger.warn('CouponsManager not available');
+            return;
+          }
+        }
+
+        // Apply coupon
+        window.couponsManager.appliedCoupon = response.data.coupon;
+        window.couponsManager.discount = response.data.discount || 0;
+        
+        // Reload cart to show discount
+        await this.loadCart();
+        
+        if (window.notifications) {
+          window.notifications.success('Cupón Aplicado', `Descuento de S/ ${window.couponsManager.discount.toFixed(2)} aplicado`);
+        }
+      } else {
+        if (window.notifications) {
+          window.notifications.error('Cupón Inválido', response?.message || 'El código de cupón no es válido');
+        }
+      }
+    } catch (e) {
+      if (window.Logger) window.Logger.error('Error applying coupon:', e);
+      if (window.notifications) {
+        window.notifications.error('Error', 'No se pudo aplicar el cupón. Por favor, intenta de nuevo.');
+      }
+    }
+  }
+
+  async removeCoupon() {
+    if (window.couponsManager) {
+      window.couponsManager.appliedCoupon = null;
+      window.couponsManager.discount = 0;
+      await this.loadCart();
+      if (window.notifications) {
+        window.notifications.info('Cupón Removido', 'El cupón ha sido removido del carrito');
+      }
+    }
+  }
+
+  getCurrentSubtotal() {
+    const container = document.getElementById('cartContainer');
+    if (!container) return 0;
+    
+    const items = container.querySelectorAll('.cart-item');
+    let subtotal = 0;
+    
+    items.forEach(item => {
+      const priceText = item.querySelector('.price-new')?.textContent || 
+                       item.querySelector('.cart-price span')?.textContent || '0';
+      const price = parseFloat(priceText.replace(/[^\d.]/g, '')) || 0;
+      const quantity = parseInt(item.querySelector('.quantity-input')?.value || 1);
+      subtotal += price * quantity;
+    });
+    
+    return subtotal;
   }
 
   updateCartCounter() {
