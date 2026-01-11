@@ -20,7 +20,7 @@ class CatalogEngine {
             minPrice: null,
             maxPrice: null,
             onSale: false,
-            inStock: true,
+            inStock: false, // Changed to false by default to show all products
             search: null
         };
         this.currentSort = 'newest';
@@ -31,6 +31,13 @@ class CatalogEngine {
 
     async init() {
         if (window.Logger) window.Logger.log('📦 [CatalogEngine] V3 Initialized');
+
+        // Wait for API to be ready
+        if (!window.api) {
+            if (window.Logger) window.Logger.error('⚠️ [CatalogEngine] API not available, retrying...');
+            setTimeout(() => this.init(), 500);
+            return;
+        }
 
         // Init Globals immediately
         if (window.Components) {
@@ -45,9 +52,18 @@ class CatalogEngine {
             }
         }
 
-        // Load categories and brands for filter
-        await this.loadCategories();
-        await this.loadBrands();
+        // Load categories and brands for filter (don't wait if they fail)
+        try {
+            await this.loadCategories();
+        } catch (e) {
+            if (window.Logger) window.Logger.warn('Failed to load categories:', e);
+        }
+        
+        try {
+            await this.loadBrands();
+        } catch (e) {
+            if (window.Logger) window.Logger.warn('Failed to load brands:', e);
+        }
 
         // 🚀 URL PARAMETER HANDLING
         this.applyInitialFilters();
@@ -164,7 +180,11 @@ class CatalogEngine {
             }
 
             // Call API with filters
+            if (window.Logger) window.Logger.log('📦 [CatalogEngine] Loading products with filters:', apiFilters);
+            
             const response = await this.api.getProducts(apiFilters);
+            
+            if (window.Logger) window.Logger.log('📦 [CatalogEngine] API Response:', response);
             
             // Handle different response formats
             let products = [];
@@ -176,15 +196,22 @@ class CatalogEngine {
             } else if (response && response.data) {
                 products = response.data.products || response.data || [];
                 total = response.data.total || products.length;
-                this.totalPages = response.data.pages || Math.ceil(total / this.itemsPerPage);
             } else if (response && response.products) {
                 products = response.products;
                 total = response.total || products.length;
+            } else if (response && response.success === false) {
+                // API returned an error
+                throw new Error(response.message || 'Error al cargar productos');
             } else {
                 products = [];
                 total = 0;
             }
+            
+            if (window.Logger) window.Logger.log(`📦 [CatalogEngine] Parsed ${products.length} products, total: ${total}`);
 
+            // Store original total BEFORE client-side filtering
+            const originalTotal = total;
+            
             // Apply client-side filters if needed
             if (this.currentFilters.onSale) {
                 products = products.filter(p => p.discount_price || p.on_sale);
@@ -195,14 +222,19 @@ class CatalogEngine {
 
             this.allProducts = products;
             this.filteredProducts = products;
-            this.totalProducts = total;
+            
+            // Use filtered count for display, but keep original total for pagination
+            const filteredCount = products.length;
+            this.totalProducts = filteredCount;
             this.currentPage = page;
             
-            // Calculate total pages correctly
-            if (response && response.data && response.data.pages) {
+            // Calculate total pages based on filtered results
+            this.totalPages = Math.ceil(filteredCount / this.itemsPerPage);
+            
+            // If we have pagination info from API, use it (but adjust for client-side filters)
+            if (response && response.data && response.data.pages && !this.currentFilters.onSale && !this.currentFilters.inStock) {
                 this.totalPages = response.data.pages;
-            } else {
-                this.totalPages = Math.ceil(total / this.itemsPerPage);
+                this.totalProducts = originalTotal;
             }
 
             // Hide loading state
@@ -410,7 +442,7 @@ class CatalogEngine {
             minPrice: null,
             maxPrice: null,
             onSale: false,
-            inStock: true,
+            inStock: false, // Changed to false to show all products
             search: null
         };
         this.currentSort = 'newest';
