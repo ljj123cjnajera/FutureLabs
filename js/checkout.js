@@ -176,14 +176,14 @@ class CheckoutManager {
         if (this.addresses.length > 0) {
             contentHtml = `
                 <div class="saved-addresses fade-in">
-                    <h3>SELECT SHIPPING ADDRESS</h3>
+                    <h3>SELECCIONAR DIRECCIÓN DE ENVÍO</h3>
                     <div class="address-grid">
                         ${this.addresses.map(addr => `
                             <div class="address-card ${this.selectedAddressId === addr.id ? 'selected' : ''}" 
                                  onclick="checkoutManager.selectAddress('${addr.id}')">
                                 <div class="addr-header">
                                     <strong>${addr.first_name || ''} ${addr.last_name || ''}</strong>
-                                    ${addr.is_default ? '<span class="badge">DEFAULT</span>' : ''}
+                                    ${addr.is_default ? '<span class="badge">PREDETERMINADA</span>' : ''}
                                 </div>
                                 <p>${addr.street_address}</p>
                                 <p>${addr.city}, ${addr.postal_code}</p>
@@ -205,7 +205,7 @@ class CheckoutManager {
         } else {
             contentHtml = `
                 <div class="fade-in">
-                    <h3>ADD SHIPPING ADDRESS</h3>
+                    <h3>AGREGAR DIRECCIÓN DE ENVÍO</h3>
                     ${this.getAddressFormHtml()}
                     <div class="checkout-actions">
                         <button class="btn btn-black btn-block" onclick="checkoutManager.saveNewAddress()">SAVE & CONTINUE</button>
@@ -304,26 +304,32 @@ class CheckoutManager {
     renderPayment() {
         const html = `
             <div class="checkout-form-section fade-in">
-                <h2>PAYMENT METHOD</h2>
+                <h2>MÉTODO DE PAGO</h2>
                  <div class="payment-tabs">
                     <button class="payment-tab ${this.paymentMethod === 'card' ? 'active' : ''}" onclick="checkoutManager.setPayment('card')">
-                        <i class="far fa-credit-card"></i> CARD
+                        <i class="far fa-credit-card"></i> TARJETA
                     </button>
-                    <button class="payment-tab ${this.paymentMethod === 'paypal' ? 'active' : ''}" onclick="checkoutManager.setPayment('paypal')">
-                        <i class="fab fa-paypal"></i> PAYPAL
+                    <button class="payment-tab ${this.paymentMethod === 'yape' ? 'active' : ''}" onclick="checkoutManager.setPayment('yape')">
+                        <i class="fas fa-mobile-alt"></i> YAPE
+                    </button>
+                    <button class="payment-tab ${this.paymentMethod === 'plin' ? 'active' : ''}" onclick="checkoutManager.setPayment('plin')">
+                        <i class="fas fa-mobile-alt"></i> PLIN
+                    </button>
+                    <button class="payment-tab ${this.paymentMethod === 'cash' ? 'active' : ''}" onclick="checkoutManager.setPayment('cash')">
+                        <i class="fas fa-money-bill"></i> EFECTIVO
                     </button>
                 </div>
 
                 ${this.paymentMethod === 'card' ? `
                     <form id="paymentForm">
                         <div class="form-group">
-                            <label>CARD NUMBER</label>
+                            <label>NÚMERO DE TARJETA</label>
                             <input type="text" class="input-card" placeholder="4242 4242 4242 4242">
                         </div>
                         <div class="form-row">
                             <div class="form-group half">
-                                <label>EXPIRY</label>
-                                <input type="text" placeholder="MM/YY">
+                                <label>VENCIMIENTO</label>
+                                <input type="text" placeholder="MM/AA">
                             </div>
                             <div class="form-group half">
                                 <label>CVC</label>
@@ -331,11 +337,21 @@ class CheckoutManager {
                             </div>
                         </div>
                     </form>
-                ` : '<div style="padding:20px; text-align:center;">Redirect to PayPal after order placement.</div>'}
+                ` : this.paymentMethod === 'yape' || this.paymentMethod === 'plin' ? `
+                    <div style="padding:20px; text-align:center; border: 2px solid var(--black); margin-top: 1rem;">
+                        <p><strong>Pago con ${this.getPaymentMethodName(this.paymentMethod)}</strong></p>
+                        <p>Se te enviará un código QR o número de cuenta para completar el pago.</p>
+                    </div>
+                ` : this.paymentMethod === 'cash' ? `
+                    <div style="padding:20px; text-align:center; border: 2px solid var(--black); margin-top: 1rem;">
+                        <p><strong>Pago en Efectivo</strong></p>
+                        <p>El pago se realizará al momento de la entrega.</p>
+                    </div>
+                ` : '<div style="padding:20px; text-align:center;">Redirección después de confirmar el pedido.</div>'}
 
                 <div class="checkout-actions">
-                    <button class="btn btn-outline" onclick="checkoutManager.renderStep(1)">BACK</button>
-                    <button class="btn btn-black" onclick="checkoutManager.renderStep(3)">REVIEW ORDER</button>
+                    <button class="btn btn-outline" onclick="checkoutManager.renderStep(1)">VOLVER</button>
+                    <button class="btn btn-black" onclick="checkoutManager.renderStep(3)">REVISAR PEDIDO</button>
                 </div>
             </div>
         `;
@@ -345,6 +361,19 @@ class CheckoutManager {
     setPayment(method) {
         this.paymentMethod = method;
         this.renderPayment();
+    }
+
+    getPaymentMethodName(method) {
+        const methods = {
+            'card': 'Tarjeta de Crédito/Débito',
+            'credit_card': 'Tarjeta de Crédito/Débito',
+            'paypal': 'PayPal',
+            'yape': 'Yape',
+            'plin': 'Plin',
+            'cash': 'Efectivo',
+            'bank_transfer': 'Transferencia Bancaria'
+        };
+        return methods[method] || method.toUpperCase();
     }
 
     renderReview() {
@@ -361,30 +390,30 @@ class CheckoutManager {
 
         const html = `
             <div class="checkout-form-section fade-in">
-                <h2>REVIEW ORDER</h2>
+                <h2>REVISAR PEDIDO</h2>
                 
                 <div class="review-block">
-                    <h4>SHIPPING TO:</h4>
+                    <h4>ENVIAR A:</h4>
                     <p><strong>${addr.first_name} ${addr.last_name}</strong></p>
-                    <p>${addr.street_address}</p>
-                    <p>${addr.city}, ${addr.postal_code}</p>
-                    <p>${addr.country}</p>
+                    <p>${addr.street_address || addr.street}</p>
+                    <p>${addr.city}${addr.region ? ', ' + addr.region : ''}, ${addr.postal_code}</p>
+                    <p>${addr.country || 'Perú'}</p>
                 </div>
 
                 <div class="review-block">
-                    <h4>PAYMENT:</h4>
-                    <p>${this.paymentMethod.toUpperCase()}</p>
+                    <h4>MÉTODO DE PAGO:</h4>
+                    <p>${this.getPaymentMethodName(this.paymentMethod)}</p>
                 </div>
 
                 <div class="review-block">
-                    <h4>ITEMS:</h4>
-                    ${this.cart.map(item => `<p>${item.quantity}x ${item.name} - $${item.price}</p>`).join('')}
+                    <h4>PRODUCTOS:</h4>
+                    ${this.cart.map(item => `<p>${item.quantity}x ${item.name} - S/ ${(item.discount_price || item.price).toFixed(2)}</p>`).join('')}
                 </div>
 
                 <div class="checkout-actions">
-                    <button class="btn btn-outline" onclick="checkoutManager.renderStep(2)">BACK</button>
+                    <button class="btn btn-outline" onclick="checkoutManager.renderStep(2)">VOLVER</button>
                     <button class="btn btn-green btn-block" onclick="checkoutManager.placeOrder()">
-                        PLACE ORDER ($${total.toFixed(2)})
+                        CONFIRMAR PEDIDO (S/ ${total.toFixed(2)})
                     </button>
                 </div>
             </div>
@@ -495,22 +524,26 @@ class CheckoutManager {
 
         this.orderSummary.innerHTML = `
             <div class="summary-card">
-                <h3>ORDER SUMMARY</h3>
+                <h3>RESUMEN DE PEDIDO</h3>
                 <div class="summary-items">
-                    ${this.cart.map(item => `
+                    ${this.cart.map(item => {
+                        const itemPrice = item.discount_price || item.price;
+                        const itemTotal = itemPrice * item.quantity;
+                        return `
                         <div class="summary-item">
-                            <img src="${item.image}" alt="${item.name}" onerror="this.src='assets/images/products/af1.jpg'">
+                            <img src="${item.image_url || item.image || 'assets/images/products/placeholder.jpg'}" alt="${item.name}" onerror="this.src='assets/images/products/placeholder.jpg'">
                             <div>
                                 <h4>${item.name}</h4>
-                                <p>x${item.quantity} - $${(item.price * item.quantity).toFixed(2)}</p>
+                                <p>x${item.quantity} - S/ ${itemTotal.toFixed(2)}</p>
                             </div>
                         </div>
-                    `).join('')}
+                    `;
+                    }).join('')}
                 </div>
                 <div class="summary-totals">
-                    <div class="row"><span>Subtotal</span> <span>$${total.toFixed(2)}</span></div>
-                    <div class="row"><span>Shipping</span> <span>${shipping === 0 ? 'FREE' : '$' + shipping.toFixed(2)}</span></div>
-                    <div class="row total"><span>TOTAL</span> <span>$${finalTotal.toFixed(2)}</span></div>
+                    <div class="row"><span>Subtotal</span> <span>S/ ${total.toFixed(2)}</span></div>
+                    <div class="row"><span>Envío</span> <span>${shipping === 0 ? 'GRATIS' : 'S/ ' + shipping.toFixed(2)}</span></div>
+                    <div class="row total"><span>TOTAL</span> <span>S/ ${finalTotal.toFixed(2)}</span></div>
                 </div>
             </div>
         `;
