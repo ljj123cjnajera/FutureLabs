@@ -17,19 +17,42 @@ document.addEventListener('DOMContentLoaded', async function () {
     // Cargar producto
     async function loadProduct() {
         const container = document.getElementById('productDetailContainer');
+        if (!container) return;
 
         if (!productId) {
-            container.innerHTML = `
-                <div style="text-align: center; padding: 100px;">
-                    <i class="fas fa-exclamation-triangle fa-3x" style="color: #e74c3c; margin-bottom: 20px;"></i>
-                    <h2>Producto no encontrado</h2>
-                    <p>El producto que buscas no existe</p>
-                </div>
-            `;
+            if (window.LoadingStates) {
+                window.LoadingStates.empty('productDetailContainer', {
+                    title: 'Producto no encontrado',
+                    message: 'El producto que buscas no existe',
+                    icon: 'fas fa-exclamation-triangle',
+                    actionLabel: 'Ver productos',
+                    actionUrl: 'products.html'
+                });
+            } else {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 100px;">
+                        <i class="fas fa-exclamation-triangle fa-3x" style="color: #e74c3c; margin-bottom: 20px;"></i>
+                        <h2>Producto no encontrado</h2>
+                        <p>El producto que buscas no existe</p>
+                    </div>
+                `;
+            }
             return;
         }
 
+        // Show loading state
+        if (window.LoadingStates) {
+            window.LoadingStates.show('productDetailContainer', {
+                message: 'Cargando producto...',
+                type: 'spinner'
+            });
+        }
+
         try {
+            if (!window.api) {
+                throw new Error('API no disponible');
+            }
+
             // 1. API Call
             const response = await window.api.getProduct(productId);
             let product = null;
@@ -41,11 +64,18 @@ document.addEventListener('DOMContentLoaded', async function () {
                 product = response;
             } else if (response && response.data && response.data.product) {
                 product = response.data.product;
+            } else if (response && !response.success) {
+                throw new Error(response.message || 'Producto no encontrado');
             }
 
             // 3. Validate Data
             if (product) {
                 window.currentProduct = product;
+
+                // Hide loading state
+                if (window.LoadingStates) {
+                    window.LoadingStates.hide('productDetailContainer');
+                }
 
                 // Normalizar imágenes
                 let galleryImages = [];
@@ -54,7 +84,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 } else if (product.image_url) {
                     galleryImages = [product.image_url, product.image_url, product.image_url, product.image_url];
                 } else {
-                    galleryImages = ['img/placeholder.jpg'];
+                    galleryImages = ['assets/images/products/placeholder.jpg'];
                 }
 
                 renderProductDetails(product, container, galleryImages);
@@ -62,18 +92,31 @@ document.addEventListener('DOMContentLoaded', async function () {
                 await renderSizeOptions(product);
                 return;
             } else {
-                throw new Error('Product Not Found in API');
+                throw new Error('Producto no encontrado en la API');
             }
 
         } catch (error) {
-            if (window.Logger) window.Logger.error('❌ API Error in PDP:', error);
-            
-            // Mostrar error real al usuario
-            renderErrorState(container, `Error al cargar producto: ${error.message || 'Error de conexión'}`);
-            
-            // No usar productos mock - solo mostrar error
-            if (window.notifications) {
-                window.notifications.error('Error de conexión', 'No se pudo cargar el producto. Por favor, intenta de nuevo.');
+            if (window.ErrorHandler) {
+                window.ErrorHandler.api(error, 'loadProduct', 'No se pudo cargar el producto. Por favor, intenta de nuevo.');
+            } else {
+                if (window.Logger) window.Logger.error('❌ API Error in PDP:', error);
+            }
+
+            // Hide loading state
+            if (window.LoadingStates) {
+                window.LoadingStates.hide('productDetailContainer');
+            }
+
+            // Show error state
+            if (window.LoadingStates) {
+                window.LoadingStates.error('productDetailContainer', {
+                    title: 'Error al cargar producto',
+                    message: error.message || 'No se pudo cargar el producto. Por favor, intenta de nuevo.',
+                    retryLabel: 'REINTENTAR',
+                    retryCallback: 'location.reload()'
+                });
+            } else {
+                renderErrorState(container, `Error al cargar producto: ${error.message || 'Error de conexión'}`);
             }
         }
     }
