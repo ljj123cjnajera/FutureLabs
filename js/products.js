@@ -250,7 +250,8 @@ class CatalogEngine {
             this.updateURL();
             this.updateCounts();
             
-            if (countLabel) countLabel.textContent = total;
+            // Update product count in hero section
+            if (countLabel) countLabel.textContent = this.totalProducts || filteredCount || 0;
             
         } catch (e) {
             if (window.ErrorHandler) {
@@ -475,7 +476,7 @@ class CatalogEngine {
         if (onSaleFilter) onSaleFilter.checked = false;
         
         const inStockFilter = document.getElementById('inStockFilter');
-        if (inStockFilter) inStockFilter.checked = true;
+        if (inStockFilter) inStockFilter.checked = false; // Match default inStock: false
         
         // Reset brand radio buttons
         const brandRadios = document.querySelectorAll('input[name="brand"]');
@@ -765,20 +766,18 @@ class CatalogEngine {
             return;
         }
         
-        if (window.cartManager) {
-            window.cartManager.add(id, 1);
-            if (window.notifications) {
-                window.notifications.success('AÑADIDO AL CARRITO', `${name} se agregó correctamente`);
-            }
-        } else if (window.CartEngine) {
-            // Try alternative cart engine
-            const cartEngine = new window.CartEngine();
-            cartEngine.addToCart(id, 1);
-            if (window.notifications) {
-                window.notifications.success('AÑADIDO AL CARRITO', `${name} se agregó correctamente`);
-            }
+        // Use cartEngine (global instance from cart.js)
+        if (window.cartEngine) {
+            window.cartEngine.add(id, 1).then(success => {
+                if (success && window.notifications) {
+                    window.notifications.success('AÑADIDO AL CARRITO', `${name} se agregó correctamente`);
+                }
+            }).catch(e => {
+                if (window.Logger) window.Logger.error('Error adding to cart:', e);
+            });
         } else {
             // Fallback: redirect to product detail
+            if (window.Logger) window.Logger.warn('CartEngine not available, redirecting to product detail');
             window.location.href = `product-detail.html?id=${id}`;
         }
     }
