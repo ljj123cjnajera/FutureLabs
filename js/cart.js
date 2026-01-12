@@ -61,11 +61,18 @@ class CartEngine {
     if (!container) return;
 
     // Show loading state
-    container.innerHTML = `
-      <div style="text-align: center; padding: 4rem;">
-        <div class="loading-brutalist">CARGANDO CARRITO...</div>
-      </div>
-    `;
+    if (window.LoadingStates) {
+      window.LoadingStates.show('cartContainer', {
+        message: 'Cargando carrito...',
+        type: 'spinner'
+      });
+    } else {
+      container.innerHTML = `
+        <div style="text-align: center; padding: 4rem;">
+          <div class="loading-brutalist">CARGANDO CARRITO...</div>
+        </div>
+      `;
+    }
 
     let items = [];
     let total = 0;
@@ -87,25 +94,80 @@ class CartEngine {
         subtotal = items.reduce((acc, item) => acc + (parseFloat(item.price || 0) * (item.quantity || 1)), 0);
         total = subtotal;
       }
+
+      // Hide loading state
+      if (window.LoadingStates) {
+        window.LoadingStates.hide('cartContainer');
+      }
+
+      if (items.length === 0) {
+        if (window.LoadingStates) {
+          window.LoadingStates.empty('cartContainer', {
+            title: 'Tu carrito está vacío',
+            message: 'Parece que aún no has encontrado tus grails perfectos.',
+            icon: 'fas fa-shopping-cart',
+            actionLabel: 'Comenzar a comprar',
+            actionUrl: 'products.html'
+          });
+        } else {
+          this.renderEmpty(container);
+        }
+      } else {
+        this.render(container, items, subtotal, total);
+      }
     } catch (e) {
-      if (window.Logger) window.Logger.error('Error loading cart:', e);
+      if (window.ErrorHandler) {
+        window.ErrorHandler.api(e, 'loadCart', 'No se pudo cargar el carrito. Por favor, intenta de nuevo.');
+      } else {
+        if (window.Logger) window.Logger.error('Error loading cart:', e);
+      }
+
+      // Hide loading state
+      if (window.LoadingStates) {
+        window.LoadingStates.hide('cartContainer');
+      }
+
       // Fallback to localStorage
       if (!this.isAuthenticated) {
         const localCart = JSON.parse(localStorage.getItem('brutalist_cart') || '[]');
         items = localCart;
         subtotal = items.reduce((acc, item) => acc + (parseFloat(item.price || 0) * (item.quantity || 1)), 0);
         total = subtotal;
+        
+        if (items.length === 0) {
+          if (window.LoadingStates) {
+            window.LoadingStates.empty('cartContainer', {
+              title: 'Tu carrito está vacío',
+              message: 'Parece que aún no has encontrado tus grails perfectos.',
+              icon: 'fas fa-shopping-cart',
+              actionLabel: 'Comenzar a comprar',
+              actionUrl: 'products.html'
+            });
+          } else {
+            this.renderEmpty(container);
+          }
+        } else {
+          this.render(container, items, subtotal, total);
+        }
       } else {
-        if (window.notifications) {
-          window.notifications.error('Error de Conexión', 'No se pudo cargar el carrito. Por favor, intenta de nuevo.');
+        if (window.LoadingStates) {
+          window.LoadingStates.error('cartContainer', {
+            title: 'Error al cargar carrito',
+            message: 'No se pudo cargar el carrito. Por favor, intenta de nuevo.',
+            retryLabel: 'REINTENTAR',
+            retryCallback: 'window.cartEngine.loadCart()'
+          });
+        } else {
+          container.innerHTML = `
+            <div style="text-align: center; padding: 4rem; border: 2px dashed #dc3545; color: #dc3545;">
+              <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+              <h3>ERROR AL CARGAR CARRITO</h3>
+              <p>No se pudo cargar el carrito. Por favor, intenta de nuevo.</p>
+              <button onclick="window.cartEngine.loadCart()" class="btn btn-outline" style="margin-top: 1rem; border-color: #dc3545; color: #dc3545;">REINTENTAR</button>
+            </div>
+          `;
         }
       }
-    }
-
-    if (items.length === 0) {
-      this.renderEmpty(container);
-    } else {
-      this.render(container, items, subtotal, total);
     }
   }
 
