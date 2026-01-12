@@ -678,14 +678,14 @@ class Components {
                 <span class="product-price-current">S/ ${parseFloat(product.price).toFixed(2)}</span>
               `}
             </div>
-            <button class="btn-quick-add" onclick="event.preventDefault(); event.stopPropagation(); window.cartManager?.add(${product.id ? `'${product.id}'` : 'null'}, 1); window.notifications?.success('AÑADIDO', '${product.name.replace(/'/g, "\\'")} al carrito');" aria-label="Agregar ${product.name.replace(/"/g, '&quot;')} al carrito">
+            <button class="btn-quick-add" onclick="event.preventDefault(); event.stopPropagation(); if(window.cartEngine) { window.cartEngine.add(${product.id}, 1).then(() => { if(window.notifications) window.notifications.success('AÑADIDO', '${product.name.replace(/'/g, "\\'")} al carrito'); }); }" aria-label="Agregar ${product.name.replace(/"/g, '&quot;')} al carrito">
                 <i class="fas fa-plus" aria-hidden="true"></i>
             </button>
           </div>
 
           <div class="product-size-preview">${sizeText}</div>
 
-          <button class="product-btn" onclick="event.stopPropagation(); window.cartManager?.add('${product.id}', 1)" aria-label="Agregar ${product.name.replace(/"/g, '&quot;')} al carrito">
+          <button class="product-btn" onclick="event.stopPropagation(); if(window.cartEngine) { window.cartEngine.add(${product.id}, 1).then(() => { if(window.notifications) window.notifications.success('AÑADIDO', '${product.name.replace(/'/g, "\\'")} al carrito'); }); }" aria-label="Agregar ${product.name.replace(/"/g, '&quot;')} al carrito">
             AGREGAR AL CARRITO
           </button>
         </div>

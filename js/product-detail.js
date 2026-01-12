@@ -528,14 +528,17 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
 
         try {
-            // Use the new CartEngine (aliased as cartManager)
-            // It will handle: Saving to LocalStorage/API, Updating UI, Opening Drawer
-            const success = await window.cartManager?.add(productId, 1, { size: selectedSize });
-            
-            if (success !== false) {
-                if (window.notifications) {
-                    window.notifications.success('Agregado al Carrito', `Talla US ${selectedSize} agregada correctamente`);
+            // Use cartEngine directly for consistency
+            if (window.cartEngine) {
+                const success = await window.cartEngine.add(productId, 1, { size: selectedSize });
+                
+                if (success !== false) {
+                    if (window.notifications) {
+                        window.notifications.success('Agregado al Carrito', `Talla US ${selectedSize} agregada correctamente`);
+                    }
                 }
+            } else {
+                throw new Error('CartEngine no disponible');
             }
         } catch (e) {
             if (window.Logger) window.Logger.error('Error adding to cart:', e);
