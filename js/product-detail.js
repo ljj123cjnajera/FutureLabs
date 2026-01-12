@@ -610,7 +610,8 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
 
         try {
-            const success = await window.cartManager?.add(productId, 1, { size: selectedSize });
+            if (window.cartEngine) {
+                const success = await window.cartEngine.add(productId, 1, { size: selectedSize });
             if (success !== false) {
                 if (window.notifications) {
                     window.notifications.success('Redirigiendo al checkout...', 'El producto se agregó al carrito');
