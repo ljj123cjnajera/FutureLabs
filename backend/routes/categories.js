@@ -16,7 +16,8 @@ router.get('/', async (req, res) => {
     console.error('Error obteniendo categorías:', error);
     res.status(500).json({
       success: false,
-      message: 'Error obteniendo categorías'
+      message: 'Error obteniendo categorías',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });

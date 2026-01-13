@@ -144,8 +144,8 @@ class SneakersAPI {
     const method = options.method ? options.method.toUpperCase() : 'GET';
     let effectiveEndpoint = endpoint;
 
-    // Parameter anti-cache (Safari)
-    if (method === 'GET') {
+    // Parameter anti-cache (Safari) - only add if endpoint is valid
+    if (method === 'GET' && endpoint && endpoint.trim() !== '') {
       const separator = endpoint.includes('?') ? '&' : '?';
       effectiveEndpoint = `${endpoint}${separator}_=${Date.now()}`;
     }
@@ -298,19 +298,32 @@ class SneakersAPI {
 
   async getProducts(filters = {}) {
     if (window.Logger) window.Logger.log('🔵 [API] getProducts called with filters:', filters);
-    // Clean filters - remove undefined/null values and convert booleans
+    // Clean filters - remove undefined/null/empty values, spaces, and convert booleans
     const cleanFilters = {};
     Object.keys(filters).forEach(key => {
-      if (filters[key] !== undefined && filters[key] !== null && filters[key] !== '') {
-        if (typeof filters[key] === 'boolean') {
-          cleanFilters[key] = filters[key].toString();
-        } else {
-          cleanFilters[key] = filters[key];
+      // Skip empty keys, undefined, null, empty strings, or keys with only spaces
+      if (!key || key.trim() === '') return;
+      const value = filters[key];
+      if (value !== undefined && value !== null && value !== '' && value !== ' ') {
+        // Convert boolean to string 'true' or 'false'
+        if (typeof value === 'boolean') {
+          cleanFilters[key.trim()] = value.toString();
+        } else if (typeof value === 'string' && value.trim() !== '') {
+          cleanFilters[key.trim()] = value.trim();
+        } else if (typeof value === 'number') {
+          cleanFilters[key.trim()] = value.toString();
         }
       }
     });
-    const params = new URLSearchParams(cleanFilters);
-    return this.request(`/products?${params.toString()}`);
+    
+    // Only create params if we have valid filters
+    let queryString = '';
+    if (Object.keys(cleanFilters).length > 0) {
+      const params = new URLSearchParams(cleanFilters);
+      queryString = params.toString();
+    }
+    
+    return this.request(`/products${queryString ? `?${queryString}` : ''}`);
   }
 
   async getProductById(id) {
