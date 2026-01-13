@@ -262,16 +262,7 @@ function setIdValue(id, value) {
     if (el) el.value = value;
 }
 
-// Global Tab Switcher (Backup if inline fails)
-window.switchTab = function (tabId) {
-    document.querySelectorAll('.account-section').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.account-nav-btn').forEach(el => el.classList.remove('active'));
-
-    document.getElementById(tabId)?.classList.add('active');
-
-    // Highlight button based on click (dirty but works for simple pages)
-    // Ideally passed by 'this' in onclick
-};
+// Global Tab Switcher - Removed duplicate, using the one below
 
 const currencyFormatter = new Intl.NumberFormat('es-PE', {
     style: 'currency',
