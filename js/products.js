@@ -120,8 +120,13 @@ class CatalogEngine {
             if (searchInput) searchInput.value = search;
         }
 
-        if (category || brand) {
-            const target = (category || brand).toLowerCase();
+        if (category) {
+            // Category filter - need to get category_id from slug
+            this.currentFilters.categorySlug = category.toLowerCase();
+            // Will need to resolve category_id when loading products
+        }
+        if (brand) {
+            const target = brand.toLowerCase();
             this.currentFilters.brand = target;
             this.updateFilterButtons(target);
         }
