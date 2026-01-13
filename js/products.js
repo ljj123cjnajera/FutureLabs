@@ -419,7 +419,27 @@ class CatalogEngine {
                     </div>
                 </div>
             `;
-            }).join('');
+                }).filter(html => html).join('');
+                
+                if (cardsHTML) {
+                    container.innerHTML = cardsHTML;
+                    if (window.Logger) window.Logger.log(`✅ [CatalogEngine] Rendered ${products.length} products (fallback)`);
+                } else {
+                    if (window.Logger) window.Logger.error('⚠️ [CatalogEngine] No fallback cards generated!');
+                    container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 4rem;">Error al renderizar productos</div>';
+                }
+            }
+        } catch (e) {
+            if (window.Logger) window.Logger.error('❌ [CatalogEngine] Error in render():', e);
+            if (container) {
+                container.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 4rem;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--gray-400); margin-bottom: 1rem;"></i>
+                        <h2>Error al mostrar productos</h2>
+                        <p>Por favor, recarga la página.</p>
+                    </div>
+                `;
+            }
         }
     }
 
