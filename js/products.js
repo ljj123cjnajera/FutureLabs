@@ -245,7 +245,7 @@ class CatalogEngine {
             this.updateCounts();
             
             // Update product count in hero section
-            if (countLabel) countLabel.textContent = this.totalProducts || filteredCount || 0;
+            if (countLabel) countLabel.textContent = this.totalProducts || 0;
             
         } catch (e) {
             if (window.ErrorHandler) {
