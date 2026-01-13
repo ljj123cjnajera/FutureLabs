@@ -80,11 +80,32 @@ document.addEventListener('DOMContentLoaded', async function () {
                 // Normalizar imágenes
                 let galleryImages = [];
                 if (Array.isArray(product.images) && product.images.length > 0) {
-                    galleryImages = product.images;
-                } else if (product.image_url) {
-                    galleryImages = [product.image_url, product.image_url, product.image_url, product.image_url];
-                } else {
+                    galleryImages = product.images.filter(img => img && img.trim() !== '');
+                } else if (typeof product.images === 'string') {
+                    // Si images es un string JSON, parsearlo
+                    try {
+                        const parsed = JSON.parse(product.images);
+                        if (Array.isArray(parsed)) {
+                            galleryImages = parsed.filter(img => img && img.trim() !== '');
+                        }
+                    } catch (e) {
+                        // Si no es JSON válido, usar image_url
+                    }
+                }
+                
+                // Si no hay imágenes en el array, usar image_url
+                if (galleryImages.length === 0 && product.image_url) {
+                    galleryImages = [product.image_url];
+                }
+                
+                // Si aún no hay imágenes, usar placeholder
+                if (galleryImages.length === 0) {
                     galleryImages = ['assets/images/products/placeholder.jpg'];
+                }
+                
+                // Asegurar que haya al menos 4 imágenes para la galería (duplicar si es necesario)
+                while (galleryImages.length < 4 && galleryImages.length > 0) {
+                    galleryImages.push(galleryImages[0]);
                 }
 
                 renderProductDetails(product, container, galleryImages);
