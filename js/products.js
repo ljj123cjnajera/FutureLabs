@@ -737,8 +737,8 @@ class CatalogEngine {
 
     async loadBrands() {
         try {
-            // Load brands from products
-            const response = await this.api.getProducts({ limit: 1000 });
+            // Load brands from products - use smaller limit to avoid timeouts
+            const response = await this.api.getProducts({ limit: 100 });
             let products = [];
             
             if (Array.isArray(response)) {
