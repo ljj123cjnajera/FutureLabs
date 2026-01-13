@@ -225,9 +225,18 @@ class CatalogEngine {
             this.currentPage = page;
             this.totalPages = pages;
 
-            // Hide loading state
+            // Hide loading state (don't restore original content, we're about to render)
             if (window.LoadingStates) {
-                window.LoadingStates.hide('productsContainer');
+                const container = document.getElementById('productsContainer');
+                if (container) {
+                    // Remove loading overlay if exists
+                    const overlay = container.querySelector('.loading-overlay');
+                    if (overlay) overlay.remove();
+                    // Clear any loading content
+                    if (container.innerHTML.includes('Cargando') || container.innerHTML.includes('loading')) {
+                        container.innerHTML = '';
+                    }
+                }
             }
 
             this.render(products);
