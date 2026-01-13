@@ -631,10 +631,27 @@ class Components {
     // SVG Data URI Placeholder (Light Grey with Text)
     const placeholderImg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Crect fill='%23f3f4f6' width='400' height='400'/%3E%3Ctext fill='%239ca3af' font-family='sans-serif' font-size='24' font-weight='bold' x='50%25' y='50%25' text-anchor='middle' dy='.3em'%3ESNEAKERS SHOP%3C/text%3E%3C/svg%3E";
 
+    // Normalize image URL
+    let imageUrl = placeholderImg;
+    if (product.image_url) {
+      imageUrl = product.image_url;
+    } else if (Array.isArray(product.images) && product.images.length > 0) {
+      imageUrl = product.images[0];
+    } else if (typeof product.images === 'string') {
+      try {
+        const parsed = JSON.parse(product.images);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          imageUrl = parsed[0];
+        }
+      } catch (e) {
+        // Not valid JSON, use placeholder
+      }
+    }
+
     return `
       <div class="product-card" onclick="window.location.href='product-detail.html?id=${product.id}'">
         <div class="product-image-container">
-          <img src="${product.image_url || placeholderImg}" 
+          <img src="${imageUrl}" 
                class="product-image"
                alt="${product.name}" 
                loading="lazy"

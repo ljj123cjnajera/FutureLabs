@@ -331,10 +331,28 @@ class CatalogEngine {
             container.innerHTML = products.map(p => window.Components.getProductCard(p)).join('');
         } else {
             // Fallback just in case (Brutalist V3 Structure)
-            container.innerHTML = products.map(p => `
+            container.innerHTML = products.map(p => {
+                // Normalize image URL
+                let imageUrl = 'assets/images/products/placeholder.jpg';
+                if (p.image_url) {
+                    imageUrl = p.image_url;
+                } else if (Array.isArray(p.images) && p.images.length > 0) {
+                    imageUrl = p.images[0];
+                } else if (typeof p.images === 'string') {
+                    try {
+                        const parsed = JSON.parse(p.images);
+                        if (Array.isArray(parsed) && parsed.length > 0) {
+                            imageUrl = parsed[0];
+                        }
+                    } catch (e) {
+                        // Not valid JSON, use placeholder
+                    }
+                }
+                
+                return `
                 <div class="product-card" onclick="window.location.href='product-detail.html?id=${p.id}'">
                     <div class="product-image-container">
-                        <img src="${p.image_url || 'assets/images/products/placeholder.jpg'}" 
+                        <img src="${imageUrl}" 
                              class="product-image" 
                              alt="${p.name}" 
                              loading="lazy"
@@ -358,7 +376,8 @@ class CatalogEngine {
                         </button>
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
         }
     }
 
