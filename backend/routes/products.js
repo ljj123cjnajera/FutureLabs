@@ -36,7 +36,8 @@ router.get('/', async (req, res) => {
     console.error('Error obteniendo productos:', error);
     res.status(500).json({
       success: false,
-      message: 'Error obteniendo productos'
+      message: 'Error obteniendo productos',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
@@ -78,7 +79,8 @@ router.get('/on-sale', async (req, res) => {
     console.error('Error obteniendo productos en oferta:', error);
     res.status(500).json({
       success: false,
-      message: 'Error obteniendo productos en oferta'
+      message: 'Error obteniendo productos en oferta',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
@@ -99,7 +101,8 @@ router.get('/trending', async (req, res) => {
     console.error('Error obteniendo productos en tendencia:', error);
     res.status(500).json({
       success: false,
-      message: 'Error obteniendo productos en tendencia'
+      message: 'Error obteniendo productos en tendencia',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
@@ -120,7 +123,8 @@ router.get('/bestseller', async (req, res) => {
     console.error('Error obteniendo productos más vendidos:', error);
     res.status(500).json({
       success: false,
-      message: 'Error obteniendo productos más vendidos'
+      message: 'Error obteniendo productos más vendidos',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
@@ -141,7 +145,8 @@ router.get('/new', async (req, res) => {
     console.error('Error obteniendo productos nuevos:', error);
     res.status(500).json({
       success: false,
-      message: 'Error obteniendo productos nuevos'
+      message: 'Error obteniendo productos nuevos',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
@@ -169,7 +174,8 @@ router.get('/category/:slug', async (req, res) => {
     console.error('Error obteniendo productos por categoría:', error);
     res.status(500).json({
       success: false,
-      message: 'Error obteniendo productos por categoría'
+      message: 'Error obteniendo productos por categoría',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
@@ -196,7 +202,8 @@ router.get('/:id', async (req, res) => {
     console.error('Error obteniendo producto:', error);
     res.status(500).json({
       success: false,
-      message: 'Error obteniendo producto'
+      message: 'Error obteniendo producto',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
@@ -223,7 +230,8 @@ router.get('/slug/:slug', async (req, res) => {
     console.error('Error obteniendo producto:', error);
     res.status(500).json({
       success: false,
-      message: 'Error obteniendo producto'
+      message: 'Error obteniendo producto',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });

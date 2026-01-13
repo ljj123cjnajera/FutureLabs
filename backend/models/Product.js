@@ -70,20 +70,32 @@ class Product {
 
   // Obtener producto por ID
   static async getById(id) {
-    return await db('products')
-      .select('products.*', 'categories.name as category_name', 'categories.slug as category_slug')
-      .leftJoin('categories', 'products.category_id', 'categories.id')
-      .where('products.id', id)
-      .first();
+    try {
+      return await db('products')
+        .select('products.*', 'categories.name as category_name', 'categories.slug as category_slug')
+        .leftJoin('categories', 'products.category_id', 'categories.id')
+        .where('products.id', id)
+        .first()
+        .timeout(20000);
+    } catch (error) {
+      console.error('Error en Product.getById:', error.message);
+      throw error;
+    }
   }
 
   // Obtener producto por slug
   static async getBySlug(slug) {
-    return await db('products')
-      .select('products.*', 'categories.name as category_name', 'categories.slug as category_slug')
-      .leftJoin('categories', 'products.category_id', 'categories.id')
-      .where('products.slug', slug)
-      .first();
+    try {
+      return await db('products')
+        .select('products.*', 'categories.name as category_name', 'categories.slug as category_slug')
+        .leftJoin('categories', 'products.category_id', 'categories.id')
+        .where('products.slug', slug)
+        .first()
+        .timeout(20000);
+    } catch (error) {
+      console.error('Error en Product.getBySlug:', error.message);
+      throw error;
+    }
   }
 
   // Obtener productos destacados
@@ -170,7 +182,12 @@ class Product {
     const sortOrder = filters.sort_order || 'desc';
     query = query.orderBy(sortBy, sortOrder);
 
-    return await query;
+    try {
+      return await query.timeout(20000);
+    } catch (error) {
+      console.error('Error en Product.getByCategory:', error.message);
+      throw error;
+    }
   }
 
   // Contar productos
@@ -213,8 +230,13 @@ class Product {
       }
     }
 
-    const result = await query.count('id as count').first();
-    return parseInt(result.count);
+    try {
+      const result = await query.count('id as count').first().timeout(20000);
+      return parseInt(result.count);
+    } catch (error) {
+      console.error('Error en Product.count:', error.message);
+      throw error;
+    }
   }
 
   // Crear producto
