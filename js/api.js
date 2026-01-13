@@ -146,8 +146,10 @@ class SneakersAPI {
 
     // Parameter anti-cache (Safari) - only add if endpoint is valid
     if (method === 'GET' && endpoint && endpoint.trim() !== '') {
-      const separator = endpoint.includes('?') ? '&' : '?';
-      effectiveEndpoint = `${endpoint}${separator}_=${Date.now()}`;
+      // Clean endpoint of any trailing spaces
+      const cleanEndpoint = endpoint.trim();
+      const separator = cleanEndpoint.includes('?') ? '&' : '?';
+      effectiveEndpoint = `${cleanEndpoint}${separator}_=${Date.now()}`;
     }
 
     const performRequest = async (retrying = false) => {

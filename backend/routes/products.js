@@ -7,7 +7,7 @@ router.get('/', async (req, res) => {
   try {
     const filters = {
       category_id: req.query.category_id,
-      brand: req.query.brand,
+      brand: req.query.brand || req.query.category, // Support category as brand filter
       min_price: req.query.min_price ? parseFloat(req.query.min_price) : undefined,
       max_price: req.query.max_price ? parseFloat(req.query.max_price) : undefined,
       search: req.query.search,
@@ -18,6 +18,13 @@ router.get('/', async (req, res) => {
       onSale: req.query.onSale === 'true' || req.query.on_sale === 'true',
       inStock: req.query.inStock !== undefined ? req.query.inStock === 'true' : undefined
     };
+    
+    // Clean undefined values
+    Object.keys(filters).forEach(key => {
+      if (filters[key] === undefined || filters[key] === null || filters[key] === '') {
+        delete filters[key];
+      }
+    });
 
     const products = await Product.getAll(filters);
     const total = await Product.count(filters);

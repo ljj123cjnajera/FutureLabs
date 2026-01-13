@@ -729,9 +729,9 @@ class CatalogEngine {
             this.renderCategoriesFilter();
         } catch (e) {
             if (window.Logger) window.Logger.error('Error loading categories:', e);
-            if (window.ErrorHandler) {
-                window.ErrorHandler.api(e, 'loadCategories', 'No se pudieron cargar las categorías.');
-            }
+            // Don't show error to user for categories - it's not critical
+            // Just use empty categories array
+            this.categories = [];
         }
     }
 
