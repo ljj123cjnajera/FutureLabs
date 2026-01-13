@@ -298,10 +298,16 @@ class CatalogEngine {
 
     render(products) {
         const container = document.getElementById('productsContainer');
-        if (!container) return;
+        if (!container) {
+            if (window.Logger) window.Logger.error('⚠️ [CatalogEngine] productsContainer not found!');
+            return;
+        }
+
+        if (window.Logger) window.Logger.log(`📦 [CatalogEngine] Rendering ${products.length} products`);
 
         // Use LoadingStates for empty state
         if (products.length === 0) {
+            if (window.Logger) window.Logger.warn('⚠️ [CatalogEngine] No products to render');
             if (window.LoadingStates) {
                 window.LoadingStates.empty('productsContainer', {
                     title: 'No se encontraron productos',
@@ -320,6 +326,11 @@ class CatalogEngine {
             return;
         }
 
+        // Ensure container has correct classes
+        if (!container.classList.contains('product-grid-v3')) {
+            container.classList.add('product-grid-v3');
+        }
+
         // Apply view mode class
         if (this.viewMode === 'list') {
             container.classList.add('list-view');
@@ -327,11 +338,33 @@ class CatalogEngine {
             container.classList.remove('list-view');
         }
 
-        if (window.Components && window.Components.getProductCard) {
-            container.innerHTML = products.map(p => window.Components.getProductCard(p)).join('');
-        } else {
-            // Fallback just in case (Brutalist V3 Structure)
-            container.innerHTML = products.map(p => {
+        // Clear any loading states
+        if (window.LoadingStates) {
+            window.LoadingStates.hide('productsContainer');
+        }
+
+        // Render products
+        try {
+            if (window.Components && window.Components.getProductCard) {
+                const cardsHTML = products.map(p => {
+                    try {
+                        return window.Components.getProductCard(p);
+                    } catch (e) {
+                        if (window.Logger) window.Logger.error('Error rendering product card:', e, p);
+                        return '';
+                    }
+                }).filter(html => html).join('');
+                
+                if (cardsHTML) {
+                    container.innerHTML = cardsHTML;
+                    if (window.Logger) window.Logger.log(`✅ [CatalogEngine] Rendered ${products.length} product cards`);
+                } else {
+                    if (window.Logger) window.Logger.error('⚠️ [CatalogEngine] No product cards generated!');
+                    container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 4rem;">Error al renderizar productos</div>';
+                }
+            } else {
+                // Fallback just in case (Brutalist V3 Structure)
+                const cardsHTML = products.map(p => {
                 // Normalize image URL
                 let imageUrl = 'assets/images/products/placeholder.jpg';
                 if (p.image_url) {

@@ -297,6 +297,7 @@ class SneakersAPI {
   // ========== PRODUCTOS ==========
 
   async getProducts(filters = {}) {
+    if (window.Logger) window.Logger.log('🔵 [API] getProducts called with filters:', filters);
     // Clean filters - remove undefined/null values and convert booleans
     const cleanFilters = {};
     Object.keys(filters).forEach(key => {
