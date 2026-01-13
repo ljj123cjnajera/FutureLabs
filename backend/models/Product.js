@@ -124,26 +124,66 @@ class Product {
 
   // Obtener productos en tendencia
   static async getTrending(limit = 8) {
-    return await db('products')
-      .select('products.*', 'categories.name as category_name', 'categories.slug as category_slug')
-      .leftJoin('categories', 'products.category_id', 'categories.id')
-      .where('products.is_trending', true)
-      .where('products.is_active', true)
-      .orderBy('products.created_at', 'desc')
-      .limit(limit)
-      .timeout(20000); // 20 segundos máximo (aumentado)
+    try {
+      try {
+        return await db('products')
+          .select('products.*', 'categories.name as category_name', 'categories.slug as category_slug')
+          .leftJoin('categories', 'products.category_id', 'categories.id')
+          .where('products.is_trending', true)
+          .where('products.is_active', true)
+          .orderBy('products.created_at', 'desc')
+          .limit(limit)
+          .timeout(20000);
+      } catch (trendingError) {
+        if (trendingError.message && trendingError.message.includes('is_trending')) {
+          console.log('⚠️ is_trending column not found, using featured products instead');
+          return await db('products')
+            .select('products.*', 'categories.name as category_name', 'categories.slug as category_slug')
+            .leftJoin('categories', 'products.category_id', 'categories.id')
+            .where('products.featured', true)
+            .where('products.is_active', true)
+            .orderBy('products.created_at', 'desc')
+            .limit(limit)
+            .timeout(20000);
+        }
+        throw trendingError;
+      }
+    } catch (error) {
+      console.error('Error en Product.getTrending:', error.message);
+      throw error;
+    }
   }
 
   // Obtener productos más vendidos
   static async getBestseller(limit = 8) {
-    return await db('products')
-      .select('products.*', 'categories.name as category_name', 'categories.slug as category_slug')
-      .leftJoin('categories', 'products.category_id', 'categories.id')
-      .where('products.is_bestseller', true)
-      .where('products.is_active', true)
-      .orderBy('products.created_at', 'desc')
-      .limit(limit)
-      .timeout(20000); // 20 segundos máximo (aumentado)
+    try {
+      try {
+        return await db('products')
+          .select('products.*', 'categories.name as category_name', 'categories.slug as category_slug')
+          .leftJoin('categories', 'products.category_id', 'categories.id')
+          .where('products.is_bestseller', true)
+          .where('products.is_active', true)
+          .orderBy('products.created_at', 'desc')
+          .limit(limit)
+          .timeout(20000);
+      } catch (bestsellerError) {
+        if (bestsellerError.message && bestsellerError.message.includes('is_bestseller')) {
+          console.log('⚠️ is_bestseller column not found, using featured products instead');
+          return await db('products')
+            .select('products.*', 'categories.name as category_name', 'categories.slug as category_slug')
+            .leftJoin('categories', 'products.category_id', 'categories.id')
+            .where('products.featured', true)
+            .where('products.is_active', true)
+            .orderBy('products.created_at', 'desc')
+            .limit(limit)
+            .timeout(20000);
+        }
+        throw bestsellerError;
+      }
+    } catch (error) {
+      console.error('Error en Product.getBestseller:', error.message);
+      throw error;
+    }
   }
 
   // Obtener productos nuevos
