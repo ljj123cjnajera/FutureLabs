@@ -173,6 +173,18 @@ class CatalogEngine {
             }
             if (this.currentFilters.category) {
                 apiFilters.category_id = this.currentFilters.category;
+            } else if (this.currentFilters.categorySlug) {
+                // If we have a category slug, map common ones to brand filters
+                // This is a temporary solution - ideally we'd resolve the slug to ID first
+                const slugMap = {
+                    'jordan': 'Jordan',
+                    'nike': 'Nike',
+                    'adidas': 'Adidas',
+                    'yeezy': 'Yeezy'
+                };
+                if (slugMap[this.currentFilters.categorySlug]) {
+                    apiFilters.brand = slugMap[this.currentFilters.categorySlug];
+                }
             }
             if (this.currentFilters.minPrice) {
                 apiFilters.min_price = this.currentFilters.minPrice;
