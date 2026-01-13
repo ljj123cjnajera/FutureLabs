@@ -55,7 +55,7 @@ if (dbUrl && !isPlaceholder) {
       seeds: baseEnvConfig.seeds || {},
       pool: {
         min: 2, // Mantener al menos 2 conexiones activas
-        max: 20, // Aumentar significativamente para manejar peticiones concurrentes
+        max: 10, // Reducir a 10 para evitar saturación
         acquireTimeoutMillis: 30000, // Aumentar timeout a 30s para dar más tiempo
         createTimeoutMillis: 10000, // Timeout de creación más largo
         idleTimeoutMillis: 30000, // Mantener conexiones idle más tiempo

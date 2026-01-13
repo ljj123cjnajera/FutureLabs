@@ -148,14 +148,35 @@ class Product {
 
   // Obtener productos nuevos
   static async getNew(limit = 8) {
-    return await db('products')
-      .select('products.*', 'categories.name as category_name', 'categories.slug as category_slug')
-      .leftJoin('categories', 'products.category_id', 'categories.id')
-      .where('products.is_new', true)
-      .where('products.is_active', true)
-      .orderBy('products.created_at', 'desc')
-      .limit(limit)
-      .timeout(20000); // 20 segundos máximo (aumentado)
+    try {
+      // Intentar con is_new primero
+      try {
+        return await db('products')
+          .select('products.*', 'categories.name as category_name', 'categories.slug as category_slug')
+          .leftJoin('categories', 'products.category_id', 'categories.id')
+          .where('products.is_new', true)
+          .where('products.is_active', true)
+          .orderBy('products.created_at', 'desc')
+          .limit(limit)
+          .timeout(20000);
+      } catch (newError) {
+        // Si is_new no existe, usar created_at reciente
+        if (newError.message && newError.message.includes('is_new')) {
+          console.log('⚠️ is_new column not found, using recent products instead');
+          return await db('products')
+            .select('products.*', 'categories.name as category_name', 'categories.slug as category_slug')
+            .leftJoin('categories', 'products.category_id', 'categories.id')
+            .where('products.is_active', true)
+            .orderBy('products.created_at', 'desc')
+            .limit(limit)
+            .timeout(20000);
+        }
+        throw newError;
+      }
+    } catch (error) {
+      console.error('Error en Product.getNew:', error.message);
+      throw error;
+    }
   }
 
   // Obtener productos por categoría
