@@ -297,7 +297,18 @@ class SneakersAPI {
   // ========== PRODUCTOS ==========
 
   async getProducts(filters = {}) {
-    const params = new URLSearchParams(filters);
+    // Clean filters - remove undefined/null values and convert booleans
+    const cleanFilters = {};
+    Object.keys(filters).forEach(key => {
+      if (filters[key] !== undefined && filters[key] !== null && filters[key] !== '') {
+        if (typeof filters[key] === 'boolean') {
+          cleanFilters[key] = filters[key].toString();
+        } else {
+          cleanFilters[key] = filters[key];
+        }
+      }
+    });
+    const params = new URLSearchParams(cleanFilters);
     return this.request(`/products?${params.toString()}`);
   }
 

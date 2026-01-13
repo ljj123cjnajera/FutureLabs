@@ -178,8 +178,12 @@ class CatalogEngine {
             if (this.currentFilters.search) {
                 apiFilters.search = this.currentFilters.search;
             }
+            // Add server-side filters
             if (this.currentFilters.onSale) {
-                // Will filter client-side for now
+                apiFilters.onSale = true;
+            }
+            if (this.currentFilters.inStock) {
+                apiFilters.inStock = true;
             }
 
             // Call API with filters
@@ -192,6 +196,7 @@ class CatalogEngine {
             // Handle different response formats
             let products = [];
             let total = 0;
+            let pages = 1;
             
             if (Array.isArray(response)) {
                 products = response;
@@ -199,9 +204,11 @@ class CatalogEngine {
             } else if (response && response.data) {
                 products = response.data.products || response.data || [];
                 total = response.data.total || products.length;
+                pages = response.data.pages || Math.ceil(total / this.itemsPerPage);
             } else if (response && response.products) {
                 products = response.products;
                 total = response.total || products.length;
+                pages = response.pages || Math.ceil(total / this.itemsPerPage);
             } else if (response && response.success === false) {
                 // API returned an error
                 throw new Error(response.message || 'Error al cargar productos');
@@ -210,35 +217,13 @@ class CatalogEngine {
                 total = 0;
             }
             
-            if (window.Logger) window.Logger.log(`📦 [CatalogEngine] Parsed ${products.length} products, total: ${total}`);
-
-            // Store original total BEFORE client-side filtering
-            const originalTotal = total;
-            
-            // Apply client-side filters if needed
-            if (this.currentFilters.onSale) {
-                products = products.filter(p => p.discount_price || p.on_sale);
-            }
-            if (this.currentFilters.inStock) {
-                products = products.filter(p => (p.stock_quantity || 0) > 0);
-            }
+            if (window.Logger) window.Logger.log(`📦 [CatalogEngine] Parsed ${products.length} products, total: ${total}, pages: ${pages}`);
 
             this.allProducts = products;
             this.filteredProducts = products;
-            
-            // Use filtered count for display, but keep original total for pagination
-            const filteredCount = products.length;
-            this.totalProducts = filteredCount;
+            this.totalProducts = total;
             this.currentPage = page;
-            
-            // Calculate total pages based on filtered results
-            this.totalPages = Math.ceil(filteredCount / this.itemsPerPage);
-            
-            // If we have pagination info from API, use it (but adjust for client-side filters)
-            if (response && response.data && response.data.pages && !this.currentFilters.onSale && !this.currentFilters.inStock) {
-                this.totalPages = response.data.pages;
-                this.totalProducts = originalTotal;
-            }
+            this.totalPages = pages;
 
             // Hide loading state
             if (window.LoadingStates) {

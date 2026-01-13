@@ -33,6 +33,18 @@ class Product {
       });
     }
 
+    if (filters.onSale) {
+      query = query.whereNotNull('products.discount_price');
+    }
+
+    if (filters.inStock !== undefined) {
+      if (filters.inStock) {
+        query = query.where('products.stock_quantity', '>', 0);
+      } else {
+        query = query.where('products.stock_quantity', '<=', 0);
+      }
+    }
+
     // Ordenamiento
     const sortBy = filters.sort_by || 'created_at';
     const sortOrder = filters.sort_order || 'desc';
@@ -169,11 +181,36 @@ class Product {
       query = query.where('category_id', filters.category_id);
     }
 
+    if (filters.brand) {
+      query = query.where('brand', filters.brand);
+    }
+
+    if (filters.min_price) {
+      query = query.where('price', '>=', filters.min_price);
+    }
+
+    if (filters.max_price) {
+      query = query.where('price', '<=', filters.max_price);
+    }
+
     if (filters.search) {
       query = query.where(function() {
         this.where('name', 'ilike', `%${filters.search}%`)
-            .orWhere('description', 'ilike', `%${filters.search}%`);
+            .orWhere('description', 'ilike', `%${filters.search}%`)
+            .orWhere('brand', 'ilike', `%${filters.search}%`);
       });
+    }
+
+    if (filters.onSale) {
+      query = query.whereNotNull('discount_price');
+    }
+
+    if (filters.inStock !== undefined) {
+      if (filters.inStock) {
+        query = query.where('stock_quantity', '>', 0);
+      } else {
+        query = query.where('stock_quantity', '<=', 0);
+      }
     }
 
     const result = await query.count('id as count').first();
