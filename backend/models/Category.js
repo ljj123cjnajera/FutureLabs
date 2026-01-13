@@ -4,13 +4,30 @@ class Category {
   // Obtener todas las categorías (con timeout)
   static async getAll() {
     try {
-      return await db('categories')
+      const categories = await db('categories')
         .select('*')
         .orderBy('sort_order', 'asc')
         .timeout(20000); // 20 segundos máximo (aumentado)
+      
+      // Si no hay sort_order, ordenar por nombre
+      if (categories.length > 0 && !categories[0].sort_order) {
+        return categories.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+      }
+      
+      return categories;
     } catch (error) {
       console.error('Error en Category.getAll:', error.message);
-      throw error;
+      console.error('Error stack:', error.stack);
+      // Si es error de timeout o conexión, intentar sin sort_order
+      try {
+        return await db('categories')
+          .select('*')
+          .orderBy('name', 'asc')
+          .timeout(20000);
+      } catch (retryError) {
+        console.error('Error en retry Category.getAll:', retryError.message);
+        throw error; // Lanzar el error original
+      }
     }
   }
 
