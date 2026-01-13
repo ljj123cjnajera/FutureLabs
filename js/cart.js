@@ -480,11 +480,29 @@ class CartEngine {
       }
 
       if (this.isAuthenticated) {
-        const response = await this.api.addToCart(productId, quantity);
-        // Check if API returned an error about stock
-        if (response && !response.success && response.message) {
+        try {
+          const response = await this.api.addToCart(productId, quantity);
+          // Check if API returned an error
+          if (response && !response.success) {
+            if (window.notifications) {
+              const message = response.message || 'No se pudo agregar el producto al carrito';
+              if (response.message && response.message.includes('Stock insuficiente')) {
+                window.notifications.warning('Stock Insuficiente', response.message);
+              } else {
+                window.notifications.error('Error', message);
+              }
+            }
+            return false;
+          }
+        } catch (e) {
+          if (window.Logger) window.Logger.error('Error adding to cart:', e);
           if (window.notifications) {
-            window.notifications.warning('Error', response.message);
+            const errorMsg = e.response?.data?.message || e.message || 'No se pudo agregar el producto. Por favor, intenta de nuevo.';
+            if (errorMsg.includes('Stock insuficiente')) {
+              window.notifications.warning('Stock Insuficiente', errorMsg);
+            } else {
+              window.notifications.error('Error', errorMsg);
+            }
           }
           return false;
         }

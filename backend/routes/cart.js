@@ -74,9 +74,13 @@ router.post('/add', authenticateToken, addToCartValidation, async (req, res) => 
   } catch (error) {
     console.error('❌ Error agregando al carrito:', error.message);
     console.error('Stack:', error.stack);
-    res.status(500).json({
+    
+    // Si es error de stock, retornar 400 (Bad Request)
+    const statusCode = error.message && error.message.includes('Stock insuficiente') ? 400 : 500;
+    
+    res.status(statusCode).json({
       success: false,
-      message: 'Error agregando producto al carrito',
+      message: error.message || 'Error agregando producto al carrito',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
@@ -113,9 +117,14 @@ router.put('/update', authenticateToken, updateQuantityValidation, async (req, r
     });
   } catch (error) {
     console.error('Error actualizando carrito:', error);
-    res.status(500).json({
+    
+    // Si es error de stock, retornar 400 (Bad Request)
+    const statusCode = error.message && error.message.includes('Stock insuficiente') ? 400 : 500;
+    
+    res.status(statusCode).json({
       success: false,
-      message: 'Error actualizando carrito'
+      message: error.message || 'Error actualizando carrito',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });

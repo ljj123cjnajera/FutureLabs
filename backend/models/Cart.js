@@ -37,12 +37,30 @@ class Cart {
 
   // Agregar producto al carrito
   static async add(userId, productId, quantity = 1) {
+    // Validar stock antes de agregar
+    const product = await db('products')
+      .where({ id: productId })
+      .first();
+
+    if (!product) {
+      throw new Error('Producto no encontrado');
+    }
+
+    if (product.stock_quantity !== null && product.stock_quantity < quantity) {
+      throw new Error(`Stock insuficiente. Disponible: ${product.stock_quantity}, Solicitado: ${quantity}`);
+    }
+
     // Verificar si el producto ya está en el carrito
     const existingItem = await Cart.getItem(userId, productId);
 
     if (existingItem) {
+      // Validar stock para la nueva cantidad total
+      const newTotalQuantity = existingItem.quantity + quantity;
+      if (product.stock_quantity !== null && product.stock_quantity < newTotalQuantity) {
+        throw new Error(`Stock insuficiente. Disponible: ${product.stock_quantity}, Solicitado: ${newTotalQuantity}`);
+      }
       // Actualizar cantidad
-      return await Cart.updateQuantity(userId, productId, existingItem.quantity + quantity);
+      return await Cart.updateQuantity(userId, productId, newTotalQuantity);
     }
 
     // Crear nuevo item
@@ -62,6 +80,19 @@ class Cart {
     if (quantity <= 0) {
       // Si la cantidad es 0 o menos, eliminar el item
       return await Cart.remove(userId, productId);
+    }
+
+    // Validar stock antes de actualizar
+    const product = await db('products')
+      .where({ id: productId })
+      .first();
+
+    if (!product) {
+      throw new Error('Producto no encontrado');
+    }
+
+    if (product.stock_quantity !== null && product.stock_quantity < quantity) {
+      throw new Error(`Stock insuficiente. Disponible: ${product.stock_quantity}, Solicitado: ${quantity}`);
     }
 
     const [item] = await db('cart')
