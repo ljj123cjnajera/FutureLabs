@@ -263,6 +263,21 @@ class Product {
       return await query.timeout(20000);
     } catch (error) {
       console.error('Error en Product.getByCategory:', error.message);
+      console.error('Error code:', error.code || 'N/A');
+      
+      // Retry para errores de timeout
+      if (error.message && (
+        error.message.includes('Timeout') ||
+        error.message.includes('Connection terminated') ||
+        error.code === 'ETIMEDOUT'
+      )) {
+        try {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          return await query.timeout(20000);
+        } catch (retryError) {
+          throw retryError;
+        }
+      }
       throw error;
     }
   }
