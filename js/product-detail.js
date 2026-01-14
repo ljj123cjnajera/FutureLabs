@@ -383,6 +383,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 
     let selectedSize = null;
+    window.selectedSize = null; // Variable global para acceso desde funciones
 
     async function renderSizeOptions(product) {
         const grid = document.getElementById('sizeSelectorGrid');
