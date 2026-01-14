@@ -54,11 +54,11 @@ if (dbUrl && !isPlaceholder) {
       migrations: baseEnvConfig.migrations || {},
       seeds: baseEnvConfig.seeds || {},
       pool: {
-        min: 2, // Mantener al menos 2 conexiones activas
-        max: 10, // Reducir a 10 para evitar saturación
-        acquireTimeoutMillis: 60000, // Aumentar timeout a 60s para conexiones lentas
-        createTimeoutMillis: 30000, // Timeout de creación más largo
-        idleTimeoutMillis: 30000, // Mantener conexiones idle más tiempo
+        min: 1, // Reducir mínimo a 1 para evitar conexiones innecesarias
+        max: 5, // Reducir máximo a 5 para evitar saturación en Railway
+        acquireTimeoutMillis: 30000, // Reducir timeout a 30s (más razonable)
+        createTimeoutMillis: 20000, // Timeout de creación más corto
+        idleTimeoutMillis: 10000, // Reducir tiempo idle para liberar conexiones más rápido
         reapIntervalMillis: 1000,
         propagateCreateError: false,
         afterCreate: function(conn, done) {

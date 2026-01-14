@@ -58,27 +58,10 @@ class Product {
     }
 
     try {
-      return await query.timeout(20000); // 20 segundos máximo (aumentado para queries complejas)
+      return await query.timeout(10000); // 10 segundos máximo (reducido para evitar saturación)
     } catch (error) {
       console.error('Error en Product.getAll:', error.message);
       console.error('Error code:', error.code || 'N/A');
-      
-      // Si es un error de timeout de conexión, intentar liberar recursos
-      if (error.message && (
-        error.message.includes('Timeout acquiring a connection') ||
-        error.message.includes('Connection terminated') ||
-        error.code === 'ETIMEDOUT'
-      )) {
-        console.error('⚠️ Pool de conexiones saturado o timeout. Intentando retry...');
-        // Retry una vez después de 1 segundo
-        try {
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          return await query.timeout(20000);
-        } catch (retryError) {
-          console.error('❌ Retry también falló:', retryError.message);
-          throw retryError;
-        }
-      }
       throw error;
     }
   }
@@ -91,7 +74,7 @@ class Product {
         .leftJoin('categories', 'products.category_id', 'categories.id')
         .where('products.id', id)
         .first()
-        .timeout(20000);
+        .timeout(10000);
     } catch (error) {
       console.error('Error en Product.getById:', error.message);
       throw error;
@@ -106,7 +89,7 @@ class Product {
         .leftJoin('categories', 'products.category_id', 'categories.id')
         .where('products.slug', slug)
         .first()
-        .timeout(20000);
+        .timeout(10000);
     } catch (error) {
       console.error('Error en Product.getBySlug:', error.message);
       throw error;
@@ -122,7 +105,7 @@ class Product {
       .where('products.is_active', true)
       .orderBy('products.created_at', 'desc')
       .limit(limit)
-      .timeout(20000); // 20 segundos máximo (aumentado)
+      .timeout(10000);
   }
 
   // Obtener productos en oferta
@@ -134,7 +117,7 @@ class Product {
       .where('products.is_active', true)
       .orderBy('products.created_at', 'desc')
       .limit(limit)
-      .timeout(20000); // 20 segundos máximo (aumentado)
+      .timeout(10000);
   }
 
   // Obtener productos en tendencia
@@ -148,7 +131,7 @@ class Product {
           .where('products.is_active', true)
           .orderBy('products.created_at', 'desc')
           .limit(limit)
-          .timeout(20000);
+          .timeout(10000);
       } catch (trendingError) {
         if (trendingError.message && trendingError.message.includes('is_trending')) {
           console.log('⚠️ is_trending column not found, using featured products instead');
@@ -159,7 +142,7 @@ class Product {
             .where('products.is_active', true)
             .orderBy('products.created_at', 'desc')
             .limit(limit)
-            .timeout(20000);
+            .timeout(10000);
         }
         throw trendingError;
       }
@@ -180,7 +163,7 @@ class Product {
           .where('products.is_active', true)
           .orderBy('products.created_at', 'desc')
           .limit(limit)
-          .timeout(20000);
+          .timeout(10000);
       } catch (bestsellerError) {
         if (bestsellerError.message && bestsellerError.message.includes('is_bestseller')) {
           console.log('⚠️ is_bestseller column not found, using featured products instead');
@@ -191,7 +174,7 @@ class Product {
             .where('products.is_active', true)
             .orderBy('products.created_at', 'desc')
             .limit(limit)
-            .timeout(20000);
+            .timeout(10000);
         }
         throw bestsellerError;
       }
@@ -213,7 +196,7 @@ class Product {
           .where('products.is_active', true)
           .orderBy('products.created_at', 'desc')
           .limit(limit)
-          .timeout(20000);
+          .timeout(10000);
       } catch (newError) {
         // Si is_new no existe, usar created_at reciente
         if (newError.message && newError.message.includes('is_new')) {
@@ -224,7 +207,7 @@ class Product {
             .where('products.is_active', true)
             .orderBy('products.created_at', 'desc')
             .limit(limit)
-            .timeout(20000);
+            .timeout(10000);
         }
         throw newError;
       }
@@ -260,7 +243,7 @@ class Product {
     query = query.orderBy(sortBy, sortOrder);
 
     try {
-      return await query.timeout(20000);
+      return await query.timeout(10000);
     } catch (error) {
       console.error('Error en Product.getByCategory:', error.message);
       console.error('Error code:', error.code || 'N/A');
@@ -273,7 +256,7 @@ class Product {
       )) {
         try {
           await new Promise(resolve => setTimeout(resolve, 1000));
-          return await query.timeout(20000);
+          return await query.timeout(10000);
         } catch (retryError) {
           throw retryError;
         }
@@ -324,7 +307,7 @@ class Product {
     }
 
     try {
-      const result = await query.count('id as count').first().timeout(20000);
+      const result = await query.count('id as count').first().timeout(10000);
       return parseInt(result.count);
     } catch (error) {
       console.error('Error en Product.count:', error.message);
@@ -338,7 +321,7 @@ class Product {
       )) {
         try {
           await new Promise(resolve => setTimeout(resolve, 1000));
-          const result = await query.count('id as count').first().timeout(20000);
+          const result = await query.count('id as count').first().timeout(10000);
           return parseInt(result.count);
         } catch (retryError) {
           throw retryError;

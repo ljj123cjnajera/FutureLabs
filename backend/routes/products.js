@@ -4,8 +4,10 @@ const Product = require('../models/Product');
 
 // GET /api/products - Obtener todos los productos con filtros
 router.get('/', async (req, res) => {
+  let filters = null;
+  
   try {
-    const filters = {
+    filters = {
       category_id: req.query.category_id,
       brand: req.query.brand || req.query.category, // Support category as brand filter
       min_price: req.query.min_price ? parseFloat(req.query.min_price) : undefined,
@@ -54,9 +56,15 @@ router.get('/', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error obteniendo productos:', error);
+    console.error('Error obteniendo productos:', error.message);
     console.error('Error stack:', error.stack);
-    console.error('Filters used:', JSON.stringify(filters, null, 2));
+    if (filters) {
+      console.error('Filters used:', JSON.stringify(filters, null, 2));
+    } else {
+      console.error('Filters: Not initialized (error occurred before filter creation)');
+      console.error('Query params:', JSON.stringify(req.query, null, 2));
+    }
+    
     res.status(500).json({
       success: false,
       message: 'Error obteniendo productos',

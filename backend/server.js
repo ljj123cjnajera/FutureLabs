@@ -3,8 +3,6 @@ if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
 }
 
-// Force redeploy marker
-
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -94,7 +92,15 @@ app.use((req, res, next) => {
   const origin = req.headers.origin;
   
   // Permitir cualquier origen de GitHub Pages, localhost, o sin origen
-  const allowOrigin = origin || '*';
+  let allowOrigin = '*';
+  if (origin) {
+    // Si hay origen, verificar si es permitido
+    if (origin.includes('.github.io') || 
+        origin.includes('localhost') || 
+        origin.includes('127.0.0.1')) {
+      allowOrigin = origin;
+    }
+  }
   
   // SIEMPRE establecer headers CORS
   res.header('Access-Control-Allow-Origin', allowOrigin);
