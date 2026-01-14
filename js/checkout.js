@@ -398,22 +398,54 @@ class CheckoutManager {
                     <p>${addr.street_address || addr.street}</p>
                     <p>${addr.city}${addr.region ? ', ' + addr.region : ''}, ${addr.postal_code}</p>
                     <p>${addr.country || 'Perú'}</p>
+                    ${addr.phone_number ? `<p><i class="fas fa-phone"></i> ${addr.phone_number}</p>` : ''}
                 </div>
 
                 <div class="review-block">
                     <h4>MÉTODO DE PAGO:</h4>
-                    <p>${this.getPaymentMethodName(this.paymentMethod)}</p>
+                    <p><strong>${this.getPaymentMethodName(this.paymentMethod)}</strong></p>
+                    ${this.paymentMethod === 'yape' || this.paymentMethod === 'plin' ? `
+                    <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem;">
+                        <i class="fas fa-info-circle"></i> Recibirás las instrucciones de pago por email después de confirmar el pedido.
+                    </p>
+                    ` : ''}
                 </div>
 
                 <div class="review-block">
                     <h4>PRODUCTOS:</h4>
-                    ${this.cart.map(item => `<p>${item.quantity}x ${item.name} - S/ ${(item.discount_price || item.price).toFixed(2)}</p>`).join('')}
+                    ${this.cart.map(item => {
+                        const price = parseFloat(item.discount_price || item.price || 0);
+                        const quantity = item.quantity || 1;
+                        const itemTotal = price * quantity;
+                        return `<p>${quantity}x ${item.name}${item.size ? ' (Talla: ' + item.size + ')' : ''} - S/ ${itemTotal.toFixed(2)}</p>`;
+                    }).join('')}
+                </div>
+
+                <div class="review-block" style="border-top: 2px solid var(--black); padding-top: 1rem; margin-top: 1rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>Subtotal:</span>
+                        <span>S/ ${subtotal.toFixed(2)}</span>
+                    </div>
+                    ${discount > 0 ? `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; color: #4caf50;">
+                        <span>Descuento:</span>
+                        <span>-S/ ${discount.toFixed(2)}</span>
+                    </div>
+                    ` : ''}
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>Envío:</span>
+                        <span>${shipping === 0 ? 'GRATIS' : 'S/ ' + shipping.toFixed(2)}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: 900; margin-top: 1rem; padding-top: 1rem; border-top: 2px solid var(--black);">
+                        <span>TOTAL:</span>
+                        <span>S/ ${total.toFixed(2)}</span>
+                    </div>
                 </div>
 
                 <div class="checkout-actions">
                     <button class="btn btn-outline" onclick="checkoutManager.renderStep(2)">VOLVER</button>
-                    <button class="btn btn-green btn-block" onclick="checkoutManager.placeOrder()">
-                        CONFIRMAR PEDIDO (S/ ${total.toFixed(2)})
+                    <button class="btn btn-black btn-block" onclick="checkoutManager.placeOrder()">
+                        <i class="fas fa-lock"></i> CONFIRMAR PEDIDO (S/ ${total.toFixed(2)})
                     </button>
                 </div>
             </div>
