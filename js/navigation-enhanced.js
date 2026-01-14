@@ -20,8 +20,8 @@ class NavigationEnhanced {
         // Setup dropdowns interactivos
         this.setupDropdowns();
         
-        // Actualizar cada 30 segundos
-        setInterval(() => this.loadCategoryData(), 30000);
+        // Deshabilitar polling automático - solo cargar una vez
+        // setInterval(() => this.loadCategoryData(), 30000);
     }
 
     async loadCategoryData() {

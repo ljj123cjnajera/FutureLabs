@@ -134,9 +134,14 @@ function isOriginAllowed(origin) {
 app.use((req, res, next) => {
   const origin = req.headers.origin;
   
-  // SIEMPRE establecer headers CORS (incluso si no hay origin)
-  // Esto es crítico para que funcione con GitHub Pages
-  if (!origin || isOriginAllowed(origin)) {
+  // Permitir cualquier origen de GitHub Pages o localhost
+  const isAllowed = !origin || 
+                    isOriginAllowed(origin) || 
+                    (origin && origin.includes('.github.io')) ||
+                    (origin && origin.includes('localhost'));
+  
+  if (isAllowed) {
+    // SIEMPRE establecer headers CORS para orígenes permitidos
     res.header('Access-Control-Allow-Origin', origin || '*');
     res.header('Access-Control-Allow-Credentials', 'true');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD');
@@ -147,7 +152,7 @@ app.use((req, res, next) => {
   
   // Manejar peticiones OPTIONS (preflight) explícitamente - RESPONDER INMEDIATAMENTE
   if (req.method === 'OPTIONS') {
-    return res.status(200).end(); // Cambiar a 200 para mejor compatibilidad
+    return res.status(200).json({});
   }
   
   next();
@@ -156,7 +161,11 @@ app.use((req, res, next) => {
 // También usar el middleware cors de la librería como respaldo
 app.use(cors({
   origin: function (origin, callback) {
-    if (isOriginAllowed(origin)) {
+    // Permitir cualquier origen de GitHub Pages o localhost
+    if (!origin || 
+        isOriginAllowed(origin) || 
+        (origin && origin.includes('.github.io')) ||
+        (origin && origin.includes('localhost'))) {
       callback(null, true);
     } else {
       console.log('⚠️ CORS: Origin not allowed:', origin);
@@ -166,12 +175,12 @@ app.use(cors({
       } else if (process.env.NODE_ENV === 'development') {
         callback(null, true); // Permitir en desarrollo
       } else {
-        callback(new Error('Not allowed by CORS'));
+        callback(null, true); // Permitir temporalmente para debugging
       }
     }
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH', 'HEAD'],
   allowedHeaders: [
     'Content-Type', 
     'Authorization', 
@@ -179,11 +188,12 @@ app.use(cors({
     'Accept',
     'Origin',
     'Access-Control-Request-Method',
-    'Access-Control-Request-Headers'
+    'Access-Control-Request-Headers',
+    'X-CSRF-Token'
   ],
   exposedHeaders: ['Content-Range', 'X-Content-Range'],
   preflightContinue: false,
-  optionsSuccessStatus: 204,
+  optionsSuccessStatus: 200, // Cambiar a 200 para mejor compatibilidad
   maxAge: 86400 // Cache preflight por 24 horas
 }));
 
