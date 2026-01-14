@@ -19,12 +19,26 @@ router.get('/', async (req, res) => {
       inStock: req.query.inStock !== undefined ? req.query.inStock === 'true' : undefined
     };
     
-    // Clean undefined values
+    // Clean undefined/null/empty values
     Object.keys(filters).forEach(key => {
-      if (filters[key] === undefined || filters[key] === null || filters[key] === '') {
+      const value = filters[key];
+      if (value === undefined || value === null || value === '' || 
+          (typeof value === 'string' && value.trim() === '')) {
         delete filters[key];
       }
     });
+    
+    // Capitalize brand if it exists (Jordan, Nike, Adidas, Yeezy)
+    if (filters.brand) {
+      const brandLower = filters.brand.toLowerCase();
+      const brandMap = {
+        'jordan': 'Jordan',
+        'nike': 'Nike',
+        'adidas': 'Adidas',
+        'yeezy': 'Yeezy'
+      };
+      filters.brand = brandMap[brandLower] || filters.brand.charAt(0).toUpperCase() + filters.brand.slice(1).toLowerCase();
+    }
 
     const products = await Product.getAll(filters);
     const total = await Product.count(filters);
