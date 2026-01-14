@@ -231,13 +231,28 @@ body {
 }
 
 /* ============================================
-   3. PRODUCTS PAGE LAYOUT
+   3. PRODUCTS PAGE LAYOUT - REDISEÑADO
    ============================================ */
 .products-hero-section {
-    background: linear-gradient(135deg, var(--black) 0%, #1a1a1a 100%);
+    background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #2d2d2d 100%);
     color: var(--white);
-    padding: 4rem 0;
-    margin-bottom: 3rem;
+    padding: 5rem 0;
+    margin-bottom: 4rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.products-hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 50%, rgba(255, 68, 0, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 50%, rgba(255, 68, 0, 0.1) 0%, transparent 50%);
+    pointer-events: none;
 }
 
 .products-hero-content {
@@ -245,38 +260,51 @@ body {
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 2rem;
+    gap: 3rem;
+    position: relative;
+    z-index: 1;
 }
 
 .hero-text {
     flex: 1;
     min-width: 300px;
+    max-width: 700px;
 }
 
 .hero-eyebrow {
-    display: block;
-    font-size: 0.9rem;
-    font-weight: 700;
+    display: inline-block;
+    font-size: 0.85rem;
+    font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 2px;
-    color: var(--accent);
-    margin-bottom: 1rem;
+    letter-spacing: 3px;
+    color: #ff4400;
+    margin-bottom: 1.5rem;
+    padding: 0.5rem 1.5rem;
+    background: rgba(255, 68, 0, 0.1);
+    border: 2px solid rgba(255, 68, 0, 0.3);
+    border-radius: 0;
 }
 
 .hero-title {
-    font-size: 3.5rem;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
     font-weight: 900;
     text-transform: uppercase;
-    line-height: 1.1;
-    margin: 0 0 1rem 0;
-    letter-spacing: -0.02em;
+    line-height: 1.05;
+    margin: 0 0 1.5rem 0;
+    letter-spacing: -0.03em;
+    text-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
+    background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .hero-description {
-    font-size: 1.1rem;
-    color: var(--gray-300);
-    max-width: 500px;
-    line-height: 1.6;
+    font-size: 1.15rem;
+    color: #d0d0d0;
+    max-width: 600px;
+    line-height: 1.7;
+    font-weight: 400;
 }
 
 .hero-stats {
@@ -286,24 +314,37 @@ body {
 
 .stat-item {
     text-align: center;
+    padding: 1.5rem 2rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+    background: rgba(255, 68, 0, 0.1);
+    border-color: rgba(255, 68, 0, 0.3);
+    transform: translateY(-5px);
 }
 
 .stat-value {
     display: block;
-    font-size: 3rem;
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
     font-weight: 900;
     line-height: 1;
-    color: var(--accent);
+    color: #ff4400;
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
 }
 
 .stat-label {
     display: block;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-top: 0.5rem;
-    color: var(--gray-300);
+    letter-spacing: 2px;
+    margin-top: 0.75rem;
+    color: #b0b0b0;
 }
 
 /* Products Layout */
@@ -509,12 +550,14 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
-    padding: 1rem;
-    background: var(--gray-50);
-    border: 2px solid var(--black);
+    margin-bottom: 3rem;
+    padding: 1.5rem 2rem;
+    background: #f8f9fa;
+    border: 3px solid var(--black);
+    border-radius: 0;
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: 1.5rem;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.1);
 }
 
 .toolbar-left {
