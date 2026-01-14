@@ -328,6 +328,22 @@ class Product {
       return parseInt(result.count);
     } catch (error) {
       console.error('Error en Product.count:', error.message);
+      console.error('Error code:', error.code || 'N/A');
+      
+      // Retry para errores de timeout
+      if (error.message && (
+        error.message.includes('Timeout') ||
+        error.message.includes('Connection terminated') ||
+        error.code === 'ETIMEDOUT'
+      )) {
+        try {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          const result = await query.count('id as count').first().timeout(20000);
+          return parseInt(result.count);
+        } catch (retryError) {
+          throw retryError;
+        }
+      }
       throw error;
     }
   }
