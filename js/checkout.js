@@ -550,35 +550,72 @@ class CheckoutManager {
     renderOrderSummary() {
         if (!this.orderSummary) return;
 
-        const total = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        const shipping = total > 150 ? 0 : 15;
-        const finalTotal = total + shipping;
+        // Calculate totals with discount if coupon applied
+        const subtotal = this.cart.reduce((sum, item) => {
+            const price = parseFloat(item.discount_price || item.price || 0);
+            return sum + (price * (item.quantity || 1));
+        }, 0);
+        
+        // Get discount from coupon manager if available
+        const discount = window.couponsManager?.discount || 0;
+        const subtotalAfterDiscount = subtotal - discount;
+        const shipping = subtotalAfterDiscount >= 150 ? 0 : 15;
+        const finalTotal = subtotalAfterDiscount + shipping;
 
         this.orderSummary.innerHTML = `
             <div class="summary-card">
-                <h3>RESUMEN DE PEDIDO</h3>
+                <h3>RESUMEN DEL PEDIDO</h3>
                 <div class="summary-items">
                     ${this.cart.map(item => {
-                        const itemPrice = item.discount_price || item.price;
-                        const itemTotal = itemPrice * item.quantity;
+                        const price = parseFloat(item.discount_price || item.price || 0);
+                        const quantity = item.quantity || 1;
+                        const itemTotal = price * quantity;
                         return `
                         <div class="summary-item">
-                            <img src="${item.image_url || item.image || 'assets/images/products/placeholder.jpg'}" alt="${item.name}" onerror="this.src='assets/images/products/placeholder.jpg'">
+                            <img src="${item.image_url || item.image || 'assets/images/products/placeholder.jpg'}" 
+                                 alt="${item.name}" 
+                                 onerror="this.src='assets/images/products/placeholder.jpg'">
                             <div>
                                 <h4>${item.name}</h4>
-                                <p>x${item.quantity} - S/ ${itemTotal.toFixed(2)}</p>
+                                <p>x${quantity} - S/ ${itemTotal.toFixed(2)}</p>
+                                ${item.size ? `<p style="font-size: 0.8rem; color: #666;">Talla: ${item.size}</p>` : ''}
                             </div>
                         </div>
                     `;
                     }).join('')}
                 </div>
                 <div class="summary-totals">
-                    <div class="row"><span>Subtotal</span> <span>S/ ${total.toFixed(2)}</span></div>
+                    <div class="row"><span>Subtotal</span> <span>S/ ${subtotal.toFixed(2)}</span></div>
+                    ${discount > 0 ? `
+                    <div class="row" style="color: #4caf50;">
+                        <span>Descuento</span> 
+                        <span>-S/ ${discount.toFixed(2)}</span>
+                    </div>
+                    ` : ''}
                     <div class="row"><span>Envío</span> <span>${shipping === 0 ? 'GRATIS' : 'S/ ' + shipping.toFixed(2)}</span></div>
+                    ${subtotalAfterDiscount < 150 ? `
+                    <div style="font-size: 0.85rem; color: #666; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #eee;">
+                        <i class="fas fa-info-circle"></i> Agrega S/ ${(150 - subtotalAfterDiscount).toFixed(2)} más para envío gratis
+                    </div>
+                    ` : ''}
                     <div class="row total"><span>TOTAL</span> <span>S/ ${finalTotal.toFixed(2)}</span></div>
                 </div>
+                ${window.couponsManager ? `
+                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 2px solid var(--black);">
+                    <div id="couponSection"></div>
+                </div>
+                ` : ''}
             </div>
         `;
+        
+        // Render coupon section if available
+        if (window.couponsManager) {
+            setTimeout(() => {
+                if (window.couponsManager.renderCouponSection) {
+                    window.couponsManager.renderCouponSection('couponSection');
+                }
+            }, 100);
+        }
     }
 }
 
