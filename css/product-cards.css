@@ -26,7 +26,7 @@
     width: 100%;
     aspect-ratio: 1;
     overflow: hidden;
-    background: var(--gray-50);
+    background: #e5e7eb; /* Light gray background for better visibility */
     border-bottom: 2px solid var(--black);
     transition: border-color 0.2s ease;
     min-height: 300px; /* Ensure container has minimum height */
@@ -42,8 +42,9 @@
     object-position: center;
     transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     mix-blend-mode: normal;
-    display: block; /* Ensure image is always visible */
-    background: var(--gray-100); /* Fallback background */
+    display: block !important; /* Force image to always be visible */
+    background: #e5e7eb; /* Fallback background - more visible */
+    min-height: 100%; /* Ensure image fills container */
 }
 
 /* Fallback when image fails to load */
