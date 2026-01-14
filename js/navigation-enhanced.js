@@ -20,8 +20,26 @@ class NavigationEnhanced {
         // Setup dropdowns interactivos
         this.setupDropdowns();
         
+        // Setup header scroll effect
+        this.setupHeaderScroll();
+        
         // Deshabilitar polling automático - solo cargar una vez
         // setInterval(() => this.loadCategoryData(), 30000);
+    }
+    
+    setupHeaderScroll() {
+        const header = document.querySelector('.header-v3');
+        if (!header) return;
+        
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        }, { passive: true });
     }
 
     async loadCategoryData() {
