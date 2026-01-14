@@ -55,6 +55,8 @@ router.get('/', async (req, res) => {
     });
   } catch (error) {
     console.error('Error obteniendo productos:', error);
+    console.error('Error stack:', error.stack);
+    console.error('Filters used:', JSON.stringify(filters, null, 2));
     res.status(500).json({
       success: false,
       message: 'Error obteniendo productos',
