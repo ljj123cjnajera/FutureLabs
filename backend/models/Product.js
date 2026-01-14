@@ -61,9 +61,23 @@ class Product {
       return await query.timeout(20000); // 20 segundos máximo (aumentado para queries complejas)
     } catch (error) {
       console.error('Error en Product.getAll:', error.message);
+      console.error('Error code:', error.code || 'N/A');
+      
       // Si es un error de timeout de conexión, intentar liberar recursos
-      if (error.message && error.message.includes('Timeout acquiring a connection')) {
-        console.error('⚠️ Pool de conexiones saturado. Considera aumentar el tamaño del pool o reducir peticiones concurrentes.');
+      if (error.message && (
+        error.message.includes('Timeout acquiring a connection') ||
+        error.message.includes('Connection terminated') ||
+        error.code === 'ETIMEDOUT'
+      )) {
+        console.error('⚠️ Pool de conexiones saturado o timeout. Intentando retry...');
+        // Retry una vez después de 1 segundo
+        try {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          return await query.timeout(20000);
+        } catch (retryError) {
+          console.error('❌ Retry también falló:', retryError.message);
+          throw retryError;
+        }
       }
       throw error;
     }

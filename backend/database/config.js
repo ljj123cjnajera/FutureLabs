@@ -56,15 +56,31 @@ if (dbUrl && !isPlaceholder) {
       pool: {
         min: 2, // Mantener al menos 2 conexiones activas
         max: 10, // Reducir a 10 para evitar saturación
-        acquireTimeoutMillis: 30000, // Aumentar timeout a 30s para dar más tiempo
-        createTimeoutMillis: 10000, // Timeout de creación más largo
+        acquireTimeoutMillis: 60000, // Aumentar timeout a 60s para conexiones lentas
+        createTimeoutMillis: 30000, // Timeout de creación más largo
         idleTimeoutMillis: 30000, // Mantener conexiones idle más tiempo
         reapIntervalMillis: 1000,
         propagateCreateError: false,
         afterCreate: function(conn, done) {
+          // Manejar errores de conexión
           conn.on('error', function(err) {
-            console.log('⚠️ Database connection error:', err.message);
-            if (conn && !conn._ending) {
+            console.error('⚠️ Database connection error:', err.message);
+            console.error('   Error code:', err.code);
+            console.error('   Error detail:', err.detail || 'N/A');
+            
+            // Intentar reconectar si es un error de conexión
+            if (err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT' || err.code === 'ENOTFOUND') {
+              console.log('   🔄 Intentando reconectar en 5 segundos...');
+              setTimeout(() => {
+                if (conn && !conn._ending) {
+                  try {
+                    conn.end();
+                  } catch (e) {
+                    // Ignorar errores al cerrar conexión con error
+                  }
+                }
+              }, 5000);
+            } else if (conn && !conn._ending) {
               try {
                 conn.end();
               } catch (e) {
@@ -72,6 +88,9 @@ if (dbUrl && !isPlaceholder) {
               }
             }
           });
+          
+          // Log cuando se crea una conexión exitosamente
+          console.log('✅ Nueva conexión a la base de datos establecida');
           done(null, conn);
         },
         destroy: function(client) {
