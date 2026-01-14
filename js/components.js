@@ -563,6 +563,10 @@ class Components {
 
   static ensureAutocompleteAssets() {
     if (typeof document === 'undefined') return;
+    
+    // Prevenir bucle infinito
+    if (this._autocompleteInitializing) return;
+    this._autocompleteInitializing = true;
 
     if (!document.querySelector('link[data-autocomplete-style]')) {
       const link = document.createElement('link');
@@ -574,18 +578,35 @@ class Components {
 
     const initialize = () => {
       if (window.searchAutocomplete && typeof window.searchAutocomplete.init === 'function') {
-        window.searchAutocomplete.init();
+        try {
+          window.searchAutocomplete.init();
+        } catch (e) {
+          if (window.Logger) window.Logger.error('Error initializing searchAutocomplete:', e);
+        }
       } else if (typeof window.initializeAutocomplete === 'function') {
-        window.initializeAutocomplete();
+        try {
+          window.initializeAutocomplete();
+        } catch (e) {
+          if (window.Logger) window.Logger.error('Error initializing autocomplete:', e);
+        }
       }
-      // Additional initializations as per user's instruction
-      if (window.Components.initSearch) window.Components.initSearch();
-      if (window.Components.initSearchOverlay) window.Components.initSearchOverlay();
-      if (window.Components.initCartCounter) window.Components.initCartCounter();
+      // NO llamar initSearch aquí para evitar bucle infinito
+      // initSearch ya se llama desde initHeader
+      
+      // Solo inicializar overlay y cart counter si no están ya inicializados
+      if (!this._overlayInitialized) {
+        this.initSearchOverlay();
+        this._overlayInitialized = true;
+      }
+      if (!this._cartCounterInitialized) {
+        this.initCartCounter();
+        this._cartCounterInitialized = true;
+      }
     };
 
     if (window.searchAutocomplete || typeof window.initializeAutocomplete === 'function') {
       initialize();
+      this._autocompleteInitializing = false;
       return;
     }
 
@@ -594,8 +615,16 @@ class Components {
       script.src = 'js/autocomplete.js';
       script.defer = true;
       script.setAttribute('data-autocomplete-script', 'true');
-      script.onload = () => initialize();
+      script.onload = () => {
+        initialize();
+        this._autocompleteInitializing = false;
+      };
+      script.onerror = () => {
+        this._autocompleteInitializing = false;
+      };
       document.body.appendChild(script);
+    } else {
+      this._autocompleteInitializing = false;
     }
   }
 

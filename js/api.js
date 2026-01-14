@@ -141,7 +141,7 @@ class SneakersAPI {
   // Helper para hacer requests
   async request(endpoint, options = {}) {
     // Override: Always use Real Backend
-    const method = options.method ? options.method.toUpperCase() : 'GET';
+    const method = (options.method && typeof options.method === 'string') ? options.method.toUpperCase() : 'GET';
     let effectiveEndpoint = endpoint;
 
     // Parameter anti-cache (Safari) - only add if endpoint is valid
