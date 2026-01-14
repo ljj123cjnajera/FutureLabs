@@ -306,9 +306,9 @@
     <script src="js/notifications.js"></script>
     <script src="js/cart.js"></script>
     
-    <!-- Page-specific script (deferred for better performance) -->
-    <!-- Catalog Engine -->
-    <script src="js/products.js" defer></script>
+    <!-- Page-specific script -->
+    <!-- Catalog Engine - NO defer, debe cargar después de api.js -->
+    <script src="js/products.js"></script>
 
     <!-- Logic moved to js/products.js -->
 </body>

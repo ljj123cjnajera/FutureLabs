@@ -20,7 +20,7 @@ class CatalogEngine {
             minPrice: null,
             maxPrice: null,
             onSale: false,
-            inStock: false, // Changed to false by default to show all products
+            inStock: false, // false = mostrar todos, true = solo con stock
             search: null
         };
         this.currentSort = 'newest';
@@ -919,6 +919,28 @@ window.applyPriceFilter = function() {
     }
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-    window.catalogEngine = new CatalogEngine();
-});
+// Initialize when DOM and API are ready
+function initCatalogEngine() {
+    // Wait for API to be available
+    if (!window.api) {
+        if (window.Logger) window.Logger.warn('⚠️ [CatalogEngine] API not ready, retrying...');
+        setTimeout(initCatalogEngine, 100);
+        return;
+    }
+    
+    // Wait for DOM to be ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!window.catalogEngine) {
+                window.catalogEngine = new CatalogEngine();
+            }
+        });
+    } else {
+        if (!window.catalogEngine) {
+            window.catalogEngine = new CatalogEngine();
+        }
+    }
+}
+
+// Start initialization
+initCatalogEngine();
