@@ -29,6 +29,10 @@
     background: var(--gray-50);
     border-bottom: 2px solid var(--black);
     transition: border-color 0.2s ease;
+    min-height: 300px; /* Ensure container has minimum height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .product-image {
@@ -38,6 +42,16 @@
     object-position: center;
     transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     mix-blend-mode: normal;
+    display: block; /* Ensure image is always visible */
+    background: var(--gray-100); /* Fallback background */
+}
+
+/* Fallback when image fails to load */
+.product-image[src=""],
+.product-image:not([src]),
+.product-image[src*="placeholder"] {
+    background: var(--gray-100);
+    opacity: 1;
 }
 
 /* Image Zoom Effect */
