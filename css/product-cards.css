@@ -28,11 +28,15 @@
     overflow: hidden;
     background: #e5e7eb; /* Light gray background for better visibility */
     border-bottom: 2px solid var(--black);
-    transition: border-color 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     min-height: 300px; /* Ensure container has minimum height */
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.product-card:hover .product-image-container {
+    border-bottom-color: var(--accent);
 }
 
 .product-image {
@@ -40,11 +44,15 @@
     height: 100%;
     object-fit: cover;
     object-position: center;
-    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     mix-blend-mode: normal;
     display: block !important; /* Force image to always be visible */
     background: #e5e7eb; /* Fallback background - more visible */
     min-height: 100%; /* Ensure image fills container */
+}
+
+.product-card:hover .product-image {
+    transform: scale(1.08);
 }
 
 /* Fallback when image fails to load */
