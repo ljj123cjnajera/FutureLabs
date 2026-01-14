@@ -3,7 +3,13 @@
  * Verifica conexión, estructura de tablas y migraciones
  */
 
-require('dotenv').config();
+// Cargar dotenv solo si está disponible (no necesario en producción)
+try {
+  require('dotenv').config();
+} catch (e) {
+  // dotenv no disponible, usar variables de entorno del sistema
+}
+
 const db = require('../database/config');
 
 async function diagnoseDatabase() {
