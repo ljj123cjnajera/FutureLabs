@@ -459,6 +459,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         // Add to clicked
         element.classList.add('selected');
         selectedSize = size;
+        window.selectedSize = size; // También guardar globalmente
 
         // Hide error
         const errorMsg = document.getElementById('sizeValidationMsg');
@@ -514,8 +515,11 @@ document.addEventListener('DOMContentLoaded', async function () {
             return;
         }
 
+        // Obtener talla seleccionada (puede ser local o global)
+        const currentSelectedSize = selectedSize || window.selectedSize || null;
+
         // VALIDACIÓN DE TALLA
-        if (!selectedSize) {
+        if (!currentSelectedSize) {
             const errorMsg = document.getElementById('sizeValidationMsg');
             const container = document.querySelector('.size-selector-container');
 
@@ -532,39 +536,56 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
 
         // VALIDACIÓN DE STOCK POR TALLA
-        if (window.productSizeStock && window.productSizeStock[selectedSize] !== undefined) {
-            const sizeStock = window.productSizeStock[selectedSize];
+        if (window.productSizeStock && window.productSizeStock[currentSelectedSize] !== undefined) {
+            const sizeStock = window.productSizeStock[currentSelectedSize];
             if (sizeStock === 0) {
                 if (window.notifications) {
-                    window.notifications.warning('Talla Agotada', `La talla US ${selectedSize} no está disponible en este momento.`);
+                    window.notifications.warning('Talla Agotada', `La talla US ${currentSelectedSize} no está disponible en este momento.`);
                 }
                 return;
             }
             if (sizeStock < 1) {
                 if (window.notifications) {
-                    window.notifications.warning('Stock Insuficiente', `Solo hay ${sizeStock} unidades disponibles en talla US ${selectedSize}.`);
+                    window.notifications.warning('Stock Insuficiente', `Solo hay ${sizeStock} unidades disponibles en talla US ${currentSelectedSize}.`);
                 }
                 return;
             }
         }
 
         try {
-            // Use cartEngine directly for consistency
-            if (window.cartEngine) {
-                const success = await window.cartEngine.add(productId, 1, { size: selectedSize });
+            // Esperar a que cartEngine esté disponible
+            let retries = 0;
+            while (!window.cartEngine && retries < 20) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                retries++;
+            }
+
+            if (!window.cartEngine) {
+                throw new Error('CartEngine no disponible. Por favor, recarga la página.');
+            }
+
+            // Agregar al carrito
+            const success = await window.cartEngine.add(productId, 1, { size: currentSelectedSize });
+            
+            if (success !== false) {
+                // Actualizar contador de carrito
+                if (window.Components && window.Components.updateCartCount) {
+                    window.Components.updateCartCount();
+                }
                 
-                if (success !== false) {
-                    if (window.notifications) {
-                        window.notifications.success('Agregado al Carrito', `Talla US ${selectedSize} agregada correctamente`);
-                    }
+                if (window.notifications) {
+                    window.notifications.success('Agregado al Carrito', `Talla US ${currentSelectedSize} agregada correctamente`);
                 }
             } else {
-                throw new Error('CartEngine no disponible');
+                if (window.notifications) {
+                    window.notifications.warning('Error', 'No se pudo agregar el producto al carrito.');
+                }
             }
         } catch (e) {
             if (window.Logger) window.Logger.error('Error adding to cart:', e);
             if (window.notifications) {
-                window.notifications.error('Error', 'No se pudo agregar el producto. Por favor, intenta de nuevo.');
+                const errorMsg = e.message || 'No se pudo agregar el producto. Por favor, intenta de nuevo.';
+                window.notifications.error('Error', errorMsg);
             }
         }
     }
@@ -596,8 +617,11 @@ document.addEventListener('DOMContentLoaded', async function () {
             return;
         }
 
+        // Obtener talla seleccionada (puede ser local o global)
+        const currentSelectedSize = selectedSize || window.selectedSize || null;
+
         // VALIDACIÓN DE TALLA
-        if (!selectedSize) {
+        if (!currentSelectedSize) {
             const errorMsg = document.getElementById('sizeValidationMsg');
             const container = document.querySelector('.size-selector-container');
 
@@ -614,37 +638,59 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
 
         // VALIDACIÓN DE STOCK POR TALLA
-        if (window.productSizeStock && window.productSizeStock[selectedSize] !== undefined) {
-            const sizeStock = window.productSizeStock[selectedSize];
+        if (window.productSizeStock && window.productSizeStock[currentSelectedSize] !== undefined) {
+            const sizeStock = window.productSizeStock[currentSelectedSize];
             if (sizeStock === 0) {
                 if (window.notifications) {
-                    window.notifications.warning('Talla Agotada', `La talla US ${selectedSize} no está disponible en este momento.`);
+                    window.notifications.warning('Talla Agotada', `La talla US ${currentSelectedSize} no está disponible en este momento.`);
                 }
                 return;
             }
             if (sizeStock < 1) {
                 if (window.notifications) {
-                    window.notifications.warning('Stock Insuficiente', `Solo hay ${sizeStock} unidades disponibles en talla US ${selectedSize}.`);
+                    window.notifications.warning('Stock Insuficiente', `Solo hay ${sizeStock} unidades disponibles en talla US ${currentSelectedSize}.`);
                 }
                 return;
             }
         }
 
         try {
-            if (window.cartEngine) {
-                const success = await window.cartEngine.add(productId, 1, { size: selectedSize });
+            // Esperar a que cartEngine esté disponible
+            let retries = 0;
+            while (!window.cartEngine && retries < 20) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                retries++;
+            }
+
+            if (!window.cartEngine) {
+                throw new Error('CartEngine no disponible. Por favor, recarga la página.');
+            }
+
+            // Agregar al carrito
+            const success = await window.cartEngine.add(productId, 1, { size: currentSelectedSize });
+            
             if (success !== false) {
+                // Actualizar contador de carrito
+                if (window.Components && window.Components.updateCartCount) {
+                    window.Components.updateCartCount();
+                }
+                
                 if (window.notifications) {
                     window.notifications.success('Redirigiendo al checkout...', 'El producto se agregó al carrito');
                 }
                 setTimeout(() => {
                     window.location.href = 'checkout.html';
                 }, 1000);
+            } else {
+                if (window.notifications) {
+                    window.notifications.warning('Error', 'No se pudo agregar el producto al carrito.');
+                }
             }
         } catch (e) {
             if (window.Logger) window.Logger.error('Error in buyNow:', e);
             if (window.notifications) {
-                window.notifications.error('Error', 'No se pudo agregar el producto. Por favor, intenta de nuevo.');
+                const errorMsg = e.message || 'No se pudo agregar el producto. Por favor, intenta de nuevo.';
+                window.notifications.error('Error', errorMsg);
             }
         }
     }
