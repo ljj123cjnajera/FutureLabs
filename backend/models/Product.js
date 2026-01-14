@@ -14,7 +14,8 @@ class Product {
     }
 
     if (filters.brand) {
-      query = query.where('products.brand', filters.brand);
+      // Support case-insensitive brand matching
+      query = query.whereRaw('LOWER(products.brand) = LOWER(?)', [filters.brand]);
     }
 
     if (filters.min_price) {
@@ -228,7 +229,8 @@ class Product {
       .where('products.is_active', true);
 
     if (filters.brand) {
-      query = query.where('products.brand', filters.brand);
+      // Support case-insensitive brand matching
+      query = query.whereRaw('LOWER(products.brand) = LOWER(?)', [filters.brand]);
     }
 
     if (filters.min_price) {
