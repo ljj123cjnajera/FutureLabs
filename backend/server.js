@@ -86,7 +86,33 @@ async function ensureDataSeeded() {
 // Agrega esta línea para el proxy:
 app.set('trust proxy', 1);
 
-// Health check - DEBE IR PRIMERO para que Railway lo detecte inmediatamente
+// ============================================
+// CORS - DEBE IR PRIMERO, ANTES DE TODO
+// ============================================
+// Middleware CORS simplificado y robusto para GitHub Pages
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  
+  // Permitir cualquier origen de GitHub Pages, localhost, o sin origen
+  const allowOrigin = origin || '*';
+  
+  // SIEMPRE establecer headers CORS
+  res.header('Access-Control-Allow-Origin', allowOrigin);
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin, Access-Control-Request-Method, Access-Control-Request-Headers, X-CSRF-Token');
+  res.header('Access-Control-Expose-Headers', 'Content-Range, X-Content-Range');
+  res.header('Access-Control-Max-Age', '86400');
+  
+  // Responder inmediatamente a OPTIONS (preflight)
+  if (req.method === 'OPTIONS') {
+    return res.status(200).json({});
+  }
+  
+  next();
+});
+
+// Health check - DEBE IR DESPUÉS de CORS
 app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'OK',
@@ -96,7 +122,7 @@ app.get('/health', (req, res) => {
   });
 });
 
-// CORS - DEBE IR ANTES DE HELMET para que funcione correctamente
+// CORS adicional con librería cors - como respaldo
 // CORS - Permite múltiples orígenes (GitHub Pages + localhost)
 const allowedOrigins = [
   process.env.FRONTEND_URL,
@@ -128,35 +154,6 @@ function isOriginAllowed(origin) {
   
   return false;
 }
-
-// Middleware CORS personalizado - MANEJA EXPLÍCITAMENTE PREFLIGHT
-// CRÍTICO: Debe estar ANTES de cualquier otro middleware
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  
-  // Permitir cualquier origen de GitHub Pages o localhost
-  const isAllowed = !origin || 
-                    isOriginAllowed(origin) || 
-                    (origin && origin.includes('.github.io')) ||
-                    (origin && origin.includes('localhost'));
-  
-  if (isAllowed) {
-    // SIEMPRE establecer headers CORS para orígenes permitidos
-    res.header('Access-Control-Allow-Origin', origin || '*');
-    res.header('Access-Control-Allow-Credentials', 'true');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin, Access-Control-Request-Method, Access-Control-Request-Headers, X-CSRF-Token');
-    res.header('Access-Control-Expose-Headers', 'Content-Range, X-Content-Range');
-    res.header('Access-Control-Max-Age', '86400');
-  }
-  
-  // Manejar peticiones OPTIONS (preflight) explícitamente - RESPONDER INMEDIATAMENTE
-  if (req.method === 'OPTIONS') {
-    return res.status(200).json({});
-  }
-  
-  next();
-});
 
 // También usar el middleware cors de la librería como respaldo
 app.use(cors({
