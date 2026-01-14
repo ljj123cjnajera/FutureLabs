@@ -347,10 +347,12 @@ class CatalogEngine {
     render(products) {
         const container = document.getElementById('productsContainer');
         if (!container) {
+            console.error('❌ [CatalogEngine] productsContainer not found!');
             if (window.Logger) window.Logger.error('⚠️ [CatalogEngine] productsContainer not found!');
             return;
         }
 
+        console.log(`📦 [CatalogEngine] Rendering ${products.length} products`);
         if (window.Logger) window.Logger.log(`📦 [CatalogEngine] Rendering ${products.length} products`);
 
         // Use LoadingStates for empty state
@@ -370,6 +372,8 @@ class CatalogEngine {
                         <p class="text-gray-600">Intenta ajustar tus filtros o busca algo diferente.</p>
                     </div>
                  `;
+                // Make container visible even when empty
+                container.classList.add('loaded');
             }
             return;
         }
@@ -405,10 +409,13 @@ class CatalogEngine {
                 
                 if (cardsHTML) {
                     container.innerHTML = cardsHTML;
+                    // Add 'loaded' class to make grid visible (removes opacity: 0)
+                    container.classList.add('loaded');
                     if (window.Logger) window.Logger.log(`✅ [CatalogEngine] Rendered ${products.length} product cards`);
                 } else {
                     if (window.Logger) window.Logger.error('⚠️ [CatalogEngine] No product cards generated!');
                     container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 4rem;">Error al renderizar productos</div>';
+                    container.classList.add('loaded'); // Still make it visible even on error
                 }
             } else {
                 // Fallback just in case (Brutalist V3 Structure)
@@ -482,10 +489,13 @@ class CatalogEngine {
                 
                 if (cardsHTML) {
                     container.innerHTML = cardsHTML;
+                    // Add 'loaded' class to make grid visible (removes opacity: 0)
+                    container.classList.add('loaded');
                     if (window.Logger) window.Logger.log(`✅ [CatalogEngine] Rendered ${products.length} products (fallback)`);
                 } else {
                     if (window.Logger) window.Logger.error('⚠️ [CatalogEngine] No fallback cards generated!');
                     container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 4rem;">Error al renderizar productos</div>';
+                    container.classList.add('loaded'); // Still make it visible even on error
                 }
             }
         } catch (e) {
@@ -498,6 +508,8 @@ class CatalogEngine {
                         <p>Por favor, recarga la página.</p>
                     </div>
                 `;
+                // Make container visible even on error
+                container.classList.add('loaded');
             }
         }
     }
