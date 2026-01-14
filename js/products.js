@@ -205,10 +205,14 @@ class CatalogEngine {
 
             // Call API with filters
             if (window.Logger) window.Logger.log('📦 [CatalogEngine] Loading products with filters:', apiFilters);
+            console.log('🔵 [CatalogEngine] Loading products with filters:', apiFilters);
             
             const response = await this.api.getProducts(apiFilters);
             
             if (window.Logger) window.Logger.log('📦 [CatalogEngine] API Response:', response);
+            console.log('🔵 [CatalogEngine] API Response:', response);
+            console.log('🔵 [CatalogEngine] Response type:', typeof response);
+            console.log('🔵 [CatalogEngine] Is Array:', Array.isArray(response));
             
             // Handle different response formats
             let products = [];
@@ -216,25 +220,43 @@ class CatalogEngine {
             let pages = 1;
             
             if (Array.isArray(response)) {
+                // Direct array response
                 products = response;
                 total = response.length;
-            } else if (response && response.data) {
+                pages = Math.ceil(total / this.itemsPerPage);
+                console.log('✅ [CatalogEngine] Parsed as direct array');
+            } else if (response && response.success === true && response.data) {
+                // Standard API response: { success: true, data: { products: [], total: X, pages: Y } }
                 products = response.data.products || response.data || [];
-                total = response.data.total || products.length;
-                pages = response.data.pages || Math.ceil(total / this.itemsPerPage);
+                total = response.data.total !== undefined ? response.data.total : products.length;
+                pages = response.data.pages !== undefined ? response.data.pages : Math.ceil(total / this.itemsPerPage);
+                console.log('✅ [CatalogEngine] Parsed as success response with data');
+            } else if (response && response.data) {
+                // Response with data but no success field
+                products = response.data.products || response.data || [];
+                total = response.data.total !== undefined ? response.data.total : products.length;
+                pages = response.data.pages !== undefined ? response.data.pages : Math.ceil(total / this.itemsPerPage);
+                console.log('✅ [CatalogEngine] Parsed as response with data');
             } else if (response && response.products) {
+                // Response with products array directly
                 products = response.products;
-                total = response.total || products.length;
-                pages = response.pages || Math.ceil(total / this.itemsPerPage);
+                total = response.total !== undefined ? response.total : products.length;
+                pages = response.pages !== undefined ? response.pages : Math.ceil(total / this.itemsPerPage);
+                console.log('✅ [CatalogEngine] Parsed as response with products');
             } else if (response && response.success === false) {
                 // API returned an error
-                throw new Error(response.message || 'Error al cargar productos');
+                const errorMsg = response.message || 'Error al cargar productos';
+                console.error('❌ [CatalogEngine] API Error:', errorMsg);
+                throw new Error(errorMsg);
             } else {
+                // Unknown or empty response
+                console.warn('⚠️ [CatalogEngine] Unknown response format or empty response');
                 products = [];
                 total = 0;
             }
             
             if (window.Logger) window.Logger.log(`📦 [CatalogEngine] Parsed ${products.length} products, total: ${total}, pages: ${pages}`);
+            console.log(`✅ [CatalogEngine] Parsed ${products.length} products, total: ${total}, pages: ${pages}`);
 
             this.allProducts = products;
             this.filteredProducts = products;
