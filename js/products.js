@@ -834,6 +834,7 @@ class CatalogEngine {
         `;
 
         const brandOptions = this.brands.map(brand => {
+            if (!brand || typeof brand !== 'string') return '';
             const brandName = brand.charAt(0).toUpperCase() + brand.slice(1);
             return `
                 <label class="filter-checkbox">

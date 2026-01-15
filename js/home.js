@@ -1175,7 +1175,8 @@ class HomeEngine {
         if (products.length > 0) {
           grid.innerHTML = products.map(p => window.Components.getProductCard(p)).join('');
         } else {
-          grid.innerHTML = `<div class="empty-state">NO WEAPONS FOUND IN SECTOR ${category.toUpperCase()}</div>`;
+          const safeCategory = (category && typeof category === 'string') ? category.toUpperCase() : 'CATEGORÍA';
+          grid.innerHTML = `<div class="empty-state">NO WEAPONS FOUND IN SECTOR ${safeCategory}</div>`;
         }
 
 
@@ -1189,7 +1190,7 @@ class HomeEngine {
           <div class="engine-error-state" style="grid-column: 1 / -1; padding: 3rem; text-align: center; border: 2px solid #e0e0e0;">
             <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ff9800; margin-bottom: 1rem;"></i>
             <h3 style="font-weight: 900; text-transform: uppercase; margin-bottom: 0.5rem;">Error al cargar productos</h3>
-            <p style="color: #666; margin-bottom: 1.5rem;">No se pudieron cargar los productos de ${category.toUpperCase()}</p>
+            <p style="color: #666; margin-bottom: 1.5rem;">No se pudieron cargar los productos de ${(category && typeof category === 'string') ? category.toUpperCase() : 'CATEGORÍA'}</p>
             <button onclick="location.reload()" class="btn btn-black">RECARGAR</button>
           </div>
         `;

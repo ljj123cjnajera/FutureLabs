@@ -34,8 +34,9 @@ class SeoManager {
      */
     static updateProductSEO(data) {
         // Basic
-        this.updateTitle(data.title.toUpperCase());
-        this.updateMeta('name', 'description', data.description);
+        const safeTitle = (data && data.title && typeof data.title === 'string') ? data.title.toUpperCase() : 'Producto';
+        this.updateTitle(safeTitle);
+        this.updateMeta('name', 'description', data?.description || '');
 
         // Open Graph
         this.updateMeta('property', 'og:title', data.title);

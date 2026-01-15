@@ -26,7 +26,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const badge = document.getElementById('orderIdDisplay');
         const container = document.getElementById('orderIdContainer');
         if (badge && container) {
-            badge.textContent = `ORDER #${orderId.toUpperCase()}`;
+            const safeOrderId = (orderId && typeof orderId === 'string') ? orderId.toUpperCase() : 'N/A';
+            badge.textContent = `ORDER #${safeOrderId}`;
             container.style.display = 'block';
         }
     }
