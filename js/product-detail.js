@@ -433,27 +433,34 @@ document.addEventListener('DOMContentLoaded', async function () {
             // Esperar a que cartEngine esté disponible (con más tiempo)
             let retries = 0;
             const maxRetries = 50; // 5 segundos
-            while (!window.cartEngine && retries < maxRetries) {
+            while (!window.cartEngine && !window.cartManager && retries < maxRetries) {
                 await new Promise(resolve => setTimeout(resolve, 100));
                 retries++;
             }
 
-            if (!window.cartEngine) {
+            // Usar cartManager como alias si cartEngine no está disponible
+            let cart = window.cartEngine || window.cartManager;
+            
+            if (!cart) {
                 // Intentar inicializar manualmente si no está disponible
                 if (window.CartEngine) {
+                    if (window.Logger) window.Logger.log('🔧 Inicializando CartEngine manualmente...');
                     window.cartEngine = new window.CartEngine();
                     window.cartManager = window.cartEngine;
                     // Esperar un poco más para que se inicialice
                     await new Promise(resolve => setTimeout(resolve, 500));
+                    cart = window.cartEngine || window.cartManager;
                 }
                 
-                if (!window.cartEngine) {
+                if (!cart) {
                     throw new Error('CartEngine no disponible. Por favor, recarga la página.');
                 }
             }
 
+            if (window.Logger) window.Logger.log('✅ CartEngine disponible, agregando producto...', { productId, size: currentSelectedSize });
+
             // Agregar al carrito con size
-            const success = await window.cartEngine.add(productId, 1, { size: currentSelectedSize });
+            const success = await cart.add(productId, 1, { size: currentSelectedSize });
             
             if (success === true) {
                 // Éxito - la notificación ya se muestra en cartEngine.add()
@@ -533,17 +540,34 @@ document.addEventListener('DOMContentLoaded', async function () {
         try {
             // Esperar a que cartEngine esté disponible
             let retries = 0;
-            while (!window.cartEngine && retries < 20) {
+            let retries = 0;
+            const maxRetries = 50;
+            while (!window.cartEngine && !window.cartManager && retries < maxRetries) {
                 await new Promise(resolve => setTimeout(resolve, 100));
                 retries++;
             }
 
-            if (!window.cartEngine) {
-                throw new Error('CartEngine no disponible. Por favor, recarga la página.');
+            // Usar cartManager como alias si cartEngine no está disponible
+            let cart = window.cartEngine || window.cartManager;
+            
+            if (!cart) {
+                if (window.CartEngine) {
+                    if (window.Logger) window.Logger.log('🔧 Inicializando CartEngine manualmente para buyNow...');
+                    window.cartEngine = new window.CartEngine();
+                    window.cartManager = window.cartEngine;
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    cart = window.cartEngine || window.cartManager;
+                }
+                
+                if (!cart) {
+                    throw new Error('CartEngine no disponible. Por favor, recarga la página.');
+                }
             }
 
+            if (window.Logger) window.Logger.log('✅ CartEngine disponible para buyNow, agregando producto...');
+
             // Agregar al carrito
-            const success = await window.cartEngine.add(productId, 1, { size: currentSelectedSize });
+            const success = await cart.add(productId, 1, { size: currentSelectedSize });
             
             if (success !== false) {
                 // Actualizar contador de carrito
