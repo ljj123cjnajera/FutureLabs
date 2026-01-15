@@ -165,6 +165,10 @@ class RecentlyViewed {
   }
 
   formatCurrency(value) {
+    // Usar utilidad compartida si está disponible, sino fallback
+    if (window.Utils && window.Utils.formatCurrency) {
+      return window.Utils.formatCurrency(value);
+    }
     const amount = Number(value) || 0;
     return `S/ ${amount.toFixed(2)}`;
   }
