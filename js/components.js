@@ -607,17 +607,8 @@ class Components {
       }
       // NO llamar initializeAutocomplete() aquí - causa bucle infinito
       // NO llamar initSearch aquí para evitar bucle infinito
-      // initSearch ya se llama desde initHeader
-      
-      // Solo inicializar overlay y cart counter si no están ya inicializados
-      if (!this._overlayInitialized) {
-        this.initSearchOverlay();
-        this._overlayInitialized = true;
-      }
-      if (!this._cartCounterInitialized) {
-        this.initCartCounter();
-        this._cartCounterInitialized = true;
-      }
+      // initSearch, initSearchOverlay, initCartCounter ya se llaman desde initHeader
+      // No inicializar aquí para evitar duplicados
     };
 
     // NO llamar initialize() si searchAutocomplete ya está inicializado
