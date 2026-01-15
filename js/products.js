@@ -205,15 +205,13 @@ class CatalogEngine {
 
             // Call API with filters
             if (window.Logger) window.Logger.log('📦 [CatalogEngine] Loading products with filters:', apiFilters);
-            if (window.Logger) window.Logger.log('🔵 [CatalogEngine] Loading products with filters:', apiFilters);
             
             const response = await this.api.getProducts(apiFilters);
             
-            if (window.Logger) window.Logger.log('📦 [CatalogEngine] API Response:', response);
             if (window.Logger) {
-                window.Logger.log('🔵 [CatalogEngine] API Response:', response);
-                window.Logger.log('🔵 [CatalogEngine] Response type:', typeof response);
-                window.Logger.log('🔵 [CatalogEngine] Is Array:', Array.isArray(response));
+                window.Logger.log('📦 [CatalogEngine] API Response:', response);
+                window.Logger.log('📦 [CatalogEngine] Response type:', typeof response);
+                window.Logger.log('📦 [CatalogEngine] Is Array:', Array.isArray(response));
             }
             
             // Handle different response formats
@@ -258,7 +256,6 @@ class CatalogEngine {
             }
             
             if (window.Logger) window.Logger.log(`📦 [CatalogEngine] Parsed ${products.length} products, total: ${total}, pages: ${pages}`);
-            if (window.Logger) window.Logger.log(`✅ [CatalogEngine] Parsed ${products.length} products, total: ${total}, pages: ${pages}`);
 
             this.allProducts = products;
             this.filteredProducts = products;
