@@ -573,11 +573,17 @@ class CartEngine {
         localStorage.setItem('brutalist_cart', JSON.stringify(cart));
       }
 
-      await this.loadCart();
+      // Update cart display if on cart page
+      const cartContainer = document.getElementById('cartContainer');
+      if (cartContainer) {
+        await this.loadCart();
+      }
+      
       this.updateCartCounter();
 
       if (window.notifications) {
-        window.notifications.success('Agregado al Carrito', 'El producto se agregó correctamente');
+        const sizeText = options.size ? ` (Talla US ${options.size})` : '';
+        window.notifications.success('Agregado al Carrito', `El producto se agregó correctamente${sizeText}`);
       }
 
       // Open drawer if available
