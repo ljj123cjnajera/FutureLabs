@@ -479,9 +479,26 @@ class CartEngine {
         }
       }
 
+      // Validate size stock if size is provided
+      if (options.size && window.productSizeStock && window.productSizeStock[options.size] !== undefined) {
+        const sizeStock = window.productSizeStock[options.size];
+        if (sizeStock === 0) {
+          if (window.notifications) {
+            window.notifications.warning('Talla Agotada', `La talla US ${options.size} no está disponible`);
+          }
+          return false;
+        }
+        if (sizeStock < quantity) {
+          if (window.notifications) {
+            window.notifications.warning('Stock Insuficiente', `Solo hay ${sizeStock} unidades en talla US ${options.size}`);
+          }
+          return false;
+        }
+      }
+
       if (this.isAuthenticated) {
         try {
-          const response = await this.api.addToCart(productId, quantity);
+          const response = await this.api.addToCart(productId, quantity, options);
           // Check if API returned an error
           if (response && !response.success) {
             if (window.notifications) {
@@ -509,9 +526,16 @@ class CartEngine {
       } else {
         // Add to localStorage
         let cart = JSON.parse(localStorage.getItem('brutalist_cart') || '[]');
-        const existing = cart.find(i => (i.id === productId || i.product_id === productId));
+        
+        // For guest users, check if same product with same size already exists
+        const existingIndex = cart.findIndex(i => {
+          const sameProduct = (i.id === productId || i.product_id === productId);
+          const sameSize = (!options.size && !i.size) || (options.size === i.size);
+          return sameProduct && sameSize;
+        });
 
-        if (existing) {
+        if (existingIndex !== -1) {
+          const existing = cart[existingIndex];
           // Check stock before increasing quantity
           if (existing.stock_quantity !== undefined) {
             const newQty = existing.quantity + quantity;
@@ -541,6 +565,7 @@ class CartEngine {
             quantity: quantity,
             image_url: product.image_url,
             brand: product.brand,
+            size: options.size || null,
             stock_quantity: product.stock_quantity
           });
         }
