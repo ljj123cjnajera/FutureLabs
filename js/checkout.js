@@ -191,14 +191,14 @@ class CheckoutManager {
                             </div>
                         `).join('')}
                     </div>
-                    <button class="btn btn-outline" style="margin-top:20px" onclick="checkoutManager.toggleNewAddressForm()">+ ADD NEW ADDRESS</button>
+                    <button class="btn btn-outline" style="margin-top:20px" onclick="checkoutManager.toggleNewAddressForm()">+ AGREGAR NUEVA DIRECCIÓN</button>
                     
                     <div id="newAddressFormContainer" style="display:none; margin-top:20px; border-top:1px solid #eee; padding-top:20px;">
                         ${this.getAddressFormHtml()}
                     </div>
 
                     <div class="checkout-actions">
-                        <button class="btn btn-black btn-block" onclick="checkoutManager.nextStep()">CONTINUE TO PAYMENT</button>
+                        <button class="btn btn-black btn-block" onclick="checkoutManager.nextStep()">CONTINUAR AL PAGO</button>
                     </div>
                 </div>
             `;
