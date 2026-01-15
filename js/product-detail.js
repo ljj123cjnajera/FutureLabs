@@ -540,7 +540,6 @@ document.addEventListener('DOMContentLoaded', async function () {
         try {
             // Esperar a que cartEngine esté disponible
             let retries = 0;
-            let retries = 0;
             const maxRetries = 50;
             while (!window.cartEngine && !window.cartManager && retries < maxRetries) {
                 await new Promise(resolve => setTimeout(resolve, 100));
