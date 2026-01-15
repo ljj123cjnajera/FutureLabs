@@ -271,7 +271,9 @@ class CheckoutManager {
     async saveNewAddress() {
         const form = document.getElementById('addressForm');
         if (!form.checkValidity()) {
-            alert('Please fill all required fields');
+            if (window.notifications) {
+                window.notifications.warning('Campos Requeridos', 'Por favor, completa todos los campos obligatorios');
+            }
             return;
         }
 
@@ -281,9 +283,12 @@ class CheckoutManager {
         addressData.is_default = this.addresses.length === 0;
         addressData.type = 'shipping';
 
+        const btn = document.querySelector('.btn-black');
+        const originalBtnText = btn ? btn.innerHTML : '';
+
         try {
-            const btn = document.querySelector('.btn-black');
-            if (btn) btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SAVING...';
+            if (btn) btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> GUARDANDO...';
+            btn.disabled = true;
 
             const res = await window.api.createAddress(addressData);
             if (res.success) {
@@ -291,13 +296,33 @@ class CheckoutManager {
                 const newAddr = res.data.address || res.data;
                 this.selectedAddressId = newAddr.id;
                 this.renderStep(1); // Go back to rendering list
+                if (window.notifications) {
+                    window.notifications.success('Dirección Guardada', 'La dirección se guardó correctamente');
+                }
             } else {
-                alert('Error saving address: ' + res.message);
-                if (btn) btn.innerHTML = 'SAVE & CONTINUE';
+                if (window.ErrorHandler) {
+                    window.ErrorHandler.handle(res, {
+                        context: 'saveNewAddress',
+                        userMessage: res.message || 'No se pudo guardar la dirección'
+                    });
+                } else if (window.notifications) {
+                    window.notifications.error('Error', res.message || 'No se pudo guardar la dirección');
+                }
             }
         } catch (e) {
-            if (window.Logger) window.Logger.error('Address Save Failed:', e);
-            alert('System Error Saving Address. Please check your connection.');
+            if (window.ErrorHandler) {
+                window.ErrorHandler.api(e, 'saveNewAddress', 'No se pudo guardar la dirección. Verifica tu conexión.');
+            } else {
+                if (window.Logger) window.Logger.error('Address Save Failed:', e);
+                if (window.notifications) {
+                    window.notifications.error('Error', 'No se pudo guardar la dirección. Verifica tu conexión.');
+                }
+            }
+        } finally {
+            if (btn) {
+                btn.innerHTML = originalBtnText || 'GUARDAR Y CONTINUAR';
+                btn.disabled = false;
+            }
         }
     }
 
