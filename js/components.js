@@ -351,6 +351,10 @@ class Components {
   }
 
   static initSearchOverlay() {
+    // Prevenir inicialización duplicada
+    if (window.searchOverlayInitialized) return;
+    window.searchOverlayInitialized = true;
+    
     window.SearchOverlay = {
       open: () => {
         const overlay = document.getElementById('searchOverlay');
@@ -470,6 +474,10 @@ class Components {
   }
 
   static initSearch() {
+    // Prevenir inicialización duplicada
+    if (window.searchInitialized) return;
+    window.searchInitialized = true;
+    
     // Init logic for Header Search Input
     const input = document.getElementById('headerSearchInput');
     if (input) {
@@ -647,6 +655,10 @@ class Components {
   }
 
   static initCartCounter() {
+    // Prevenir inicialización duplicada
+    if (window.cartCounterInitialized) return;
+    window.cartCounterInitialized = true;
+    
     // Actualizar contador de carrito
     document.addEventListener('cartUpdated', (e) => {
       const cartCount = document.querySelector('.cart-count');

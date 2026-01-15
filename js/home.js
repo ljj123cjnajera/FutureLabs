@@ -105,12 +105,14 @@ class HomeEngine {
           headerElement.replaceWith(tempDiv.firstElementChild);
         }
 
+        // initHeader() ya inicializa: CartDrawer, SearchOverlay, CartCounter, Search
+        // No es necesario llamarlos individualmente
         window.Components.initHeader();
-        if (window.Components.initCartDrawer) window.Components.initCartDrawer();
-
-        // Init other header components
-        if (window.Components.initSearch) window.Components.initSearch();
-        if (window.Components.initCartCounter) window.Components.initCartCounter();
+        
+        // Solo initSearch() necesita llamarse explícitamente si no se llamó desde initHeader
+        if (window.Components.initSearch && !window.searchInitialized) {
+          window.Components.initSearch();
+        }
       } else {
         if (window.Logger) window.Logger.warn("⚠️ Header container missing or Components not ready.");
       }

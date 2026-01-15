@@ -455,9 +455,12 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     if (headerContainer && window.Components) {
         headerContainer.innerHTML = window.Components.getHeader(true, true);
+        // initHeader() ya inicializa: CartDrawer, SearchOverlay, CartCounter
         window.Components.initHeader();
-        window.Components.initSearch();
-        window.Components.initCartCounter();
+        // Solo initSearch() necesita llamarse explícitamente si no se llamó desde initHeader
+        if (window.Components.initSearch && !window.searchInitialized) {
+            window.Components.initSearch();
+        }
     }
 
     if (footerContainer && window.Components) {
