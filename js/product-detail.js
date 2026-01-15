@@ -60,8 +60,16 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
 
         try {
+            // Esperar a que API esté disponible
             if (!window.api) {
-                throw new Error('API no disponible');
+                let apiRetries = 0;
+                while (!window.api && apiRetries < 30) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    apiRetries++;
+                }
+                if (!window.api) {
+                    throw new Error('API no disponible. Por favor, recarga la página.');
+                }
             }
 
             // 1. API Call
