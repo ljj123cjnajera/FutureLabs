@@ -43,16 +43,21 @@ class CartEngine {
         // Sync each item to API
         for (const item of localCart) {
           try {
-            await this.api.addToCart(item.id, item.quantity);
+            // Pasar size si existe en el item
+            const options = item.size ? { size: item.size } : {};
+            await this.api.addToCart(item.id || item.product_id, item.quantity || 1, options);
           } catch (e) {
             // Item might already exist, continue
+            if (window.Logger) window.Logger.warn('Error syncing item to API:', e);
           }
         }
         // Clear localStorage after sync
         localStorage.removeItem('brutalist_cart');
+        if (window.Logger) window.Logger.log('✅ LocalStorage cart synced to API');
       }
     } catch (e) {
       // Silent fail, continue with API cart
+      if (window.Logger) window.Logger.error('Error in syncLocalToAPI:', e);
     }
   }
 

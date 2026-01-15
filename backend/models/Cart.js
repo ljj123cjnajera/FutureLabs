@@ -26,13 +26,21 @@ class Cart {
   }
 
   // Obtener item específico del carrito
-  static async getItem(userId, productId) {
-    return await db('cart')
+  // Nota: Por ahora no consideramos size en la búsqueda porque la tabla no tiene columna size
+  // En el futuro, cuando se agregue la columna size, se deberá incluir en el where
+  static async getItem(userId, productId, size = null) {
+    const query = db('cart')
       .where({
         user_id: userId,
         product_id: productId
-      })
-      .first();
+      });
+    
+    // Si en el futuro se agrega columna size, descomentar:
+    // if (size !== null) {
+    //   query.where('size', size);
+    // }
+    
+    return await query.first();
   }
 
   // Agregar producto al carrito

@@ -64,10 +64,10 @@
 
 - [x] Análisis completo del proyecto
 - [x] Reemplazar console.log con window.Logger (products.js completado)
-- [ ] Eliminar código duplicado
+- [x] Eliminar código duplicado (creado utils.js con funciones compartidas)
+- [x] Eliminar archivos de análisis duplicados (ANALISIS_COMPLETO_PROYECTO.md)
 - [ ] Corregir fallas lógicas
 - [ ] Optimizar estructura
-- [x] Eliminar archivos de análisis duplicados (ANALISIS_COMPLETO_PROYECTO.md)
 
 ---
 

@@ -60,10 +60,15 @@ router.post('/add', authenticateToken, addToCartValidation, async (req, res) => 
       });
     }
 
-    const { product_id, quantity } = req.body;
+    const { product_id, quantity, size } = req.body;
+    // size es opcional y se puede usar en el futuro para variantes
+    // Por ahora lo aceptamos pero no lo guardamos en la BD (la tabla cart no tiene columna size)
+    if (size && process.env.NODE_ENV === 'development') {
+      console.log('📏 Talla recibida:', size, '(no se guarda en BD aún)');
+    }
     console.log('📦 Agregando producto:', product_id, 'cantidad:', quantity || 1);
 
-    const item = await Cart.add(req.user.id, product_id, quantity || 1);
+    const item = await Cart.add(req.user.id, product_id, quantity || 1, size || null);
     console.log('✅ Item agregado al carrito:', item.id);
 
     res.status(201).json({

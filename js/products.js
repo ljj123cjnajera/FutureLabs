@@ -907,13 +907,18 @@ class CatalogEngine {
         // Use cartEngine (global instance from cart.js)
         const cart = window.cartEngine || window.cartManager;
         if (cart) {
-            cart.add(id, 1).then(success => {
+            // En products listing no hay size, así que no pasamos options
+            cart.add(id, 1, {}).then(success => {
                 if (success && window.notifications) {
                     window.notifications.success('AÑADIDO AL CARRITO', `${name} se agregó correctamente`);
                 }
             }).catch(e => {
                 if (window.Logger) window.Logger.error('Error adding to cart:', e);
+                if (window.notifications) {
+                    window.notifications.error('Error', 'No se pudo agregar el producto al carrito.');
+                }
             });
+            return true;
         } else {
             if (window.notifications) {
                 window.notifications.error('Error', 'Carrito no disponible. Por favor, recarga la página.');
