@@ -918,9 +918,11 @@ class CatalogEngine {
                 if (window.Logger) window.Logger.error('Error adding to cart:', e);
             });
         } else {
-            // Fallback: redirect to product detail
-            if (window.Logger) window.Logger.warn('CartEngine not available, redirecting to product detail');
-            window.location.href = `product-detail.html?id=${id}`;
+            if (window.notifications) {
+                window.notifications.error('Error', 'Carrito no disponible. Por favor, recarga la página.');
+            }
+            if (window.Logger) window.Logger.error('CartEngine not available');
+            return false;
         }
     }
 }
