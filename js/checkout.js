@@ -208,7 +208,7 @@ class CheckoutManager {
                     <h3>AGREGAR DIRECCIÓN DE ENVÍO</h3>
                     ${this.getAddressFormHtml()}
                     <div class="checkout-actions">
-                        <button class="btn btn-black btn-block" onclick="checkoutManager.saveNewAddress()">SAVE & CONTINUE</button>
+                        <button class="btn btn-black btn-block" onclick="checkoutManager.saveNewAddress()">GUARDAR Y CONTINUAR</button>
                     </div>
                 </div>
             `;
