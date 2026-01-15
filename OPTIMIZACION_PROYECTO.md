@@ -68,6 +68,7 @@
 - [x] Eliminar archivos de análisis duplicados (ANALISIS_COMPLETO_PROYECTO.md)
 - [x] Corregir fallas lógicas (syncLocalToAPI, validación stock, quickAdd)
 - [x] Optimizar estructura (creado ESTRUCTURA_PROYECTO.md con organización completa)
+- [x] Revisar manejo de errores (creado GUIA_MANEJO_ERRORES.md, corregido alert() en checkout.js)
 
 ---
 
