@@ -584,19 +584,20 @@ class Components {
     }
 
     const initialize = () => {
-      if (window.searchAutocomplete && typeof window.searchAutocomplete.init === 'function') {
+      // NO inicializar searchAutocomplete aquí - ya se inicializa automáticamente en autocomplete.js
+      // Solo verificar que el script se cargó correctamente
+      if (window.searchAutocomplete && window.searchAutocomplete.initialized) {
+        // Ya está inicializado, no hacer nada
+        if (window.Logger) window.Logger.log('✅ SearchAutocomplete ya está inicializado');
+      } else if (window.searchAutocomplete && typeof window.searchAutocomplete.init === 'function' && !window.searchAutocomplete.initialized) {
+        // Solo inicializar si no está ya inicializado
         try {
           window.searchAutocomplete.init();
         } catch (e) {
           if (window.Logger) window.Logger.error('Error initializing searchAutocomplete:', e);
         }
-      } else if (typeof window.initializeAutocomplete === 'function') {
-        try {
-          window.initializeAutocomplete();
-        } catch (e) {
-          if (window.Logger) window.Logger.error('Error initializing autocomplete:', e);
-        }
       }
+      // NO llamar initializeAutocomplete() aquí - causa bucle infinito
       // NO llamar initSearch aquí para evitar bucle infinito
       // initSearch ya se llama desde initHeader
       
@@ -611,8 +612,18 @@ class Components {
       }
     };
 
-    if (window.searchAutocomplete || typeof window.initializeAutocomplete === 'function') {
-      initialize();
+    // NO llamar initialize() si searchAutocomplete ya está inicializado
+    // El script autocomplete.js se inicializa automáticamente
+    if (window.searchAutocomplete && window.searchAutocomplete.initialized) {
+      this._autocompleteInitializing = false;
+      return;
+    }
+    
+    if (window.searchAutocomplete && typeof window.searchAutocomplete.init === 'function') {
+      // Solo inicializar si no está ya inicializado
+      if (!window.searchAutocomplete.initialized) {
+        initialize();
+      }
       this._autocompleteInitializing = false;
       return;
     }
