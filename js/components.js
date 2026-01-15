@@ -711,8 +711,8 @@ class Components {
     }
 
     return `
-      <div class="product-card" onclick="window.location.href='product-detail.html?id=${product.id}'">
-        <div class="product-image-container">
+      <div class="product-card">
+        <div class="product-image-container" onclick="window.location.href='product-detail.html?id=${product.id}'">
           <img src="${imageUrl}" 
                class="product-image"
                alt="${product.name || 'Producto'}" 
@@ -747,7 +747,7 @@ class Components {
 
         <div class="product-content">
           <span class="product-category">${product.brand || 'Sneakers'}</span>
-          <h3 class="product-title">${product.name}</h3>
+          <h3 class="product-title" onclick="window.location.href='product-detail.html?id=${product.id}'" style="cursor: pointer;">${product.name}</h3>
           
           <div class="product-price-container">
             <div class="product-price">

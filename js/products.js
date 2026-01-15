@@ -893,20 +893,24 @@ class CatalogEngine {
     }
 
     quickAdd(id, name, event) {
-        if (event) event.stopPropagation();
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
         
         // Find product to check stock
-        const product = this.allProducts.find(p => p.id === id);
+        const product = this.allProducts.find(p => p.id === id || p.id === String(id));
         if (product && (product.stock_quantity || 0) === 0) {
             if (window.notifications) {
                 window.notifications.warning('Producto Agotado', 'Este producto no está disponible en este momento.');
             }
-            return;
+            return false;
         }
         
         // Use cartEngine (global instance from cart.js)
-        if (window.cartEngine) {
-            window.cartEngine.add(id, 1).then(success => {
+        const cart = window.cartEngine || window.cartManager;
+        if (cart) {
+            cart.add(id, 1).then(success => {
                 if (success && window.notifications) {
                     window.notifications.success('AÑADIDO AL CARRITO', `${name} se agregó correctamente`);
                 }
