@@ -87,17 +87,50 @@ class CartEngine {
       if (this.isAuthenticated) {
         // Load from API
         const response = await this.api.getCart();
+        
+        // Handle different response formats
         if (response && response.success && response.data) {
+          // Format: { success: true, data: { items: [], total: 0, count: 0 } }
           items = response.data.items || [];
           subtotal = response.data.total || 0;
-          total = subtotal; // Shipping will be calculated later
+        } else if (response && response.success && Array.isArray(response.data)) {
+          // Format: { success: true, data: [...] }
+          items = response.data;
+          subtotal = items.reduce((acc, item) => {
+            const price = parseFloat(item.discount_price || item.price || 0);
+            return acc + (price * (item.quantity || 1));
+          }, 0);
+        } else if (Array.isArray(response)) {
+          // Format: [...]
+          items = response;
+          subtotal = items.reduce((acc, item) => {
+            const price = parseFloat(item.discount_price || item.price || 0);
+            return acc + (price * (item.quantity || 1));
+          }, 0);
+        } else if (response && response.items) {
+          // Format: { items: [], total: 0 }
+          items = response.items;
+          subtotal = response.total || 0;
+        } else {
+          // Empty cart or unexpected format
+          items = [];
+          subtotal = 0;
         }
+        
+        total = subtotal; // Shipping will be calculated later
+        
+        if (window.Logger) window.Logger.log('✅ Cart loaded from API:', { itemsCount: items.length, subtotal });
       } else {
         // Load from localStorage for guests
         const localCart = JSON.parse(localStorage.getItem('brutalist_cart') || '[]');
         items = localCart;
-        subtotal = items.reduce((acc, item) => acc + (parseFloat(item.price || 0) * (item.quantity || 1)), 0);
+        subtotal = items.reduce((acc, item) => {
+          const price = parseFloat(item.discount_price || item.price || 0);
+          return acc + (price * (item.quantity || 1));
+        }, 0);
         total = subtotal;
+        
+        if (window.Logger) window.Logger.log('✅ Cart loaded from localStorage:', { itemsCount: items.length, subtotal });
       }
 
       // Hide loading state
