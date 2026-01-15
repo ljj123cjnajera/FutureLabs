@@ -53,7 +53,7 @@ class ChatWidget {
                     position: fixed;
                     bottom: 100px; /* Elevated further to strictly clear Sticky Footer & Close Button */
                     right: 25px;
-                    z-index: 10000; /* Ensure above footer */
+                    z-index: var(--z-chat-widget, 4000); /* Ensure above footer */
                     font-family: 'Courier New', monospace;
                 }
 

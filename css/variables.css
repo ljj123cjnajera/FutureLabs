@@ -157,14 +157,33 @@
     --transition: var(--transition-base);
     
     /* ============================================
-       Z-INDEX
+       Z-INDEX - Sistema Estandarizado
        ============================================ */
+    /* Base layers */
+    --z-base: 1;
     --z-dropdown: 1000;
     --z-sticky: 1020;
     --z-fixed: 1030;
-    --z-modal-backdrop: 1040;
-    --z-modal: 1050;
-    --z-popover: 1060;
-    --z-tooltip: 1070;
+    
+    /* Header & Navigation */
+    --z-header: 1000;
+    --z-announcement: 1002;
+    --z-search-autocomplete: 1005;
+    
+    /* Modals & Overlays */
+    --z-modal-backdrop: 2000;
+    --z-modal: 2001;
+    --z-mobile-menu-overlay: 2000;
+    --z-mobile-menu-sidebar: 2001;
+    --z-quick-view: 2000;
+    --z-product-gallery-lightbox: 2000;
+    
+    /* Notifications & Tooltips */
+    --z-notifications: 3000;
+    --z-tooltip: 3010;
+    --z-popover: 3020;
+    
+    /* Chat Widget (siempre visible) */
+    --z-chat-widget: 4000;
 }
 
