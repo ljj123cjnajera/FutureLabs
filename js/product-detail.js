@@ -1,12 +1,23 @@
 // Inicializar header dinámico y cargar producto
 document.addEventListener('DOMContentLoaded', async function () {
+    // Esperar a que componentes críticos estén disponibles
+    let retries = 0;
+    while ((!window.Components || !window.api) && retries < 30) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        retries++;
+    }
+
     // Inicializar header
     const headerContainer = document.getElementById('mainHeader');
     if (headerContainer && window.Components) {
-        headerContainer.innerHTML = window.Components.getHeader(true, true);
-        window.Components.initHeader();
-        window.Components.initSearch();
-        window.Components.initCartCounter();
+        try {
+            headerContainer.innerHTML = window.Components.getHeader(true, true);
+            if (window.Components.initHeader) window.Components.initHeader();
+            if (window.Components.initSearch) window.Components.initSearch();
+            if (window.Components.initCartCounter) window.Components.initCartCounter();
+        } catch (e) {
+            if (window.Logger) window.Logger.error('Error initializing header:', e);
+        }
     }
 
     // Obtener ID del producto de la URL

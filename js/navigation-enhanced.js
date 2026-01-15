@@ -230,7 +230,7 @@ class NavigationEnhanced {
             'adidas': 'ADIDAS',
             'new': 'NUEVOS LANZAMIENTOS',
             'sale': 'OFERTAS'
-        }[category] || category.toUpperCase();
+        }[category] || (category && typeof category === 'string' ? category.toUpperCase() : 'CATEGORÍA');
         
         return `
             <div class="nav-dropdown-content">

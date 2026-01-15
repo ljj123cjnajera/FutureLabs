@@ -481,7 +481,14 @@ class Components {
     }
 
     // Keep autocomplete loading if needed but ensure our direct search works
-    this.ensureAutocompleteAssets();
+    // Solo llamar ensureAutocompleteAssets si no está ya inicializando
+    if (!this._autocompleteInitializing) {
+      try {
+        this.ensureAutocompleteAssets();
+      } catch (e) {
+        if (window.Logger) window.Logger.error('Error in initSearch ensureAutocompleteAssets:', e);
+      }
+    }
   }
 
   static submitSearch() {

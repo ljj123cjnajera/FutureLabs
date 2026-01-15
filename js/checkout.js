@@ -373,7 +373,7 @@ class CheckoutManager {
             'cash': 'Efectivo',
             'bank_transfer': 'Transferencia Bancaria'
         };
-        return methods[method] || method.toUpperCase();
+        return methods[method] || (method && typeof method === 'string' ? method.toUpperCase() : 'UNKNOWN');
     }
 
     renderReview() {

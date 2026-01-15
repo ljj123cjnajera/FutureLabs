@@ -117,8 +117,10 @@
      * @param {string} userMessage - Mensaje amigable opcional
      */
     function handleAPIError(error, context, userMessage = null) {
+        // Asegurar que context sea string
+        const safeContext = (context && typeof context === 'string') ? context : 'Unknown';
         return handleError(error, {
-            context: `API:${context}`,
+            context: `API:${safeContext}`,
             userMessage: userMessage,
             showNotification: true,
             logError: true
