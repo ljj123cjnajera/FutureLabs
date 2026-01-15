@@ -25,6 +25,10 @@ document.addEventListener('DOMContentLoaded', async function () {
     const productId = urlParams.get('id');
     window.currentProductId = productId;
 
+    // Inicializar selectedSize global
+    window.selectedSize = null;
+    let selectedSize = null;
+
     // Cargar producto
     async function loadProduct() {
         const container = document.getElementById('productDetailContainer');
@@ -37,7 +41,9 @@ document.addEventListener('DOMContentLoaded', async function () {
                     message: 'El producto que buscas no existe',
                     icon: 'fas fa-exclamation-triangle',
                     actionLabel: 'Ver productos',
-                    actionUrl: 'products.html'
+                    onAction: () => {
+                        window.location.href = 'products.html';
+                    }
                 });
             } else {
                 container.innerHTML = `
@@ -84,7 +90,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             } else if (response && response.data && response.data.product) {
                 product = response.data.product;
             } else if (response && !response.success) {
-                throw new Error(response.message || 'Producto no encontrado');
+                throw new Error(response.message || 'Producto no encontrado en la API');
             }
 
             // 3. Validate Data
@@ -99,9 +105,8 @@ document.addEventListener('DOMContentLoaded', async function () {
                 // Normalizar imágenes
                 let galleryImages = [];
                 if (Array.isArray(product.images) && product.images.length > 0) {
-                    galleryImages = product.images.filter(img => img && img.trim() !== '');
-                } else if (typeof product.images === 'string') {
-                    // Si images es un string JSON, parsearlo
+                    galleryImages = product.images;
+                } else if (product.images && typeof product.images === 'string') {
                     try {
                         const parsed = JSON.parse(product.images);
                         if (Array.isArray(parsed)) {
@@ -112,24 +117,15 @@ document.addEventListener('DOMContentLoaded', async function () {
                     }
                 }
                 
-                // Si no hay imágenes en el array, usar image_url
                 if (galleryImages.length === 0 && product.image_url) {
                     galleryImages = [product.image_url];
                 }
                 
-                // Si aún no hay imágenes, usar placeholder
                 if (galleryImages.length === 0) {
                     galleryImages = ['assets/images/products/placeholder.jpg'];
                 }
-                
-                // Asegurar que haya al menos 4 imágenes para la galería (duplicar si es necesario)
-                while (galleryImages.length < 4 && galleryImages.length > 0) {
-                    galleryImages.push(galleryImages[0]);
-                }
 
                 renderProductDetails(product, container, galleryImages);
-                // Render size options after product details are rendered
-                await renderSizeOptions(product);
                 return;
             } else {
                 throw new Error('Producto no encontrado en la API');
@@ -152,28 +148,26 @@ document.addEventListener('DOMContentLoaded', async function () {
                 window.LoadingStates.error('productDetailContainer', {
                     title: 'Error al cargar producto',
                     message: error.message || 'No se pudo cargar el producto. Por favor, intenta de nuevo.',
-                    retryLabel: 'REINTENTAR',
-                    retryCallback: 'location.reload()'
+                    actionLabel: 'REINTENTAR',
+                    onAction: () => {
+                        loadProduct();
+                    }
                 });
             } else {
-                renderErrorState(container, `Error al cargar producto: ${error.message || 'Error de conexión'}`);
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 100px;">
+                        <i class="fas fa-exclamation-triangle fa-3x" style="color: #e74c3c; margin-bottom: 20px;"></i>
+                        <h2>Error al cargar producto</h2>
+                        <p>${error.message || 'No se pudo cargar el producto. Por favor, intenta de nuevo.'}</p>
+                        <button onclick="location.reload()" style="margin-top: 20px; padding: 10px 20px; background: #000; color: #fff; border: none; cursor: pointer;">REINTENTAR</button>
+                    </div>
+                `;
             }
         }
     }
 
     // --- HELPER: RENDER UI ---
     function renderProductDetails(product, container, galleryImages) {
-        // ... (Same rendering logic as before, refactored out or kept inline if simple)
-        // Note: For minimal diff, I will paste the entire innerHTML block here or assume the user wants me to duplicate the block.
-        // BETTER: Let's actually keep the huge innerHTML block in the main flow but just wrap the "Success" part.
-        // However, since I can't refactor the whole function easily in one go without a massive diff, I will duplicate the render logic inside the mock block OR 
-        // essentially "hijack" the success flow.
-
-        // RE-STRATEGY for minimal diff: 
-        // 1. Define getMockProduct at the end.
-        // 2. In the catch/else blocks, if mock exists, just assign `response = { success: true, data: { product: mock } }` effectively? 
-        // No, let's keep it explicit.
-
         // Update live viewers count (simulated for conversion)
         updateLiveViewers(product.id);
         
@@ -181,12 +175,24 @@ document.addEventListener('DOMContentLoaded', async function () {
         if (window.SeoManager) {
             window.SeoManager.updateProductSEO({
                 title: product.name,
-                description: product.description || `Buy ${product.name} at Sneakers Shop.`,
+                description: product.description || `Compra ${product.name} en Sneakers Shop.`,
                 image: product.image_url,
                 url: window.location.href,
                 price: product.price,
                 currency: 'PEN'
             });
+        }
+
+        // Parse size stock if available
+        window.productSizeStock = {};
+        if (product.size_stock && typeof product.size_stock === 'string') {
+            try {
+                window.productSizeStock = JSON.parse(product.size_stock);
+            } catch (e) {
+                // Ignore parse errors
+            }
+        } else if (product.size_stock && typeof product.size_stock === 'object') {
+            window.productSizeStock = product.size_stock;
         }
 
         container.innerHTML = `
@@ -200,7 +206,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             <div class="product-info-detail">
                 <div class="product-header-group">
                     <div class="product-meta-header" style="display:flex; justify-content:space-between; align-items:center;">
-                        <p class="product-brand" style="font-weight: 800; text-transform: uppercase; color: #666; margin-bottom: 0.5rem; letter-spacing: 0.1em;">${product.brand}</p>
+                        <p class="product-brand" style="font-weight: 800; text-transform: uppercase; color: #666; margin-bottom: 0.5rem; letter-spacing: 0.1em;">${product.brand || 'MARCA'}</p>
                         <div class="product-rating-detail">
                             <span class="stars-detail">★★★★★</span>
                             <span class="rating-text-detail">(${product.rating_count || 12} reviews)</span>
@@ -263,250 +269,96 @@ document.addEventListener('DOMContentLoaded', async function () {
                         <i class="fas fa-exclamation-circle"></i> SELECCIONA UNA TALLA PARA CONTINUAR
                     </div>
                 </div>
-
-                <!-- Price Display with Discount -->
-                ${product.discount_price && product.discount_price < product.price ? `
-                <div class="product-price-display" style="margin-bottom: 1.5rem; padding: 20px; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 4px;">
-                    <div style="display: flex; align-items: baseline; gap: 15px; margin-bottom: 10px;">
-                        <span style="font-size: 2rem; font-weight: 900; color: var(--black);">S/ ${parseFloat(product.discount_price).toFixed(2)}</span>
-                        <span style="font-size: 1.2rem; color: #666; text-decoration: line-through;">S/ ${parseFloat(product.price).toFixed(2)}</span>
-                        <span style="background: #d32f2f; color: white; padding: 5px 10px; border-radius: 4px; font-weight: 700; font-size: 0.9rem;">
-                            -${Math.round(((product.price - product.discount_price) / product.price) * 100)}% OFF
-                        </span>
-                    </div>
-                    <p style="margin: 0; color: #666; font-size: 0.9rem;">
-                        <i class="fas fa-tag" aria-hidden="true"></i> Ahorras S/ ${(parseFloat(product.price) - parseFloat(product.discount_price)).toFixed(2)}
-                    </p>
-                </div>
-                ` : `
-                <div class="product-price-display" style="margin-bottom: 1.5rem;">
-                    <span style="font-size: 2rem; font-weight: 900; color: var(--black);">S/ ${parseFloat(product.price).toFixed(2)}</span>
-                </div>
-                `}
                 
-                <!-- Action Buttons -->
-                <div class="product-actions-sticky" style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 2rem;">
-                    ${product.stock_quantity > 0 || product.stock_quantity === undefined ? `
-                    <button type="button" class="btn btn-massive btn-primary" id="buyNowBtn" onclick="buyNow()" style="background: var(--black); color: white; padding: 18px; font-size: 1.1rem; font-weight: 900; text-transform: uppercase; border: none; cursor: pointer; width: 100%;">
-                        <i class="fas fa-bolt" aria-hidden="true"></i> COMPRAR AHORA
+                <div class="product-actions-detail" style="margin-top: 2rem;">
+                    <button class="btn-add-cart-detail" onclick="window.addToCart()" id="addToCartBtn">
+                        <i class="fas fa-shopping-cart"></i> AGREGAR AL CARRITO
                     </button>
-                    <button type="button" class="btn btn-massive" id="addToCartBtn" onclick="addToCart()" style="background: white; color: var(--black); padding: 18px; font-size: 1.1rem; font-weight: 900; text-transform: uppercase; border: 3px solid var(--black); cursor: pointer; width: 100%;">
-                        <i class="fas fa-shopping-cart" aria-hidden="true"></i> AÑADIR AL CARRITO
+                    <button class="btn-buy-now-detail" onclick="window.buyNow()" id="buyNowBtn">
+                        <i class="fas fa-bolt"></i> COMPRAR AHORA
                     </button>
+                </div>
+                
+                <div class="product-price-detail" style="margin-top: 2rem; padding-top: 2rem; border-top: 2px solid #eee;">
+                    ${product.discount_price && product.discount_price < product.price ? `
+                        <div style="display: flex; align-items: baseline; gap: 15px;">
+                            <span class="price-original" style="font-size: 1.5rem; color: #999; text-decoration: line-through;">S/ ${parseFloat(product.price).toFixed(2)}</span>
+                            <span class="price-discount" style="font-size: 2.5rem; font-weight: 900; color: #d32f2f;">S/ ${parseFloat(product.discount_price).toFixed(2)}</span>
+                            <span class="discount-badge" style="background: #d32f2f; color: #fff; padding: 5px 10px; border-radius: 4px; font-size: 0.9rem; font-weight: 700;">
+                                ${Math.round(((product.price - product.discount_price) / product.price) * 100)}% OFF
+                            </span>
+                        </div>
                     ` : `
-                    <button type="button" class="btn btn-massive" disabled style="background: #ccc; color: #666; padding: 18px; font-size: 1.1rem; font-weight: 900; text-transform: uppercase; border: none; cursor: not-allowed; width: 100%;">
-                        <i class="fas fa-times-circle" aria-hidden="true"></i> AGOTADO
-                    </button>
+                        <span class="price-current" style="font-size: 2.5rem; font-weight: 900; color: #000;">S/ ${parseFloat(product.price || 0).toFixed(2)}</span>
                     `}
                 </div>
-                
-                <!-- Shipping & Guarantees Section -->
-                <div class="product-meta-footer" style="margin-top: 2rem; border-top: 4px solid var(--black); padding-top: 2rem;">
-                    <div class="shipping-info-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 1.5rem;">
-                        <div class="shipping-item" style="display: flex; gap: 10px; padding: 15px; background: #e3f2fd; border-radius: 4px;">
-                            <i class="fas fa-stopwatch" style="font-size: 1.5rem; color: #2196f3;" aria-hidden="true"></i>
-                            <div>
-                                <strong style="text-transform: uppercase; font-weight: 900; color: var(--black); display: block;">¡LLEGA MAÑANA!</strong>
-                                <p style="margin:5px 0 0 0; color: #666; font-size: 0.85rem;">Pide antes de las 5PM</p>
-                            </div>
-                        </div>
-                        <div class="shipping-item" style="display: flex; gap: 10px; padding: 15px; background: #f3e5f5; border-radius: 4px;">
-                            <i class="fas fa-truck" style="font-size: 1.5rem; color: #9c27b0;" aria-hidden="true"></i>
-                            <div>
-                                <strong style="text-transform: uppercase; font-weight: 900; color: var(--black); display: block;">ENVÍO GRATIS</strong>
-                                <p style="margin:5px 0 0 0; color: #666; font-size: 0.85rem;">En compras S/150+</p>
-                            </div>
-                        </div>
-                        <div class="shipping-item" style="display: flex; gap: 10px; padding: 15px; background: #e8f5e9; border-radius: 4px;">
-                            <i class="fas fa-shield-alt" style="font-size: 1.5rem; color: #4caf50;" aria-hidden="true"></i>
-                            <div>
-                                <strong style="text-transform: uppercase; font-weight: 900; color: var(--black); display: block;">GARANTÍA</strong>
-                                <p style="margin:5px 0 0 0; color: #666; font-size: 0.85rem;">100% Auténtico</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Payment Methods -->
-                    <div class="payment-methods-display" style="padding: 15px; background: #f5f5f5; border-radius: 4px; margin-bottom: 1rem;">
-                        <p style="margin: 0 0 10px 0; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; color: #666;">Métodos de Pago:</p>
-                        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-                            <span style="padding: 5px 10px; background: white; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">VISA</span>
-                            <span style="padding: 5px 10px; background: white; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">MASTERCARD</span>
-                            <span style="padding: 5px 10px; background: white; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">YAPE</span>
-                            <span style="padding: 5px 10px; background: white; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">PLIN</span>
-                            <span style="padding: 5px 10px; background: white; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">EFECTIVO</span>
-                        </div>
-                    </div>
-                </div>
             </div>
-        </div>`;
-
-        // Injected Logic
-        if (!document.getElementById('sizeGuideModal')) {
-            document.body.insertAdjacentHTML('beforeend', getModalHTML());
-        }
-
-        const grid = document.getElementById('sizeSelectorGrid');
-        const sizes = ['7', '7.5', '8', '8.5', '9', '9.5', '10', '10.5', '11', '12', '13'];
-        if (grid) {
-            grid.innerHTML = sizes.map(size => `
-                <button class="size-option" onclick="selectSize('${size}', this)">${size}</button>
-             `).join('');
-        }
-
-        if (window.productGallery) window.productGallery.render(galleryImages, product);
-    }
-
-    function renderErrorState(container, msg) {
-        container.innerHTML = `
-            <div style="text-align: center; padding: 100px;">
-                <i class="fas fa-exclamation-triangle fa-3x" style="color: #e74c3c; margin-bottom: 20px;"></i>
-                <h2>Producto no encontrado</h2>
-                <p>${msg}</p>
-                <a href="index.html" class="btn btn-black" style="margin-top:20px">VOLVER AL HOME</a>
-            </div>
+        </div>
         `;
+
+        // Initialize gallery
+        if (window.ProductGallery && galleryImages.length > 0) {
+            window.ProductGallery.init('productGallery', galleryImages);
+        }
+
+        // Render size selector
+        renderSizeSelector(product);
     }
 
-    // --- LIVE VIEWERS SIMULATION (Conversion Optimization) ---
-    function updateLiveViewers(productId) {
-        const viewerElement = document.getElementById('viewerCount');
-        if (!viewerElement) return;
-        
-        // Simulate realistic viewer count (8-25 people)
-        const baseCount = 12;
-        const variation = Math.floor(Math.random() * 17) + 1;
-        const viewerCount = baseCount + variation;
-        
-        viewerElement.textContent = viewerCount;
-        
-        // Update every 15-30 seconds to simulate real activity
-        setInterval(() => {
-            const change = Math.floor(Math.random() * 5) - 2; // -2 to +2
-            const newCount = Math.max(8, Math.min(30, viewerCount + change));
-            viewerElement.textContent = newCount;
-        }, 20000 + Math.random() * 10000);
-    }
-    
-
-    function getModalHTML() {
-        return `
-         <div id="sizeGuideModal" class="modal" style="display: none;">
-             <div class="modal-content">
-                 <span class="close-modal" onclick="closeSizeGuideModal()">&times;</span>
-                 <h2>Guía de Tallas</h2>
-                 <p>Standard US Sizing.</p>
-             </div>
-         </div>`;
-    }
-
-
-    let selectedSize = null;
-    window.selectedSize = null; // Variable global para acceso desde funciones
-
-    async function renderSizeOptions(product) {
+    function renderSizeSelector(product) {
         const grid = document.getElementById('sizeSelectorGrid');
         if (!grid) return;
 
-        // Try to get sizes from API (product.variants or product.sizes)
-        let availableSizes = [];
-        let sizeStockMap = {};
+        // Common US sizes for sneakers
+        const sizes = ['6', '6.5', '7', '7.5', '8', '8.5', '9', '9.5', '10', '10.5', '11', '11.5', '12', '12.5', '13'];
         
-        if (product.variants && Array.isArray(product.variants)) {
-            // If product has variants with sizes
-            availableSizes = product.variants
-                .filter(v => v.size && v.stock_quantity > 0)
-                .map(v => ({ size: v.size, stock: v.stock_quantity }));
-            sizeStockMap = product.variants.reduce((acc, v) => {
-                if (v.size) acc[v.size] = v.stock_quantity || 0;
-                return acc;
-            }, {});
-        } else if (product.sizes && Array.isArray(product.sizes)) {
-            // If product has sizes array
-            availableSizes = product.sizes
-                .filter(s => s.stock_quantity > 0)
-                .map(s => ({ size: s.size || s.name, stock: s.stock_quantity }));
-            sizeStockMap = product.sizes.reduce((acc, s) => {
-                const sizeName = s.size || s.name;
-                if (sizeName) acc[sizeName] = s.stock_quantity || 0;
-                return acc;
-            }, {});
-        } else if (product.stock_by_size && typeof product.stock_by_size === 'object') {
-            // If product has stock_by_size object
-            sizeStockMap = product.stock_by_size;
-            availableSizes = Object.keys(sizeStockMap)
-                .filter(size => sizeStockMap[size] > 0)
-                .map(size => ({ size, stock: sizeStockMap[size] }));
-        }
-
-        // Fallback to standard sizes if no API data
-        const standardSizes = ['7', '7.5', '8', '8.5', '9', '9.5', '10', '10.5', '11', '12', '13'];
-        const sizesToRender = availableSizes.length > 0 
-            ? availableSizes.map(s => s.size)
-            : standardSizes;
-
-        // Check if product has stock at all
-        const hasStock = product.stock_quantity > 0 || availableSizes.length > 0;
-
-        grid.innerHTML = sizesToRender.map(size => {
-            const stockForSize = sizeStockMap[size] !== undefined ? sizeStockMap[size] : 
-                               (product.stock_quantity !== undefined ? product.stock_quantity : null);
-            const isAvailable = stockForSize !== null ? stockForSize > 0 : hasStock;
-            const isLowStock = stockForSize !== null && stockForSize > 0 && stockForSize <= 3;
+        grid.innerHTML = sizes.map(size => {
+            const stock = window.productSizeStock && window.productSizeStock[size] !== undefined 
+                ? window.productSizeStock[size] 
+                : (product.stock_quantity || 0);
+            const isAvailable = stock > 0;
+            const isLowStock = stock > 0 && stock <= 3;
             
             return `
-                <button class="size-option ${!isAvailable ? 'disabled' : ''} ${isLowStock ? 'low-stock' : ''}"
-                        onclick="selectSize('${size}', this)" 
-                        ${!isAvailable ? 'disabled' : ''}
-                        data-stock="${stockForSize !== null ? stockForSize : ''}"
-                        title="${stockForSize !== null ? `${stockForSize} disponibles` : ''}">
+                <button 
+                    class="size-option ${!isAvailable ? 'out-of-stock' : ''} ${isLowStock ? 'low-stock' : ''}" 
+                    data-size="${size}"
+                    ${!isAvailable ? 'disabled' : ''}
+                    onclick="selectSize('${size}')"
+                >
                     ${size}
-                    ${isLowStock && isAvailable ? '<span class="low-stock-indicator">!</span>' : ''}
+                    ${isLowStock ? '<span class="stock-badge">¡Últimas!</span>' : ''}
                 </button>
             `;
         }).join('');
 
-        // Store size stock map globally for validation
-        window.productSizeStock = sizeStockMap;
+        // Add click handlers
+        grid.querySelectorAll('.size-option').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (this.disabled) return;
+                selectSize(this.dataset.size);
+            });
+        });
     }
 
-    window.selectSize = function (size, element) {
-        if (element.disabled) return;
-
-        // Remove active class from all
-        document.querySelectorAll('.size-option').forEach(el => el.classList.remove('selected'));
-
-        // Add to clicked
-        element.classList.add('selected');
+    function selectSize(size) {
         selectedSize = size;
-        window.selectedSize = size; // También guardar globalmente
+        window.selectedSize = size;
 
-        // Hide error
+        // Update UI
+        document.querySelectorAll('.size-option').forEach(btn => {
+            btn.classList.remove('selected');
+            if (btn.dataset.size === size) {
+                btn.classList.add('selected');
+            }
+        });
+
+        // Hide validation message
         const errorMsg = document.getElementById('sizeValidationMsg');
         if (errorMsg) errorMsg.classList.remove('visible');
-    };
+    }
 
-    window.openSizeGuideModal = function () {
-        const modal = document.getElementById('sizeGuideModal');
-        if (modal) {
-            modal.style.display = 'block';
-            // Force display block first then add opacity for transition if needed
-            // Simple css display toggle for now
-        }
-    };
-
-    window.closeSizeGuideModal = function () {
-        const modal = document.getElementById('sizeGuideModal');
-        if (modal) modal.style.display = 'none';
-    };
-
-    // Close modal when clicking outside
-    window.onclick = function (event) {
-        const modal = document.getElementById('sizeGuideModal');
-        if (event.target == modal) {
-            modal.style.display = "none";
-        }
-    };
+    window.selectSize = selectSize;
 
     // Agregar al carrito
     window.addToCart = async function () {
@@ -619,7 +471,6 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     }
 
-    // Comprar ahora
     window.buyNow = async function () {
         const product = window.currentProduct;
         if (!product) {
@@ -633,15 +484,6 @@ document.addEventListener('DOMContentLoaded', async function () {
         if (!productId) {
             if (window.notifications) {
                 window.notifications.error('Error', 'ID de producto no encontrado');
-            }
-            return;
-        }
-
-        // VALIDACIÓN DE STOCK GENERAL
-        const stock = product.stock_quantity;
-        if (stock !== undefined && stock === 0) {
-            if (window.notifications) {
-                window.notifications.warning('Producto Agotado', 'Este producto no está disponible en este momento.');
             }
             return;
         }
@@ -723,6 +565,23 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
         }
     }
+
+    function updateLiveViewers(productId) {
+        // Simulated live viewers count
+        const viewersEl = document.querySelector('.live-viewers-count');
+        if (viewersEl) {
+            const count = Math.floor(Math.random() * 20) + 5;
+            viewersEl.textContent = `${count} personas viendo este producto`;
+        }
+    }
+
+    function openSizeGuideModal() {
+        if (window.notifications) {
+            window.notifications.info('Guía de Tallas', 'Selecciona tu talla según tu medida en centímetros. Si tienes dudas, contáctanos.');
+        }
+    }
+
+    window.openSizeGuideModal = openSizeGuideModal;
 
     const clearRecentlyViewedBtn = document.getElementById('clearRecentlyViewedBtn');
     if (clearRecentlyViewedBtn) {
