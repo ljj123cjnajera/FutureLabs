@@ -66,8 +66,8 @@
 - [x] Reemplazar console.log con window.Logger (products.js completado)
 - [x] Eliminar código duplicado (creado utils.js con funciones compartidas)
 - [x] Eliminar archivos de análisis duplicados (ANALISIS_COMPLETO_PROYECTO.md)
-- [ ] Corregir fallas lógicas
-- [ ] Optimizar estructura
+- [x] Corregir fallas lógicas (syncLocalToAPI, validación stock, quickAdd)
+- [x] Optimizar estructura (creado ESTRUCTURA_PROYECTO.md con organización completa)
 
 ---
 
