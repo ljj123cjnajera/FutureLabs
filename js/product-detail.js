@@ -554,30 +554,39 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
 
         try {
-            // Esperar a que cartEngine esté disponible
+            // Esperar a que cartEngine esté disponible (con más tiempo)
             let retries = 0;
-            while (!window.cartEngine && retries < 20) {
+            const maxRetries = 50; // 5 segundos
+            while (!window.cartEngine && retries < maxRetries) {
                 await new Promise(resolve => setTimeout(resolve, 100));
                 retries++;
             }
 
             if (!window.cartEngine) {
-                throw new Error('CartEngine no disponible. Por favor, recarga la página.');
-            }
-
-            // Agregar al carrito
-            const success = await window.cartEngine.add(productId, 1, { size: currentSelectedSize });
-            
-            if (success !== false) {
-                // Actualizar contador de carrito
-                if (window.Components && window.Components.updateCartCount) {
-                    window.Components.updateCartCount();
+                // Intentar inicializar manualmente si no está disponible
+                if (window.CartEngine) {
+                    window.cartEngine = new window.CartEngine();
+                    window.cartManager = window.cartEngine;
+                    // Esperar un poco más para que se inicialice
+                    await new Promise(resolve => setTimeout(resolve, 500));
                 }
                 
-                if (window.notifications) {
-                    window.notifications.success('Agregado al Carrito', `Talla US ${currentSelectedSize} agregada correctamente`);
+                if (!window.cartEngine) {
+                    throw new Error('CartEngine no disponible. Por favor, recarga la página.');
                 }
+            }
+
+            // Agregar al carrito con size
+            const success = await window.cartEngine.add(productId, 1, { size: currentSelectedSize });
+            
+            if (success === true) {
+                // Éxito - la notificación ya se muestra en cartEngine.add()
+                return;
+            } else if (success === false) {
+                // Error manejado en cartEngine.add()
+                return;
             } else {
+                // Caso inesperado
                 if (window.notifications) {
                     window.notifications.warning('Error', 'No se pudo agregar el producto al carrito.');
                 }

@@ -409,10 +409,14 @@ class SneakersAPI {
     return this.request('/cart');
   }
 
-  async addToCart(productId, quantity = 1) {
+  async addToCart(productId, quantity = 1, options = {}) {
+    const payload = { product_id: productId, quantity };
+    if (options.size) {
+      payload.size = options.size;
+    }
     return this.request('/cart/add', {
       method: 'POST',
-      body: JSON.stringify({ product_id: productId, quantity })
+      body: JSON.stringify(payload)
     });
   }
 
