@@ -360,15 +360,20 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     window.selectSize = selectSize;
 
-    // Agregar al carrito
+    // Agregar al carrito - Asegurar que esté disponible globalmente
     window.addToCart = async function () {
+        if (window.Logger) window.Logger.log('🛒 addToCart llamado');
+        
         const product = window.currentProduct;
         if (!product) {
+            if (window.Logger) window.Logger.error('❌ Producto no disponible en window.currentProduct');
             if (window.notifications) {
                 window.notifications.error('Error', 'Producto no disponible');
             }
             return;
         }
+        
+        if (window.Logger) window.Logger.log('✅ Producto encontrado:', product.id || product.product_id);
 
         const productId = product.id || product.product_id;
         if (!productId) {
