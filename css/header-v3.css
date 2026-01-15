@@ -930,6 +930,25 @@
 }
 
 /* 2. CART DRAWER (BRUTALIST V3 - RECEIPT MODE) */
+.cart-drawer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: var(--z-modal-backdrop, 2000);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s;
+    backdrop-filter: blur(5px);
+}
+
+.cart-drawer-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
 .cart-drawer {
     position: fixed;
     top: 0;
