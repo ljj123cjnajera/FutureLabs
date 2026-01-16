@@ -1197,7 +1197,37 @@ document.getElementById('addressModal')?.addEventListener('click', function (e) 
 const logoutButton = document.getElementById('logoutButton');
 if (logoutButton) {
     logoutButton.addEventListener('click', async function () {
-        if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+        // Usar notificación en lugar de confirm nativo
+        const confirmed = await new Promise((resolve) => {
+            if (window.notifications) {
+                // Crear modal de confirmación personalizado
+                const modal = document.createElement('div');
+                modal.className = 'confirmation-modal';
+                modal.innerHTML = `
+                    <div class="confirmation-content">
+                        <h3>¿Cerrar sesión?</h3>
+                        <p>¿Estás seguro de que quieres cerrar sesión?</p>
+                        <div class="confirmation-buttons">
+                            <button class="btn btn-black" onclick="this.closest('.confirmation-modal').dataset.result='true'; this.closest('.confirmation-modal').remove(); resolve(true);">SÍ</button>
+                            <button class="btn btn-outline" onclick="this.closest('.confirmation-modal').remove(); resolve(false);">NO</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                modal.dataset.result = 'false';
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.remove();
+                        resolve(false);
+                    }
+                });
+            } else {
+                // Fallback a confirm nativo si no hay sistema de notificaciones
+                resolve(confirm('¿Estás seguro de que quieres cerrar sesión?'));
+            }
+        });
+        
+        if (confirmed) {
             try {
                 if (window.Logger) window.Logger.log('🔴 [PROFILE] Cerrando sesión...');
 

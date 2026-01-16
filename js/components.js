@@ -408,14 +408,20 @@ class Components {
     let msgIndex = 0;
     const ticker = document.getElementById('announcementText');
     if (ticker) {
-      setInterval(() => {
+      // Guardar interval ID para poder limpiarlo si es necesario
+      const tickerInterval = setInterval(() => {
         msgIndex = (msgIndex + 1) % messages.length;
         ticker.style.opacity = 0;
         setTimeout(() => {
-          ticker.innerText = messages[msgIndex];
-          ticker.style.opacity = 1;
+          if (ticker) { // Verificar que el elemento aún existe
+            ticker.innerText = messages[msgIndex];
+            ticker.style.opacity = 1;
+          }
         }, 500);
       }, 4000);
+      
+      // Guardar interval ID globalmente para poder limpiarlo
+      window.announcementTickerInterval = tickerInterval;
     }
 
     this.ensureWishlistAssets();
