@@ -185,23 +185,67 @@ async function loadWishlist() {
     const container = document.getElementById('wishlistGrid');
     if (!container) return;
 
+    // Show loading state
+    if (window.LoadingStates) {
+        window.LoadingStates.show('wishlistGrid', {
+            message: 'Cargando favoritos...',
+            type: 'spinner'
+        });
+    } else {
+        container.innerHTML = '<div class="loading-brutalist">CARGANDO FAVORITOS...</div>';
+    }
+
     // Real Wishlist Load
     try {
-        const res = await window.api.getWishlist();
         let items = [];
         
-        // Handle different response formats
-        if (res && res.success && res.data) {
-            if (Array.isArray(res.data)) {
-                items = res.data;
-            } else if (res.data.items) {
-                items = res.data.items;
-            } else if (res.data.lists && Array.isArray(res.data.lists)) {
-                // Flatten lists
-                items = res.data.lists.flatMap(list => list.items || []);
+        // Si está autenticado, cargar desde API
+        if (window.authManager?.isAuthenticated() && window.api) {
+            const res = await window.api.getWishlist();
+            
+            // Handle different response formats
+            if (res && res.success && res.data) {
+                if (Array.isArray(res.data)) {
+                    items = res.data;
+                } else if (res.data.items) {
+                    items = res.data.items;
+                } else if (res.data.lists && Array.isArray(res.data.lists)) {
+                    // Flatten lists
+                    items = res.data.lists.flatMap(list => list.items || []);
+                }
+            } else if (Array.isArray(res)) {
+                items = res;
             }
-        } else if (Array.isArray(res)) {
-            items = res;
+        } else {
+            // Si no está autenticado, cargar desde localStorage
+            const localWishlist = JSON.parse(localStorage.getItem('brutalist_wishlist') || '[]');
+            
+            // Cargar información de productos desde localStorage o mostrar IDs
+            if (localWishlist.length > 0) {
+                // Intentar cargar productos desde API si está disponible
+                if (window.api) {
+                    try {
+                        const products = await Promise.all(
+                            localWishlist.map(id => 
+                                window.api.getProduct(id).catch(() => null)
+                            )
+                        );
+                        items = products
+                            .filter(p => p && p.success && p.data)
+                            .map(p => ({ product: p.data }));
+                    } catch (e) {
+                        // Si falla, usar IDs directamente
+                        items = localWishlist.map(id => ({ product: { id, name: `Producto ${id}`, price: 0 } }));
+                    }
+                } else {
+                    items = localWishlist.map(id => ({ product: { id, name: `Producto ${id}`, price: 0 } }));
+                }
+            }
+        }
+        
+        // Hide loading state
+        if (window.LoadingStates) {
+            window.LoadingStates.hide('wishlistGrid');
         }
 
         if (items.length > 0) {

@@ -233,7 +233,7 @@ class Components {
                         <i class="far fa-user" aria-hidden="true"></i>
                         <span class="desktop-only">CUENTA</span>
                     </a>
-                    <button class="action-btn" onclick="window.location.href='profile.html?tab=wishlist'" aria-label="Lista de deseos">
+                    <button class="action-btn" onclick="event.preventDefault(); window.location.href='profile.html?tab=wishlist'" aria-label="Lista de deseos">
                         <i class="far fa-heart" aria-hidden="true"></i>
                         <span class="action-badge" id="wishlistCount" style="display: none;">0</span>
                         <span class="desktop-only">FAVORITOS</span>
