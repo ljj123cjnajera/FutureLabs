@@ -73,7 +73,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (window.notifications) {
                             window.notifications.success('Mensaje enviado', 'Te contactaremos pronto a ' + formData.email);
                         } else {
-                            alert('Mensaje enviado. Te contactaremos pronto.');
+                            if (window.notifications) {
+                                window.notifications.success('Mensaje enviado', 'Te contactaremos pronto.');
+                            } else {
+                                alert('Mensaje enviado. Te contactaremos pronto.');
+                            }
                         }
                         form.reset();
                         btn.innerHTML = 'Mensaje Enviado ✓';
@@ -90,7 +94,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (window.notifications) {
                         window.notifications.info('Mensaje recibido', 'Gracias por contactarnos. Te responderemos pronto.');
                     } else {
-                        alert('Gracias por contactarnos. Te responderemos pronto.');
+                        if (window.notifications) {
+                            window.notifications.info('Mensaje recibido', 'Gracias por contactarnos. Te responderemos pronto.');
+                        } else {
+                            alert('Gracias por contactarnos. Te responderemos pronto.');
+                        }
                     }
                     form.reset();
                     btn.innerHTML = originalText;
@@ -102,7 +110,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (window.notifications) {
                         window.notifications.success('Mensaje enviado', 'Te contactaremos pronto a ' + formData.email);
                     } else {
-                        alert('Mensaje enviado. Te contactaremos pronto.');
+                        if (window.notifications) {
+                            window.notifications.success('Mensaje enviado', 'Te contactaremos pronto.');
+                        } else {
+                            alert('Mensaje enviado. Te contactaremos pronto.');
+                        }
                     }
                     form.reset();
                     btn.innerHTML = 'Mensaje Enviado ✓';
