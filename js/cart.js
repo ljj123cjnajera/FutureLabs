@@ -266,10 +266,11 @@ class CartEngine {
                                     <a href="product-detail.html?id=${productId}">${item.name}</a>
                                 </h3>
                                 ${item.slug ? `<div class="cart-item-slug">SKU: ${item.slug}</div>` : ''}
+                                ${item.size ? `<div class="cart-item-size" style="margin-top: 0.5rem; font-weight: 600; color: var(--gray-600);">Talla: ${item.size}</div>` : ''}
                                 
                                 <div class="quantity-control">
                                     <button class="quantity-btn" 
-                                            onclick="window.cartEngine.updateQty(${productId}, ${itemQuantity - 1})"
+                                            onclick="window.cartEngine.updateQty(${productId}, ${itemQuantity - 1}, ${item.size ? `'${item.size}'` : 'null'})"
                                             ${itemQuantity <= 1 ? 'disabled' : ''}
                                             aria-label="Disminuir cantidad">
                                         <i class="fas fa-minus"></i>
@@ -282,7 +283,7 @@ class CartEngine {
                                            readonly
                                            aria-label="Cantidad">
                                     <button class="quantity-btn" 
-                                            onclick="window.cartEngine.updateQty(${productId}, ${itemQuantity + 1})"
+                                            onclick="window.cartEngine.updateQty(${productId}, ${itemQuantity + 1}, ${item.size ? `'${item.size}'` : 'null'})"
                                             ${(stockAvailable !== null && itemQuantity >= stockAvailable) ? 'disabled' : ''}
                                             aria-label="Aumentar cantidad">
                                         <i class="fas fa-plus"></i>
@@ -301,7 +302,7 @@ class CartEngine {
                                     <div class="item-total">S/ ${itemTotal.toFixed(2)}</div>
                                 </div>
                                 <button class="btn-remove" 
-                                        onclick="window.cartEngine.removeItem(${productId})"
+                                        onclick="window.cartEngine.removeItem(${productId}, ${item.size ? `'${item.size}'` : 'null'})"
                                         aria-label="Eliminar producto">
                                     <i class="fas fa-trash"></i> ELIMINAR
                                 </button>
@@ -400,27 +401,50 @@ class CartEngine {
         `;
   }
 
-  async updateQty(productId, newQty) {
+  async updateQty(productId, newQty, size = null) {
     if (newQty <= 0) {
-      return this.removeItem(productId);
+      return this.removeItem(productId, size);
     }
 
     try {
-      // Validate stock before updating
-      const stockInfo = await this.validateStock(productId, newQty);
-      if (!stockInfo.available) {
-        if (window.notifications) {
-          window.notifications.warning('Stock Insuficiente', stockInfo.message || 'No hay suficiente stock disponible');
+      // Validate stock before updating (considerando size si existe)
+      if (size && window.productSizeStock && window.productSizeStock[size] !== undefined) {
+        const sizeStock = window.productSizeStock[size];
+        if (sizeStock === 0) {
+          if (window.notifications) {
+            window.notifications.warning('Talla Agotada', `La talla ${size} no está disponible.`);
+          }
+          return;
         }
-        return;
+        if (sizeStock < newQty) {
+          if (window.notifications) {
+            window.notifications.warning('Stock Insuficiente', `Solo hay ${sizeStock} unidades disponibles en talla ${size}.`);
+          }
+          return;
+        }
+      } else {
+        const stockInfo = await this.validateStock(productId, newQty);
+        if (!stockInfo.available) {
+          if (window.notifications) {
+            window.notifications.warning('Stock Insuficiente', stockInfo.message || 'No hay suficiente stock disponible');
+          }
+          return;
+        }
       }
 
       if (this.isAuthenticated) {
-        await this.api.updateCartItem(productId, newQty);
+        // Pasar size si existe
+        const options = size ? { size } : {};
+        await this.api.updateCartItem(productId, newQty, options);
       } else {
         // Update localStorage
         let cart = JSON.parse(localStorage.getItem('brutalist_cart') || '[]');
-        const item = cart.find(i => (i.id === productId || i.product_id === productId));
+        // Buscar por productId Y size (si existe)
+        const item = cart.find(i => {
+          const sameProduct = (i.id === productId || i.product_id === productId);
+          const sameSize = (!size && !i.size) || (size === i.size);
+          return sameProduct && sameSize;
+        });
         if (item) {
           // Validate stock in localStorage item
           if (item.stock_quantity !== undefined && newQty > item.stock_quantity) {
@@ -438,7 +462,8 @@ class CartEngine {
       this.updateCartCounter();
       
       if (window.notifications) {
-        window.notifications.success('Carrito Actualizado', 'La cantidad se actualizó correctamente');
+        const sizeText = size ? ` (Talla ${size})` : '';
+        window.notifications.success('Carrito Actualizado', `La cantidad se actualizó correctamente${sizeText}`);
       }
     } catch (e) {
       if (window.Logger) window.Logger.error('Error updating cart:', e);
@@ -476,14 +501,25 @@ class CartEngine {
     }
   }
 
-  async removeItem(productId) {
+  async removeItem(productId, size = null) {
     try {
       if (this.isAuthenticated) {
-        await this.api.removeFromCart(productId);
+        // Pasar size si existe en las opciones
+        const options = size ? { size } : {};
+        await this.api.removeFromCart(productId, options);
       } else {
         // Remove from localStorage
         let cart = JSON.parse(localStorage.getItem('brutalist_cart') || '[]');
-        cart = cart.filter(i => (i.id !== productId && i.product_id !== productId));
+        // Remover por productId (y size si se especifica)
+        cart = cart.filter(i => {
+          const isSameProduct = (i.id === productId || i.product_id === productId);
+          // Si se especifica size, solo remover si coincide
+          if (size) {
+            return !(isSameProduct && i.size === size);
+          }
+          // Si no se especifica size, remover todos los items de ese producto
+          return !isSameProduct;
+        });
         localStorage.setItem('brutalist_cart', JSON.stringify(cart));
       }
 
@@ -491,7 +527,8 @@ class CartEngine {
       this.updateCartCounter();
       
       if (window.notifications) {
-        window.notifications.success('Producto Eliminado', 'El producto fue removido del carrito');
+        const sizeText = size ? ` (Talla ${size})` : '';
+        window.notifications.success('Producto Eliminado', `El producto fue removido del carrito${sizeText}`);
       }
     } catch (e) {
       if (window.Logger) window.Logger.error('Error removing from cart:', e);
