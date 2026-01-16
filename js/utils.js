@@ -165,6 +165,32 @@
         }
     }
 
+    /**
+     * Escapa caracteres HTML para prevenir XSS (alias de sanitizeString).
+     * @param {string} text - El texto a escapar.
+     * @returns {string} El texto escapado de forma segura.
+     */
+    function escapeHTML(text) {
+        return sanitizeString(text);
+    }
+
+    /**
+     * Sanitiza un objeto para uso en innerHTML, escapando propiedades de texto.
+     * @param {Object} obj - El objeto a sanitizar.
+     * @param {Array<string>} safeKeys - Claves que no necesitan escape (ej. 'id', 'image_url').
+     * @returns {Object} El objeto sanitizado.
+     */
+    function sanitizeForHTML(obj, safeKeys = ['id', 'image_url', 'price', 'discount_price', 'stock_quantity', 'quantity']) {
+        if (!obj || typeof obj !== 'object') return obj;
+        const sanitized = { ...obj };
+        for (const key in sanitized) {
+            if (sanitized.hasOwnProperty(key) && typeof sanitized[key] === 'string' && !safeKeys.includes(key)) {
+                sanitized[key] = sanitizeString(sanitized[key]);
+            }
+        }
+        return sanitized;
+    }
+
     // Exportar al scope global
     window.Utils = {
         formatCurrency,
@@ -172,6 +198,8 @@
         validateEmail,
         validatePhone,
         sanitizeString,
+        escapeHTML,
+        sanitizeForHTML,
         debounce,
         throttle,
         formatNumber,
