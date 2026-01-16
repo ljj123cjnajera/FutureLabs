@@ -72,14 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (response && response.success) {
                         if (window.notifications) {
                             window.notifications.success('Mensaje enviado', 'Te contactaremos pronto a ' + formData.email);
-                        } else {
-                            if (window.notifications) {
-                                window.notifications.success('Mensaje enviado', 'Te contactaremos pronto.');
-                            } else {
-                                if (window.notifications) {
-                                    window.notifications.success('Mensaje enviado', 'Te contactaremos pronto a ' + formData.email);
-                                }
-                            }
                         }
                         form.reset();
                         btn.innerHTML = 'Mensaje Enviado ✓';
