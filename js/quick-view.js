@@ -41,25 +41,48 @@ class QuickView {
   }
 
   setupEventListeners() {
+    // Limpiar listeners anteriores si existen
+    this.cleanup();
+    
     // Cerrar al hacer click en overlay
-    document.addEventListener('click', (e) => {
+    this.overlayClickHandler = (e) => {
       if (e.target.classList.contains('quick-view-overlay')) {
         this.close();
       }
-    });
+    };
+    document.addEventListener('click', this.overlayClickHandler);
 
     // Cerrar con botón X
     const closeBtn = document.getElementById('quickViewClose');
     if (closeBtn) {
-      closeBtn.addEventListener('click', () => this.close());
+      this.closeBtnHandler = () => this.close();
+      closeBtn.addEventListener('click', this.closeBtnHandler);
     }
 
     // Cerrar con ESC
-    document.addEventListener('keydown', (e) => {
+    this.escapeKeyHandler = (e) => {
       if (e.key === 'Escape' && this.modal?.classList.contains('active')) {
         this.close();
       }
-    });
+    };
+    document.addEventListener('keydown', this.escapeKeyHandler);
+  }
+  
+  cleanup() {
+    // Remover event listeners para prevenir memory leaks
+    if (this.overlayClickHandler) {
+      document.removeEventListener('click', this.overlayClickHandler);
+      this.overlayClickHandler = null;
+    }
+    if (this.escapeKeyHandler) {
+      document.removeEventListener('keydown', this.escapeKeyHandler);
+      this.escapeKeyHandler = null;
+    }
+    const closeBtn = document.getElementById('quickViewClose');
+    if (closeBtn && this.closeBtnHandler) {
+      closeBtn.removeEventListener('click', this.closeBtnHandler);
+      this.closeBtnHandler = null;
+    }
   }
 
   async show(productId) {
