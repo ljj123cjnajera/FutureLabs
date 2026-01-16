@@ -65,9 +65,11 @@
 /* 3. PRODUCT INFO (Right Column - Sticky) */
 .product-info-detail {
     position: sticky;
-    top: 120px;
-    /* Offset for Header */
+    top: calc(var(--header-height, 80px) + 2rem);
+    /* Dynamic offset for Header height */
     padding-right: 20px;
+    max-height: calc(100vh - var(--header-height, 80px) - 4rem);
+    overflow-y: auto;
 }
 
 /* 4. TYPOGRAPHY & BRANDING */
