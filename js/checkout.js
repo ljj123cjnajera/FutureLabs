@@ -54,15 +54,15 @@ class CheckoutManager {
                 } else if (response && Array.isArray(response)) {
                     this.cart = response;
                 } else {
-                    // Fallback a localStorage
-                    const stored = localStorage.getItem('cart') || localStorage.getItem('brutalist_cart');
+                    // Fallback a localStorage (usar brutalist_cart consistentemente)
+                    const stored = localStorage.getItem('brutalist_cart');
                     if (stored) {
                         this.cart = JSON.parse(stored);
                     }
                 }
             } else {
-                // Usuario no autenticado, usar localStorage
-                const stored = localStorage.getItem('cart') || localStorage.getItem('brutalist_cart');
+                // Usuario no autenticado, usar localStorage (brutalist_cart)
+                const stored = localStorage.getItem('brutalist_cart');
                 if (stored) {
                     this.cart = JSON.parse(stored);
                 }
@@ -108,7 +108,7 @@ class CheckoutManager {
             }
 
             // Fallback a localStorage
-            const stored = localStorage.getItem('cart') || localStorage.getItem('brutalist_cart');
+            const stored = localStorage.getItem('brutalist_cart');
             if (stored) {
                 this.cart = JSON.parse(stored);
             }
