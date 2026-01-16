@@ -1246,7 +1246,8 @@ document.addEventListener('DOMContentLoaded', () => {
   window.homeEngine = new HomeEngine();
 
   // Failsafe: Ensure Footer is visible if Engine hangs
-  setTimeout(() => {
+  // Guardar timeout ID para poder limpiarlo si es necesario
+  const footerFailsafeTimeout = setTimeout(() => {
     const footer = document.getElementById('mainFooter');
     if (footer && (!footer.innerHTML.trim() || footer.offsetHeight < 10)) {
       if (window.Components && window.Components.getFooter) {
@@ -1255,4 +1256,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   }, 2000);
+  
+  // Guardar timeout ID para poder limpiarlo si es necesario
+  if (!window.homeTimeouts) window.homeTimeouts = [];
+  window.homeTimeouts.push(footerFailsafeTimeout);
 });
