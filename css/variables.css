@@ -130,6 +130,8 @@
        LAYOUT
        ============================================ */
     --container-width: 1400px;
+    --header-height: 80px;
+    --announcement-height: 44px;
     --max-width-sm: 640px;
     --max-width-md: 768px;
     --max-width-lg: 1024px;
