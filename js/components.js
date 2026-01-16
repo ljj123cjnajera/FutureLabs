@@ -5,8 +5,27 @@
 class Components {
   static updateCartCount() {
     try {
-      const cart = JSON.parse(localStorage.getItem('cart')) || [];
-      const count = cart.reduce((total, item) => total + (item.quantity || 1), 0);
+      // Usar brutalist_cart consistentemente (eliminar referencia a 'cart' viejo)
+      let count = 0;
+      
+      // Si está autenticado y cartEngine está disponible, usar su contador
+      if (window.authManager?.isAuthenticated() && window.cartEngine) {
+        // El cartEngine maneja el contador automáticamente desde API
+        // Solo actualizar UI si hay elementos
+        const cartCountElements = document.querySelectorAll('.cart-count');
+        if (cartCountElements.length > 0) {
+          // Intentar obtener desde API si está disponible
+          if (window.cartEngine.isAuthenticated && window.api) {
+            // El contador se actualizará desde el evento cartUpdated
+            return;
+          }
+        }
+      }
+      
+      // Fallback a localStorage (brutalist_cart)
+      const cart = JSON.parse(localStorage.getItem('brutalist_cart') || '[]');
+      count = cart.reduce((total, item) => total + (item.quantity || 1), 0);
+      
       document.querySelectorAll('.cart-count').forEach(el => {
         el.textContent = count;
         // Optional: Hide badge if 0

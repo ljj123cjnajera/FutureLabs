@@ -530,8 +530,7 @@ class CheckoutManager {
             if (response.success) {
                 if (window.Logger) window.Logger.log('✅ Order Created');
 
-                // Clear Cart
-                localStorage.removeItem('cart');
+                // Clear Cart (usar brutalist_cart consistentemente)
                 localStorage.removeItem('brutalist_cart');
                 localStorage.removeItem('cart_expires'); // If used
 
