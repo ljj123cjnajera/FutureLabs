@@ -1004,7 +1004,9 @@ class HomeEngine {
           if (window.notifications) {
             window.notifications.info('Video Player', 'Cargando reproductor...');
           } else {
-            alert('Video Player loading...');
+            if (window.notifications) {
+                window.notifications.info('VIDEO PLAYER', 'Feature coming in v7.5 update');
+            }
           }
         }
       });

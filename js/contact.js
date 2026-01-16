@@ -76,7 +76,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             if (window.notifications) {
                                 window.notifications.success('Mensaje enviado', 'Te contactaremos pronto.');
                             } else {
-                                alert('Mensaje enviado. Te contactaremos pronto.');
+                                if (window.notifications) {
+                                    window.notifications.success('Mensaje enviado', 'Te contactaremos pronto a ' + formData.email);
+                                }
                             }
                         }
                         form.reset();
@@ -93,12 +95,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Fallback: mostrar mensaje de éxito aunque no se haya enviado (para UX)
                     if (window.notifications) {
                         window.notifications.info('Mensaje recibido', 'Gracias por contactarnos. Te responderemos pronto.');
-                    } else {
-                        if (window.notifications) {
-                            window.notifications.info('Mensaje recibido', 'Gracias por contactarnos. Te responderemos pronto.');
-                        } else {
-                            alert('Gracias por contactarnos. Te responderemos pronto.');
-                        }
                     }
                     form.reset();
                     btn.innerHTML = originalText;
@@ -109,12 +105,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => {
                     if (window.notifications) {
                         window.notifications.success('Mensaje enviado', 'Te contactaremos pronto a ' + formData.email);
-                    } else {
-                        if (window.notifications) {
-                            window.notifications.success('Mensaje enviado', 'Te contactaremos pronto.');
-                        } else {
-                            alert('Mensaje enviado. Te contactaremos pronto.');
-                        }
                     }
                     form.reset();
                     btn.innerHTML = 'Mensaje Enviado ✓';
