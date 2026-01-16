@@ -112,6 +112,16 @@ class WishlistManager {
     }
 
     getItem(productId, listId = null) {
+        // Si no está autenticado, verificar localStorage
+        if (!window.authManager?.isAuthenticated()) {
+            const localWishlist = JSON.parse(localStorage.getItem('brutalist_wishlist') || '[]');
+            if (localWishlist.includes(productId)) {
+                return { product_id: productId, list_id: 'local_default' };
+            }
+            return null;
+        }
+        
+        // Si está autenticado, usar API data
         if (listId) {
             const list = this.getListById(listId);
             return list?.items?.find(item => item.product_id === productId) || null;
@@ -123,6 +133,42 @@ class WishlistManager {
         }
 
         return null;
+    }
+    
+    async syncLocalToAPI() {
+        // Sincronizar wishlist de localStorage a API cuando el usuario inicia sesión
+        if (!window.authManager?.isAuthenticated()) {
+            return;
+        }
+        
+        try {
+            const localWishlist = JSON.parse(localStorage.getItem('brutalist_wishlist') || '[]');
+            if (localWishlist.length > 0) {
+                let syncedCount = 0;
+                let failedCount = 0;
+                
+                for (const productId of localWishlist) {
+                    try {
+                        await window.api.addToWishlist(productId);
+                        syncedCount++;
+                    } catch (e) {
+                        failedCount++;
+                        if (window.Logger) window.Logger.warn('Error syncing wishlist item to API:', e);
+                    }
+                }
+                
+                if (syncedCount > 0) {
+                    localStorage.removeItem('brutalist_wishlist');
+                    if (window.Logger) window.Logger.log(`✅ ${syncedCount} items de wishlist sincronizados desde localStorage a API`);
+                    
+                    if (failedCount > 0 && window.notifications) {
+                        window.notifications.info('Favoritos sincronizados', `${syncedCount} productos sincronizados. ${failedCount} productos no pudieron sincronizarse.`);
+                    }
+                }
+            }
+        } catch (e) {
+            if (window.Logger) window.Logger.error('Error in syncLocalToAPI wishlist:', e);
+        }
     }
 
     async setActiveList(listId) {
