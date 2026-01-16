@@ -238,6 +238,8 @@ class QuickView {
       document.body.style.overflow = '';
       this.currentProduct = null;
     }
+    // Limpiar listeners cuando se cierra
+    this.cleanup();
   }
 
   async addToCart(productId) {

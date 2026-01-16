@@ -31,7 +31,8 @@ class NavigationEnhanced {
         const header = document.querySelector('.header-v3');
         if (!header) return;
         
-        window.addEventListener('scroll', () => {
+        // Guardar referencia al handler para poder limpiarlo
+        this.scrollHandler = () => {
             const currentScroll = window.pageYOffset;
             
             if (currentScroll > 50) {
@@ -39,7 +40,17 @@ class NavigationEnhanced {
             } else {
                 header.classList.remove('scrolled');
             }
-        }, { passive: true });
+        };
+        
+        window.addEventListener('scroll', this.scrollHandler, { passive: true });
+    }
+    
+    cleanup() {
+        // Remover scroll listener si existe
+        if (this.scrollHandler) {
+            window.removeEventListener('scroll', this.scrollHandler);
+            this.scrollHandler = null;
+        }
     }
 
     async loadCategoryData() {
