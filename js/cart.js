@@ -15,11 +15,18 @@ class CartEngine {
     this.isAuthenticated = this.checkAuth();
     
     // Restore Global Header/Footer if missing
-    if (window.Components && !document.getElementById('mainHeader')?.innerHTML) {
+    if (window.Components) {
       const header = document.getElementById('mainHeader');
-      if (header) {
+      if (header && !header.innerHTML.trim()) {
         header.innerHTML = window.Components.getHeader(true, true);
         if (window.Components.initHeader) window.Components.initHeader();
+        if (window.Components.initSearch) window.Components.initSearch();
+        if (window.Components.initCartCounter) window.Components.initCartCounter();
+      }
+      
+      const footer = document.getElementById('mainFooter');
+      if (footer && !footer.innerHTML.trim()) {
+        footer.innerHTML = window.Components.getFooter();
       }
     }
 
@@ -217,9 +224,7 @@ class CartEngine {
                         const itemPrice = parseFloat(item.discount_price || item.price || 0);
                         const itemQuantity = item.quantity || 1;
                         const itemTotal = itemPrice * itemQuantity;
-                        const stockAvailable;
-                        const itemSize = item.size || null;
-                        const sizeParam = itemSize ? `, {size: \'${itemSize}\'}` : \'\'; = item.stock_quantity !== undefined ? item.stock_quantity : null;
+                        const stockAvailable = item.stock_quantity !== undefined ? item.stock_quantity : null;
                         const isOutOfStock = stockAvailable !== null && stockAvailable === 0;
                         const isLowStock = stockAvailable !== null && stockAvailable > 0 && stockAvailable < itemQuantity;
                         const itemSize = item.size || null;
@@ -244,7 +249,6 @@ class CartEngine {
                                     <a href="product-detail.html?id=${productId}">${item.name}</a>
                                 </h3>
                                 ${item.slug ? `<div class="cart-item-slug">SKU: ${item.slug}</div>` : ''}
-                                ${itemSize ? `<div class="cart-item-size" style="margin-top: 0.5rem; font-weight: 600; text-transform: uppercase; color: var(--gray-600);">Talla: ${itemSize}</div>` : \'\'}
                                 ${itemSize ? `<div class="cart-item-size" style="margin-top: 0.5rem; font-weight: 600; text-transform: uppercase; color: var(--gray-600);">Talla: ${itemSize}</div>` : ''}
                                 
                                 <div class="quantity-control">

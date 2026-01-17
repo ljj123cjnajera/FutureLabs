@@ -45,6 +45,8 @@ class CatalogEngine {
             if (header && !header.innerHTML.trim()) {
                 header.innerHTML = window.Components.getHeader(true, true);
                 if (window.Components.initHeader) window.Components.initHeader();
+                if (window.Components.initSearch) window.Components.initSearch();
+                if (window.Components.initCartCounter) window.Components.initCartCounter();
             }
             const footer = document.getElementById('mainFooter');
             if (footer && !footer.innerHTML.trim()) {
