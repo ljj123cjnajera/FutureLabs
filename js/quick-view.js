@@ -243,21 +243,15 @@ class QuickView {
   }
 
   async addToCart(productId) {
-    try {
-      if (window.cartManager) {
-        await window.cartManager.add(productId, 1);
-        if (window.notifications) {
-          window.notifications.success('Producto agregado al carrito');
-        }
-        // Cerrar modal después de agregar
-        setTimeout(() => this.close(), 500);
-      }
-    } catch (error) {
-      if (window.Logger) window.Logger.error('Error agregando al carrito:', error);
-      if (window.notifications) {
-        window.notifications.error('Error al agregar producto');
-      }
+    // IMPORTANTE: Quick View no puede agregar sin seleccionar talla
+    // Redirigir a product-detail para seleccionar talla
+    this.close();
+    if (window.notifications) {
+      window.notifications.info('Selecciona una Talla', 'Redirigiendo a la página del producto...');
     }
+    setTimeout(() => {
+      window.location.href = `product-detail.html?id=${productId}`;
+    }, 300);
   }
 
   buyNow(productId) {

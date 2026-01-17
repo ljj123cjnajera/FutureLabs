@@ -144,11 +144,7 @@ const relatedProducts = new RelatedProducts();
 
 // Funciones globales
 async function addToCart(productId) {
-  try {
-    await window.cartManager.add(productId, 1);
-    window.notifications.show('Producto agregado al carrito', 'success');
-  } catch (error) {
-    window.notifications.show('Error al agregar al carrito', 'error');
-  }
+  // Redirigir a product-detail para seleccionar talla
+  window.location.href = `product-detail.html?id=${productId}`;
 }
 

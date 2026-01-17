@@ -793,8 +793,8 @@ class Components {
 
           <div class="product-size-preview">${sizeText}</div>
 
-          <button class="product-btn" onclick="event.preventDefault(); event.stopPropagation(); const cart = window.cartEngine || window.cartManager; if(cart) { cart.add('${product.id}', 1).then(() => { if(window.notifications) window.notifications.success('AÑADIDO', '${product.name.replace(/'/g, "\\'")} al carrito'); }); } else { if(window.notifications) window.notifications.error('Error', 'Carrito no disponible. Por favor, recarga la página.'); }" aria-label="Agregar ${product.name.replace(/"/g, '&quot;')} al carrito">
-            AGREGAR AL CARRITO
+          <button class="product-btn" onclick="event.stopPropagation(); window.location.href='product-detail.html?id=${product.id}';" aria-label="Ver detalles de ${product.name.replace(/"/g, '&quot;')}">
+            VER DETALLES
           </button>
         </div>
       </div>
