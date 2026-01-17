@@ -297,12 +297,21 @@ document.addEventListener('DOMContentLoaded', async function () {
         `;
 
         // Initialize gallery
-        if (window.ProductGallery && galleryImages.length > 0) {
-            window.ProductGallery.init('productGallery', galleryImages);
+        if (window.productGallery && galleryImages.length > 0) {
+            window.productGallery.render(galleryImages, product);
+        } else if (window.ProductGallery && galleryImages.length > 0) {
+            // Fallback: try to initialize if not already done
+            if (typeof window.ProductGallery === 'function') {
+                window.productGallery = new window.ProductGallery('productGallery');
+                window.productGallery.render(galleryImages, product);
+            }
         }
 
         // Render size selector
         renderSizeSelector(product);
+        
+        // Update wishlist button state
+        setTimeout(() => updateWishlistButton(), 500);
     }
 
     function renderSizeSelector(product) {
@@ -610,6 +619,85 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     window.openSizeGuideModal = openSizeGuideModal;
+
+    // Wishlist toggle function
+    window.toggleWishlist = async function() {
+        const product = window.currentProduct;
+        if (!product) {
+            if (window.notifications) {
+                window.notifications.error('Error', 'Producto no disponible');
+            }
+            return;
+        }
+
+        const productId = product.id || product.product_id;
+        if (!productId) {
+            if (window.notifications) {
+                window.notifications.error('Error', 'ID de producto no encontrado');
+            }
+            return;
+        }
+
+        try {
+            if (window.wishlistManager) {
+                const isInWishlist = await window.wishlistManager.isInWishlist(productId);
+                await window.wishlistManager.toggle(productId);
+                
+                // Update button icon
+                const icon = document.getElementById('wishlistIcon');
+                const btn = document.getElementById('wishlistBtn');
+                if (icon && btn) {
+                    if (isInWishlist) {
+                        icon.className = 'far fa-heart';
+                        btn.style.background = 'white';
+                        btn.style.color = '#000';
+                    } else {
+                        icon.className = 'fas fa-heart';
+                        btn.style.background = '#d32f2f';
+                        btn.style.color = '#fff';
+                    }
+                }
+            } else {
+                if (window.notifications) {
+                    window.notifications.warning('Wishlist no disponible', 'Por favor, recarga la página.');
+                }
+            }
+        } catch (e) {
+            if (window.Logger) window.Logger.error('Error toggling wishlist:', e);
+            if (window.notifications) {
+                window.notifications.error('Error', 'No se pudo actualizar la wishlist.');
+            }
+        }
+    };
+
+    // Update wishlist button state when product loads
+    async function updateWishlistButton() {
+        const product = window.currentProduct;
+        if (!product || !window.wishlistManager) return;
+
+        const productId = product.id || product.product_id;
+        if (!productId) return;
+
+        try {
+            const isInWishlist = await window.wishlistManager.isInWishlist(productId);
+            const icon = document.getElementById('wishlistIcon');
+            const btn = document.getElementById('wishlistBtn');
+            
+            if (icon && btn) {
+                if (isInWishlist) {
+                    icon.className = 'fas fa-heart';
+                    btn.style.background = '#d32f2f';
+                    btn.style.color = '#fff';
+                } else {
+                    icon.className = 'far fa-heart';
+                    btn.style.background = 'white';
+                    btn.style.color = '#000';
+                }
+            }
+        } catch (e) {
+            if (window.Logger) window.Logger.error('Error checking wishlist:', e);
+        }
+    }
 
     const clearRecentlyViewedBtn = document.getElementById('clearRecentlyViewedBtn');
     if (clearRecentlyViewedBtn) {

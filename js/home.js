@@ -570,10 +570,10 @@ class HomeEngine {
     const cardsHTML = window.Components && window.Components.getProductCard
       ? products.map(p => window.Components.getProductCard(p)).join('')
       : products.map(p => `
-            <div class="product-card brutalist-fallback">
+            <div class="product-card brutalist-fallback" onclick="window.location.href='product-detail.html?id=${p.id}'">
                 <h3>${p.name}</h3>
                 <p>S/ ${p.price}</p>
-                <button onclick="window.cartManager?.add('${p.id}')">Agregar al Carrito</button>
+                <button onclick="event.stopPropagation(); window.location.href='product-detail.html?id=${p.id}'">Ver Detalles</button>
             </div>
         `).join('');
 
