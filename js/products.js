@@ -36,6 +36,8 @@ class CatalogEngine {
         if (!window.api) {
             if (window.Logger) window.Logger.error('⚠️ [CatalogEngine] API not available, retrying...');
             setTimeout(() => this.init(), 500);
+                if (window.Components.initSearch) window.Components.initSearch();
+                if (window.Components.initCartCounter) window.Components.initCartCounter();
             return;
         }
 
@@ -340,9 +342,12 @@ class CatalogEngine {
             case 'price-desc':
             case 'name-desc':
             case 'newest':
-            default:
-                return 'desc';
-        }
+    search(query) {
+        const trimmedQuery = query ? query.trim() : ';
+        this.currentFilters.search = trimmedQuery || null;
+        this.currentPage = 1;
+        this.updateURL();
+        this.loadProducts(1);
     }
 
     render(products) {
@@ -372,9 +377,14 @@ class CatalogEngine {
                     </div>
                  `;
                 // Make container visible even when empty
-                container.classList.add('loaded');
+            // Show range: "1-12 de 50" format
+            const start = (this.currentPage - 1) * this.itemsPerPage + 1;
+            const end = Math.min(this.currentPage * this.itemsPerPage, this.totalProducts);
+            if (this.totalProducts > 0) {
+                resultsCount.textContent = `${start}-${end} de ${this.totalProducts}`;
+            } else {
+                resultsCount.textContent = '0';
             }
-            return;
         }
 
         // Ensure container has correct classes
