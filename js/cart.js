@@ -1,6 +1,6 @@
 /**
- * 🛒 CART ENGINE V4 (API Integration + LocalStorage Fallback)
- * Focus: API Integration, Guest Support, Stock Validation, Spanish UI
+ * 🛒 CART ENGINE V5 (API Integration + LocalStorage Fallback + Size Support)
+ * Focus: API Integration, Guest Support, Stock Validation, Size Handling, Spanish UI
  */
 
 class CartEngine {
@@ -199,40 +199,14 @@ class CartEngine {
         } else {
           this.render(container, items, subtotal, total);
         }
-      } else {
-        if (window.LoadingStates) {
-          window.LoadingStates.error('cartContainer', {
-            title: 'Error al cargar carrito',
-            message: 'No se pudo cargar el carrito. Por favor, intenta de nuevo.',
-            retryLabel: 'REINTENTAR',
-            retryCallback: 'window.cartEngine.loadCart()'
-          });
-        } else {
-          container.innerHTML = `
-            <div style="text-align: center; padding: 4rem; border: 2px dashed #dc3545; color: #dc3545;">
-              <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
-              <h3>ERROR AL CARGAR CARRITO</h3>
-              <p>No se pudo cargar el carrito. Por favor, intenta de nuevo.</p>
-              <button onclick="window.cartEngine.loadCart()" class="btn btn-outline" style="margin-top: 1rem; border-color: #dc3545; color: #dc3545;">REINTENTAR</button>
-            </div>
-          `;
-        }
       }
     }
   }
 
   render(container, items, subtotal, total) {
-    // Get applied coupon discount if any
-    const appliedCoupon = window.couponsManager?.appliedCoupon || null;
-    const couponDiscount = window.couponsManager?.discount || 0;
-    
-    // Calculate subtotal after coupon
-    const subtotalAfterCoupon = Math.max(0, subtotal - couponDiscount);
-    
-    // Calculate shipping (free over S/ 150, based on subtotal after coupon)
-    const shippingThreshold = 150;
-    const shipping = subtotalAfterCoupon >= shippingThreshold ? 0 : 15;
-    const finalTotal = subtotalAfterCoupon + shipping;
+    // Calculate shipping (free over S/ 150)
+    const shipping = subtotal >= 150 ? 0 : 15;
+    const finalTotal = subtotal + shipping;
 
     container.innerHTML = `
             <div class="cart-grid-v3">
@@ -246,6 +220,8 @@ class CartEngine {
                         const stockAvailable = item.stock_quantity !== undefined ? item.stock_quantity : null;
                         const isOutOfStock = stockAvailable !== null && stockAvailable === 0;
                         const isLowStock = stockAvailable !== null && stockAvailable > 0 && stockAvailable < itemQuantity;
+                        const itemSize = item.size || null;
+                        const sizeParam = itemSize ? `, {size: '${itemSize}'}` : '';
 
                         return `
                         <div class="cart-item ${isOutOfStock ? 'out-of-stock' : ''}">
@@ -266,11 +242,11 @@ class CartEngine {
                                     <a href="product-detail.html?id=${productId}">${item.name}</a>
                                 </h3>
                                 ${item.slug ? `<div class="cart-item-slug">SKU: ${item.slug}</div>` : ''}
-                                ${item.size ? `<div class="cart-item-size" style="margin-top: 0.5rem; font-weight: 600; color: var(--gray-600);">Talla: ${item.size}</div>` : ''}
+                                ${itemSize ? `<div class="cart-item-size" style="margin-top: 0.5rem; font-weight: 600; text-transform: uppercase; color: var(--gray-600);">Talla: ${itemSize}</div>` : ''}
                                 
                                 <div class="quantity-control">
                                     <button class="quantity-btn" 
-                                            onclick="window.cartEngine.updateQty(${productId}, ${itemQuantity - 1}, ${item.size ? `'${item.size}'` : 'null'})"
+                                            onclick="window.cartEngine.updateQty(${productId}, ${itemQuantity - 1}${sizeParam})"
                                             ${itemQuantity <= 1 ? 'disabled' : ''}
                                             aria-label="Disminuir cantidad">
                                         <i class="fas fa-minus"></i>
@@ -283,7 +259,7 @@ class CartEngine {
                                            readonly
                                            aria-label="Cantidad">
                                     <button class="quantity-btn" 
-                                            onclick="window.cartEngine.updateQty(${productId}, ${itemQuantity + 1}, ${item.size ? `'${item.size}'` : 'null'})"
+                                            onclick="window.cartEngine.updateQty(${productId}, ${itemQuantity + 1}${sizeParam})"
                                             ${(stockAvailable !== null && itemQuantity >= stockAvailable) ? 'disabled' : ''}
                                             aria-label="Aumentar cantidad">
                                         <i class="fas fa-plus"></i>
@@ -302,7 +278,7 @@ class CartEngine {
                                     <div class="item-total">S/ ${itemTotal.toFixed(2)}</div>
                                 </div>
                                 <button class="btn-remove" 
-                                        onclick="window.cartEngine.removeItem(${productId}, ${item.size ? `'${item.size}'` : 'null'})"
+                                        onclick="window.cartEngine.removeItem(${productId}${sizeParam})"
                                         aria-label="Eliminar producto">
                                     <i class="fas fa-trash"></i> ELIMINAR
                                 </button>
@@ -320,26 +296,13 @@ class CartEngine {
                         <span>SUBTOTAL</span>
                         <span>S/ ${subtotal.toFixed(2)}</span>
                     </div>
-                    ${appliedCoupon ? `
-                    <div class="summary-row" style="color: var(--success, #28a745);">
-                        <span>
-                            <i class="fas fa-tag"></i> CUPÓN: ${appliedCoupon.code}
-                            <button onclick="window.cartEngine.removeCoupon()" 
-                                    style="margin-left: 0.5rem; background: transparent; border: none; color: inherit; cursor: pointer; font-size: 0.8rem;"
-                                    aria-label="Remover cupón">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </span>
-                        <span>-S/ ${couponDiscount.toFixed(2)}</span>
-                    </div>
-                    ` : ''}
                     <div class="summary-row">
                         <span>ENVÍO</span>
                         <span>${shipping === 0 ? 'GRATIS' : `S/ ${shipping.toFixed(2)}`}</span>
                     </div>
-                    ${subtotalAfterCoupon < shippingThreshold ? `
+                    ${subtotal < 150 ? `
                     <div class="summary-shipping-note" style="font-size: 0.85rem; color: #666; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #eee;">
-                        <i class="fas fa-info-circle"></i> Agrega S/ ${(shippingThreshold - subtotalAfterCoupon).toFixed(2)} más para envío gratis
+                        <i class="fas fa-info-circle"></i> Agrega S/ ${(150 - subtotal).toFixed(2)} más para envío gratis
                     </div>
                     ` : ''}
 
@@ -353,24 +316,6 @@ class CartEngine {
                             ${items.some(item => (item.stock_quantity !== undefined && item.stock_quantity === 0)) ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
                         <i class="fas fa-lock"></i> PROCEDER AL PAGO
                     </button>
-                    
-                    <!-- Coupon Section -->
-                    <div id="cartCouponSection" style="margin-top: 1rem; padding-top: 1rem; border-top: 2px solid var(--black);">
-                        ${appliedCoupon ? '' : `
-                        <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
-                            <input type="text" 
-                                   id="couponCodeInput" 
-                                   placeholder="CÓDIGO DE CUPÓN" 
-                                   style="flex: 1; padding: 0.75rem; border: 2px solid var(--black); font-weight: 600; text-transform: uppercase;"
-                                   onkeypress="if(event.key==='Enter') window.cartEngine.applyCoupon()">
-                            <button onclick="window.cartEngine.applyCoupon()" 
-                                    class="btn btn-black" 
-                                    style="padding: 0.75rem 1.5rem; white-space: nowrap;">
-                                APLICAR
-                            </button>
-                        </div>
-                        `}
-                    </div>
                     
                     ${!this.isAuthenticated ? `
                     <div style="margin-top: 1rem; padding: 1rem; background: #fff3cd; border: 2px solid #ffc107; text-align: center;">
@@ -401,58 +346,23 @@ class CartEngine {
         `;
   }
 
-  async updateQty(productId, newQty, size = null) {
+  async updateQty(productId, newQty, options = {}) {
     if (newQty <= 0) {
-      return this.removeItem(productId, size);
+      return this.removeItem(productId, options);
     }
 
     try {
-      // Validate stock before updating (considerando size si existe)
-      if (size && window.productSizeStock && window.productSizeStock[size] !== undefined) {
-        const sizeStock = window.productSizeStock[size];
-        if (sizeStock === 0) {
-          if (window.notifications) {
-            window.notifications.warning('Talla Agotada', `La talla ${size} no está disponible.`);
-          }
-          return;
-        }
-        if (sizeStock < newQty) {
-          if (window.notifications) {
-            window.notifications.warning('Stock Insuficiente', `Solo hay ${sizeStock} unidades disponibles en talla ${size}.`);
-          }
-          return;
-        }
-      } else {
-        const stockInfo = await this.validateStock(productId, newQty);
-        if (!stockInfo.available) {
-          if (window.notifications) {
-            window.notifications.warning('Stock Insuficiente', stockInfo.message || 'No hay suficiente stock disponible');
-          }
-          return;
-        }
-      }
-
       if (this.isAuthenticated) {
-        // Pasar size si existe
-        const options = size ? { size } : {};
         await this.api.updateCartItem(productId, newQty, options);
       } else {
         // Update localStorage
         let cart = JSON.parse(localStorage.getItem('brutalist_cart') || '[]');
-        // Buscar por productId Y size (si existe)
         const item = cart.find(i => {
           const sameProduct = (i.id === productId || i.product_id === productId);
-          const sameSize = (!size && !i.size) || (size === i.size);
+          const sameSize = (!options.size && !i.size) || (options.size === i.size);
           return sameProduct && sameSize;
         });
         if (item) {
-          // Validate stock in localStorage item
-          if (item.stock_quantity !== undefined && newQty > item.stock_quantity) {
-            if (window.notifications) {
-              window.notifications.warning('Stock Insuficiente', `Solo hay ${item.stock_quantity} unidades disponibles`);
-            }
-            return;
-          }
           item.quantity = newQty;
           localStorage.setItem('brutalist_cart', JSON.stringify(cart));
         }
@@ -462,63 +372,28 @@ class CartEngine {
       this.updateCartCounter();
       
       if (window.notifications) {
-        const sizeText = size ? ` (Talla ${size})` : '';
-        window.notifications.success('Carrito Actualizado', `La cantidad se actualizó correctamente${sizeText}`);
+        window.notifications.success('Carrito Actualizado', 'La cantidad se actualizó correctamente');
       }
     } catch (e) {
       if (window.Logger) window.Logger.error('Error updating cart:', e);
       if (window.notifications) {
-        const errorMsg = e.response?.data?.message || e.message || 'No se pudo actualizar la cantidad. Por favor, intenta de nuevo.';
-        window.notifications.error('Error', errorMsg);
+        window.notifications.error('Error', 'No se pudo actualizar la cantidad. Por favor, intenta de nuevo.');
       }
     }
   }
 
-  async validateStock(productId, quantity) {
-    try {
-      // Try to get product info from API
-      if (this.api && this.api.getProduct) {
-        const product = await this.api.getProduct(productId);
-        if (product && product.success && product.data) {
-          const stock = product.data.stock_quantity;
-          if (stock !== undefined) {
-            if (stock === 0) {
-              return { available: false, message: 'Este producto está agotado' };
-            }
-            if (stock < quantity) {
-              return { available: false, message: `Solo hay ${stock} unidades disponibles` };
-            }
-            return { available: true };
-          }
-        }
-      }
-      // If validation fails, allow the operation (fallback)
-      return { available: true };
-    } catch (e) {
-      if (window.Logger) window.Logger.warn('Error validating stock:', e);
-      // On error, allow the operation (fail open)
-      return { available: true };
-    }
-  }
-
-  async removeItem(productId, size = null) {
+  async removeItem(productId, options = {}) {
     try {
       if (this.isAuthenticated) {
-        // Pasar size si existe en las opciones
-        const options = size ? { size } : {};
         await this.api.removeFromCart(productId, options);
       } else {
-        // Remove from localStorage
+        // Remove from localStorage (considerando size si existe)
         let cart = JSON.parse(localStorage.getItem('brutalist_cart') || '[]');
-        // Remover por productId (y size si se especifica)
         cart = cart.filter(i => {
-          const isSameProduct = (i.id === productId || i.product_id === productId);
-          // Si se especifica size, solo remover si coincide
-          if (size) {
-            return !(isSameProduct && i.size === size);
-          }
+          const sameProduct = (i.id === productId || i.product_id === productId);
+          const sameSize = (!options.size && !i.size) || (options.size === i.size);
           // Si no se especifica size, remover todos los items de ese producto
-          return !isSameProduct;
+          return !sameProduct || (options.size && !sameSize);
         });
         localStorage.setItem('brutalist_cart', JSON.stringify(cart));
       }
@@ -527,8 +402,7 @@ class CartEngine {
       this.updateCartCounter();
       
       if (window.notifications) {
-        const sizeText = size ? ` (Talla ${size})` : '';
-        window.notifications.success('Producto Eliminado', `El producto fue removido del carrito${sizeText}`);
+        window.notifications.success('Producto Eliminado', 'El producto fue removido del carrito');
       }
     } catch (e) {
       if (window.Logger) window.Logger.error('Error removing from cart:', e);
@@ -540,99 +414,48 @@ class CartEngine {
 
   async add(productId, quantity = 1, options = {}) {
     try {
-      // Validate stock before adding
-      const stockInfo = await this.validateStock(productId, quantity);
-      if (!stockInfo.available) {
-        if (window.notifications) {
-          window.notifications.warning('Stock Insuficiente', stockInfo.message || 'No hay suficiente stock disponible');
-        }
-        return false;
-      }
-
-      // Additional validation from currentProduct if available
-      if (window.currentProduct) {
-        const stock = window.currentProduct.stock_quantity;
-        if (stock !== undefined && stock === 0) {
-          if (window.notifications) {
-            window.notifications.warning('Producto Agotado', 'Este producto no está disponible en este momento.');
-          }
-          return false;
-        }
-        if (stock !== undefined && stock < quantity) {
-          if (window.notifications) {
-            window.notifications.warning('Stock Insuficiente', `Solo hay ${stock} unidades disponibles`);
-          }
-          return false;
-        }
-      }
-
-      // Validate size stock if size is provided
-      if (options.size && window.productSizeStock && window.productSizeStock[options.size] !== undefined) {
-        const sizeStock = window.productSizeStock[options.size];
-        if (sizeStock === 0) {
-          if (window.notifications) {
-            window.notifications.warning('Talla Agotada', `La talla US ${options.size} no está disponible`);
-          }
-          return false;
-        }
-        if (sizeStock < quantity) {
-          if (window.notifications) {
-            window.notifications.warning('Stock Insuficiente', `Solo hay ${sizeStock} unidades en talla US ${options.size}`);
-          }
-          return false;
-        }
-      }
-
-      if (this.isAuthenticated) {
-        try {
-          const response = await this.api.addToCart(productId, quantity, options);
-          // Check if API returned an error
-          if (response && !response.success) {
+      // Validar stock antes de agregar
+      try {
+        const productResponse = await this.api.getProduct(productId);
+        const product = productResponse?.data || productResponse;
+        
+        if (product) {
+          const stock = product.stock_quantity;
+          if (stock !== undefined && stock === 0) {
             if (window.notifications) {
-              const message = response.message || 'No se pudo agregar el producto al carrito';
-              if (response.message && response.message.includes('Stock insuficiente')) {
-                window.notifications.warning('Stock Insuficiente', response.message);
-              } else {
-                window.notifications.error('Error', message);
-              }
+              window.notifications.warning('Producto Agotado', 'Este producto no está disponible en este momento.');
             }
             return false;
           }
-        } catch (e) {
-          if (window.Logger) window.Logger.error('Error adding to cart:', e);
-          if (window.notifications) {
-            const errorMsg = e.response?.data?.message || e.message || 'No se pudo agregar el producto. Por favor, intenta de nuevo.';
-            if (errorMsg.includes('Stock insuficiente')) {
-              window.notifications.warning('Stock Insuficiente', errorMsg);
-            } else {
-              window.notifications.error('Error', errorMsg);
+          
+          // Validar cantidad vs stock disponible
+          if (stock !== undefined && stock < quantity) {
+            if (window.notifications) {
+              window.notifications.warning('Stock Insuficiente', `Solo hay ${stock} unidades disponibles.`);
             }
+            return false;
           }
-          return false;
         }
+      } catch (stockError) {
+        // Si falla la validación de stock, continuar (no bloquear)
+        if (window.Logger) window.Logger.warn('Error validating stock, continuing:', stockError);
+      }
+
+      if (this.isAuthenticated) {
+        // Pasar options (incluyendo size) a la API
+        await this.api.addToCart(productId, quantity, options);
       } else {
         // Add to localStorage
         let cart = JSON.parse(localStorage.getItem('brutalist_cart') || '[]');
         
-        // For guest users, check if same product with same size already exists
-        const existingIndex = cart.findIndex(i => {
+        // Buscar item existente (considerando size si existe)
+        const existing = cart.find(i => {
           const sameProduct = (i.id === productId || i.product_id === productId);
           const sameSize = (!options.size && !i.size) || (options.size === i.size);
           return sameProduct && sameSize;
         });
 
-        if (existingIndex !== -1) {
-          const existing = cart[existingIndex];
-          // Check stock before increasing quantity
-          if (existing.stock_quantity !== undefined) {
-            const newQty = existing.quantity + quantity;
-            if (newQty > existing.stock_quantity) {
-              if (window.notifications) {
-                window.notifications.warning('Stock Insuficiente', `Solo puedes agregar ${existing.stock_quantity - existing.quantity} unidades más`);
-              }
-              return false;
-            }
-          }
+        if (existing) {
           existing.quantity += quantity;
         } else {
           const product = window.currentProduct || { 
@@ -640,8 +463,7 @@ class CartEngine {
             name: 'Producto ' + productId, 
             price: 0, 
             image_url: 'assets/images/products/placeholder.jpg', 
-            brand: 'Marca',
-            stock_quantity: undefined
+            brand: 'Sneakers' 
           };
 
           cart.push({
@@ -650,27 +472,20 @@ class CartEngine {
             name: product.name,
             price: parseFloat(product.discount_price || product.price || 0),
             quantity: quantity,
-            image_url: product.image_url,
-            brand: product.brand,
-            size: options.size || null,
-            stock_quantity: product.stock_quantity
+            image_url: product.image_url || 'assets/images/products/placeholder.jpg',
+            brand: product.brand || 'Sneakers',
+            size: options.size || null
           });
         }
 
         localStorage.setItem('brutalist_cart', JSON.stringify(cart));
       }
 
-      // Update cart display if on cart page
-      const cartContainer = document.getElementById('cartContainer');
-      if (cartContainer) {
-        await this.loadCart();
-      }
-      
+      await this.loadCart();
       this.updateCartCounter();
 
       if (window.notifications) {
-        const sizeText = options.size ? ` (Talla US ${options.size})` : '';
-        window.notifications.success('Agregado al Carrito', `El producto se agregó correctamente${sizeText}`);
+        window.notifications.success('Agregado al Carrito', 'El producto se agregó correctamente');
       }
 
       // Open drawer if available
@@ -680,97 +495,10 @@ class CartEngine {
     } catch (e) {
       if (window.Logger) window.Logger.error('Error adding to cart:', e);
       if (window.notifications) {
-        const errorMsg = e.response?.data?.message || e.message || 'No se pudo agregar el producto. Por favor, intenta de nuevo.';
-        window.notifications.error('Error', errorMsg);
+        window.notifications.error('Error', 'No se pudo agregar el producto. Por favor, intenta de nuevo.');
       }
       return false;
     }
-  }
-
-  async applyCoupon() {
-    const input = document.getElementById('couponCodeInput');
-    if (!input) return;
-    
-    const code = input.value.trim().toUpperCase();
-    if (!code) {
-      if (window.notifications) {
-        window.notifications.warning('Cupón Inválido', 'Por favor ingresa un código de cupón');
-      }
-      return;
-    }
-
-    try {
-      // Get current cart total
-      const container = document.getElementById('cartContainer');
-      const items = container ? Array.from(container.querySelectorAll('.cart-item')).map(item => {
-        const productId = item.dataset.productId || null;
-        const quantity = parseInt(item.querySelector('.quantity-input')?.value || 1);
-        return { product_id: productId, quantity };
-      }) : [];
-
-      const response = await this.api.validateCoupon(code, this.getCurrentSubtotal(), items);
-      
-      if (response && response.success) {
-        // Initialize coupons manager if not already
-        if (!window.couponsManager) {
-          if (window.CouponsManager) {
-            window.couponsManager = new window.CouponsManager();
-          } else {
-            if (window.Logger) window.Logger.warn('CouponsManager not available');
-            return;
-          }
-        }
-
-        // Apply coupon
-        window.couponsManager.appliedCoupon = response.data.coupon;
-        window.couponsManager.discount = response.data.discount || 0;
-        
-        // Reload cart to show discount
-        await this.loadCart();
-        
-        if (window.notifications) {
-          window.notifications.success('Cupón Aplicado', `Descuento de S/ ${window.couponsManager.discount.toFixed(2)} aplicado`);
-        }
-      } else {
-        if (window.notifications) {
-          window.notifications.error('Cupón Inválido', response?.message || 'El código de cupón no es válido');
-        }
-      }
-    } catch (e) {
-      if (window.Logger) window.Logger.error('Error applying coupon:', e);
-      if (window.notifications) {
-        window.notifications.error('Error', 'No se pudo aplicar el cupón. Por favor, intenta de nuevo.');
-      }
-    }
-  }
-
-  async removeCoupon() {
-    if (window.couponsManager) {
-      window.couponsManager.appliedCoupon = null;
-      window.couponsManager.discount = 0;
-      await this.loadCart();
-      if (window.notifications) {
-        window.notifications.info('Cupón Removido', 'El cupón ha sido removido del carrito');
-      }
-    }
-  }
-
-  getCurrentSubtotal() {
-    const container = document.getElementById('cartContainer');
-    if (!container) return 0;
-    
-    const items = container.querySelectorAll('.cart-item');
-    let subtotal = 0;
-    
-    items.forEach(item => {
-      const priceText = item.querySelector('.price-new')?.textContent || 
-                       item.querySelector('.cart-price span')?.textContent || '0';
-      const price = parseFloat(priceText.replace(/[^\d.]/g, '')) || 0;
-      const quantity = parseInt(item.querySelector('.quantity-input')?.value || 1);
-      subtotal += price * quantity;
-    });
-    
-    return subtotal;
   }
 
   updateCartCounter() {
