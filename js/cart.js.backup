@@ -217,9 +217,7 @@ class CartEngine {
                         const itemPrice = parseFloat(item.discount_price || item.price || 0);
                         const itemQuantity = item.quantity || 1;
                         const itemTotal = itemPrice * itemQuantity;
-                        const stockAvailable;
-                        const itemSize = item.size || null;
-                        const sizeParam = itemSize ? `, {size: \'${itemSize}\'}` : \'\'; = item.stock_quantity !== undefined ? item.stock_quantity : null;
+                        const stockAvailable = item.stock_quantity !== undefined ? item.stock_quantity : null;
                         const isOutOfStock = stockAvailable !== null && stockAvailable === 0;
                         const isLowStock = stockAvailable !== null && stockAvailable > 0 && stockAvailable < itemQuantity;
                         const itemSize = item.size || null;
@@ -244,7 +242,6 @@ class CartEngine {
                                     <a href="product-detail.html?id=${productId}">${item.name}</a>
                                 </h3>
                                 ${item.slug ? `<div class="cart-item-slug">SKU: ${item.slug}</div>` : ''}
-                                ${itemSize ? `<div class="cart-item-size" style="margin-top: 0.5rem; font-weight: 600; text-transform: uppercase; color: var(--gray-600);">Talla: ${itemSize}</div>` : \'\'}
                                 ${itemSize ? `<div class="cart-item-size" style="margin-top: 0.5rem; font-weight: 600; text-transform: uppercase; color: var(--gray-600);">Talla: ${itemSize}</div>` : ''}
                                 
                                 <div class="quantity-control">
