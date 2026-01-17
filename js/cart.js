@@ -514,6 +514,10 @@ class CartEngine {
     if (window.Components && window.Components.updateCartCount) {
       window.Components.updateCartCount();
     }
+    // Update cart drawer if it's open
+    if (window.CartDrawer && document.getElementById('cartDrawer')?.classList.contains('active')) {
+      window.CartDrawer.update();
+    }
   }
 }
 

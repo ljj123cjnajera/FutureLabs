@@ -353,6 +353,8 @@ class Components {
           drawer.classList.add('active');
           overlay.classList.add('active');
           document.body.style.overflow = 'hidden';
+          // Update drawer content when opening
+          window.CartDrawer.update();
         } else if (window.Logger) {
           window.Logger.warn('⚠️ Cart drawer elements not found when trying to open');
         }
@@ -364,6 +366,107 @@ class Components {
           drawer.classList.remove('active');
           overlay.classList.remove('active');
           document.body.style.overflow = '';
+        }
+      },
+      update: async () => {
+        const itemsContainer = document.getElementById('cartDrawerItems');
+        const totalElement = document.getElementById('cartDrawerTotal');
+        if (!itemsContainer) return;
+
+        let items = [];
+        let subtotal = 0;
+
+        try {
+          // Try to get items from CartEngine if available
+          if (window.cartEngine) {
+            // Get current cart items
+            if (window.cartEngine.isAuthenticated) {
+              try {
+                const response = await window.cartEngine.api.getCart();
+                if (response && response.success && response.data) {
+                  items = response.data.items || [];
+                  subtotal = response.data.total || 0;
+                } else if (Array.isArray(response)) {
+                  items = response;
+                  subtotal = items.reduce((acc, item) => {
+                    const price = parseFloat(item.discount_price || item.price || 0);
+                    return acc + (price * (item.quantity || 1));
+                  }, 0);
+                }
+              } catch (e) {
+                if (window.Logger) window.Logger.warn('Error loading cart for drawer:', e);
+              }
+            }
+          }
+
+          // Fallback to localStorage if no items from API
+          if (items.length === 0) {
+            const localCart = JSON.parse(localStorage.getItem('brutalist_cart') || '[]');
+            items = localCart;
+            subtotal = items.reduce((acc, item) => {
+              const price = parseFloat(item.discount_price || item.price || 0);
+              return acc + (price * (item.quantity || 1));
+            }, 0);
+          }
+
+          // Render items
+          if (items.length === 0) {
+            itemsContainer.innerHTML = `
+              <div class="empty-cart-message">
+                <p>TU CARRITO ESTÁ VACÍO</p>
+                <button class="btn btn-black" onclick="window.CartDrawer.close()">EMPEZAR A COMPRAR</button>
+              </div>
+            `;
+          } else {
+            itemsContainer.innerHTML = items.map(item => {
+              const productId = item.product_id || item.id;
+              const itemPrice = parseFloat(item.discount_price || item.price || 0);
+              const itemQuantity = item.quantity || 1;
+              const itemTotal = itemPrice * itemQuantity;
+              const itemSize = item.size || null;
+              const sizeParam = itemSize ? `, {size: '${itemSize}'}` : '';
+
+              return `
+                <div class="cart-drawer-item">
+                  <div class="cart-drawer-item-image">
+                    <img src="${item.image_url || 'assets/images/products/placeholder.jpg'}" 
+                         alt="${item.name}" 
+                         loading="lazy"
+                         onerror="this.src='assets/images/products/placeholder.jpg'">
+                  </div>
+                  <div class="cart-drawer-item-details">
+                    <h4>${item.name || 'Producto'}</h4>
+                    ${item.brand ? `<span class="cart-drawer-item-brand">${item.brand}</span>` : ''}
+                    ${itemSize ? `<span class="cart-drawer-item-size">Talla: ${itemSize}</span>` : ''}
+                    <div class="cart-drawer-item-quantity">
+                      <button class="qty-btn" onclick="window.cartEngine?.updateQty(${productId}, ${itemQuantity - 1}${sizeParam})" ${itemQuantity <= 1 ? 'disabled' : ''}>-</button>
+                      <span>${itemQuantity}</span>
+                      <button class="qty-btn" onclick="window.cartEngine?.updateQty(${productId}, ${itemQuantity + 1}${sizeParam})">+</button>
+                    </div>
+                  </div>
+                  <div class="cart-drawer-item-price">
+                    <span>S/ ${itemTotal.toFixed(2)}</span>
+                    <button class="remove-btn" onclick="window.cartEngine?.removeItem(${productId}${sizeParam})" aria-label="Eliminar">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </div>
+              `;
+            }).join('');
+          }
+
+          // Update total
+          if (totalElement) {
+            totalElement.textContent = `S/ ${subtotal.toFixed(2)}`;
+          }
+        } catch (e) {
+          if (window.Logger) window.Logger.error('Error updating cart drawer:', e);
+          itemsContainer.innerHTML = `
+            <div class="empty-cart-message">
+              <p>Error al cargar el carrito</p>
+              <button class="btn btn-black" onclick="window.location.reload()">RECARGAR</button>
+            </div>
+          `;
         }
       }
     };
