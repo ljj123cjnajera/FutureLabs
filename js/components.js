@@ -786,8 +786,8 @@ class Components {
                 <span class="product-price-current">S/ ${parseFloat(product.price).toFixed(2)}</span>
               `}
             </div>
-            <button class="btn-quick-add" onclick="event.preventDefault(); event.stopPropagation(); const cart = window.cartEngine || window.cartManager; if(cart) { cart.add('${product.id}', 1).then(() => { if(window.notifications) window.notifications.success('AÑADIDO', '${product.name.replace(/'/g, "\\'")} al carrito'); }); } else { if(window.notifications) window.notifications.error('Error', 'Carrito no disponible. Por favor, recarga la página.'); }" aria-label="Agregar ${product.name.replace(/"/g, '&quot;')} al carrito">
-                <i class="fas fa-plus" aria-hidden="true"></i>
+            <button class="btn-quick-add" onclick="event.preventDefault(); event.stopPropagation(); window.location.href='product-detail.html?id=${product.id}';" aria-label="Ver detalles de ${product.name.replace(/"/g, '&quot;')}">
+                <i class="fas fa-eye" aria-hidden="true"></i>
             </button>
           </div>
 
