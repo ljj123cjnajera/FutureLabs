@@ -577,8 +577,10 @@ class CatalogEngine {
     }
 
     search(query) {
-        this.currentFilters.search = query;
+        const trimmedQuery = query ? query.trim() : '';
+        this.currentFilters.search = trimmedQuery || null;
         this.currentPage = 1;
+        this.updateURL();
         this.loadProducts(1);
     }
 
