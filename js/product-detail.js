@@ -270,12 +270,15 @@ document.addEventListener('DOMContentLoaded', async function () {
                     </div>
                 </div>
                 
-                <div class="product-actions-detail" style="margin-top: 2rem;">
-                    <button class="btn-add-cart-detail" onclick="window.addToCart()" id="addToCartBtn">
+                <div class="product-actions-detail" style="margin-top: 2rem; display: flex; gap: 15px; flex-wrap: wrap;">
+                    <button class="btn-add-cart-detail" onclick="window.addToCart()" id="addToCartBtn" style="flex: 1; min-width: 200px;">
                         <i class="fas fa-shopping-cart"></i> AGREGAR AL CARRITO
                     </button>
-                    <button class="btn-buy-now-detail" onclick="window.buyNow()" id="buyNowBtn">
+                    <button class="btn-buy-now-detail" onclick="window.buyNow()" id="buyNowBtn" style="flex: 1; min-width: 200px;">
                         <i class="fas fa-bolt"></i> COMPRAR AHORA
+                    </button>
+                    <button class="btn-wishlist-detail" onclick="window.toggleWishlist()" id="wishlistBtn" style="padding: 15px 20px; background: white; border: 2px solid #000; color: #000; cursor: pointer; font-weight: 700; border-radius: 4px;">
+                        <i class="far fa-heart" id="wishlistIcon"></i>
                     </button>
                 </div>
                 
