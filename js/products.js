@@ -475,9 +475,9 @@ class CatalogEngine {
                         </div>
                         
                         <button class="product-btn" 
-                                onclick="event.stopPropagation(); window.catalogEngine.quickAdd(${p.id}, '${p.name}', event)"
+                                onclick="event.stopPropagation(); window.location.href='product-detail.html?id=${p.id}';"
                                 ${(p.stock_quantity || 0) === 0 ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
-                            <i class="fas fa-shopping-cart"></i> ${(p.stock_quantity || 0) === 0 ? 'AGOTADO' : 'AGREGAR AL CARRITO'}
+                            <i class="fas fa-eye"></i> ${(p.stock_quantity || 0) === 0 ? 'AGOTADO' : 'VER DETALLES'}
                         </button>
                     </div>
                 </div>
