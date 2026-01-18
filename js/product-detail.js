@@ -395,6 +395,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                     data-size="${size}"
                     ${!isAvailable ? 'disabled' : ''}
                     type="button"
+                    onclick="window.selectSize('${size}')"
                 >
                     ${size}
                     ${isLowStock ? '<span class="stock-badge">¡Últimas!</span>' : ''}
@@ -402,28 +403,33 @@ document.addEventListener('DOMContentLoaded', async function () {
             `;
         }).join('');
 
-        // Robust Event Delegation
-        grid.onclick = function (e) {
-            const btn = e.target.closest('.size-option');
-            if (!btn || btn.disabled) return;
-
-            const size = btn.dataset.size;
-            if (size) {
-                selectSize(size);
-            }
-        };
+        // Nuclear Fix: Force explicit onclick assignment if needed, although inline attribute handles it
+        // We leave this empty or for logging, as we moved logic to inline onclick
     }
+
+    // Expose explicitly to window scope before usage
+    window.selectSize = selectSize;
 
     function selectSize(size) {
         // Update variables
         selectedSize = size;
         window.selectedSize = size;
 
-        // Update UI
-        document.querySelectorAll('.size-option').forEach(btn => {
+        // Update UI logic - Force reflow and strict class adding
+        const allBtns = document.querySelectorAll('.size-option');
+        allBtns.forEach(btn => {
+            // Remove from all
             btn.classList.remove('selected');
+            btn.style.background = ''; // Clear inline styles if any
+            btn.style.color = '';
+
+            // Add to target
             if (btn.dataset.size === size) {
                 btn.classList.add('selected');
+                // Force inline styles as fallback "Nuclear" option
+                btn.style.background = '#000000';
+                btn.style.color = '#ffffff';
+                btn.style.borderColor = '#000000';
             }
         });
 
@@ -431,8 +437,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         const errorMsg = document.getElementById('sizeValidationMsg');
         if (errorMsg) errorMsg.classList.remove('visible');
 
-        // Console visual confirmation (for debugging)
-        if (window.Logger) window.Logger.log('📏 Talla seleccionada:', size);
+        if (window.Logger) window.Logger.log('📏 Talla seleccionada (Global):', size);
     }
 
     window.selectSize = selectSize;

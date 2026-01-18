@@ -158,9 +158,9 @@
 }
 
 .size-option.selected {
-    background: var(--black);
-    color: var(--white);
-    border-color: var(--black);
+    background: var(--black) !important;
+    color: var(--white) !important;
+    border-color: var(--black) !important;
 }
 
 .size-option.disabled {
