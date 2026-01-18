@@ -320,7 +320,7 @@ class AdminCRUD {
     };
 
     this.deleteProduct = async (id) => {
-      if (confirm('¿Estás seguro de eliminar este producto?')) {
+      if (window.confirm && window.confirm('¿Estás seguro de eliminar este producto?')) {
         try {
           const response = await window.api.request(`/admin/products/${id}`, { method: 'DELETE' });
 
@@ -436,7 +436,7 @@ class AdminCRUD {
     };
 
     this.deleteCategory = async (id) => {
-      if (confirm('¿Estás seguro de eliminar esta categoría?')) {
+      if (window.confirm && window.confirm('¿Estás seguro de eliminar esta categoría?')) {
         try {
           const response = await window.api.request(`/admin/categories/${id}`, { method: 'DELETE' });
 
@@ -593,20 +593,21 @@ class AdminCRUD {
     };
 
     this.deleteReview = async (id) => {
-      if (confirm('¿Estás seguro de eliminar esta reseña?')) {
+      if (window.confirm && window.confirm('¿Estás seguro de eliminar esta reseña?')) {
         try {
           const response = await window.api.request(`/admin/reviews/${id}`, { method: 'DELETE' });
 
           if (response.success) {
-            window.notifications.success('Reseña eliminada exitosamente');
+            if (window.notifications) window.notifications.success('Reseña eliminada exitosamente');
             if (window.adminManager) {
               window.adminManager.loadReviews();
             }
           } else {
-            window.notifications.error('Error al eliminar reseña');
+            if (window.notifications) window.notifications.error('Error al eliminar reseña');
           }
         } catch (error) {
-          window.notifications.error('Error al eliminar reseña');
+          if (window.Logger) window.Logger.error('Error deleting review:', error);
+          if (window.notifications) window.notifications.error('Error al eliminar reseña: ' + (error.message || 'Error desconocido'));
         }
       }
     };
