@@ -733,13 +733,11 @@ document.addEventListener('DOMContentLoaded', async function () {
                         if (isNowInWishlist) {
                             // Now in wishlist - show filled heart
                             icon.className = 'fas fa-heart';
-                            btn.style.background = '#d32f2f';
-                            btn.style.color = '#fff';
+                            btn.classList.add('active');
                         } else {
                             // Now removed - show empty heart
                             icon.className = 'far fa-heart';
-                            btn.style.background = 'white';
-                            btn.style.color = '#000';
+                            btn.classList.remove('active');
                         }
                     }
                     
