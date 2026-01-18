@@ -345,24 +345,67 @@ class AdminManager {
     try {
       const response = await window.api.request('/admin/dashboard/stats');
 
-      if (response.success) {
+      if (response.success && response.data) {
         const { overview, orders_by_status, top_products, sales_by_day, payment_methods } = response.data;
 
-        // Actualizar estadísticas
-        document.getElementById('totalProducts').textContent = overview.total_products;
-        document.getElementById('totalUsers').textContent = overview.total_users;
-        document.getElementById('totalOrders').textContent = overview.total_orders;
-        document.getElementById('totalSales').textContent = `S/ ${parseFloat(overview.total_sales).toFixed(2)}`;
+        // Actualizar estadísticas con validación
+        const totalProductsEl = document.getElementById('totalProducts');
+        const totalUsersEl = document.getElementById('totalUsers');
+        const totalOrdersEl = document.getElementById('totalOrders');
+        const totalSalesEl = document.getElementById('totalSales');
 
-        // Renderizar gráficos
-        this.renderCharts(orders_by_status, top_products, sales_by_day, payment_methods);
+        if (totalProductsEl && overview) {
+          totalProductsEl.textContent = overview.total_products || 0;
+        }
+        if (totalUsersEl && overview) {
+          totalUsersEl.textContent = overview.total_users || 0;
+        }
+        if (totalOrdersEl && overview) {
+          totalOrdersEl.textContent = overview.total_orders || 0;
+        }
+        if (totalSalesEl && overview) {
+          totalSalesEl.textContent = `S/ ${parseFloat(overview.total_sales || 0).toFixed(2)}`;
+        }
+
+        // Renderizar gráficos con validación
+        if (window.Chart) {
+          this.renderCharts(
+            orders_by_status || [],
+            top_products || [],
+            sales_by_day || [],
+            payment_methods || []
+          );
+        } else {
+          if (window.Logger) window.Logger.warn('Chart.js no disponible, gráficos no se renderizarán');
+        }
 
         // Cargar pedidos recientes
         await this.loadRecentOrders();
+      } else {
+        throw new Error(response.message || 'Error al obtener datos del dashboard');
       }
     } catch (error) {
       if (window.Logger) window.Logger.error('Error loading dashboard:', error);
-      window.notifications.error('Error al cargar dashboard');
+      const errorMsg = error.message || 'Error al cargar dashboard';
+      if (window.notifications) {
+        window.notifications.error('Error', errorMsg);
+      }
+      
+      // Mostrar mensaje de error en el dashboard
+      const dashboardSection = document.getElementById('dashboard');
+      if (dashboardSection) {
+        const errorDiv = document.createElement('div');
+        errorDiv.style.cssText = 'padding: 2rem; text-align: center; color: #ef4444;';
+        errorDiv.innerHTML = `
+          <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+          <p style="font-size: 1.1rem; font-weight: 600;">Error al cargar dashboard</p>
+          <p style="font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.8;">${errorMsg}</p>
+          <button class="btn-primary" onclick="window.adminManager?.loadDashboard()" style="margin-top: 1rem;">
+            <i class="fas fa-redo"></i> Reintentar
+          </button>
+        `;
+        dashboardSection.appendChild(errorDiv);
+      }
     }
   }
 
