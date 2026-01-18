@@ -31,10 +31,29 @@ class RecentlyViewed {
 
     const price = Number(rawProduct.price ?? rawProduct.discount_price ?? 0);
     const discountPrice = Number(rawProduct.discount_price ?? 0);
-    const imageUrl = rawProduct.image_url ||
-      rawProduct.thumbnail ||
-      rawProduct.images?.[0] ||
-      this.defaultImage;
+    
+    // Normalize image URL using shared utility if available
+    let imageUrl = rawProduct.image_url || rawProduct.thumbnail || this.defaultImage;
+    
+    if (rawProduct.images && window.Utils?.normalizeImageUrls) {
+      const normalizedImages = window.Utils.normalizeImageUrls(rawProduct.images, '');
+      if (normalizedImages.length > 0) {
+        imageUrl = normalizedImages[0];
+      }
+    } else if (Array.isArray(rawProduct.images) && rawProduct.images.length > 0) {
+      // Fallback if utils not available
+      const firstImg = rawProduct.images[0];
+      if (firstImg && window.Utils?.isValidImageUrl?.(firstImg)) {
+        imageUrl = firstImg;
+      } else if (firstImg && typeof firstImg === 'string' && firstImg.trim() !== '' && !firstImg.includes('undefined')) {
+        imageUrl = firstImg;
+      }
+    }
+    
+    // Validate final imageUrl
+    if (window.Utils?.isValidImageUrl && !window.Utils.isValidImageUrl(imageUrl)) {
+      imageUrl = this.defaultImage;
+    }
 
     return {
       id: rawProduct.id,
