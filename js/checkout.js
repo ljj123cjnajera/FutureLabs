@@ -21,11 +21,11 @@ class CheckoutManager {
     async init() {
         if (window.Logger) window.Logger.log('💳 CheckoutManager V2 Starting...');
 
-        // 1. Auth Guard
-        if (!window.authManager || !window.authManager.isAuthenticated()) {
-            window.location.href = 'login.html?returnUrl=checkout.html';
-            return;
-        }
+        // 1. Auth Guard - REMOVED for Guest Checkout
+        // if (!window.authManager || !window.authManager.isAuthenticated()) {
+        //     window.location.href = 'login.html?returnUrl=checkout.html';
+        //     return;
+        // }
 
         // 2. Load Data
         await this.loadCart();
@@ -176,8 +176,15 @@ class CheckoutManager {
     }
 
     getAddressFormHtml() {
+        const isGuest = !window.authManager || !window.authManager.isAuthenticated();
         return `
             <form id="addressForm">
+                ${isGuest ? `
+                <div class="form-group">
+                    <label>Email Address (Para confirmación del pedido)</label>
+                    <input type="email" name="email" required>
+                </div>
+                ` : ''}
                 <div class="form-row">
                     <div class="form-group half">
                         <label>First Name</label>
@@ -204,7 +211,7 @@ class CheckoutManager {
                 </div>
                  <div class="form-group">
                     <label>Country</label>
-                    <input type="text" name="country" value="United States" required>
+                    <input type="text" name="country" value="Perú" required>
                 </div>
                 <div class="form-group">
                     <label>Phone</label>
@@ -237,7 +244,19 @@ class CheckoutManager {
 
         const formData = new FormData(form);
         const addressData = Object.fromEntries(formData);
-        // Defaults
+
+        // Handle Guest Flow
+        if (!window.authManager || !window.authManager.isAuthenticated()) {
+            this.guestAddress = addressData;
+            this.guestEmail = addressData.email;
+            this.selectedAddressId = 'GUEST_ADDR';
+
+            // Advance to Payment immediately
+            this.renderStep(2);
+            return;
+        }
+
+        // Handle Auth Flow
         addressData.is_default = this.addresses.length === 0;
         addressData.type = 'shipping';
 
@@ -362,7 +381,12 @@ class CheckoutManager {
             return;
         }
 
-        const addr = this.addresses.find(a => a.id == this.selectedAddressId);
+        let addr = this.addresses.find(a => a.id == this.selectedAddressId);
+
+        // Use Guest Address if applicable
+        if (this.selectedAddressId === 'GUEST_ADDR' && this.guestAddress) {
+            addr = this.guestAddress;
+        }
 
         const cartTotal = this.cart.reduce((sum, i) => sum + (i.price * i.quantity), 0);
         const shipping = cartTotal > 150 ? 0 : 15;
@@ -375,6 +399,7 @@ class CheckoutManager {
                 <div class="review-block">
                     <h4>ENVIAR A:</h4>
                     <p><strong>${addr.first_name} ${addr.last_name}</strong></p>
+                    <p>${addr.email ? `<span>${addr.email}</span><br>` : ''}</p>
                     <p>${addr.street_address || addr.street}</p>
                     <p>${addr.city}${addr.region ? ', ' + addr.region : ''}, ${addr.postal_code}</p>
                     <p>${addr.country || 'Perú'}</p>
@@ -472,13 +497,24 @@ class CheckoutManager {
                     price: item.discount_price || item.price, // Optional, backend might verify
                     size: item.size || null // Include size if available
                 })),
-                shipping_address_id: this.selectedAddressId,
                 payment_method: this.paymentMethod === 'card' ? 'credit_card' : this.paymentMethod,
                 payment_details: {
                     provider: 'stripe',
                     transaction_id: 'tx_' + Date.now() // Placeholder for actual gateway integration
                 }
             };
+
+            // Handle Address (Guest vs Auth)
+            if (this.selectedAddressId === 'GUEST_ADDR' && this.guestAddress) {
+                // If backend supports raw address object:
+                orderData.shipping_address = this.guestAddress;
+                // If backend requires discrete fields, spread them:
+                // ...this.guestAddress
+
+                if (this.guestEmail) orderData.email = this.guestEmail;
+            } else {
+                orderData.shipping_address_id = this.selectedAddressId;
+            }
 
             if (window.Logger) window.Logger.log('📤 Placing Order:', orderData);
             const response = await window.api.createOrder(orderData);
