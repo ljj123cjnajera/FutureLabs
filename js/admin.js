@@ -212,18 +212,6 @@ class AdminManager {
     }
   }
 
-  // Este método ya no es necesario, loadDashboard() maneja todo
-      const revenueEl = document.querySelector('.metric-card:first-child .metric-value');
-      if (revenueEl) revenueEl.textContent = `S/ ${totalRevenue.toFixed(2)}`;
-
-      // Update Charts
-      this.updateCharts(orders);
-
-    } catch (e) {
-      if (window.Logger) window.Logger.error('Dashboard Sync Error:', e);
-    }
-  }
-
   updateCharts(orders) {
     if (!this.charts) return;
 
