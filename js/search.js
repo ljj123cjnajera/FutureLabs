@@ -253,17 +253,47 @@ class SearchEngine {
     }
 
     sortResults(criteria) {
-        if (criteria === 'price_asc') {
-            this.results.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
-        } else if (criteria === 'price_desc') {
-            this.results.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
-        } else if (criteria === 'name_asc') {
-            this.results.sort((a, b) => a.name.localeCompare(b.name));
-        } else {
-            // Newest (Default usually, if we have ID or date)
-            this.results.sort((a, b) => b.id - a.id);
+        if (!this.results || this.results.length === 0) return;
+        
+        try {
+            if (criteria === 'price_asc') {
+                this.results.sort((a, b) => {
+                    const priceA = parseFloat(a.discount_price || a.price || 0);
+                    const priceB = parseFloat(b.discount_price || b.price || 0);
+                    return priceA - priceB;
+                });
+            } else if (criteria === 'price_desc') {
+                this.results.sort((a, b) => {
+                    const priceA = parseFloat(a.discount_price || a.price || 0);
+                    const priceB = parseFloat(b.discount_price || b.price || 0);
+                    return priceB - priceA;
+                });
+            } else if (criteria === 'name_asc') {
+                this.results.sort((a, b) => {
+                    const nameA = (a.name || '').toLowerCase();
+                    const nameB = (b.name || '').toLowerCase();
+                    return nameA.localeCompare(nameB);
+                });
+            } else if (criteria === 'name_desc') {
+                this.results.sort((a, b) => {
+                    const nameA = (a.name || '').toLowerCase();
+                    const nameB = (b.name || '').toLowerCase();
+                    return nameB.localeCompare(nameA);
+                });
+            } else {
+                // Newest (Default) - sort by ID descending
+                this.results.sort((a, b) => {
+                    const idA = parseInt(a.id || 0);
+                    const idB = parseInt(b.id || 0);
+                    return idB - idA;
+                });
+            }
+            this.renderResults();
+        } catch (e) {
+            if (window.Logger) window.Logger.error('Error sorting results:', e);
+            // Continue with unsorted results
+            this.renderResults();
         }
-        this.renderResults();
     }
 }
 
