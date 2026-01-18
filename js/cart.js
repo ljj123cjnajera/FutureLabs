@@ -188,7 +188,10 @@ class CartEngine {
       if (!this.isAuthenticated) {
         const localCart = JSON.parse(localStorage.getItem('brutalist_cart') || '[]');
         items = localCart;
-        subtotal = items.reduce((acc, item) => acc + (parseFloat(item.price || 0) * (item.quantity || 1)), 0);
+        subtotal = items.reduce((acc, item) => {
+          const price = parseFloat(item.discount_price || item.price || 0);
+          return acc + (price * (item.quantity || 1));
+        }, 0);
         total = subtotal;
         
         if (items.length === 0) {
