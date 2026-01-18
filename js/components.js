@@ -7,7 +7,7 @@ class Components {
     try {
       // Usar brutalist_cart consistentemente (eliminar referencia a 'cart' viejo)
       let count = 0;
-      
+
       // Si está autenticado y cartEngine está disponible, usar su contador
       if (window.authManager?.isAuthenticated() && window.cartEngine) {
         // El cartEngine maneja el contador automáticamente desde API
@@ -21,11 +21,11 @@ class Components {
           }
         }
       }
-      
+
       // Fallback a localStorage (brutalist_cart)
       const cart = JSON.parse(localStorage.getItem('brutalist_cart') || '[]');
       count = cart.reduce((total, item) => total + (item.quantity || 1), 0);
-      
+
       document.querySelectorAll('.cart-count').forEach(el => {
         el.textContent = count;
         // Optional: Hide badge if 0
@@ -339,12 +339,12 @@ class Components {
   static initCartDrawer() {
     const cartDrawer = document.getElementById('cartDrawer');
     const cartDrawerOverlay = document.getElementById('cartDrawerOverlay');
-    
+
     if (!cartDrawer || !cartDrawerOverlay) {
       if (window.Logger) window.Logger.warn('⚠️ Cart drawer elements not found. Make sure getHeader() is called first.');
       return;
     }
-    
+
     window.CartDrawer = {
       open: () => {
         const drawer = document.getElementById('cartDrawer');
@@ -476,7 +476,7 @@ class Components {
     // Prevenir inicialización duplicada
     if (window.searchOverlayInitialized) return;
     window.searchOverlayInitialized = true;
-    
+
     window.SearchOverlay = {
       open: () => {
         const overlay = document.getElementById('searchOverlay');
@@ -514,10 +514,10 @@ class Components {
 
     // Initialize Cart Drawer (must be done after header HTML is injected)
     this.initCartDrawer();
-    
+
     // Initialize Search Overlay
     this.initSearchOverlay();
-    
+
     // MobileMenu is initialized globally below (line 763), no need to init here
 
     // Ticker Animation Logic - Mensajes más convincentes
@@ -541,7 +541,7 @@ class Components {
           }
         }, 500);
       }, 4000);
-      
+
       // Guardar interval ID globalmente para poder limpiarlo
       window.announcementTickerInterval = tickerInterval;
     }
@@ -605,7 +605,7 @@ class Components {
     // Prevenir inicialización duplicada
     if (window.searchInitialized) return;
     window.searchInitialized = true;
-    
+
     // Init logic for Header Search Input
     const input = document.getElementById('headerSearchInput');
     if (input) {
@@ -706,7 +706,7 @@ class Components {
 
   static ensureAutocompleteAssets() {
     if (typeof document === 'undefined') return;
-    
+
     // Prevenir bucle infinito
     if (this._autocompleteInitializing) return;
     this._autocompleteInitializing = true;
@@ -745,7 +745,7 @@ class Components {
       this._autocompleteInitializing = false;
       return;
     }
-    
+
     if (window.searchAutocomplete && typeof window.searchAutocomplete.init === 'function') {
       // Solo inicializar si no está ya inicializado
       if (!window.searchAutocomplete.initialized) {
@@ -777,7 +777,7 @@ class Components {
     // Prevenir inicialización duplicada
     if (window.cartCounterInitialized) return;
     window.cartCounterInitialized = true;
-    
+
     // Actualizar contador de carrito
     document.addEventListener('cartUpdated', (e) => {
       const cartCount = document.querySelector('.cart-count');
@@ -811,11 +811,11 @@ class Components {
 
     // Normalize image URL - validate before using
     let imageUrl = placeholderImg;
-    if (product.image_url && 
-        product.image_url.trim() !== '' && 
-        !product.image_url.includes('undefined') &&
-        !product.image_url.includes('null') &&
-        (product.image_url.startsWith('http') || product.image_url.startsWith('/') || product.image_url.startsWith('assets/'))) {
+    if (product.image_url &&
+      product.image_url.trim() !== '' &&
+      !product.image_url.includes('undefined') &&
+      !product.image_url.includes('null') &&
+      (product.image_url.startsWith('http') || product.image_url.startsWith('/') || product.image_url.startsWith('assets/'))) {
       imageUrl = product.image_url;
     } else if (Array.isArray(product.images) && product.images.length > 0 && product.images[0]) {
       const firstImg = product.images[0];
@@ -876,7 +876,7 @@ class Components {
           </div>
         </div>
 
-        <div class="product-content">
+          <div class="product-content">
           <span class="product-category">${product.brand || 'Sneakers'}</span>
           <h3 class="product-title" onclick="window.location.href='product-detail.html?id=${product.id}'" style="cursor: pointer;">${product.name}</h3>
           
@@ -889,16 +889,18 @@ class Components {
                 <span class="product-price-current">S/ ${parseFloat(product.price).toFixed(2)}</span>
               `}
             </div>
-            <button class="btn-quick-add" onclick="event.preventDefault(); event.stopPropagation(); window.location.href='product-detail.html?id=${product.id}';" aria-label="Ver detalles de ${product.name.replace(/"/g, '&quot;')}">
-                <i class="fas fa-eye" aria-hidden="true"></i>
-            </button>
           </div>
 
           <div class="product-size-preview">${sizeText}</div>
 
-          <button class="product-btn" onclick="event.stopPropagation(); window.location.href='product-detail.html?id=${product.id}';" aria-label="Ver detalles de ${product.name.replace(/"/g, '&quot;')}">
-            VER DETALLES
-          </button>
+          <div class="product-card-actions" style="display: flex; gap: 8px; margin-top: 12px;">
+              <button class="product-btn" onclick="event.stopPropagation(); window.location.href='product-detail.html?id=${product.id}';" aria-label="Ver detalles" style="flex: 1; background: transparent; border: 1px solid var(--black); color: var(--black);">
+                VER DETALLES
+              </button>
+              <button class="product-btn-add" onclick="event.stopPropagation(); window.location.href='product-detail.html?id=${product.id}';" aria-label="Agregar al carrito" style="flex: 1; background: var(--black); color: var(--white); border: 1px solid var(--black); font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                <i class="fas fa-shopping-cart"></i> AGREGAR
+              </button>
+          </div>
         </div>
       </div>
       `;
