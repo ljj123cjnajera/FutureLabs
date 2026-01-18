@@ -337,24 +337,22 @@ class QuickView {
         btn.disabled = true;
       }
 
-      // Add to cart using engine
+      // Add to cart using engine (Robust method: handles Guests + Auth + Stock)
       if (window.cartEngine) {
-        await window.cartEngine.api.addToCart(productId, 1, { size: this.selectedSize });
+        // Use cartEngine.add() instead of direct API call to support LocalStorage/Guests
+        const success = await window.cartEngine.add(productId, 1, { size: this.selectedSize });
 
-        // Refresh cart UI
-        await window.cartEngine.loadCart();
+        if (success) {
+          // Success notification is handled by cartEngine, but we can do extra UI cleanup here
+          this.close();
 
-        // Show success notification
-        if (window.notifications) {
-          window.notifications.success('¡Agregado!', 'Producto añadido al carrito correctamente');
+          // Open cart drawer if available
+          if (window.CartDrawer) {
+            window.CartDrawer.open();
+          }
         }
-
-        this.close();
-
-        // Open cart drawer if available
-        if (window.CartDrawer) {
-          window.CartDrawer.open();
-        }
+      } else {
+        throw new Error('Sistema de carrito no disponible');
       }
     } catch (e) {
       console.error('Error adding to cart:', e);
