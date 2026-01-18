@@ -1174,9 +1174,37 @@ function openCategoryModal() {
   }
 }
 
-// Inicializar
-const adminManager = new AdminManager();
-window.adminManager = adminManager; // Exponer globalmente para adminCRUD
+// Inicializar cuando el DOM esté listo y las dependencias estén cargadas
+(function() {
+  function initAdmin() {
+    // Verificar que las dependencias críticas estén disponibles
+    if (!window.api || !window.Chart) {
+      // Esperar un poco más si no están disponibles
+      if (window.Logger) window.Logger.log('⏳ Esperando dependencias (api, Chart.js)...');
+      setTimeout(initAdmin, 100);
+      return;
+    }
+
+    // Crear instancia y inicializar
+    if (!window.adminManager) {
+      window.adminManager = new AdminManager();
+      window.adminManager.init().catch(error => {
+        if (window.Logger) window.Logger.error('Error inicializando AdminManager:', error);
+        if (window.notifications) {
+          window.notifications.error('Error', 'No se pudo inicializar el panel de administración');
+        }
+      });
+    }
+  }
+
+  // Inicializar cuando el DOM esté listo
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAdmin);
+  } else {
+    // DOM ya está listo
+    initAdmin();
+  }
+})();
 
 // ===== FUNCIONES DE REPORTES =====
 async function exportSalesReport() {
