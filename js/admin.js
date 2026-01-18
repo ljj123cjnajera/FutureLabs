@@ -342,7 +342,17 @@ class AdminManager {
 
   // Dashboard
   async loadDashboard() {
+    const dashboard = document.getElementById('dashboard');
     try {
+      if (window.LoadingStates) {
+        // Usar 'skeleton' si es posible, o 'spinner' con overlay
+        window.LoadingStates.show(dashboard, {
+          message: 'Actualizando métricas...',
+          overlay: true,
+          type: 'spinner'
+        });
+      }
+
       const response = await window.api.request('/admin/dashboard/stats');
 
       if (response.success && response.data) {
@@ -387,25 +397,12 @@ class AdminManager {
     } catch (error) {
       if (window.Logger) window.Logger.error('Error loading dashboard:', error);
       const errorMsg = error.message || 'Error al cargar dashboard';
-      if (window.notifications) {
-        window.notifications.error('Error', errorMsg);
-      }
-      
-      // Mostrar mensaje de error en el dashboard
-      const dashboardSection = document.getElementById('dashboard');
-      if (dashboardSection) {
-        const errorDiv = document.createElement('div');
-        errorDiv.style.cssText = 'padding: 2rem; text-align: center; color: #ef4444;';
-        errorDiv.innerHTML = `
-          <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-          <p style="font-size: 1.1rem; font-weight: 600;">Error al cargar dashboard</p>
-          <p style="font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.8;">${errorMsg}</p>
-          <button class="btn-primary" onclick="window.adminManager?.loadDashboard()" style="margin-top: 1rem;">
-            <i class="fas fa-redo"></i> Reintentar
-          </button>
-        `;
-        dashboardSection.appendChild(errorDiv);
-      }
+      window.notifications?.error('Error', errorMsg);
+
+      // No reemplazamos todo el dashboard con error, solo notificamos
+      // para mantener la UI visible aunque sea con datos viejos o vacíos
+    } finally {
+      if (window.LoadingStates) window.LoadingStates.hide(dashboard);
     }
   }
 
@@ -490,8 +487,19 @@ class AdminManager {
     const tbody = document.getElementById('productsTable');
     if (!tbody) return;
 
-    // Mostrar estado de carga
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;"><div class="loading-spinner"></div><p style="margin-top: 10px; color: #666;">Cargando productos...</p></td></tr>';
+    // Buscar el contenedor padre para el overlay
+    const container = tbody.closest('.table-responsive') || tbody.parentElement;
+
+    // Mostrar estado de carga (Overlay)
+    if (window.LoadingStates) {
+      window.LoadingStates.show(container, {
+        message: 'Cargando productos...',
+        overlay: true,
+        type: 'spinner'
+      });
+    } else {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;"><div class="loading-spinner"></div><p style="margin-top: 10px; color: #666;">Cargando productos...</p></td></tr>';
+    }
 
     try {
       const response = await window.api.getProducts();
@@ -511,38 +519,37 @@ class AdminManager {
               </td>
             </tr>
           `;
-          return;
+        } else {
+          // Usar utilidad centralizada para escapar HTML (prevenir XSS)
+          const escapeHtml = (text) => {
+            if (window.Utils && window.Utils.escapeHTML) {
+              return window.Utils.escapeHTML(text);
+            }
+            // Fallback si Utils no está disponible
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+          };
+
+          tbody.innerHTML = products.map(product => `
+                  <tr>
+                    <td>${escapeHtml(product.id.substring(0, 8))}...</td>
+                    <td>${escapeHtml(product.name)}</td>
+                    <td>${escapeHtml(product.category_name || 'Sin categoría')}</td>
+                    <td>S/ ${parseFloat(product.price || 0).toFixed(2)}</td>
+                    <td>${parseInt(product.stock_quantity || 0)}</td>
+                    <td><span class="badge badge-${product.is_active ? 'success' : 'danger'}">${product.is_active ? 'Activo' : 'Inactivo'}</span></td>
+                    <td>
+                      <button class="btn-action btn-edit" onclick="window.editProduct('${escapeHtml(product.id)}', event)" aria-label="Editar producto">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button class="btn-action btn-delete" onclick="window.deleteProduct('${escapeHtml(product.id)}')" aria-label="Eliminar producto">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+            `).join('');
         }
-
-        // Usar utilidad centralizada para escapar HTML (prevenir XSS)
-        const escapeHtml = (text) => {
-          if (window.Utils && window.Utils.escapeHTML) {
-            return window.Utils.escapeHTML(text);
-          }
-          // Fallback si Utils no está disponible
-          const div = document.createElement('div');
-          div.textContent = text;
-          return div.innerHTML;
-        };
-
-        tbody.innerHTML = products.map(product => `
-              <tr>
-                <td>${escapeHtml(product.id.substring(0, 8))}...</td>
-                <td>${escapeHtml(product.name)}</td>
-                <td>${escapeHtml(product.category_name || 'Sin categoría')}</td>
-                <td>S/ ${parseFloat(product.price || 0).toFixed(2)}</td>
-                <td>${parseInt(product.stock_quantity || 0)}</td>
-                <td><span class="badge badge-${product.is_active ? 'success' : 'danger'}">${product.is_active ? 'Activo' : 'Inactivo'}</span></td>
-                <td>
-                  <button class="btn-action btn-edit" onclick="window.editProduct('${escapeHtml(product.id)}', event)" aria-label="Editar producto">
-                    <i class="fas fa-edit"></i>
-                  </button>
-                  <button class="btn-action btn-delete" onclick="window.deleteProduct('${escapeHtml(product.id)}')" aria-label="Eliminar producto">
-                    <i class="fas fa-trash"></i>
-                  </button>
-                </td>
-              </tr>
-        `).join('');
 
         // Cargar categorías en el select del modal
         await this.loadCategoriesForProductModal();
@@ -550,21 +557,30 @@ class AdminManager {
     } catch (error) {
       if (window.Logger) window.Logger.error('Error loading products:', error);
       const errorMsg = error.message || error.status === 401 ? 'Sesión expirada. Por favor, inicia sesión nuevamente.' : 'Error desconocido al cargar productos';
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="7" style="text-align: center; padding: 60px 20px;">
-            <div style="color: #ef4444;">
-              <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 16px; opacity: 0.7;"></i>
-              <p style="font-size: 16px; margin: 0; font-weight: 600;">Error al cargar productos</p>
-              <p style="font-size: 14px; margin-top: 8px; opacity: 0.8;">${errorMsg}</p>
-              <button class="btn-primary" onclick="window.adminManager?.loadProducts()" style="margin-top: 16px;">
-                <i class="fas fa-redo"></i> Reintentar
-              </button>
-            </div>
-          </td>
-        </tr>
-      `;
-      window.notifications?.error('Error al cargar productos: ' + errorMsg);
+
+      if (window.LoadingStates && window.LoadingStates.error) {
+        // Si LoadingStates tiene manejo de errores limpio
+        window.notifications?.error('Error al cargar productos: ' + errorMsg);
+        // Fallback visual en tabla
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px; color: #ef4444;">${errorMsg}</td></tr>`;
+      } else {
+        tbody.innerHTML = `
+            <tr>
+              <td colspan="7" style="text-align: center; padding: 60px 20px;">
+                <div style="color: #ef4444;">
+                  <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 16px; opacity: 0.7;"></i>
+                  <p style="font-size: 16px; margin: 0; font-weight: 600;">Error al cargar productos</p>
+                  <p style="font-size: 14px; margin-top: 8px; opacity: 0.8;">${errorMsg}</p>
+                  <button class="btn-primary" onclick="window.adminManager?.loadProducts()" style="margin-top: 16px;">
+                    <i class="fas fa-redo"></i> Reintentar
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+      }
+    } finally {
+      if (window.LoadingStates) window.LoadingStates.hide(container);
     }
   }
 
@@ -575,7 +591,7 @@ class AdminManager {
       if (response.success && response.data) {
         const categories = response.data.categories || [];
         const select = document.getElementById('productCategory');
-        
+
         if (!select) {
           if (window.Logger) window.Logger.warn('productCategory select no encontrado');
           return;
@@ -605,8 +621,14 @@ class AdminManager {
     const tbody = document.getElementById('categoriesTable');
     if (!tbody) return;
 
-    // Mostrar estado de carga
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px;"><div class="loading-spinner"></div><p style="margin-top: 10px; color: #666;">Cargando categorías...</p></td></tr>';
+    // Buscar el contenedor padre para el overlay
+    const container = tbody.closest('.table-responsive') || tbody.parentElement;
+
+    if (window.LoadingStates) {
+      window.LoadingStates.show(container, { message: 'Cargando categorías...', overlay: true, type: 'spinner' });
+    } else {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px;"><div class="loading-spinner"></div><p style="margin-top: 10px; color: #666;">Cargando categorías...</p></td></tr>';
+    }
 
     try {
       const response = await window.api.getCategories();
@@ -670,6 +692,8 @@ class AdminManager {
         </tr>
       `;
       window.notifications?.error('Error al cargar categorías: ' + errorMsg);
+    } finally {
+      if (window.LoadingStates && container) window.LoadingStates.hide(container);
     }
   }
 
@@ -678,8 +702,14 @@ class AdminManager {
     const tbody = document.getElementById('ordersTable');
     if (!tbody) return;
 
-    // Mostrar estado de carga
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;"><div class="loading-spinner"></div> Cargando pedidos...</td></tr>';
+    // Buscar el contenedor padre para el overlay
+    const container = tbody.closest('.table-responsive') || tbody.parentElement;
+
+    if (window.LoadingStates) {
+      window.LoadingStates.show(container, { message: 'Cargando pedidos...', overlay: true, type: 'spinner' });
+    } else {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;"><div class="loading-spinner"></div> Cargando pedidos...</td></tr>';
+    }
 
     try {
       const response = await window.api.request('/admin/orders');
@@ -745,6 +775,8 @@ class AdminManager {
         </tr>
       `;
       window.notifications?.error('Error al cargar pedidos: ' + errorMsg);
+    } finally {
+      if (window.LoadingStates && container) window.LoadingStates.hide(container);
     }
   }
 
@@ -753,8 +785,14 @@ class AdminManager {
     const tbody = document.getElementById('usersTable');
     if (!tbody) return;
 
-    // Mostrar estado de carga
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;"><div class="loading-spinner"></div> Cargando usuarios...</td></tr>';
+    // Buscar el contenedor padre para el overlay
+    const container = tbody.closest('.table-responsive') || tbody.parentElement;
+
+    if (window.LoadingStates) {
+      window.LoadingStates.show(container, { message: 'Cargando usuarios...', overlay: true, type: 'spinner' });
+    } else {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;"><div class="loading-spinner"></div> Cargando usuarios...</td></tr>';
+    }
 
     try {
       const response = await window.api.request('/admin/users');
@@ -836,6 +874,8 @@ class AdminManager {
         </tr>
       `;
       window.notifications?.error('Error al cargar usuarios: ' + errorMsg);
+    } finally {
+      if (window.LoadingStates && container) window.LoadingStates.hide(container);
     }
   }
 
@@ -844,8 +884,14 @@ class AdminManager {
     const tbody = document.getElementById('reviewsTable');
     if (!tbody) return;
 
-    // Mostrar estado de carga
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;"><div class="loading-spinner"></div><p style="margin-top: 10px; color: #666;">Cargando reseñas...</p></td></tr>';
+    // Buscar el contenedor padre para el overlay
+    const container = tbody.closest('.table-responsive') || tbody.parentElement;
+
+    if (window.LoadingStates) {
+      window.LoadingStates.show(container, { message: 'Cargando reseñas...', overlay: true, type: 'spinner' });
+    } else {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;"><div class="loading-spinner"></div><p style="margin-top: 10px; color: #666;">Cargando reseñas...</p></td></tr>';
+    }
 
     try {
       const response = await window.api.request('/admin/reviews');
@@ -929,6 +975,8 @@ class AdminManager {
         </tr>
       `;
       window.notifications?.error('Error al cargar reseñas: ' + errorMsg);
+    } finally {
+      if (window.LoadingStates && container) window.LoadingStates.hide(container);
     }
   }
 
@@ -1200,7 +1248,7 @@ function openCategoryModal() {
 }
 
 // Inicializar cuando el DOM esté listo y las dependencias estén cargadas
-(function() {
+(function () {
   function initAdmin() {
     // Verificar que las dependencias críticas estén disponibles
     if (!window.api || !window.Chart) {

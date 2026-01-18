@@ -21,11 +21,27 @@ class CheckoutManager {
     async init() {
         if (window.Logger) window.Logger.log('💳 CheckoutManager V2 Starting...');
 
-        // 1. Auth Guard
-        if (!window.authManager || !window.authManager.isAuthenticated()) {
-            window.location.href = 'login.html?returnUrl=checkout.html';
-            return;
+        // 0. Initialize UI Components (Header/Footer)
+        if (window.Components) {
+            const headerContainer = document.getElementById('mainHeader');
+            if (headerContainer) {
+                // Use simplified=true for header to keep checkout clean but consistent
+                headerContainer.innerHTML = window.Components.getHeader(true, true);
+                if (window.Components.initHeader) window.Components.initHeader();
+                if (window.Components.initSearch) window.Components.initSearch();
+            }
+
+            const footerContainer = document.getElementById('mainFooter');
+            if (footerContainer) {
+                footerContainer.innerHTML = window.Components.getFooter();
+            }
         }
+
+        // 1. Auth Guard - REMOVED for Guest Checkout
+        // if (!window.authManager || !window.authManager.isAuthenticated()) {
+        //     window.location.href = 'login.html?returnUrl=checkout.html';
+        //     return;
+        // }
 
         // 2. Load Data
         await this.loadCart();
@@ -37,39 +53,26 @@ class CheckoutManager {
     }
 
     async loadCart() {
-        // Mostrar loading state
         if (window.LoadingStates && this.formContainer) {
-            window.LoadingStates.show(this.formContainer, { 
-                message: 'Cargando carrito...',
-                type: 'spinner'
-            });
+            window.LoadingStates.show(this.formContainer, { message: 'Cargando carrito...', type: 'spinner' });
         }
 
         try {
             // Intentar cargar desde API primero
             if (window.authManager && window.authManager.isAuthenticated() && window.api) {
                 const response = await window.api.getCart();
-                if (response && response.success && response.data && response.data.items) {
-                    this.cart = response.data.items;
-                } else if (response && Array.isArray(response)) {
-                    this.cart = response;
-                } else {
-                    // Fallback a localStorage (usar brutalist_cart consistentemente)
-                    const stored = localStorage.getItem('brutalist_cart');
-                    if (stored) {
-                        this.cart = JSON.parse(stored);
-                    }
-                }
-            } else {
-                // Usuario no autenticado, usar localStorage (brutalist_cart)
+                this.cart = (response && response.success && response.data && response.data.items) ? response.data.items :
+                    (Array.isArray(response) ? response : []);
+            }
+
+            // Si falla API o está vacio, intentar localStorage
+            if (!this.cart || this.cart.length === 0) {
                 const stored = localStorage.getItem('brutalist_cart');
-                if (stored) {
-                    this.cart = JSON.parse(stored);
-                }
+                if (stored) this.cart = JSON.parse(stored);
             }
 
             if (!this.cart || this.cart.length === 0) {
-                if (window.LoadingStates && this.formContainer) {
+                if (window.LoadingStates) {
                     window.LoadingStates.empty(this.formContainer, {
                         icon: 'fas fa-shopping-cart',
                         title: 'Carrito Vacío',
@@ -78,48 +81,23 @@ class CheckoutManager {
                         actionUrl: 'products.html'
                     });
                 }
-                if (window.notifications) {
-                    window.notifications.warning('Tu carrito está vacío', 'Agrega productos antes de continuar');
-                }
-                setTimeout(() => {
-                    window.location.href = 'cart.html';
-                }, 2000);
+                setTimeout(() => window.location.href = 'cart.html', 2000);
                 return;
             }
         } catch (error) {
-            // Usar error handler si está disponible
             if (window.ErrorHandler) {
                 window.ErrorHandler.api(error, 'loadCart', 'No se pudo cargar el carrito');
             } else {
                 if (window.Logger) window.Logger.error('Error loading cart:', error);
-                if (window.notifications) {
-                    window.notifications.error('Error', 'No se pudo cargar el carrito. Por favor, intenta de nuevo.');
-                }
             }
 
-            // Mostrar estado de error
-            if (window.LoadingStates && this.formContainer) {
-                window.LoadingStates.error(this.formContainer, {
-                    title: 'Error al Cargar',
-                    message: 'No se pudo cargar el carrito. Por favor, intenta de nuevo.',
-                    retryLabel: 'Reintentar',
-                    retryCallback: 'window.checkoutManager.loadCart()'
-                });
-            }
-
-            // Fallback a localStorage
+            // Fallback final a localStorage
             const stored = localStorage.getItem('brutalist_cart');
-            if (stored) {
-                this.cart = JSON.parse(stored);
-            }
-            if (!this.cart || this.cart.length === 0) {
-                window.location.href = 'cart.html';
-            }
+            if (stored) this.cart = JSON.parse(stored);
+
+            if (!this.cart || this.cart.length === 0) window.location.href = 'cart.html';
         } finally {
-            // Ocultar loading state
-            if (window.LoadingStates && this.formContainer) {
-                window.LoadingStates.hide(this.formContainer, false);
-            }
+            if (window.LoadingStates) window.LoadingStates.hide(this.formContainer, false);
         }
     }
 
@@ -127,23 +105,19 @@ class CheckoutManager {
         try {
             const response = await window.api.getAddresses();
             if (response.success) {
-                this.addresses = response.data.addresses || response.data; // Handle potential wrapper
-                // Auto-select default or first
-                const defaultAddr = this.addresses.find(a => a.is_default);
-                if (defaultAddr) this.selectedAddressId = defaultAddr.id;
-                else if (this.addresses.length > 0) this.selectedAddressId = this.addresses[0].id;
+                this.addresses = response.data.addresses || response.data || [];
+                // Auto-select
+                if (this.addresses.length > 0) {
+                    const defaultAddr = this.addresses.find(a => a.is_default);
+                    this.selectedAddressId = defaultAddr ? defaultAddr.id : this.addresses[0].id;
+                }
             } else {
-                // Si no hay direcciones, inicializar array vacío
                 this.addresses = [];
             }
         } catch (e) {
-            // Usar error handler si está disponible
             if (window.ErrorHandler) {
                 window.ErrorHandler.api(e, 'loadAddresses', 'No se pudieron cargar las direcciones');
-            } else {
-                if (window.Logger) window.Logger.error('Failed to load addresses:', e);
             }
-            // Inicializar array vacío en caso de error
             this.addresses = [];
         }
     }
@@ -218,8 +192,15 @@ class CheckoutManager {
     }
 
     getAddressFormHtml() {
+        const isGuest = !window.authManager || !window.authManager.isAuthenticated();
         return `
             <form id="addressForm">
+                ${isGuest ? `
+                <div class="form-group">
+                    <label>Email Address (Para confirmación del pedido)</label>
+                    <input type="email" name="email" required>
+                </div>
+                ` : ''}
                 <div class="form-row">
                     <div class="form-group half">
                         <label>First Name</label>
@@ -246,7 +227,7 @@ class CheckoutManager {
                 </div>
                  <div class="form-group">
                     <label>Country</label>
-                    <input type="text" name="country" value="United States" required>
+                    <input type="text" name="country" value="Perú" required>
                 </div>
                 <div class="form-group">
                     <label>Phone</label>
@@ -279,7 +260,19 @@ class CheckoutManager {
 
         const formData = new FormData(form);
         const addressData = Object.fromEntries(formData);
-        // Defaults
+
+        // Handle Guest Flow
+        if (!window.authManager || !window.authManager.isAuthenticated()) {
+            this.guestAddress = addressData;
+            this.guestEmail = addressData.email;
+            this.selectedAddressId = 'GUEST_ADDR';
+
+            // Advance to Payment immediately
+            this.renderStep(2);
+            return;
+        }
+
+        // Handle Auth Flow
         addressData.is_default = this.addresses.length === 0;
         addressData.type = 'shipping';
 
@@ -314,9 +307,6 @@ class CheckoutManager {
                 window.ErrorHandler.api(e, 'saveNewAddress', 'No se pudo guardar la dirección. Verifica tu conexión.');
             } else {
                 if (window.Logger) window.Logger.error('Address Save Failed:', e);
-                if (window.notifications) {
-                    window.notifications.error('Error', 'No se pudo guardar la dirección. Verifica tu conexión.');
-                }
             }
         } finally {
             if (btn) {
@@ -407,7 +397,12 @@ class CheckoutManager {
             return;
         }
 
-        const addr = this.addresses.find(a => a.id == this.selectedAddressId);
+        let addr = this.addresses.find(a => a.id == this.selectedAddressId);
+
+        // Use Guest Address if applicable
+        if (this.selectedAddressId === 'GUEST_ADDR' && this.guestAddress) {
+            addr = this.guestAddress;
+        }
 
         const cartTotal = this.cart.reduce((sum, i) => sum + (i.price * i.quantity), 0);
         const shipping = cartTotal > 150 ? 0 : 15;
@@ -420,6 +415,7 @@ class CheckoutManager {
                 <div class="review-block">
                     <h4>ENVIAR A:</h4>
                     <p><strong>${addr.first_name} ${addr.last_name}</strong></p>
+                    <p>${addr.email ? `<span>${addr.email}</span><br>` : ''}</p>
                     <p>${addr.street_address || addr.street}</p>
                     <p>${addr.city}${addr.region ? ', ' + addr.region : ''}, ${addr.postal_code}</p>
                     <p>${addr.country || 'Perú'}</p>
@@ -439,11 +435,11 @@ class CheckoutManager {
                 <div class="review-block">
                     <h4>PRODUCTOS:</h4>
                     ${this.cart.map(item => {
-                        const price = parseFloat(item.discount_price || item.price || 0);
-                        const quantity = item.quantity || 1;
-                        const itemTotal = price * quantity;
-                        return `<p>${quantity}x ${item.name}${item.size ? ' (Talla: ' + item.size + ')' : ''} - S/ ${itemTotal.toFixed(2)}</p>`;
-                    }).join('')}
+            const price = parseFloat(item.discount_price || item.price || 0);
+            const quantity = item.quantity || 1;
+            const itemTotal = price * quantity;
+            return `<p>${quantity}x ${item.name}${item.size ? ' (Talla: ' + item.size + ')' : ''} - S/ ${itemTotal.toFixed(2)}</p>`;
+        }).join('')}
                 </div>
 
                 <div class="review-block" style="border-top: 2px solid var(--black); padding-top: 1rem; margin-top: 1rem;">
@@ -481,7 +477,7 @@ class CheckoutManager {
     async placeOrder() {
         const btn = document.querySelector('.btn-green');
         const originalBtnText = btn ? btn.innerHTML : '';
-        
+
         if (btn) {
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESANDO...';
             btn.disabled = true;
@@ -517,13 +513,24 @@ class CheckoutManager {
                     price: item.discount_price || item.price, // Optional, backend might verify
                     size: item.size || null // Include size if available
                 })),
-                shipping_address_id: this.selectedAddressId,
                 payment_method: this.paymentMethod === 'card' ? 'credit_card' : this.paymentMethod,
                 payment_details: {
                     provider: 'stripe',
                     transaction_id: 'tx_' + Date.now() // Placeholder for actual gateway integration
                 }
             };
+
+            // Handle Address (Guest vs Auth)
+            if (this.selectedAddressId === 'GUEST_ADDR' && this.guestAddress) {
+                // If backend supports raw address object:
+                orderData.shipping_address = this.guestAddress;
+                // If backend requires discrete fields, spread them:
+                // ...this.guestAddress
+
+                if (this.guestEmail) orderData.email = this.guestEmail;
+            } else {
+                orderData.shipping_address_id = this.selectedAddressId;
+            }
 
             if (window.Logger) window.Logger.log('📤 Placing Order:', orderData);
             const response = await window.api.createOrder(orderData);
@@ -545,8 +552,17 @@ class CheckoutManager {
 
                 // Redirect to Success Page
                 const orderId = response.data.order ? response.data.order.id : (response.data.id || 'CONFIRMED');
+                let redirectUrl = `order-success.html?id=${orderId}`;
+
+                // If guest email is present, pass it
+                if (orderData.email) {
+                    redirectUrl += `&email=${encodeURIComponent(orderData.email)}`;
+                } else if (!window.authManager.isAuthenticated() && this.guestEmail) {
+                    redirectUrl += `&email=${encodeURIComponent(this.guestEmail)}`;
+                }
+
                 setTimeout(() => {
-                    window.location.href = `order-success.html?id=${orderId}`;
+                    window.location.href = redirectUrl;
                 }, 1000);
             } else {
                 throw new Error(response.message || 'Failed to create order');
@@ -580,7 +596,7 @@ class CheckoutManager {
             const price = parseFloat(item.discount_price || item.price || 0);
             return sum + (price * (item.quantity || 1));
         }, 0);
-        
+
         // Get discount from coupon manager if available
         const discount = window.couponsManager?.discount || 0;
         const subtotalAfterDiscount = subtotal - discount;
@@ -592,10 +608,10 @@ class CheckoutManager {
                 <h3>RESUMEN DEL PEDIDO</h3>
                 <div class="summary-items">
                     ${this.cart.map(item => {
-                        const price = parseFloat(item.discount_price || item.price || 0);
-                        const quantity = item.quantity || 1;
-                        const itemTotal = price * quantity;
-                        return `
+            const price = parseFloat(item.discount_price || item.price || 0);
+            const quantity = item.quantity || 1;
+            const itemTotal = price * quantity;
+            return `
                         <div class="summary-item">
                             <img src="${item.image_url || item.image || 'assets/images/products/placeholder.jpg'}" 
                                  alt="${item.name}" 
@@ -607,7 +623,7 @@ class CheckoutManager {
                             </div>
                         </div>
                     `;
-                    }).join('')}
+        }).join('')}
                 </div>
                 <div class="summary-totals">
                     <div class="row"><span>Subtotal</span> <span>S/ ${subtotal.toFixed(2)}</span></div>
@@ -632,7 +648,7 @@ class CheckoutManager {
                 ` : ''}
             </div>
         `;
-        
+
         // Render coupon section if available
         if (window.couponsManager) {
             setTimeout(() => {

@@ -41,7 +41,17 @@
 
         <div class="success-actions">
             <a href="index.html" class="btn btn-outline">VOLVER AL INICIO</a>
-            <a href="profile.html?tab=orders" class="btn btn-black">VER PEDIDO</a>
+            <a href="profile.html?tab=orders" class="btn btn-black" id="viewOrderBtn">VER PEDIDO</a>
+        </div>
+
+        <!-- Guest Upsell Section (Hidden initially) -->
+        <div id="guestUpsell" style="display: none; margin-top: 3rem; border-top: 1px solid #eee; padding-top: 2rem;">
+            <h3>¿Quieres rastrear tu pedido?</h3>
+            <p style="color: var(--gray-600); margin-bottom: 1.5rem;">
+                Crea una cuenta con <strong><span id="upsellEmail">tu email</span></strong> para guardar tu historial y
+                recibir ofertas exclusivas.
+            </p>
+            <a href="register.html" id="registerLink" class="btn btn-outline">CREAR CUENTA</a>
         </div>
     </main>
 

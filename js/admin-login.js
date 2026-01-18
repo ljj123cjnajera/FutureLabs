@@ -12,8 +12,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const originalBtnText = btn.innerHTML;
 
         // Loading State
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> AUTENTICANDO...';
-        btn.disabled = true;
+        if (window.LoadingStates) {
+            window.LoadingStates.show(form, { message: 'Autenticando...', overlay: true, type: 'spinner' });
+        } else {
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> AUTENTICANDO...';
+            btn.disabled = true;
+        }
 
         try {
             // Hacer login directamente con la API
@@ -68,6 +72,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => input.classList.remove('input-shake'), 300);
             });
         } finally {
+            if (window.LoadingStates) {
+                window.LoadingStates.hide(form);
+            }
             btn.innerHTML = originalBtnText;
             btn.disabled = false;
         }

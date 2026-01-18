@@ -51,9 +51,11 @@
         rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- Preload Critical Resources -->
-    <link rel="preload" href="https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&q=80&w=1600" as="image" fetchpriority="high">
+    <link rel="preload"
+        href="https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&q=80&w=1600" as="image"
+        fetchpriority="high">
     <link rel="dns-prefetch" href="https://futurelabs-production.up.railway.app">
 
     <!-- CSS Unificado (Streetwear Standard V3) -->
@@ -104,7 +106,7 @@
       "url": "https://ljj123cjnajera.github.io/FutureLabs/"
     }
     </script>
-    
+
     <!-- BreadcrumbList Structured Data -->
     <script type="application/ld+json">
     {
@@ -135,267 +137,293 @@
 
     <!-- Hero Slider -->
     <main id="main-content">
-    <section class="hero-section" aria-label="Hero slider">
-        <div id="heroSlidesContainer" class="hero-slides">
-            <!-- Static Slide 1 (Critical Rendering Path) -->
-            <div class="slide active hero-bg-1">
-                <div class="slide-content">
-                    <div class="hero-urgency-badge">
-                        <span class="urgency-pulse">⚡</span> SOLO 12 PARES DISPONIBLES
+        <section class="hero-section" aria-label="Hero slider">
+            <div id="heroSlidesContainer" class="hero-slides">
+                <!-- Static Slide 1 (Critical Rendering Path) -->
+                <div class="slide active hero-bg-1">
+                    <div class="slide-content">
+                        <div class="hero-urgency-badge">
+                            <span class="urgency-pulse">⚡</span> SOLO 12 PARES DISPONIBLES
+                        </div>
+                        <span class="slide-subtitle">NUEVA TEMPORADA</span>
+                        <h1 class="hero-title">JORDAN RETRO <span class="highlight">HIGH</span></h1>
+                        <p>La silueta icónica regresa en colores originales. <strong>Stock limitado disponible.</strong>
+                        </p>
+                        <div class="hero-cta-group">
+                            <a href="products.html" class="btn btn-primary">COMPRAR AHORA</a>
+                            <div class="hero-stock-indicator">
+                                <span class="stock-dot"></span> 12 pares restantes
+                            </div>
+                        </div>
                     </div>
-                    <span class="slide-subtitle">NUEVA TEMPORADA</span>
-                    <h1 class="hero-title">JORDAN RETRO <span class="highlight">HIGH</span></h1>
-                    <p>La silueta icónica regresa en colores originales. <strong>Stock limitado disponible.</strong></p>
-                    <div class="hero-cta-group">
-                        <a href="products.html" class="btn btn-primary">COMPRAR AHORA</a>
-                        <div class="hero-stock-indicator">
-                            <span class="stock-dot"></span> 12 pares restantes
+                </div>
+                <!-- Slide 2 -->
+                <div class="slide hero-bg-2">
+                    <div class="slide-content">
+                        <div class="hero-urgency-badge">
+                            <span class="urgency-pulse">🔥</span> MÁS VENDIDO ESTA SEMANA
+                        </div>
+                        <span class="slide-subtitle">EXCLUSIVO</span>
+                        <h1 class="hero-title">YEEZY <span class="highlight">BOOST</span></h1>
+                        <p>Re-diseñadas para la comodidad. Creadas para las calles. <strong>Envío gratis
+                                incluido.</strong></p>
+                        <div class="hero-cta-group">
+                            <a href="products.html?category=yeezy" class="btn btn-primary">COMPRAR AHORA</a>
+                            <div class="hero-stock-indicator">
+                                <span class="stock-dot available"></span> En stock
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Slide 3 -->
+                <div class="slide hero-bg-3">
+                    <div class="slide-content">
+                        <div class="hero-urgency-badge">
+                            <span class="urgency-pulse">✨</span> NUEVO LANZAMIENTO
+                        </div>
+                        <span class="slide-subtitle">RECIÉN LLEGADO</span>
+                        <h1 class="hero-title">NIKE <span class="highlight">DUNK</span></h1>
+                        <p>La silueta que definió una generación. <strong>Nuevos colores disponibles ahora.</strong></p>
+                        <div class="hero-cta-group">
+                            <a href="products.html?category=nike" class="btn btn-primary">VER COLECCIÓN</a>
+                            <div class="hero-stock-indicator">
+                                <span class="stock-dot available"></span> Disponible en 8 colores
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- Slide 2 -->
-            <div class="slide hero-bg-2">
-                <div class="slide-content">
-                    <div class="hero-urgency-badge">
-                        <span class="urgency-pulse">🔥</span> MÁS VENDIDO ESTA SEMANA
+            <div id="heroSliderDots" class="hero-dots"></div>
+        </section>
+
+        <!-- Brand Marquee Compacto -->
+        <div class="brand-marquee-section" style="padding: 1rem 0; background: var(--gray-50);">
+            <div class="brand-marquee">
+                <div class="marquee-track">
+                    <span class="brand-item">NIKE</span>
+                    <span class="brand-item">JORDAN</span>
+                    <span class="brand-item">ADIDAS</span>
+                    <span class="brand-item">YEEZY</span>
+                    <span class="brand-item">NEW BALANCE</span>
+                    <span class="brand-item">PUMA</span>
+                    <span class="brand-item">NIKE</span>
+                    <span class="brand-item">JORDAN</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- KINETIC MARQUEE TAPE (YELLOW) -->
+        <div class="marquee-tape">
+            <div class="marquee-content">
+                <span>ENVÍOS A TODO EL PERÚ 🇵🇪 // ACEPTAMOS YAPE Y PLIN // STOCK LIMITADO // COMPRA 100% SEGURA
+                    //</span>
+                <span>ENVÍOS A TODO EL PERÚ 🇵🇪 // ACEPTAMOS YAPE Y PLIN // STOCK LIMITADO // COMPRA 100% SEGURA
+                    //</span>
+            </div>
+        </div>
+
+        <!-- 🚀 PRODUCT ENGINE: TABBED COLLECTIONS (The "Flagship" Feature) -->
+        <section class="section product-engine-section">
+            <div class="container">
+                <div class="engine-header">
+                    <h2 class="section-title-brutalist">ELIGE TU ESTILO //</h2>
+                    <div class="engine-tabs" role="tablist" aria-label="Filtrar productos por marca">
+                        <button class="engine-tab active" data-tab="nike" role="tab" aria-selected="true"
+                            aria-controls="engineGrid">NIKE</button>
+                        <button class="engine-tab" data-tab="jordan" role="tab" aria-selected="false"
+                            aria-controls="engineGrid">JORDAN</button>
+                        <button class="engine-tab" data-tab="yeezy" role="tab" aria-selected="false"
+                            aria-controls="engineGrid">YEEZY</button>
+                        <button class="engine-tab" data-tab="adidas" role="tab" aria-selected="false"
+                            aria-controls="engineGrid">ADIDAS</button>
                     </div>
-                    <span class="slide-subtitle">EXCLUSIVO</span>
-                    <h1 class="hero-title">YEEZY <span class="highlight">BOOST</span></h1>
-                    <p>Re-diseñadas para la comodidad. Creadas para las calles. <strong>Envío gratis incluido.</strong></p>
-                    <div class="hero-cta-group">
-                        <a href="products.html?category=yeezy" class="btn btn-primary">COMPRAR AHORA</a>
-                        <div class="hero-stock-indicator">
-                            <span class="stock-dot available"></span> En stock
+                </div>
+
+                <div class="engine-display">
+                    <!-- Loading State (Initial) -->
+                    <div id="engineLoader" class="engine-loader">
+                        <div class="spinner-square"></div>
+                        <p>INICIANDO BASE DE DATOS...</p>
+                    </div>
+
+                    <!-- Dynamic Grid Container -->
+                    <div id="engineGrid" class="product-grid-v3 engine-grid-container">
+
+                        <!-- JS will inject cards here -->
+                    </div>
+
+                    <!-- See All Link -->
+                    <div class="engine-footer">
+                        <a href="products.html" id="engineSeeAll" class="link-arrow">VER COLECCIÓN COMPLETA <i
+                                class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- CATEGORÍAS COMPACTAS -->
+        <section class="section" style="padding: 1.5rem 0;" aria-labelledby="collections-title">
+            <div class="container">
+                <h2 id="collections-title" class="section-title-brutalist glitch-text" data-text="EXPLORA COLECCIONES">
+                    EXPLORA COLECCIONES</h2>
+                <div id="homeSectionsContainer" class="bento-grid"
+                    style="grid-template-columns: repeat(4, 1fr); gap: 0.75rem;">
+                    <a href="products.html?category=jordan" class="bento-item" style="min-height: 180px;"
+                        aria-label="Ver productos Jordan">
+                        <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=800"
+                            alt="Jordan" loading="lazy" decoding="async">
+                        <div class="bento-overlay">
+                            <h3>JORDAN</h3>
+                        </div>
+                    </a>
+                    <a href="products.html?category=yeezy" class="bento-item" style="min-height: 180px;"
+                        aria-label="Ver productos Yeezy">
+                        <img src="https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&q=80&w=800"
+                            alt="Yeezy" loading="lazy" decoding="async">
+                        <div class="bento-overlay">
+                            <h3>YEEZY</h3>
+                        </div>
+                    </a>
+                    <a href="products.html?category=nike" class="bento-item" style="min-height: 180px;"
+                        aria-label="Ver productos Nike">
+                        <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=800"
+                            alt="Nike" loading="lazy" decoding="async">
+                        <div class="bento-overlay">
+                            <h3>NIKE</h3>
+                        </div>
+                    </a>
+                    <a href="products.html?category=adidas" class="bento-item" style="min-height: 180px;"
+                        aria-label="Ver productos Adidas">
+                        <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=800"
+                            alt="Adidas" loading="lazy" decoding="async">
+                        <div class="bento-overlay">
+                            <h3>ADIDAS</h3>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- TRENDING NOW (HORIZONTAL SLIDER) -->
+        <section class="section" style="padding-top: 1.5rem;" aria-labelledby="trending-title">
+            <div class="section-header"
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <div>
+                    <h2 id="trending-title" class="section-title glitch-text" data-text="TENDENCIA AHORA">TENDENCIA
+                        AHORA</h2>
+                    <p class="section-description">ALTA DEMANDA. STOCK LIMITADO.</p>
+                </div>
+                <a href="products.html?filter=trending" class="link-arrow"
+                    aria-label="Ver todos los productos en tendencia">Ver más <i class="fas fa-arrow-right"
+                        aria-hidden="true"></i></a>
+            </div>
+            <div class="fluid-container">
+                <!-- Converted to Horizontal Scroll Container -->
+                <div id="trendingProductsGrid" class="products-horizontal-scroll">
+                    <!-- Loading state -->
+                    <div class="loading-state" style="min-width: 100%; padding: 3rem;">
+                        <div class="loading-spinner"></div>
+                        <p>Cargando productos en tendencia...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Trust Bar Mejorado (Con números y social proof) -->
+        <section class="trust-bar-enhanced">
+            <div class="container">
+                <div class="trust-grid">
+                    <div class="trust-item">
+                        <div class="trust-icon">✓</div>
+                        <div class="trust-content">
+                            <div class="trust-number">10,000+</div>
+                            <div class="trust-label">Productos Auténticos</div>
+                        </div>
+                    </div>
+                    <div class="trust-item">
+                        <div class="trust-icon">🚚</div>
+                        <div class="trust-content">
+                            <div class="trust-number">GRATIS</div>
+                            <div class="trust-label">Envío a Todo Perú</div>
+                        </div>
+                    </div>
+                    <div class="trust-item">
+                        <div class="trust-icon">↩️</div>
+                        <div class="trust-content">
+                            <div class="trust-number">30 Días</div>
+                            <div class="trust-label">Devolución Garantizada</div>
+                        </div>
+                    </div>
+                    <div class="trust-item">
+                        <div class="trust-icon">💳</div>
+                        <div class="trust-content">
+                            <div class="trust-number">100%</div>
+                            <div class="trust-label">Pago Seguro</div>
+                        </div>
+                    </div>
+                    <div class="trust-item">
+                        <div class="trust-icon">⭐</div>
+                        <div class="trust-content">
+                            <div class="trust-number">4.9/5</div>
+                            <div class="trust-label">Valoración Clientes</div>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- Slide 3 -->
-            <div class="slide hero-bg-3">
-                <div class="slide-content">
-                    <div class="hero-urgency-badge">
-                        <span class="urgency-pulse">✨</span> NUEVO LANZAMIENTO
-                    </div>
-                    <span class="slide-subtitle">RECIÉN LLEGADO</span>
-                    <h1 class="hero-title">NIKE <span class="highlight">DUNK</span></h1>
-                    <p>La silueta que definió una generación. <strong>Nuevos colores disponibles ahora.</strong></p>
-                    <div class="hero-cta-group">
-                        <a href="products.html?category=nike" class="btn btn-primary">VER COLECCIÓN</a>
-                        <div class="hero-stock-indicator">
-                            <span class="stock-dot available"></span> Disponible en 8 colores
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div id="heroSliderDots" class="hero-dots"></div>
-    </section>
+        </section>
 
-    <!-- Brand Marquee Compacto -->
-    <div class="brand-marquee-section" style="padding: 1rem 0; background: var(--gray-50);">
-        <div class="brand-marquee">
-            <div class="marquee-track">
-                <span class="brand-item">NIKE</span>
-                <span class="brand-item">JORDAN</span>
-                <span class="brand-item">ADIDAS</span>
-                <span class="brand-item">YEEZY</span>
-                <span class="brand-item">NEW BALANCE</span>
-                <span class="brand-item">PUMA</span>
-                <span class="brand-item">NIKE</span>
-                <span class="brand-item">JORDAN</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- KINETIC MARQUEE TAPE (YELLOW) -->
-    <div class="marquee-tape">
-        <div class="marquee-content">
-            <span>ENVÍOS A TODO EL PERÚ 🇵🇪 // ACEPTAMOS YAPE Y PLIN // STOCK LIMITADO // COMPRA 100% SEGURA //</span>
-            <span>ENVÍOS A TODO EL PERÚ 🇵🇪 // ACEPTAMOS YAPE Y PLIN // STOCK LIMITADO // COMPRA 100% SEGURA //</span>
-        </div>
-    </div>
-
-    <!-- 🚀 PRODUCT ENGINE: TABBED COLLECTIONS (The "Flagship" Feature) -->
-    <section class="section product-engine-section">
-        <div class="container">
-            <div class="engine-header">
-                <h2 class="section-title-brutalist">ELIGE TU ESTILO //</h2>
-                <div class="engine-tabs" role="tablist" aria-label="Filtrar productos por marca">
-                    <button class="engine-tab active" data-tab="nike" role="tab" aria-selected="true" aria-controls="engineGrid">NIKE</button>
-                    <button class="engine-tab" data-tab="jordan" role="tab" aria-selected="false" aria-controls="engineGrid">JORDAN</button>
-                    <button class="engine-tab" data-tab="yeezy" role="tab" aria-selected="false" aria-controls="engineGrid">YEEZY</button>
-                    <button class="engine-tab" data-tab="adidas" role="tab" aria-selected="false" aria-controls="engineGrid">ADIDAS</button>
+        <!-- ON SALE -->
+        <section class="section" style="padding-top: 1.5rem;" aria-labelledby="on-sale-title">
+            <div class="container">
+                <div class="section-header-row"
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h2 id="on-sale-title" class="section-title-brutalist glitch-text" data-text="EN OFERTA">EN OFERTA
+                    </h2>
+                    <a href="products.html?filter=on-sale" class="link-arrow"
+                        aria-label="Ver todos los productos en oferta">Ver todas las ofertas <i
+                            class="fas fa-arrow-right" aria-hidden="true"></i></a>
                 </div>
-            </div>
-
-            <div class="engine-display">
-                <!-- Loading State (Initial) -->
-                <div id="engineLoader" class="engine-loader">
-                    <div class="spinner-square"></div>
-                    <p>INICIANDO BASE DE DATOS...</p>
-                </div>
-
-                <!-- Dynamic Grid Container -->
-                <div id="engineGrid" class="product-grid-v3 engine-grid-container">
-
-                    <!-- JS will inject cards here -->
-                </div>
-
-                <!-- See All Link -->
-                <div class="engine-footer">
-                    <a href="products.html" id="engineSeeAll" class="link-arrow">VER COLECCIÓN COMPLETA <i
-                            class="fas fa-arrow-right"></i></a>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- CATEGORÍAS COMPACTAS -->
-    <section class="section" style="padding: 1.5rem 0;" aria-labelledby="collections-title">
-        <div class="container">
-            <h2 id="collections-title" class="section-title-brutalist glitch-text" data-text="EXPLORA COLECCIONES">EXPLORA COLECCIONES</h2>
-            <div id="homeSectionsContainer" class="bento-grid" style="grid-template-columns: repeat(4, 1fr); gap: 0.75rem;">
-                <a href="products.html?category=jordan" class="bento-item" style="min-height: 180px;" aria-label="Ver productos Jordan">
-                    <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=800"
-                        alt="Jordan" loading="lazy" decoding="async">
-                    <div class="bento-overlay">
-                        <h3>JORDAN</h3>
-                    </div>
-                </a>
-                <a href="products.html?category=yeezy" class="bento-item" style="min-height: 180px;" aria-label="Ver productos Yeezy">
-                    <img src="https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&q=80&w=800"
-                        alt="Yeezy" loading="lazy" decoding="async">
-                    <div class="bento-overlay">
-                        <h3>YEEZY</h3>
-                    </div>
-                </a>
-                <a href="products.html?category=nike" class="bento-item" style="min-height: 180px;" aria-label="Ver productos Nike">
-                    <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=800"
-                        alt="Nike" loading="lazy" decoding="async">
-                    <div class="bento-overlay">
-                        <h3>NIKE</h3>
-                    </div>
-                </a>
-                <a href="products.html?category=adidas" class="bento-item" style="min-height: 180px;" aria-label="Ver productos Adidas">
-                    <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=800"
-                        alt="Adidas" loading="lazy" decoding="async">
-                    <div class="bento-overlay">
-                        <h3>ADIDAS</h3>
-                    </div>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- TRENDING NOW (HORIZONTAL SLIDER) -->
-    <section class="section" style="padding-top: 1.5rem;" aria-labelledby="trending-title">
-        <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-            <div>
-                <h2 id="trending-title" class="section-title glitch-text" data-text="TENDENCIA AHORA">TENDENCIA AHORA</h2>
-                <p class="section-description">ALTA DEMANDA. STOCK LIMITADO.</p>
-            </div>
-            <a href="products.html?filter=trending" class="link-arrow" aria-label="Ver todos los productos en tendencia">Ver más <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
-        </div>
-        <div class="fluid-container">
-            <!-- Converted to Horizontal Scroll Container -->
-            <div id="trendingProductsGrid" class="products-horizontal-scroll">
-                <!-- Loading state -->
-                <div class="loading-state" style="min-width: 100%; padding: 3rem;">
-                    <div class="loading-spinner"></div>
-                    <p>Cargando productos en tendencia...</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Trust Bar Mejorado (Con números y social proof) -->
-    <section class="trust-bar-enhanced">
-        <div class="container">
-            <div class="trust-grid">
-                <div class="trust-item">
-                    <div class="trust-icon">✓</div>
-                    <div class="trust-content">
-                        <div class="trust-number">10,000+</div>
-                        <div class="trust-label">Productos Auténticos</div>
-                    </div>
-                </div>
-                <div class="trust-item">
-                    <div class="trust-icon">🚚</div>
-                    <div class="trust-content">
-                        <div class="trust-number">GRATIS</div>
-                        <div class="trust-label">Envío a Todo Perú</div>
-                    </div>
-                </div>
-                <div class="trust-item">
-                    <div class="trust-icon">↩️</div>
-                    <div class="trust-content">
-                        <div class="trust-number">30 Días</div>
-                        <div class="trust-label">Devolución Garantizada</div>
-                    </div>
-                </div>
-                <div class="trust-item">
-                    <div class="trust-icon">💳</div>
-                    <div class="trust-content">
-                        <div class="trust-number">100%</div>
-                        <div class="trust-label">Pago Seguro</div>
-                    </div>
-                </div>
-                <div class="trust-item">
-                    <div class="trust-icon">⭐</div>
-                    <div class="trust-content">
-                        <div class="trust-number">4.9/5</div>
-                        <div class="trust-label">Valoración Clientes</div>
+                <div id="onSaleProductsGrid" class="product-grid-v3">
+                    <!-- Loading state -->
+                    <div class="loading-state" style="grid-column: 1 / -1;">
+                        <div class="loading-spinner"></div>
+                        <p>Cargando ofertas...</p>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- ON SALE -->
-    <section class="section" style="padding-top: 1.5rem;" aria-labelledby="on-sale-title">
-        <div class="container">
-            <div class="section-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <h2 id="on-sale-title" class="section-title-brutalist glitch-text" data-text="EN OFERTA">EN OFERTA</h2>
-                <a href="products.html?filter=on-sale" class="link-arrow" aria-label="Ver todos los productos en oferta">Ver todas las ofertas <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
-            </div>
-            <div id="onSaleProductsGrid" class="product-grid-v3">
-                <!-- Loading state -->
-                <div class="loading-state" style="grid-column: 1 / -1;">
-                    <div class="loading-spinner"></div>
-                    <p>Cargando ofertas...</p>
+
+
+
+
+
+
+        <!-- 🚀 V3 CLEAN SLATE: LEGACY CATEGORIES REMOVED -->
+
+        <!-- NUEVOS LANZAMIENTOS -->
+        <section class="section" style="padding-top: 1.5rem;" aria-labelledby="new-products-title">
+            <div class="container">
+                <div class="section-header-row"
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h2 id="new-products-title" class="section-title-brutalist glitch-text"
+                        data-text="NUEVOS LANZAMIENTOS">NUEVOS LANZAMIENTOS</h2>
+                    <a href="products.html?sort=newest" class="link-arrow"
+                        aria-label="Ver todos los nuevos productos">Ver todos <i class="fas fa-arrow-right"
+                            aria-hidden="true"></i></a>
+                </div>
+                <div id="newProductsGrid" class="product-grid-v3">
+                    <!-- Loading state -->
+                    <div class="loading-state" style="grid-column: 1 / -1;">
+                        <div class="loading-spinner"></div>
+                        <p>Cargando nuevos productos...</p>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
-
-
-
-
-
-
-
-    <!-- 🚀 V3 CLEAN SLATE: LEGACY CATEGORIES REMOVED -->
-
-    <!-- NUEVOS LANZAMIENTOS -->
-    <section class="section" style="padding-top: 1.5rem;" aria-labelledby="new-products-title">
-        <div class="container">
-            <div class="section-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <h2 id="new-products-title" class="section-title-brutalist glitch-text" data-text="NUEVOS LANZAMIENTOS">NUEVOS LANZAMIENTOS</h2>
-                <a href="products.html?sort=newest" class="link-arrow" aria-label="Ver todos los nuevos productos">Ver todos <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
-            </div>
-            <div id="newProductsGrid" class="product-grid-v3">
-                <!-- Loading state -->
-                <div class="loading-state" style="grid-column: 1 / -1;">
-                    <div class="loading-spinner"></div>
-                    <p>Cargando nuevos productos...</p>
-                </div>
-            </div>
-        </div>
-    </section>
+        </section>
 
 
     </main>
-    
+
     <!-- Footer -->
     <footer id="mainFooter" class="footer" role="contentinfo"></footer>
 
@@ -406,9 +434,11 @@
                 <div class="sticky-urgency">
                     <span class="urgency-icon">⚡</span>
                     <div class="sticky-text">
-                        <strong>OFERTA FLASH:</strong> Código <span class="offer-code-badge">LIMA20</span> = S/ 20.00 OFF
+                        <strong>OFERTA FLASH:</strong> Código <span class="offer-code-badge">LIMA20</span> = S/ 20.00
+                        OFF
                         <span class="sticky-separator">•</span>
-                        <span class="sticky-timer" id="flashSaleTimer">Termina en: <span id="timerDisplay">23:45:12</span></span>
+                        <span class="sticky-timer" id="flashSaleTimer">Termina en: <span
+                                id="timerDisplay">23:45:12</span></span>
                     </div>
                 </div>
                 <div class="sticky-actions">
@@ -440,32 +470,11 @@
 
     <!-- PAGE SPECIFIC ENGINE -->
     <script src="js/home.js?v=8.0-CLEAN"></script>
+    <script src="js/quick-view.js?v=8.0-CLEAN"></script>
     <!-- Non-critical scripts loaded with defer for better performance -->
     <script src="js/autocomplete.js?v=8.0-CLEAN" defer></script>
 
-    <!-- Quick View Modal (Brutalist Harmonized) -->
-    <div id="quickViewModal" class="quick-view-modal">
-        <div class="quick-view-content modal-content">
-            <span class="quick-view-close close-modal" onclick="closeQuickView()">&times;</span>
-            <div class="quick-view-image">
-                <img id="qvImage" src="" alt="">
-            </div>
-            <div class="quick-view-details">
-                <div id="qvBrand" class="quick-view-brand">Marca</div>
-                <h2 id="qvTitle" class="quick-view-title">Nombre del Producto</h2>
-                <div id="qvPrice" class="quick-view-price">S/ 0.00</div>
-                <p id="qvDescription" class="quick-view-description">Descripción</p>
-                <div class="quick-view-actions">
-                    <button class="quick-view-btn product-btn" onclick="addToCartFromQuickView()">
-                        Añadir al Carrito
-                    </button>
-                    <a id="qvFullDetails" href="#" class="link-arrow"
-                        style="display: block; text-align: center; margin-top: 15px; font-size: 0.9rem;">Ver
-                        detalles completos</a>
-                </div>
-            </div>
-        </div>
-    </div>
+
 
     <!-- Newsletter Popup (Brutalist) -->
     <div id="newsletterPopup" class="newsletter-popup" style="display:none;">

@@ -81,7 +81,7 @@ class SearchEngine {
         const searchTitle = document.getElementById('searchTitle');
         const countLabel = document.getElementById('resultsCount');
         const container = document.getElementById('searchResultsGrid');
-        
+
         if (!container) return;
 
         if (searchTitle) searchTitle.textContent = `"${query}"`;
@@ -165,7 +165,7 @@ class SearchEngine {
 
             const countLabel = document.getElementById('resultsCount');
             if (countLabel) countLabel.textContent = 'ERROR DE CONEXIÓN';
-            
+
             if (window.LoadingStates) {
                 window.LoadingStates.error('searchResultsGrid', {
                     title: 'Error de conexión',
@@ -203,37 +203,19 @@ class SearchEngine {
         // Use Components.getProductCard if available
         if (window.Components && window.Components.getProductCard) {
             container.innerHTML = this.results.map(product => window.Components.getProductCard(product)).join('');
+            // Ensure images are loaded/visible
+            container.querySelectorAll('img').forEach(img => {
+                img.style.opacity = '1';
+            });
         } else {
-            // Manual Fallback Card
-            container.innerHTML = this.results.map(product => {
-                const price = parseFloat(product.discount_price || product.price || 0);
-                const originalPrice = product.discount_price && product.discount_price < product.price ? parseFloat(product.price) : null;
-                
-                return `
-                    <div class="product-card" onclick="window.location.href='product-detail.html?id=${product.id}'">
-                        <div class="product-image-container">
-                            <img src="${product.image_url || 'assets/images/products/placeholder.jpg'}" 
-                                 alt="${product.name}" 
-                                 class="product-image"
-                                 loading="lazy"
-                                 onerror="this.src='assets/images/products/placeholder.jpg'">
-                            ${product.stock_quantity === 0 ? '<div class="product-badges"><span class="product-badge sold-out">AGOTADO</span></div>' : ''}
-                        </div>
-                        <div class="product-content">
-                            <span class="product-category">${product.brand || 'SNEAKERS'}</span>
-                            <h3 class="product-title">${product.name}</h3>
-                            <div class="product-price-container">
-                                ${originalPrice ? `
-                                    <span class="product-price-new">S/ ${price.toFixed(2)}</span>
-                                    <span class="product-price-old">S/ ${originalPrice.toFixed(2)}</span>
-                                ` : `
-                                    <span class="product-price-current">S/ ${price.toFixed(2)}</span>
-                                `}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
+            // If components are missing, show error
+            if (window.ErrorHandler) {
+                window.ErrorHandler.handle(new Error('Components module missing'), {
+                    context: 'SearchEngine.renderResults',
+                    userMessage: 'Error al renderizar resultados.'
+                });
+            }
+            container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 2rem;">Error interno de visualización.</div>';
         }
     }
 
@@ -241,20 +223,31 @@ class SearchEngine {
         const container = document.getElementById('searchResultsGrid');
         const countLabel = document.getElementById('resultsCount');
 
-        countLabel.textContent = '0 RESULTADOS';
-        container.innerHTML = `
-            <div class="empty-search" style="grid-column: 1 / -1;">
-                <i class="fas fa-search" style="font-size: 4rem; margin-bottom: 20px; color: #ccc;"></i>
-                <h2 style="margin-bottom: 10px;">${msg}</h2>
-                <p style="color: #666; margin-bottom: 20px;">Intenta revisar la ortografía o usa palabras clave más generales.</p>
-                <a href="index.html" class="btn btn-black" style="margin-top: 20px;">VOLVER AL INICIO</a>
-            </div>
-        `;
+        if (countLabel) countLabel.textContent = '0 RESULTADOS';
+
+        if (window.LoadingStates) {
+            window.LoadingStates.empty('searchResultsGrid', {
+                title: 'Búsqueda sin resultados',
+                message: msg || 'Intenta revisar la ortografía o usa palabras clave más generales.',
+                icon: 'fas fa-search',
+                actionLabel: 'VOLVER AL INICIO',
+                actionUrl: 'index.html'
+            });
+        } else {
+            container.innerHTML = `
+                <div class="empty-search" style="grid-column: 1 / -1; text-align: center; padding: 4rem;">
+                    <i class="fas fa-search" style="font-size: 4rem; margin-bottom: 20px; color: #ccc;"></i>
+                    <h2 style="margin-bottom: 10px;">${msg}</h2>
+                    <p style="color: #666; margin-bottom: 20px;">Intenta revisar la ortografía o usa palabras clave más generales.</p>
+                    <a href="index.html" class="btn btn-black" style="margin-top: 20px;">VOLVER AL INICIO</a>
+                </div>
+            `;
+        }
     }
 
     sortResults(criteria) {
         if (!this.results || this.results.length === 0) return;
-        
+
         try {
             if (criteria === 'price_asc') {
                 this.results.sort((a, b) => {

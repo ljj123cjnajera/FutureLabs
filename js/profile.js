@@ -70,13 +70,12 @@ async function loadOrders() {
     if (!container) return;
 
     // Show loading state
+    // Show loading state
     if (window.LoadingStates) {
         window.LoadingStates.show('ordersList', {
             message: 'Cargando pedidos...',
-            type: 'spinner'
+            type: 'skeleton'
         });
-    } else {
-        container.innerHTML = '<div class="loading-brutalist">CARGANDO PEDIDOS...</div>';
     }
 
     try {
@@ -85,7 +84,7 @@ async function loadOrders() {
         }
 
         const res = await window.api.getOrders();
-        
+
         // Handle different response formats
         let orders = [];
         if (res && res.success && res.data) {
@@ -136,7 +135,7 @@ async function loadOrders() {
                 'cancelled': '#DC3545'
             };
             const statusColor = statusColors[order.status?.toLowerCase()] || '#666';
-            
+
             return `
                 <div class="order-item" style="border: 3px solid var(--black); padding: 1.5rem; margin-bottom: 1rem; background: var(--white);">
                     <div class="order-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
@@ -160,7 +159,7 @@ async function loadOrders() {
         } else {
             if (window.Logger) window.Logger.error('Orders API Error:', e);
         }
-        
+
         if (window.LoadingStates) {
             window.LoadingStates.error('ordersList', {
                 title: 'Error al cargar pedidos',
@@ -168,15 +167,6 @@ async function loadOrders() {
                 retryLabel: 'REINTENTAR',
                 retryCallback: 'loadOrders()'
             });
-        } else {
-            container.innerHTML = `
-                <div style="padding: 2rem; border: 2px dashed var(--error); text-align: center; color: var(--error);">
-                    <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
-                    <h3>NO SE PUDO CARGAR EL HISTORIAL</h3>
-                    <p>La conexión del sistema falló. Por favor, inténtalo de nuevo más tarde.</p>
-                    <button onclick="loadOrders()" class="btn btn-sm btn-outline-white" style="margin-top:1rem; border-color:var(--error); color:var(--error);">REINTENTAR</button>
-                </div>
-            `;
         }
     }
 }
@@ -186,23 +176,22 @@ async function loadWishlist() {
     if (!container) return;
 
     // Show loading state
+    // Show loading state
     if (window.LoadingStates) {
         window.LoadingStates.show('wishlistGrid', {
             message: 'Cargando favoritos...',
-            type: 'spinner'
+            type: 'skeleton'
         });
-    } else {
-        container.innerHTML = '<div class="loading-brutalist">CARGANDO FAVORITOS...</div>';
     }
 
     // Real Wishlist Load
     try {
         let items = [];
-        
+
         // Si está autenticado, cargar desde API
         if (window.authManager?.isAuthenticated() && window.api) {
             const res = await window.api.getWishlist();
-            
+
             // Handle different response formats
             if (res && res.success && res.data) {
                 if (Array.isArray(res.data)) {
@@ -219,14 +208,14 @@ async function loadWishlist() {
         } else {
             // Si no está autenticado, cargar desde localStorage
             const localWishlist = JSON.parse(localStorage.getItem('brutalist_wishlist') || '[]');
-            
+
             // Cargar información de productos desde localStorage o mostrar IDs
             if (localWishlist.length > 0) {
                 // Intentar cargar productos desde API si está disponible
                 if (window.api) {
                     try {
                         const products = await Promise.all(
-                            localWishlist.map(id => 
+                            localWishlist.map(id =>
                                 window.api.getProduct(id).catch(() => null)
                             )
                         );
@@ -242,7 +231,7 @@ async function loadWishlist() {
                 }
             }
         }
-        
+
         // Hide loading state
         if (window.LoadingStates) {
             window.LoadingStates.hide('wishlistGrid');
@@ -255,7 +244,7 @@ async function loadWishlist() {
                 const name = product.name || 'Producto';
                 const price = parseFloat(product.discount_price || product.price || 0);
                 const productId = product.id || product.product_id;
-                
+
                 return `
                     <div class="stat-box" style="padding:0; border:3px solid var(--black); position:relative; background: var(--white); cursor: pointer;" onclick="window.location.href='product-detail.html?id=${productId}'">
                         <div style="height:200px; overflow:hidden; border-bottom:3px solid var(--black); background: var(--gray-100);">
@@ -677,7 +666,7 @@ window.switchTab = function (tabId) {
 // Inicializar perfil
 async function initializeProfile() {
     if (window.Logger) window.Logger.log('🔵 Inicializando perfil...');
-    
+
     // Cargar datos en paralelo pero con manejo de errores individual
     const promises = [
         loadUserData().catch(e => { if (window.Logger) window.Logger.error('Error loading user data:', e); }),
@@ -695,7 +684,7 @@ async function initializeProfile() {
 async function loadUserData() {
     const nameEl = document.getElementById('profileName');
     const emailEl = document.getElementById('profileEmail');
-    
+
     if (nameEl) nameEl.textContent = 'Cargando...';
     if (emailEl) emailEl.textContent = '...';
 
@@ -707,7 +696,7 @@ async function loadUserData() {
         const response = await window.api.getProfile();
 
         let user = null;
-        
+
         // Handle different response formats
         if (response && response.success && response.data) {
             user = response.data.user || response.data;
@@ -779,14 +768,14 @@ async function loadStats() {
         try {
             const wishlistResponse = await window.api.getWishlist();
             let wishlistTotal = 0;
-            
+
             if (wishlistResponse && wishlistResponse.success && wishlistResponse.data) {
                 const lists = wishlistResponse.data.lists || wishlistResponse.data || [];
                 wishlistTotal = lists.reduce((sum, list) => sum + (list.items?.length || 0), 0);
             } else if (Array.isArray(wishlistResponse)) {
                 wishlistTotal = wishlistResponse.length;
             }
-            
+
             const wishlistCountEl = document.getElementById('wishlistCount');
             if (wishlistCountEl) {
                 wishlistCountEl.textContent = wishlistTotal;
@@ -799,35 +788,35 @@ async function loadStats() {
     }
 }
 
-    // Cargar direcciones
-    async function loadAddresses() {
-        const container = document.getElementById('addressList');
-        if (!container) {
-            if (window.Logger) window.Logger.warn('⚠️ addressList container not found');
-            return;
+// Cargar direcciones
+async function loadAddresses() {
+    const container = document.getElementById('addressList');
+    if (!container) {
+        if (window.Logger) window.Logger.warn('⚠️ addressList container not found');
+        return;
+    }
+
+    // Show loading state
+    if (window.LoadingStates) {
+        window.LoadingStates.show('addressList', {
+            message: 'Cargando direcciones...',
+            type: 'spinner'
+        });
+    } else {
+        container.innerHTML = '<div class="loading-brutalist">CARGANDO DIRECCIONES...</div>';
+    }
+
+    try {
+        if (!window.api) {
+            throw new Error('API no disponible');
         }
 
-        // Show loading state
+        const response = await window.api.getAddresses();
+
+        // Hide loading state
         if (window.LoadingStates) {
-            window.LoadingStates.show('addressList', {
-                message: 'Cargando direcciones...',
-                type: 'spinner'
-            });
-        } else {
-            container.innerHTML = '<div class="loading-brutalist">CARGANDO DIRECCIONES...</div>';
+            window.LoadingStates.hide('addressList');
         }
-
-        try {
-            if (!window.api) {
-                throw new Error('API no disponible');
-            }
-
-            const response = await window.api.getAddresses();
-            
-            // Hide loading state
-            if (window.LoadingStates) {
-                window.LoadingStates.hide('addressList');
-            }
 
         let addresses = [];
         if (response && response.success) {
@@ -870,7 +859,7 @@ async function loadStats() {
             const country = addr.country || 'Perú';
             const name = `${addr.first_name || ''} ${addr.last_name || ''}`.trim() || 'Dirección';
             const phone = addr.phone_number || addr.phone || '';
-            
+
             return `
                 <div class="address-card" style="border: 3px solid var(--black); padding: 1.5rem; position: relative; background: var(--white);">
                     ${addr.is_default ? '<span class="badge" style="position: absolute; top: 10px; right: 10px; background: var(--black); color: white; padding: 4px 8px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">PREDETERMINADA</span>' : ''}
@@ -897,7 +886,7 @@ async function loadStats() {
         } else {
             if (window.Logger) window.Logger.error('Addresses API Error:', error);
         }
-        
+
         if (window.LoadingStates) {
             window.LoadingStates.error('addressList', {
                 title: 'Error al cargar direcciones',
@@ -925,20 +914,20 @@ async function loadLoyaltyPoints() {
         if (response.success && response.data.points !== undefined) {
             const points = Number(response.data.points || 0);
             updateLoyaltyUI(points);
-            
+
             // Actualizar también en la sección de loyalty
             const balanceEl = document.getElementById('loyaltyBalance');
             if (balanceEl) {
                 balanceEl.textContent = `${points.toLocaleString('es-PE')} PTS`;
             }
-            
+
             // Calcular puntos ganados en total (suma de transacciones positivas)
             const transactionsResponse = await window.api.getLoyaltyTransactions(100);
             if (transactionsResponse.success && transactionsResponse.data.transactions) {
                 const lifetimeEarned = transactionsResponse.data.transactions
                     .filter(t => t.points_change > 0)
                     .reduce((sum, t) => sum + t.points_change, 0);
-                
+
                 const lifetimeEl = document.getElementById('loyaltyLifetime');
                 if (lifetimeEl) {
                     lifetimeEl.textContent = `${lifetimeEarned.toLocaleString('es-PE')} PTS`;
@@ -1036,7 +1025,7 @@ let profileForm = null;
 document.addEventListener('DOMContentLoaded', () => {
     personalDataForm = document.getElementById('personalDataForm');
     profileForm = document.getElementById('profileForm');
-    
+
     if (profileForm) {
         profileForm.addEventListener('submit', handleProfileUpdate);
     }
@@ -1295,7 +1284,7 @@ if (logoutButton) {
                 resolve(confirm('¿Estás seguro de que quieres cerrar sesión?'));
             }
         });
-        
+
         if (confirmed) {
             try {
                 if (window.Logger) window.Logger.log('🔴 [PROFILE] Cerrando sesión...');
@@ -1369,7 +1358,7 @@ window.handleSaveAddress = async function (e) {
         };
 
         const response = await window.api.createAddress(data);
-        
+
         if (response && response.success) {
             if (window.notifications) {
                 window.notifications.success('Dirección Guardada', 'La dirección fue agregada correctamente');

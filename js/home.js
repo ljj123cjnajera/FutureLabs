@@ -61,7 +61,7 @@ class HomeEngine {
       // 2. Load Content with Failsafes
       // Hero primero (crítico para primera impresión)
       await this.safeLoad(this.loadHero.bind(this), 'Hero Slider');
-      
+
       // Resto en paralelo
       await Promise.all([
         this.safeLoad(this.loadCategories.bind(this), 'Categories'),
@@ -108,7 +108,7 @@ class HomeEngine {
         // initHeader() ya inicializa: CartDrawer, SearchOverlay, CartCounter, Search
         // No es necesario llamarlos individualmente
         window.Components.initHeader();
-        
+
         // Solo initSearch() necesita llamarse explícitamente si no se llamó desde initHeader
         if (window.Components.initSearch && !window.searchInitialized) {
           window.Components.initSearch();
@@ -182,7 +182,7 @@ class HomeEngine {
       if (window.Logger) window.Logger.error('❌ Hero container not found');
       return;
     }
-    
+
     // Asegurar que el contenedor sea visible
     container.style.display = 'block';
     container.style.opacity = '1';
@@ -264,7 +264,7 @@ class HomeEngine {
         { icon: '✨', text: 'NUEVO LANZAMIENTO' }
       ];
       const urgencyBadge = slide.urgency_badge || urgencyBadges[index] || urgencyBadges[0];
-      
+
       // Determinar indicador de stock
       const stockIndicators = [
         { dot: '', text: '12 pares restantes' },
@@ -272,7 +272,7 @@ class HomeEngine {
         { dot: 'available', text: 'Disponible en 8 colores' }
       ];
       const stockIndicator = slide.stock_indicator || stockIndicators[index] || stockIndicators[0];
-      
+
       return `
             <div class="slide ${index === 0 ? 'active' : ''}" style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('${slide.image_url}')">
                 <div class="slide-content">
@@ -416,20 +416,20 @@ class HomeEngine {
   // ==========================================
   async loadProducts() {
     // Cargar cada sección desde su endpoint específico para productos REALES
-    
+
     // A. FEATURED PRODUCTS (Slider) - PRIORIDAD ALTA
     try {
       const featuredResponse = await this.api.getFeaturedProducts(12);
       let featuredProducts = [];
-      
+
       if (featuredResponse && featuredResponse.success && featuredResponse.data) {
-        featuredProducts = Array.isArray(featuredResponse.data.products) 
-          ? featuredResponse.data.products 
-          : Array.isArray(featuredResponse.data) 
-            ? featuredResponse.data 
+        featuredProducts = Array.isArray(featuredResponse.data.products)
+          ? featuredResponse.data.products
+          : Array.isArray(featuredResponse.data)
+            ? featuredResponse.data
             : [];
       }
-      
+
       if (featuredProducts.length > 0) {
         if (window.Logger) window.Logger.log(`✅ Loaded ${featuredProducts.length} featured products from API`);
         this.renderProductSlider('featuredProductsGrid', featuredProducts).catch(e => { if (window.Logger) window.Logger.error('Error rendering featured:', e); });
@@ -447,15 +447,15 @@ class HomeEngine {
       try {
         const trendingResponse = await this.api.getTrendingProducts(12);
         let trendingProducts = [];
-        
+
         if (trendingResponse && trendingResponse.success && trendingResponse.data) {
-          trendingProducts = Array.isArray(trendingResponse.data.products) 
-            ? trendingResponse.data.products 
-            : Array.isArray(trendingResponse.data) 
-              ? trendingResponse.data 
+          trendingProducts = Array.isArray(trendingResponse.data.products)
+            ? trendingResponse.data.products
+            : Array.isArray(trendingResponse.data)
+              ? trendingResponse.data
               : [];
         }
-        
+
         if (trendingProducts.length > 0) {
           if (window.Logger) window.Logger.log(`✅ Loaded ${trendingProducts.length} trending products from API`);
           const trendingContainer = document.getElementById('trendingProductsGrid');
@@ -476,15 +476,15 @@ class HomeEngine {
       try {
         const saleResponse = await this.api.getOnSaleProducts(12);
         let saleProducts = [];
-        
+
         if (saleResponse && saleResponse.success && saleResponse.data) {
-          saleProducts = Array.isArray(saleResponse.data.products) 
-            ? saleResponse.data.products 
-            : Array.isArray(saleResponse.data) 
-              ? saleResponse.data 
+          saleProducts = Array.isArray(saleResponse.data.products)
+            ? saleResponse.data.products
+            : Array.isArray(saleResponse.data)
+              ? saleResponse.data
               : [];
         }
-        
+
         if (saleProducts.length > 0) {
           if (window.Logger) window.Logger.log(`✅ Loaded ${saleProducts.length} on-sale products from API`);
           this.renderProductGrid('onSaleProductsGrid', saleProducts).catch(e => { if (window.Logger) window.Logger.error('Error rendering on sale:', e); });
@@ -503,15 +503,15 @@ class HomeEngine {
       try {
         const newResponse = await this.api.getNewProducts(12);
         let newProducts = [];
-        
+
         if (newResponse && newResponse.success && newResponse.data) {
-          newProducts = Array.isArray(newResponse.data.products) 
-            ? newResponse.data.products 
-            : Array.isArray(newResponse.data) 
-              ? newResponse.data 
+          newProducts = Array.isArray(newResponse.data.products)
+            ? newResponse.data.products
+            : Array.isArray(newResponse.data)
+              ? newResponse.data
               : [];
         }
-        
+
         if (newProducts.length > 0) {
           if (window.Logger) window.Logger.log(`✅ Loaded ${newProducts.length} new products from API`);
           this.renderProductGrid('newProductsGrid', newProducts).catch(e => { if (window.Logger) window.Logger.error('Error rendering new products:', e); });
@@ -562,7 +562,7 @@ class HomeEngine {
 
     // Mostrar skeleton loader mientras se renderiza
     this.showSkeletonLoader(container, products.length);
-    
+
     // Pequeño delay para transición suave (reducido de 300ms a 150ms)
     await new Promise(r => setTimeout(r, 150));
 
@@ -607,7 +607,7 @@ class HomeEngine {
         <div class="skeleton skeleton-button" style="margin-top: 1rem;"></div>
       </div>
     `).join('');
-    
+
     container.innerHTML = `<div class="product-grid-v3">${skeletonCards}</div>`;
   }
 
@@ -633,44 +633,44 @@ class HomeEngine {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           const img = entry.target;
-          
+
           // Si tiene data-src, usarlo (para carga diferida avanzada)
           if (img.dataset.src) {
             img.src = img.dataset.src;
             img.removeAttribute('data-src');
           }
-          
+
           // Agregar decoding async si no está presente
           if (!img.hasAttribute('decoding')) {
             img.decoding = 'async';
           }
-          
+
           // Agregar clase para animación de fade-in suave
           img.style.opacity = '0';
           img.style.transition = 'opacity 0.3s ease-in-out';
-          
+
           // Manejar carga exitosa
           const handleLoad = () => {
             img.style.opacity = '1';
             img.removeEventListener('load', handleLoad);
             img.removeEventListener('error', handleError);
           };
-          
+
           // Manejar errores de carga
           const handleError = () => {
             img.style.opacity = '1'; // Mostrar placeholder incluso en error
             img.removeEventListener('load', handleLoad);
             img.removeEventListener('error', handleError);
           };
-          
+
           img.addEventListener('load', handleLoad);
           img.addEventListener('error', handleError);
-          
+
           // Si la imagen ya está cargada (cached), aplicar opacidad inmediatamente
           if (img.complete) {
             img.style.opacity = '1';
           }
-          
+
           observer.unobserve(img);
         }
       });
@@ -698,7 +698,7 @@ class HomeEngine {
 
     // Mostrar skeleton loader para slider
     this.showSkeletonSlider(container, products.length || 8);
-    
+
     // Pequeño delay para transición suave
     await new Promise(r => setTimeout(r, 150));
 
@@ -718,11 +718,11 @@ class HomeEngine {
     // Transform grid to slider via style injection if needed
     container.style.opacity = '0';
     container.style.transition = 'opacity 0.3s ease';
-    
+
     setTimeout(() => {
       if (window.Components && window.Components.getProductCard) {
         container.innerHTML = products.map(p => window.Components.getProductCard(p)).join('');
-        
+
         // Lazy load images
         this.initLazyLoading(container);
       } else {
@@ -735,7 +735,7 @@ class HomeEngine {
           </div>
         `).join('');
       }
-      
+
       requestAnimationFrame(() => {
         container.style.opacity = '1';
       });
@@ -753,7 +753,7 @@ class HomeEngine {
         <div class="skeleton skeleton-button" style="margin-top: 1rem;"></div>
       </div>
     `).join('');
-    
+
     container.innerHTML = skeletonCards;
     container.classList.add('products-horizontal-scroll');
   }
@@ -797,23 +797,32 @@ class HomeEngine {
 
 
   toggleLoader(show) {
-    const loader = document.getElementById('preloader');
-    if (!loader) return;
-    if (show) {
-      loader.style.display = 'flex'; // Ensure it's in logic flow
-      loader.style.visibility = 'visible';
-      // Small timeout to allow display change to register before opacity transition
-      requestAnimationFrame(() => {
-        loader.style.opacity = '1';
-      });
+    if (window.LoadingStates) {
+      if (show) {
+        // Use the modern LoadingStates system on the body
+        window.LoadingStates.show('main-content', {
+          type: 'pulse',
+          overlay: true,
+          message: 'INICIANDO SISTEMA...',
+          zIndex: 9999
+        });
+      } else {
+        window.LoadingStates.hide('main-content');
+      }
     } else {
-      setTimeout(() => {
+      // Fallback for legacy behavior if LoadingStates is missing
+      const loader = document.getElementById('preloader');
+      if (!loader) return;
+      if (show) {
+        loader.style.display = 'flex';
+        loader.style.visibility = 'visible';
+        loader.style.opacity = '1';
+      } else {
         loader.style.opacity = '0';
         setTimeout(() => {
-          loader.style.visibility = 'hidden';
-          loader.style.display = 'none'; // CRITICAL FIX: Remove from layout
+          loader.style.display = 'none';
         }, 500);
-      }, 800);
+      }
     }
   }
 
@@ -884,12 +893,21 @@ class HomeEngine {
   }
 
   // 🛡️ UTILITY: Safe Loader
+  // 🛡️ UTILITY: Safe Loader using ErrorHandler
   async safeLoad(fn, name) {
-    try {
-      await fn();
-      if (window.Logger) window.Logger.log(`✅ [HomeEngine] ${name} Loaded`);
-    } catch (e) {
-      if (window.Logger) window.Logger.error(`❌ [HomeEngine] ${name} Failed`, e);
+    if (window.ErrorHandler && window.ErrorHandler.safe) {
+      await window.ErrorHandler.safe(fn, {
+        context: name,
+        logError: true
+      });
+    } else {
+      // Legacy fallback
+      try {
+        await fn();
+        if (window.Logger) window.Logger.log(`✅ [HomeEngine] ${name} Loaded`);
+      } catch (e) {
+        if (window.Logger) window.Logger.error(`❌ [HomeEngine] ${name} Failed`, e);
+      }
     }
   }
 
@@ -911,7 +929,7 @@ class HomeEngine {
       window.notifications.show('¡Te has suscrito! Revisa tu email para confirmar.', 'success');
     }
     localStorage.setItem('newsletter_subscribed', 'true');
-    
+
     // Limpiar input
     const input = document.getElementById('jsFooterEmail');
     if (input) input.value = '';
@@ -950,7 +968,7 @@ class HomeEngine {
     // 2. Popup Logic (Exit Intent / Time Delay)
     const popup = document.getElementById('newsletterPopup');
     if (popup && !localStorage.getItem('newsletter_subscribed') && !localStorage.getItem('newsletter_dismissed')) {
-      
+
       // Exit Intent Detection
       let exitIntentTriggered = false;
       document.addEventListener('mouseout', (e) => {
@@ -1005,7 +1023,7 @@ class HomeEngine {
             window.notifications.info('Video Player', 'Cargando reproductor...');
           } else {
             if (window.notifications) {
-                window.notifications.info('VIDEO PLAYER', 'Feature coming in v7.5 update');
+              window.notifications.info('VIDEO PLAYER', 'Feature coming in v7.5 update');
             }
           }
         }
@@ -1091,7 +1109,7 @@ class HomeEngine {
 
   initStickyFooter() {
     const sticky = document.getElementById('stickyFooter');
-    
+
     // Inicializar contador de tiempo para oferta flash
     this.initFlashSaleTimer();
     if (!sticky) return;
@@ -1146,9 +1164,15 @@ class HomeEngine {
 
     const loadCategory = async (category) => {
       // 1. UI Loading State
-      grid.style.display = 'none';
-      grid.classList.remove('loaded');
-      if (loader) loader.style.display = 'flex';
+      // 1. UI Loading State (Modern Skeleton)
+      if (window.LoadingStates) {
+        window.LoadingStates.show(grid, { type: 'skeleton' });
+      } else {
+        // Legacy
+        grid.style.display = 'none';
+        grid.classList.remove('loaded');
+        if (loader) loader.style.display = 'flex';
+      }
 
       // Update active tab
       tabs.forEach(t => t.classList.remove('active'));
@@ -1204,6 +1228,9 @@ class HomeEngine {
         `;
       } finally {
         // 5. Reveal
+        if (window.LoadingStates) {
+          window.LoadingStates.hide(grid, false); // Don't restore content, we replaced it
+        }
         if (loader) loader.style.display = 'none';
         grid.style.display = 'grid';
         // Small delay to allow display:grid to apply before opacity transition
@@ -1237,7 +1264,7 @@ class HomeEngine {
 }
 
 // Global function for closing newsletter popup
-window.closeNewsletterPopup = function() {
+window.closeNewsletterPopup = function () {
   const popup = document.getElementById('newsletterPopup');
   if (popup) {
     popup.classList.remove('visible', 'active');
@@ -1262,7 +1289,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   }, 2000);
-  
+
   // Guardar timeout ID para poder limpiarlo si es necesario
   if (!window.homeTimeouts) window.homeTimeouts = [];
   window.homeTimeouts.push(footerFailsafeTimeout);

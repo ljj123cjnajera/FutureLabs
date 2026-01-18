@@ -8,13 +8,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.Components.initSearch) window.Components.initSearch();
             if (window.Components.initCartCounter) window.Components.initCartCounter();
         }
-        
+
         const footerContainer = document.getElementById('mainFooter');
         if (footerContainer && !footerContainer.innerHTML.trim()) {
             footerContainer.innerHTML = window.Components.getFooter();
         }
     }
-    
+
     const registerForm = document.getElementById('registerForm');
 
     if (registerForm) {
@@ -73,18 +73,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            const btn = registerForm.querySelector('button[type="submit"]');
-            const originalText = btn ? btn.innerHTML : 'CREAR CUENTA';
-            if (btn) {
-                btn.disabled = true;
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> CREANDO CUENTA...';
-            }
-
             try {
+                // MODERN CORE: Use LoadingStates
+                if (window.LoadingStates) {
+                    window.LoadingStates.show(registerForm, { type: 'spinner', message: 'Creando cuenta...', overlay: true });
+                } else {
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> CREANDO CUENTA...';
+                }
+
                 const response = await window.api.register({ first_name, last_name, email, password });
+
                 if (response.success || response.token) {
                     if (window.notifications) window.notifications.success('¡Bienvenido!', 'Cuenta creada exitosamente. Verifica tu email para continuar.');
-                    
+
                     if (response.token) {
                         localStorage.setItem('auth_token', response.token);
                         if (response.user) {
@@ -104,17 +106,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     throw new Error(response.message || 'Error al registrar');
                 }
             } catch (error) {
+                if (window.LoadingStates) window.LoadingStates.hide(registerForm);
+
                 // Usar error handler si está disponible
                 if (window.ErrorHandler) {
-                    window.ErrorHandler.api(error, 'register', 'No se pudo crear la cuenta. Por favor, intenta de nuevo.');
+                    window.ErrorHandler.api(error, 'register', 'No se pudo crear la cuenta.');
                 } else {
-                    if (window.Logger) window.Logger.error('Registration error:', error);
                     if (window.notifications) {
                         const errorMsg = error.message || error.response?.data?.message || 'No se pudo crear la cuenta. Por favor, intenta de nuevo.';
                         window.notifications.error('Error de Registro', errorMsg);
                     }
                 }
-                if (btn) {
+
+                if (!window.LoadingStates && btn) {
                     btn.disabled = false;
                     btn.innerHTML = originalText;
                 }

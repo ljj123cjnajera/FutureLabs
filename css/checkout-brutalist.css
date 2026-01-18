@@ -12,15 +12,13 @@
 
 /* 1. LAYOUT STRUCTURE */
 .checkout-page {
-    padding-top: 2rem;
+    padding-top: 140px;
+    /* Space for Fixed Header */
     padding-bottom: 8rem;
     background: var(--white);
 }
 
-/* Checkout Header (Isolation) */
-.checkout-header {
-    margin-bottom: 2rem;
-}
+/* Legacy Header Removed */
 
 .checkout-container {
     display: grid;
@@ -184,8 +182,15 @@
 }
 
 @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
 }
 
 .summary-total {

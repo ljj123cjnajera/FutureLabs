@@ -9,11 +9,18 @@ class AdminCoupons {
         const tbody = document.getElementById('couponsTable');
         if (!tbody) return;
 
-        // Mostrar estado de carga
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;"><div class="loading-spinner"></div><p>Cargando cupones...</p></td></tr>';
+        // MODERN CORE: Loading State
+        if (window.LoadingStates) {
+            window.LoadingStates.show(tbody, { type: 'spinner', message: 'Cargando cupones...' });
+        } else {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;"><div class="loading-spinner"></div><p>Cargando cupones...</p></td></tr>';
+        }
 
         try {
             const response = await window.api.getCoupons();
+            // MODERN CORE: Hide Loader
+            if (window.LoadingStates) window.LoadingStates.hide(tbody);
+
             if (response.success) {
                 this.coupons = response.data.coupons || response.data || [];
                 this.renderTable();
@@ -21,7 +28,17 @@ class AdminCoupons {
                 this.renderError('Error al cargar cupones');
             }
         } catch (error) {
-            if (window.Logger) window.Logger.error('Error loading coupons:', error);
+            // MODERN CORE: Hide Loader
+            if (window.LoadingStates) window.LoadingStates.hide(tbody);
+
+            // MODERN CORE: Error Handler
+            if (window.ErrorHandler) {
+                window.ErrorHandler.handle(error, {
+                    context: 'AdminCoupons:loadCoupons',
+                    userMessage: 'No se pudieron cargar los cupones',
+                    logError: true
+                });
+            }
             this.renderError('Error de conexión');
         }
     }
@@ -194,22 +211,22 @@ class AdminCoupons {
 }
 
 // Inicializar cuando el DOM esté listo
-(function() {
-  function initAdminCoupons() {
-    if (!window.adminCoupons) {
-      window.adminCoupons = new AdminCoupons();
-      
-      // Event Listener para el formulario
-      const form = document.getElementById('couponForm');
-      if (form) {
-        form.addEventListener('submit', (e) => window.adminCoupons.saveCoupon(e));
-      }
-    }
-  }
+(function () {
+    function initAdminCoupons() {
+        if (!window.adminCoupons) {
+            window.adminCoupons = new AdminCoupons();
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initAdminCoupons);
-  } else {
-    initAdminCoupons();
-  }
+            // Event Listener para el formulario
+            const form = document.getElementById('couponForm');
+            if (form) {
+                form.addEventListener('submit', (e) => window.adminCoupons.saveCoupon(e));
+            }
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initAdminCoupons);
+    } else {
+        initAdminCoupons();
+    }
 })();
