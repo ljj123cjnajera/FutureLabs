@@ -411,13 +411,16 @@ class AdminManager {
 
   async loadRecentOrders() {
     const tbody = document.getElementById('recentOrdersTable');
-    if (!tbody) return;
+    if (!tbody) {
+      if (window.Logger) window.Logger.warn('recentOrdersTable no encontrado');
+      return;
+    }
 
     try {
       const response = await window.api.request('/admin/orders');
 
-      if (response.success) {
-        const orders = response.data.orders.slice(0, 10);
+      if (response.success && response.data) {
+        const orders = (response.data.orders || []).slice(0, 10);
 
         if (orders.length === 0) {
           tbody.innerHTML = `
@@ -432,23 +435,53 @@ class AdminManager {
           return;
         }
 
-        tbody.innerHTML = orders.map(order => `
-          <tr>
-            <td>#${order.order_number}</td>
-            <td>${order.first_name} ${order.last_name}</td>
-            <td>S/ ${parseFloat(order.total_amount).toFixed(2)}</td>
-            <td><span class="badge badge-${this.getStatusBadgeClass(order.status)}">${this.getStatusText(order.status)}</span></td>
-            <td>${new Date(order.created_at).toLocaleDateString('es-PE')}</td>
-            <td>
-              <button class="btn-action btn-view" onclick="viewOrder('${order.id}')">
-                <i class="fas fa-eye"></i> Ver
-              </button>
-            </td>
-          </tr>
-        `).join('');
+        // Usar escapeHTML para prevenir XSS
+        const escapeHtml = window.Utils?.escapeHTML || ((text) => {
+          const div = document.createElement('div');
+          div.textContent = text;
+          return div.innerHTML;
+        });
+
+        tbody.innerHTML = orders.map(order => {
+          const orderNumber = escapeHtml(order.order_number || order.id || 'N/A');
+          const customerName = escapeHtml(`${order.first_name || ''} ${order.last_name || ''}`.trim() || 'Sin nombre');
+          const totalAmount = parseFloat(order.total_amount || 0).toFixed(2);
+          const status = order.status || 'pending';
+          const orderDate = order.created_at ? new Date(order.created_at).toLocaleDateString('es-PE') : 'N/A';
+          const orderId = escapeHtml(order.id || '');
+
+          return `
+            <tr>
+              <td>#${orderNumber}</td>
+              <td>${customerName}</td>
+              <td>S/ ${totalAmount}</td>
+              <td><span class="badge badge-${this.getStatusBadgeClass(status)}">${this.getStatusText(status)}</span></td>
+              <td>${orderDate}</td>
+              <td>
+                <button class="btn-action btn-view" onclick="viewOrder('${orderId}')">
+                  <i class="fas fa-eye"></i> Ver
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } else {
+        throw new Error(response.message || 'Error al obtener pedidos');
       }
     } catch (error) {
       if (window.Logger) window.Logger.error('Error loading recent orders:', error);
+      const errorMsg = error.message || 'Error al cargar pedidos';
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align: center; padding: 40px; color: #ef4444;">
+            <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 10px;"></i>
+            <p>${errorMsg}</p>
+            <button class="btn-primary" onclick="window.adminManager?.loadRecentOrders()" style="margin-top: 10px;">
+              <i class="fas fa-redo"></i> Reintentar
+            </button>
+          </td>
+        </tr>
+      `;
     }
   }
 
