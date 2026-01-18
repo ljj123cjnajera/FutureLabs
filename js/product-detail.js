@@ -1,12 +1,34 @@
 // Inicializar header dinámico y cargar producto
 document.addEventListener('DOMContentLoaded', async function () {
-    // Inicializar header
-    const headerContainer = document.getElementById('mainHeader');
-    if (headerContainer && window.Components) {
-        headerContainer.innerHTML = window.Components.getHeader(true, true);
-        window.Components.initHeader();
-        window.Components.initSearch();
-        window.Components.initCartCounter();
+    // Esperar a que componentes críticos estén disponibles
+    let retries = 0;
+    while ((!window.Components || !window.api) && retries < 30) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        retries++;
+    }
+
+    // Inicializar header y footer
+    if (window.Components) {
+        const headerContainer = document.getElementById('mainHeader');
+        if (headerContainer && !headerContainer.innerHTML.trim()) {
+            try {
+                headerContainer.innerHTML = window.Components.getHeader(true, true);
+                if (window.Components.initHeader) window.Components.initHeader();
+                if (window.Components.initSearch) window.Components.initSearch();
+                if (window.Components.initCartCounter) window.Components.initCartCounter();
+            } catch (e) {
+                if (window.Logger) window.Logger.error('Error initializing header:', e);
+            }
+        }
+        
+        const footerContainer = document.getElementById('mainFooter');
+        if (footerContainer && !footerContainer.innerHTML.trim()) {
+            try {
+                footerContainer.innerHTML = window.Components.getFooter();
+            } catch (e) {
+                if (window.Logger) window.Logger.error('Error initializing footer:', e);
+            }
+        }
     }
 
     // Obtener ID del producto de la URL
@@ -14,22 +36,59 @@ document.addEventListener('DOMContentLoaded', async function () {
     const productId = urlParams.get('id');
     window.currentProductId = productId;
 
+    // Inicializar selectedSize global
+    window.selectedSize = null;
+    let selectedSize = null;
+
     // Cargar producto
     async function loadProduct() {
         const container = document.getElementById('productDetailContainer');
+        if (!container) return;
 
         if (!productId) {
-            container.innerHTML = `
-                <div style="text-align: center; padding: 100px;">
-                    <i class="fas fa-exclamation-triangle fa-3x" style="color: #e74c3c; margin-bottom: 20px;"></i>
-                    <h2>Producto no encontrado</h2>
-                    <p>El producto que buscas no existe</p>
-                </div>
-            `;
+            if (window.LoadingStates) {
+                window.LoadingStates.empty('productDetailContainer', {
+                    title: 'Producto no encontrado',
+                    message: 'El producto que buscas no existe',
+                    icon: 'fas fa-exclamation-triangle',
+                    actionLabel: 'Ver productos',
+                    onAction: () => {
+                        window.location.href = 'products.html';
+                    }
+                });
+            } else {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 100px;">
+                        <i class="fas fa-exclamation-triangle fa-3x" style="color: #e74c3c; margin-bottom: 20px;"></i>
+                        <h2>Producto no encontrado</h2>
+                        <p>El producto que buscas no existe</p>
+                    </div>
+                `;
+            }
             return;
         }
 
+        // Show loading state
+        if (window.LoadingStates) {
+            window.LoadingStates.show('productDetailContainer', {
+                message: 'Cargando producto...',
+                type: 'spinner'
+            });
+        }
+
         try {
+            // Esperar a que API esté disponible
+            if (!window.api) {
+                let apiRetries = 0;
+                while (!window.api && apiRetries < 30) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    apiRetries++;
+                }
+                if (!window.api) {
+                    throw new Error('API no disponible. Por favor, recarga la página.');
+                }
+            }
+
             // 1. API Call
             const response = await window.api.getProduct(productId);
             let product = null;
@@ -41,54 +100,85 @@ document.addEventListener('DOMContentLoaded', async function () {
                 product = response;
             } else if (response && response.data && response.data.product) {
                 product = response.data.product;
+            } else if (response && !response.success) {
+                throw new Error(response.message || 'Producto no encontrado en la API');
             }
 
             // 3. Validate Data
             if (product) {
                 window.currentProduct = product;
 
+                // Hide loading state
+                if (window.LoadingStates) {
+                    window.LoadingStates.hide('productDetailContainer');
+                }
+
                 // Normalizar imágenes
                 let galleryImages = [];
                 if (Array.isArray(product.images) && product.images.length > 0) {
                     galleryImages = product.images;
-                } else if (product.image_url) {
-                    galleryImages = [product.image_url, product.image_url, product.image_url, product.image_url];
-                } else {
-                    galleryImages = ['img/placeholder.jpg'];
+                } else if (product.images && typeof product.images === 'string') {
+                    try {
+                        const parsed = JSON.parse(product.images);
+                        if (Array.isArray(parsed)) {
+                            galleryImages = parsed.filter(img => img && img.trim() !== '');
+                        }
+                    } catch (e) {
+                        // Si no es JSON válido, usar image_url
+                    }
+                }
+                
+                if (galleryImages.length === 0 && product.image_url) {
+                    galleryImages = [product.image_url];
+                }
+                
+                if (galleryImages.length === 0) {
+                    galleryImages = ['assets/images/products/placeholder.jpg'];
                 }
 
                 renderProductDetails(product, container, galleryImages);
                 return;
             } else {
-                throw new Error('Product Not Found in API');
+                throw new Error('Producto no encontrado en la API');
             }
 
         } catch (error) {
-            if (window.Logger) window.Logger.error('❌ API Error in PDP:', error);
-            
-            // Mostrar error real al usuario
-            renderErrorState(container, `Error al cargar producto: ${error.message || 'Error de conexión'}`);
-            
-            // No usar productos mock - solo mostrar error
-            if (window.notifications) {
-                window.notifications.error('Error de conexión', 'No se pudo cargar el producto. Por favor, intenta de nuevo.');
+            if (window.ErrorHandler) {
+                window.ErrorHandler.api(error, 'loadProduct', 'No se pudo cargar el producto. Por favor, intenta de nuevo.');
+            } else {
+                if (window.Logger) window.Logger.error('❌ API Error in PDP:', error);
+            }
+
+            // Hide loading state
+            if (window.LoadingStates) {
+                window.LoadingStates.hide('productDetailContainer');
+            }
+
+            // Show error state
+            if (window.LoadingStates) {
+                window.LoadingStates.error('productDetailContainer', {
+                    title: 'Error al cargar producto',
+                    message: error.message || 'No se pudo cargar el producto. Por favor, intenta de nuevo.',
+                    actionLabel: 'REINTENTAR',
+                    onAction: () => {
+                        loadProduct();
+                    }
+                });
+            } else {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 100px;">
+                        <i class="fas fa-exclamation-triangle fa-3x" style="color: #e74c3c; margin-bottom: 20px;"></i>
+                        <h2>Error al cargar producto</h2>
+                        <p>${error.message || 'No se pudo cargar el producto. Por favor, intenta de nuevo.'}</p>
+                        <button onclick="location.reload()" style="margin-top: 20px; padding: 10px 20px; background: #000; color: #fff; border: none; cursor: pointer;">REINTENTAR</button>
+                    </div>
+                `;
             }
         }
     }
 
     // --- HELPER: RENDER UI ---
     function renderProductDetails(product, container, galleryImages) {
-        // ... (Same rendering logic as before, refactored out or kept inline if simple)
-        // Note: For minimal diff, I will paste the entire innerHTML block here or assume the user wants me to duplicate the block.
-        // BETTER: Let's actually keep the huge innerHTML block in the main flow but just wrap the "Success" part.
-        // However, since I can't refactor the whole function easily in one go without a massive diff, I will duplicate the render logic inside the mock block OR 
-        // essentially "hijack" the success flow.
-
-        // RE-STRATEGY for minimal diff: 
-        // 1. Define getMockProduct at the end.
-        // 2. In the catch/else blocks, if mock exists, just assign `response = { success: true, data: { product: mock } }` effectively? 
-        // No, let's keep it explicit.
-
         // Update live viewers count (simulated for conversion)
         updateLiveViewers(product.id);
         
@@ -96,12 +186,24 @@ document.addEventListener('DOMContentLoaded', async function () {
         if (window.SeoManager) {
             window.SeoManager.updateProductSEO({
                 title: product.name,
-                description: product.description || `Buy ${product.name} at Sneakers Shop.`,
+                description: product.description || `Compra ${product.name} en Sneakers Shop.`,
                 image: product.image_url,
                 url: window.location.href,
                 price: product.price,
                 currency: 'PEN'
             });
+        }
+
+        // Parse size stock if available
+        window.productSizeStock = {};
+        if (product.size_stock && typeof product.size_stock === 'string') {
+            try {
+                window.productSizeStock = JSON.parse(product.size_stock);
+            } catch (e) {
+                // Ignore parse errors
+            }
+        } else if (product.size_stock && typeof product.size_stock === 'object') {
+            window.productSizeStock = product.size_stock;
         }
 
         container.innerHTML = `
@@ -115,7 +217,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             <div class="product-info-detail">
                 <div class="product-header-group">
                     <div class="product-meta-header" style="display:flex; justify-content:space-between; align-items:center;">
-                        <p class="product-brand" style="font-weight: 800; text-transform: uppercase; color: #666; margin-bottom: 0.5rem; letter-spacing: 0.1em;">${product.brand}</p>
+                        <p class="product-brand" style="font-weight: 800; text-transform: uppercase; color: #666; margin-bottom: 0.5rem; letter-spacing: 0.1em;">${product.brand || 'MARCA'}</p>
                         <div class="product-rating-detail">
                             <span class="stars-detail">★★★★★</span>
                             <span class="rating-text-detail">(${product.rating_count || 12} reviews)</span>
@@ -178,214 +280,151 @@ document.addEventListener('DOMContentLoaded', async function () {
                         <i class="fas fa-exclamation-circle"></i> SELECCIONA UNA TALLA PARA CONTINUAR
                     </div>
                 </div>
-
-                <!-- Price Display with Discount -->
-                ${product.discount_price && product.discount_price < product.price ? `
-                <div class="product-price-display" style="margin-bottom: 1.5rem; padding: 20px; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 4px;">
-                    <div style="display: flex; align-items: baseline; gap: 15px; margin-bottom: 10px;">
-                        <span style="font-size: 2rem; font-weight: 900; color: var(--black);">S/ ${parseFloat(product.discount_price).toFixed(2)}</span>
-                        <span style="font-size: 1.2rem; color: #666; text-decoration: line-through;">S/ ${parseFloat(product.price).toFixed(2)}</span>
-                        <span style="background: #d32f2f; color: white; padding: 5px 10px; border-radius: 4px; font-weight: 700; font-size: 0.9rem;">
-                            -${Math.round(((product.price - product.discount_price) / product.price) * 100)}% OFF
-                        </span>
-                    </div>
-                    <p style="margin: 0; color: #666; font-size: 0.9rem;">
-                        <i class="fas fa-tag" aria-hidden="true"></i> Ahorras S/ ${(parseFloat(product.price) - parseFloat(product.discount_price)).toFixed(2)}
-                    </p>
-                </div>
-                ` : `
-                <div class="product-price-display" style="margin-bottom: 1.5rem;">
-                    <span style="font-size: 2rem; font-weight: 900; color: var(--black);">S/ ${parseFloat(product.price).toFixed(2)}</span>
-                </div>
-                `}
                 
-                <!-- Action Buttons -->
-                <div class="product-actions-sticky" style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 2rem;">
-                    ${product.stock_quantity > 0 || product.stock_quantity === undefined ? `
-                    <button type="button" class="btn btn-massive btn-primary" id="buyNowBtn" onclick="buyNow()" style="background: var(--black); color: white; padding: 18px; font-size: 1.1rem; font-weight: 900; text-transform: uppercase; border: none; cursor: pointer; width: 100%;">
-                        <i class="fas fa-bolt" aria-hidden="true"></i> COMPRAR AHORA
+                <div class="product-actions-detail" style="margin-top: 2rem; display: flex; gap: 15px; flex-wrap: wrap;">
+                    <button class="btn-add-cart-detail" onclick="window.addToCart()" id="addToCartBtn" style="flex: 1; min-width: 200px;">
+                        <i class="fas fa-shopping-cart"></i> AGREGAR AL CARRITO
                     </button>
-                    <button type="button" class="btn btn-massive" id="addToCartBtn" onclick="addToCart()" style="background: white; color: var(--black); padding: 18px; font-size: 1.1rem; font-weight: 900; text-transform: uppercase; border: 3px solid var(--black); cursor: pointer; width: 100%;">
-                        <i class="fas fa-shopping-cart" aria-hidden="true"></i> AÑADIR AL CARRITO
+                    <button class="btn-buy-now-detail" onclick="window.buyNow()" id="buyNowBtn" style="flex: 1; min-width: 200px;">
+                        <i class="fas fa-bolt"></i> COMPRAR AHORA
                     </button>
+                    <button class="btn-wishlist-detail" onclick="window.toggleWishlist()" id="wishlistBtn" style="padding: 15px 20px; background: white; border: 2px solid #000; color: #000; cursor: pointer; font-weight: 700; border-radius: 4px;">
+                        <i class="far fa-heart" id="wishlistIcon"></i>
+                    </button>
+                </div>
+                
+                <div class="product-price-detail" style="margin-top: 2rem; padding-top: 2rem; border-top: 2px solid #eee;">
+                    ${product.discount_price && product.discount_price < product.price ? `
+                        <div style="display: flex; align-items: baseline; gap: 15px;">
+                            <span class="price-original" style="font-size: 1.5rem; color: #999; text-decoration: line-through;">S/ ${parseFloat(product.price).toFixed(2)}</span>
+                            <span class="price-discount" style="font-size: 2.5rem; font-weight: 900; color: #d32f2f;">S/ ${parseFloat(product.discount_price).toFixed(2)}</span>
+                            <span class="discount-badge" style="background: #d32f2f; color: #fff; padding: 5px 10px; border-radius: 4px; font-size: 0.9rem; font-weight: 700;">
+                                ${Math.round(((product.price - product.discount_price) / product.price) * 100)}% OFF
+                            </span>
+                        </div>
                     ` : `
-                    <button type="button" class="btn btn-massive" disabled style="background: #ccc; color: #666; padding: 18px; font-size: 1.1rem; font-weight: 900; text-transform: uppercase; border: none; cursor: not-allowed; width: 100%;">
-                        <i class="fas fa-times-circle" aria-hidden="true"></i> AGOTADO
-                    </button>
+                        <span class="price-current" style="font-size: 2.5rem; font-weight: 900; color: #000;">S/ ${parseFloat(product.price || 0).toFixed(2)}</span>
                     `}
                 </div>
-                
-                <!-- Shipping & Guarantees Section -->
-                <div class="product-meta-footer" style="margin-top: 2rem; border-top: 4px solid var(--black); padding-top: 2rem;">
-                    <div class="shipping-info-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 1.5rem;">
-                        <div class="shipping-item" style="display: flex; gap: 10px; padding: 15px; background: #e3f2fd; border-radius: 4px;">
-                            <i class="fas fa-stopwatch" style="font-size: 1.5rem; color: #2196f3;" aria-hidden="true"></i>
-                            <div>
-                                <strong style="text-transform: uppercase; font-weight: 900; color: var(--black); display: block;">¡LLEGA MAÑANA!</strong>
-                                <p style="margin:5px 0 0 0; color: #666; font-size: 0.85rem;">Pide antes de las 5PM</p>
-                            </div>
-                        </div>
-                        <div class="shipping-item" style="display: flex; gap: 10px; padding: 15px; background: #f3e5f5; border-radius: 4px;">
-                            <i class="fas fa-truck" style="font-size: 1.5rem; color: #9c27b0;" aria-hidden="true"></i>
-                            <div>
-                                <strong style="text-transform: uppercase; font-weight: 900; color: var(--black); display: block;">ENVÍO GRATIS</strong>
-                                <p style="margin:5px 0 0 0; color: #666; font-size: 0.85rem;">En compras S/150+</p>
-                            </div>
-                        </div>
-                        <div class="shipping-item" style="display: flex; gap: 10px; padding: 15px; background: #e8f5e9; border-radius: 4px;">
-                            <i class="fas fa-shield-alt" style="font-size: 1.5rem; color: #4caf50;" aria-hidden="true"></i>
-                            <div>
-                                <strong style="text-transform: uppercase; font-weight: 900; color: var(--black); display: block;">GARANTÍA</strong>
-                                <p style="margin:5px 0 0 0; color: #666; font-size: 0.85rem;">100% Auténtico</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Payment Methods -->
-                    <div class="payment-methods-display" style="padding: 15px; background: #f5f5f5; border-radius: 4px; margin-bottom: 1rem;">
-                        <p style="margin: 0 0 10px 0; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; color: #666;">Métodos de Pago:</p>
-                        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-                            <span style="padding: 5px 10px; background: white; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">VISA</span>
-                            <span style="padding: 5px 10px; background: white; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">MASTERCARD</span>
-                            <span style="padding: 5px 10px; background: white; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">YAPE</span>
-                            <span style="padding: 5px 10px; background: white; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">PLIN</span>
-                            <span style="padding: 5px 10px; background: white; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">EFECTIVO</span>
-                        </div>
-                    </div>
-                </div>
             </div>
-        </div>`;
-
-        // Injected Logic
-        if (!document.getElementById('sizeGuideModal')) {
-            document.body.insertAdjacentHTML('beforeend', getModalHTML());
-        }
-
-        const grid = document.getElementById('sizeSelectorGrid');
-        const sizes = ['7', '7.5', '8', '8.5', '9', '9.5', '10', '10.5', '11', '12', '13'];
-        if (grid) {
-            grid.innerHTML = sizes.map(size => `
-                <button class="size-option" onclick="selectSize('${size}', this)">${size}</button>
-             `).join('');
-        }
-
-        if (window.productGallery) window.productGallery.render(galleryImages, product);
-    }
-
-    function renderErrorState(container, msg) {
-        container.innerHTML = `
-            <div style="text-align: center; padding: 100px;">
-                <i class="fas fa-exclamation-triangle fa-3x" style="color: #e74c3c; margin-bottom: 20px;"></i>
-                <h2>Producto no encontrado</h2>
-                <p>${msg}</p>
-                <a href="index.html" class="btn btn-black" style="margin-top:20px">VOLVER AL HOME</a>
-            </div>
+        </div>
         `;
+
+        // Initialize gallery - Wait a bit for product-gallery.js to load
+        setTimeout(() => {
+            const galleryContainer = document.getElementById('productGallery');
+            if (!galleryContainer || galleryImages.length === 0) return;
+            
+            // Try using existing productGallery instance
+            if (window.productGallery && typeof window.productGallery.render === 'function') {
+                window.productGallery.render(galleryImages, product);
+            } 
+            // Try creating new ProductGallery instance
+            else if (window.ProductGallery && typeof window.ProductGallery === 'function') {
+                try {
+                    window.productGallery = new window.ProductGallery('productGallery');
+                    if (window.productGallery && typeof window.productGallery.render === 'function') {
+                        window.productGallery.render(galleryImages, product);
+                    }
+                } catch (e) {
+                    if (window.Logger) window.Logger.warn('Error initializing ProductGallery:', e);
+                }
+            }
+            
+            // Fallback: simple gallery HTML if ProductGallery not available
+            if (!window.productGallery || typeof window.productGallery.render !== 'function') {
+                if (window.Logger) window.Logger.warn('ProductGallery not available, using fallback');
+                const fallbackHTML = galleryImages.map(img => `
+                    <div class="gallery-image-wrapper">
+                        <img src="${img || 'assets/images/products/placeholder.jpg'}" 
+                             alt="${product.name || 'Producto'}" 
+                             class="gallery-image" 
+                             loading="lazy"
+                             onerror="this.src='assets/images/products/placeholder.jpg'">
+                    </div>
+                `).join('');
+                if (galleryContainer) {
+                    galleryContainer.innerHTML = fallbackHTML;
+                }
+            }
+        }, 150);
+
+        // Render size selector
+        renderSizeSelector(product);
+        
+        // Update wishlist button state
+        setTimeout(() => updateWishlistButton(), 500);
     }
 
-    // --- LIVE VIEWERS SIMULATION (Conversion Optimization) ---
-    function updateLiveViewers(productId) {
-        const viewerElement = document.getElementById('viewerCount');
-        if (!viewerElement) return;
-        
-        // Simulate realistic viewer count (8-25 people)
-        const baseCount = 12;
-        const variation = Math.floor(Math.random() * 17) + 1;
-        const viewerCount = baseCount + variation;
-        
-        viewerElement.textContent = viewerCount;
-        
-        // Update every 15-30 seconds to simulate real activity
-        setInterval(() => {
-            const change = Math.floor(Math.random() * 5) - 2; // -2 to +2
-            const newCount = Math.max(8, Math.min(30, viewerCount + change));
-            viewerElement.textContent = newCount;
-        }, 20000 + Math.random() * 10000);
-    }
-    
-
-    function getModalHTML() {
-        return `
-         <div id="sizeGuideModal" class="modal" style="display: none;">
-             <div class="modal-content">
-                 <span class="close-modal" onclick="closeSizeGuideModal()">&times;</span>
-                 <h2>Guía de Tallas</h2>
-                 <p>Standard US Sizing.</p>
-             </div>
-         </div>`;
-    }
-
-
-    let selectedSize = null;
-
-    function renderSizeOptions(product) {
+    function renderSizeSelector(product) {
         const grid = document.getElementById('sizeSelectorGrid');
         if (!grid) return;
 
-        // Standard US Men Sizes
-        const sizes = ['7', '7.5', '8', '8.5', '9', '9.5', '10', '10.5', '11', '12', '13'];
-
-        // Logic: If total stock > 0, assume all sizes available (Simple V1)
-        // If stock === 0, all disabled.
-        const hasStock = product.stock_quantity > 0;
-
+        // Common US sizes for sneakers
+        const sizes = ['6', '6.5', '7', '7.5', '8', '8.5', '9', '9.5', '10', '10.5', '11', '11.5', '12', '12.5', '13'];
+        
         grid.innerHTML = sizes.map(size => {
+            const stock = window.productSizeStock && window.productSizeStock[size] !== undefined 
+                ? window.productSizeStock[size] 
+                : (product.stock_quantity || 0);
+            const isAvailable = stock > 0;
+            const isLowStock = stock > 0 && stock <= 3;
+            
             return `
-                    <button class="size-option ${!hasStock ? 'disabled' : ''}"
-                onclick = "selectSize('${size}', this)" 
-                        ${!hasStock ? 'disabled' : ''}>
+                <button 
+                    class="size-option ${!isAvailable ? 'out-of-stock' : ''} ${isLowStock ? 'low-stock' : ''}" 
+                    data-size="${size}"
+                    ${!isAvailable ? 'disabled' : ''}
+                    onclick="selectSize('${size}')"
+                >
                     ${size}
-                </button >
-                    `;
+                    ${isLowStock ? '<span class="stock-badge">¡Últimas!</span>' : ''}
+                </button>
+            `;
         }).join('');
+
+        // Add click handlers
+        grid.querySelectorAll('.size-option').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (this.disabled) return;
+                selectSize(this.dataset.size);
+            });
+        });
     }
 
-    window.selectSize = function (size, element) {
-        if (element.disabled) return;
-
-        // Remove active class from all
-        document.querySelectorAll('.size-option').forEach(el => el.classList.remove('selected'));
-
-        // Add to clicked
-        element.classList.add('selected');
+    function selectSize(size) {
         selectedSize = size;
+        window.selectedSize = size;
 
-        // Hide error
+        // Update UI
+        document.querySelectorAll('.size-option').forEach(btn => {
+            btn.classList.remove('selected');
+            if (btn.dataset.size === size) {
+                btn.classList.add('selected');
+            }
+        });
+
+        // Hide validation message
         const errorMsg = document.getElementById('sizeValidationMsg');
         if (errorMsg) errorMsg.classList.remove('visible');
-    };
+    }
 
-    window.openSizeGuideModal = function () {
-        const modal = document.getElementById('sizeGuideModal');
-        if (modal) {
-            modal.style.display = 'block';
-            // Force display block first then add opacity for transition if needed
-            // Simple css display toggle for now
-        }
-    };
+    window.selectSize = selectSize;
 
-    window.closeSizeGuideModal = function () {
-        const modal = document.getElementById('sizeGuideModal');
-        if (modal) modal.style.display = 'none';
-    };
-
-    // Close modal when clicking outside
-    window.onclick = function (event) {
-        const modal = document.getElementById('sizeGuideModal');
-        if (event.target == modal) {
-            modal.style.display = "none";
-        }
-    };
-
-    // Agregar al carrito
+    // Agregar al carrito - Asegurar que esté disponible globalmente
     window.addToCart = async function () {
+        if (window.Logger) window.Logger.log('🛒 addToCart llamado');
+        
         const product = window.currentProduct;
         if (!product) {
+            if (window.Logger) window.Logger.error('❌ Producto no disponible en window.currentProduct');
             if (window.notifications) {
                 window.notifications.error('Error', 'Producto no disponible');
             }
             return;
         }
+        
+        if (window.Logger) window.Logger.log('✅ Producto encontrado:', product.id || product.product_id);
 
         const productId = product.id || product.product_id;
         if (!productId) {
@@ -395,7 +434,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             return;
         }
 
-        // VALIDACIÓN DE STOCK
+        // VALIDACIÓN DE STOCK GENERAL
         const stock = product.stock_quantity;
         if (stock !== undefined && stock === 0) {
             if (window.notifications) {
@@ -404,8 +443,11 @@ document.addEventListener('DOMContentLoaded', async function () {
             return;
         }
 
+        // Obtener talla seleccionada (puede ser local o global)
+        const currentSelectedSize = selectedSize || window.selectedSize || null;
+
         // VALIDACIÓN DE TALLA
-        if (!selectedSize) {
+        if (!currentSelectedSize) {
             const errorMsg = document.getElementById('sizeValidationMsg');
             const container = document.querySelector('.size-selector-container');
 
@@ -421,25 +463,77 @@ document.addEventListener('DOMContentLoaded', async function () {
             return;
         }
 
-        try {
-            // Use the new CartEngine (aliased as cartManager)
-            // It will handle: Saving to LocalStorage/API, Updating UI, Opening Drawer
-            const success = await window.cartManager?.add(productId, 1, { size: selectedSize });
-            
-            if (success !== false) {
+        // VALIDACIÓN DE STOCK POR TALLA
+        if (window.productSizeStock && window.productSizeStock[currentSelectedSize] !== undefined) {
+            const sizeStock = window.productSizeStock[currentSelectedSize];
+            if (sizeStock === 0) {
                 if (window.notifications) {
-                    window.notifications.success('Agregado al Carrito', `Talla US ${selectedSize} agregada correctamente`);
+                    window.notifications.warning('Talla Agotada', `La talla US ${currentSelectedSize} no está disponible en este momento.`);
+                }
+                return;
+            }
+            if (sizeStock < 1) {
+                if (window.notifications) {
+                    window.notifications.warning('Stock Insuficiente', `Solo hay ${sizeStock} unidades disponibles en talla US ${currentSelectedSize}.`);
+                }
+                return;
+            }
+        }
+
+        try {
+            // Esperar a que cartEngine esté disponible (con más tiempo)
+            let retries = 0;
+            const maxRetries = 50; // 5 segundos
+            while (!window.cartEngine && !window.cartManager && retries < maxRetries) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                retries++;
+            }
+
+            // Usar cartManager como alias si cartEngine no está disponible
+            let cart = window.cartEngine || window.cartManager;
+            
+            if (!cart) {
+                // Intentar inicializar manualmente si no está disponible
+                if (window.CartEngine) {
+                    if (window.Logger) window.Logger.log('🔧 Inicializando CartEngine manualmente...');
+                    window.cartEngine = new window.CartEngine();
+                    window.cartManager = window.cartEngine;
+                    // Esperar un poco más para que se inicialice
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    cart = window.cartEngine || window.cartManager;
+                }
+                
+                if (!cart) {
+                    throw new Error('CartEngine no disponible. Por favor, recarga la página.');
+                }
+            }
+
+            if (window.Logger) window.Logger.log('✅ CartEngine disponible, agregando producto...', { productId, size: currentSelectedSize });
+
+            // Agregar al carrito con size
+            const success = await cart.add(productId, 1, { size: currentSelectedSize });
+            
+            if (success === true) {
+                // Éxito - la notificación ya se muestra en cartEngine.add()
+                return;
+            } else if (success === false) {
+                // Error manejado en cartEngine.add()
+                return;
+            } else {
+                // Caso inesperado
+                if (window.notifications) {
+                    window.notifications.warning('Error', 'No se pudo agregar el producto al carrito.');
                 }
             }
         } catch (e) {
             if (window.Logger) window.Logger.error('Error adding to cart:', e);
             if (window.notifications) {
-                window.notifications.error('Error', 'No se pudo agregar el producto. Por favor, intenta de nuevo.');
+                const errorMsg = e.message || 'No se pudo agregar el producto. Por favor, intenta de nuevo.';
+                window.notifications.error('Error', errorMsg);
             }
         }
     }
 
-    // Comprar ahora
     window.buyNow = async function () {
         const product = window.currentProduct;
         if (!product) {
@@ -457,17 +551,11 @@ document.addEventListener('DOMContentLoaded', async function () {
             return;
         }
 
-        // VALIDACIÓN DE STOCK
-        const stock = product.stock_quantity;
-        if (stock !== undefined && stock === 0) {
-            if (window.notifications) {
-                window.notifications.warning('Producto Agotado', 'Este producto no está disponible en este momento.');
-            }
-            return;
-        }
+        // Obtener talla seleccionada (puede ser local o global)
+        const currentSelectedSize = selectedSize || window.selectedSize || null;
 
         // VALIDACIÓN DE TALLA
-        if (!selectedSize) {
+        if (!currentSelectedSize) {
             const errorMsg = document.getElementById('sizeValidationMsg');
             const container = document.querySelector('.size-selector-container');
 
@@ -483,21 +571,234 @@ document.addEventListener('DOMContentLoaded', async function () {
             return;
         }
 
+        // VALIDACIÓN DE STOCK POR TALLA
+        if (window.productSizeStock && window.productSizeStock[currentSelectedSize] !== undefined) {
+            const sizeStock = window.productSizeStock[currentSelectedSize];
+            if (sizeStock === 0) {
+                if (window.notifications) {
+                    window.notifications.warning('Talla Agotada', `La talla US ${currentSelectedSize} no está disponible en este momento.`);
+                }
+                return;
+            }
+            if (sizeStock < 1) {
+                if (window.notifications) {
+                    window.notifications.warning('Stock Insuficiente', `Solo hay ${sizeStock} unidades disponibles en talla US ${currentSelectedSize}.`);
+                }
+                return;
+            }
+        }
+
         try {
-            const success = await window.cartManager?.add(productId, 1, { size: selectedSize });
+            // Esperar a que cartEngine esté disponible
+            let retries = 0;
+            const maxRetries = 50;
+            while (!window.cartEngine && !window.cartManager && retries < maxRetries) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                retries++;
+            }
+
+            // Usar cartManager como alias si cartEngine no está disponible
+            let cart = window.cartEngine || window.cartManager;
+            
+            if (!cart) {
+                if (window.CartEngine) {
+                    if (window.Logger) window.Logger.log('🔧 Inicializando CartEngine manualmente para buyNow...');
+                    window.cartEngine = new window.CartEngine();
+                    window.cartManager = window.cartEngine;
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    cart = window.cartEngine || window.cartManager;
+                }
+                
+                if (!cart) {
+                    throw new Error('CartEngine no disponible. Por favor, recarga la página.');
+                }
+            }
+
+            if (window.Logger) window.Logger.log('✅ CartEngine disponible para buyNow, agregando producto...');
+
+            // Agregar al carrito
+            const success = await cart.add(productId, 1, { size: currentSelectedSize });
+            
             if (success !== false) {
+                // Actualizar contador de carrito
+                if (window.Components && window.Components.updateCartCount) {
+                    window.Components.updateCartCount();
+                }
+                
                 if (window.notifications) {
                     window.notifications.success('Redirigiendo al checkout...', 'El producto se agregó al carrito');
                 }
                 setTimeout(() => {
                     window.location.href = 'checkout.html';
                 }, 1000);
+            } else {
+                if (window.notifications) {
+                    window.notifications.warning('Error', 'No se pudo agregar el producto al carrito.');
+                }
             }
         } catch (e) {
             if (window.Logger) window.Logger.error('Error in buyNow:', e);
             if (window.notifications) {
-                window.notifications.error('Error', 'No se pudo agregar el producto. Por favor, intenta de nuevo.');
+                const errorMsg = e.message || 'No se pudo agregar el producto. Por favor, intenta de nuevo.';
+                window.notifications.error('Error', errorMsg);
             }
+        }
+    }
+
+    function updateLiveViewers(productId) {
+        // Simulated live viewers count
+        const viewersEl = document.querySelector('.live-viewers-count');
+        if (viewersEl) {
+            const count = Math.floor(Math.random() * 20) + 5;
+            viewersEl.textContent = `${count} personas viendo este producto`;
+        }
+    }
+
+    function openSizeGuideModal() {
+        if (window.notifications) {
+            window.notifications.info('Guía de Tallas', 'Selecciona tu talla según tu medida en centímetros. Si tienes dudas, contáctanos.');
+        }
+    }
+
+    window.openSizeGuideModal = openSizeGuideModal;
+
+    // Wishlist toggle function
+    window.toggleWishlist = async function() {
+        const product = window.currentProduct;
+        if (!product) {
+            if (window.notifications) {
+                window.notifications.error('Error', 'Producto no disponible');
+            }
+            return;
+        }
+
+        const productId = product.id || product.product_id;
+        if (!productId) {
+            if (window.notifications) {
+                window.notifications.error('Error', 'ID de producto no encontrado');
+            }
+            return;
+        }
+
+        try {
+            // Wait for wishlistManager if not available
+            if (!window.wishlistManager) {
+                let retries = 0;
+                while (!window.wishlistManager && retries < 20) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    retries++;
+                }
+            }
+            
+            // Initialize wishlistManager if needed (works for both authenticated and guest users)
+            if (window.wishlistManager && (!window.wishlistManager.lists || window.wishlistManager.lists.length === 0)) {
+                try {
+                    await window.wishlistManager.init();
+                } catch (e) {
+                    if (window.Logger) window.Logger.warn('Error initializing wishlist:', e);
+                }
+            }
+
+            if (window.wishlistManager) {
+                // Check state BEFORE toggle (sync, not async for localStorage)
+                const wasInWishlist = window.wishlistManager.isInWishlist(productId);
+                
+                // Perform toggle
+                const success = await window.wishlistManager.toggle(productId);
+                
+                if (success) {
+                    // After toggle, the state is opposite of what it was before
+                    const isNowInWishlist = !wasInWishlist;
+                    
+                    // Update button icon based on NEW state
+                    const icon = document.getElementById('wishlistIcon');
+                    const btn = document.getElementById('wishlistBtn');
+                    if (icon && btn) {
+                        if (isNowInWishlist) {
+                            // Now in wishlist - show filled heart
+                            icon.className = 'fas fa-heart';
+                            btn.style.background = '#d32f2f';
+                            btn.style.color = '#fff';
+                        } else {
+                            // Now removed - show empty heart
+                            icon.className = 'far fa-heart';
+                            btn.style.background = 'white';
+                            btn.style.color = '#000';
+                        }
+                    }
+                    
+                    // Update wishlist count if available
+                    if (window.wishlistManager.updateWishlistCount) {
+                        window.wishlistManager.updateWishlistCount();
+                    }
+                    
+                    // Sync toggle buttons
+                    if (window.wishlistManager.syncToggleButtons) {
+                        window.wishlistManager.syncToggleButtons();
+                    }
+                } else {
+                    // Toggle failed - revert button state
+                    await updateWishlistButton();
+                }
+            } else {
+                if (window.notifications) {
+                    window.notifications.warning('Wishlist no disponible', 'Por favor, recarga la página.');
+                }
+            }
+        } catch (e) {
+            if (window.Logger) window.Logger.error('Error toggling wishlist:', e);
+            if (window.notifications) {
+                window.notifications.error('Error', 'No se pudo actualizar la wishlist.');
+            }
+        }
+    };
+
+    // Update wishlist button state when product loads
+    async function updateWishlistButton() {
+        const product = window.currentProduct;
+        if (!product) return;
+
+        const productId = product.id || product.product_id;
+        if (!productId) return;
+
+        // Wait for wishlistManager if not available
+        if (!window.wishlistManager) {
+            let retries = 0;
+            while (!window.wishlistManager && retries < 20) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                retries++;
+            }
+        }
+
+        // Initialize wishlistManager if needed
+        if (window.wishlistManager && !window.wishlistManager.lists || window.wishlistManager.lists.length === 0) {
+            try {
+                await window.wishlistManager.init();
+            } catch (e) {
+                if (window.Logger) window.Logger.warn('Error initializing wishlist:', e);
+            }
+        }
+
+        if (!window.wishlistManager) return;
+
+        try {
+            const isInWishlist = window.wishlistManager.isInWishlist(productId);
+            const icon = document.getElementById('wishlistIcon');
+            const btn = document.getElementById('wishlistBtn');
+            
+            if (icon && btn) {
+                if (isInWishlist) {
+                    icon.className = 'fas fa-heart';
+                    btn.style.background = '#d32f2f';
+                    btn.style.color = '#fff';
+                } else {
+                    icon.className = 'far fa-heart';
+                    btn.style.background = 'white';
+                    btn.style.color = '#000';
+                }
+            }
+        } catch (e) {
+            if (window.Logger) window.Logger.error('Error checking wishlist:', e);
         }
     }
 

@@ -197,7 +197,7 @@
                     <label class="filter-checkbox">
                         <input type="checkbox" 
                                id="onSaleFilter" 
-                               onchange="window.catalogEngine.toggleSaleFilter()">
+                               onchange="if(window.catalogEngine) window.catalogEngine.toggleSaleFilter()">
                         <span>Solo productos en oferta</span>
                     </label>
                 </div>

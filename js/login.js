@@ -1,5 +1,19 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    if (window.Components) window.Components.loadHeader();
+    // Initialize header and footer
+    if (window.Components) {
+        const headerContainer = document.getElementById('mainHeader');
+        if (headerContainer && !headerContainer.innerHTML.trim()) {
+            headerContainer.innerHTML = window.Components.getHeader(true, true);
+            if (window.Components.initHeader) window.Components.initHeader();
+            if (window.Components.initSearch) window.Components.initSearch();
+            if (window.Components.initCartCounter) window.Components.initCartCounter();
+        }
+        
+        const footerContainer = document.getElementById('mainFooter');
+        if (footerContainer && !footerContainer.innerHTML.trim()) {
+            footerContainer.innerHTML = window.Components.getFooter();
+        }
+    }
 
     // 1. Auto-redirect if already logged in
     if (window.authManager) {

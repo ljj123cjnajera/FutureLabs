@@ -1,19 +1,17 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Load Components
+    // 1. Initialize Components
     if (window.Components) {
-        window.Components.loadHeader(false, false); // Minimal header
+        const headerContainer = document.getElementById('mainHeader');
+        if (headerContainer && !headerContainer.innerHTML.trim()) {
+            headerContainer.innerHTML = window.Components.getHeader(true, true);
+            if (window.Components.initHeader) window.Components.initHeader();
+            if (window.Components.initSearch) window.Components.initSearch();
+            if (window.Components.initCartCounter) window.Components.initCartCounter();
+        }
 
-        // Lazy load footer using HomeEngine logic if available, or simple inject
-        const footer = document.getElementById('mainFooter');
-        if (footer && window.HomeEngine) {
-            // Using HomeEngine's footer generator if accessible, else manual
-            // For now, simpler:
-            footer.innerHTML = `
-                <div style="background:var(--black); color:var(--white); padding:3rem 1rem; text-align:center; margin-top:4rem;">
-                    <h4 style="margin-bottom:1rem;">SNEAKERS SHOP</h4>
-                    <p style="opacity:0.6; font-size:0.9rem;">&copy; 2025 ALL RIGHTS RESERVED.</p>
-                </div>
-             `;
+        const footerContainer = document.getElementById('mainFooter');
+        if (footerContainer && !footerContainer.innerHTML.trim()) {
+            footerContainer.innerHTML = window.Components.getFooter();
         }
     }
 

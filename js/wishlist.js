@@ -408,22 +408,28 @@ class WishlistManager {
 
 window.wishlistManager = new WishlistManager();
 
-if (window.authManager) {
-    document.addEventListener('authStateChanged', () => {
-        if (window.authManager.isAuthenticated()) {
-            window.wishlistManager.init();
-        }
-    });
-}
-
-if (window.authManager && window.authManager.isAuthenticated()) {
-    window.wishlistManager.init();
-}
-
+// Initialize wishlist manager (works for both authenticated and guest users)
 document.addEventListener('DOMContentLoaded', () => {
-    window.wishlistManager.syncToggleButtons();
+    if (window.wishlistManager) {
+        window.wishlistManager.init();
+        window.wishlistManager.syncToggleButtons();
+    }
 });
 
+// Also initialize if DOM is already loaded
 if (document.readyState !== 'loading') {
-    window.wishlistManager.syncToggleButtons();
+    if (window.wishlistManager) {
+        window.wishlistManager.init();
+        window.wishlistManager.syncToggleButtons();
+    }
+}
+
+// Sync when auth state changes
+if (window.authManager) {
+    document.addEventListener('authStateChanged', () => {
+        if (window.wishlistManager) {
+            window.wishlistManager.init();
+            window.wishlistManager.syncToggleButtons();
+        }
+    });
 }
