@@ -36,9 +36,9 @@ document.addEventListener('DOMContentLoaded', async function () {
     const productId = urlParams.get('id');
     window.currentProductId = productId;
 
-    // Inicializar selectedSize global
+    // Inicializar selectedSize global SOLAMENTE
     window.selectedSize = null;
-    let selectedSize = null;
+    // let selectedSize = null; // REMOVED to prevent scope duplication
 
     // Cargar producto
     async function loadProduct() {
@@ -46,34 +46,22 @@ document.addEventListener('DOMContentLoaded', async function () {
         if (!container) return;
 
         if (!productId) {
+            // ... (error handling code remains same) ...
             if (window.LoadingStates) {
                 window.LoadingStates.empty('productDetailContainer', {
                     title: 'Producto no encontrado',
                     message: 'El producto que buscas no existe',
                     icon: 'fas fa-exclamation-triangle',
                     actionLabel: 'Ver productos',
-                    onAction: () => {
-                        window.location.href = 'products.html';
-                    }
+                    onAction: () => window.location.href = 'products.html'
                 });
-            } else {
-                container.innerHTML = `
-                    <div style="text-align: center; padding: 100px;">
-                        <i class="fas fa-exclamation-triangle fa-3x" style="color: #e74c3c; margin-bottom: 20px;"></i>
-                        <h2>Producto no encontrado</h2>
-                        <p>El producto que buscas no existe</p>
-                    </div>
-                `;
             }
             return;
         }
 
         // Show loading state
         if (window.LoadingStates) {
-            window.LoadingStates.show('productDetailContainer', {
-                message: 'Cargando producto...',
-                type: 'spinner'
-            });
+            window.LoadingStates.show('productDetailContainer', { message: 'Cargando producto...', type: 'spinner' });
         }
 
         try {
@@ -84,61 +72,71 @@ document.addEventListener('DOMContentLoaded', async function () {
                     await new Promise(resolve => setTimeout(resolve, 100));
                     apiRetries++;
                 }
-                if (!window.api) {
-                    throw new Error('API no disponible. Por favor, recarga la página.');
-                }
+                if (!window.api) throw new Error('API no disponible. Por favor, recarga la página.');
             }
 
             // 1. API Call
             const response = await window.api.getProduct(productId);
             let product = null;
 
-            // 2. Parsed Response (Handle various API formats)
+            // 2. ROBUST Response Parsing (Deep Search)
+            // Debug log to help trace the issue
+            if (window.Logger) window.Logger.log('📦 Raw Product Response:', response);
+
             if (response && response.success && response.data) {
-                product = response.data;
+                // Case A: Standard Envelope { success: true, data: { ... } }
+                // Check if 'data' IS the product or CONTAINS the product
+                if (response.data.price !== undefined || response.data.name) {
+                    product = response.data;
+                } else if (response.data.product) {
+                    // Case B: Nested { data: { product: { ... } } }
+                    product = response.data.product;
+                } else {
+                    // Fallback: Assume data is the product
+                    product = response.data;
+                }
             } else if (response && response.id) {
+                // Case C: Direct Object { id: "...", name: "..." }
                 product = response;
-            } else if (response && response.data && response.data.product) {
-                product = response.data.product;
-            } else if (response && !response.success) {
-                throw new Error(response.message || 'Producto no encontrado en la API');
+            } else if (response && response.product) {
+                // Case D: Root property { product: { ... } }
+                product = response.product;
             }
 
-            // 3. Validate Data
-            if (product) {
-                window.currentProduct = product;
-
-                // Hide loading state
-                if (window.LoadingStates) {
-                    window.LoadingStates.hide('productDetailContainer');
-                }
-
-                // Normalizar y validar imágenes usando utilidad compartida
-                let galleryImages = [];
-
-                // 1. Intentar normalizar product.images
-                if (product.images) {
-                    galleryImages = window.Utils?.normalizeImageUrls?.(product.images, '') || [];
-                }
-
-                // 2. Fallback a image_url si no hay imágenes válidas
-                if (galleryImages.length === 0 && product.image_url) {
-                    const imageUrl = window.Utils?.isValidImageUrl?.(product.image_url) ? product.image_url : '';
-                    if (imageUrl) {
-                        galleryImages = [imageUrl];
-                    }
-                }
-
-                // 3. Fallback final a placeholder SVG (ya que placeholder.jpg no existe)
-                if (galleryImages.length === 0) {
-                    galleryImages = ["data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Crect fill='%23e5e7eb' width='400' height='400'/%3E%3Ctext fill='%236b7280' font-family='system-ui, -apple-system, sans-serif' font-size='28' font-weight='900' x='50%25' y='45%25' text-anchor='middle'%3ESNEAKERS%3C/text%3E%3Ctext fill='%236b7280' font-family='system-ui, -apple-system, sans-serif' font-size='28' font-weight='900' x='50%25' y='60%25' text-anchor='middle'%3ESHOP%3C/text%3E%3C/svg%3E"];
-                }
-
-                renderProductDetails(product, container, galleryImages);
-                return;
-            } else {
-                throw new Error('Producto no encontrado en la API');
+            // 3. Final Validation
+            if (!product || (!product.name && !product.price)) {
+                throw new Error('Datos del producto incompletos o no encontrados.');
             }
+
+            // SUCCESS
+            window.currentProduct = product;
+
+            // Hide loading state
+            if (window.LoadingStates) window.LoadingStates.hide('productDetailContainer');
+
+            // Normalizar y validar imágenes usando utilidad compartida
+            let galleryImages = [];
+
+            // 1. Intentar normalizar product.images
+            if (product.images) {
+                galleryImages = window.Utils?.normalizeImageUrls?.(product.images, '') || [];
+            }
+
+            // 2. Fallback a image_url si no hay imágenes válidas
+            if (galleryImages.length === 0 && product.image_url) {
+                const imageUrl = window.Utils?.isValidImageUrl?.(product.image_url) ? product.image_url : '';
+                if (imageUrl) {
+                    galleryImages = [imageUrl];
+                }
+            }
+
+            // 3. Fallback final a placeholder SVG (ya que placeholder.jpg no existe)
+            if (galleryImages.length === 0) {
+                galleryImages = ["data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Crect fill='%23e5e7eb' width='400' height='400'/%3E%3Ctext fill='%236b7280' font-family='system-ui, -apple-system, sans-serif' font-size='28' font-weight='900' x='50%25' y='45%25' text-anchor='middle'%3ESNEAKERS%3C/text%3E%3Ctext fill='%236b7280' font-family='system-ui, -apple-system, sans-serif' font-size='28' font-weight='900' x='50%25' y='60%25' text-anchor='middle'%3ESHOP%3C/text%3E%3C/svg%3E"];
+            }
+
+            renderProductDetails(product, container, galleryImages);
+            return;
 
         } catch (error) {
             if (window.ErrorHandler) {
@@ -422,8 +420,10 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     function selectSize(size) {
-        selectedSize = size;
+        // Update GLOBAL variable strictly
         window.selectedSize = size;
+
+        if (window.Logger) window.Logger.log('📏 Size Selected:', size);
 
         // Update UI
         document.querySelectorAll('.size-option').forEach(btn => {
