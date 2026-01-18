@@ -22,7 +22,7 @@ class ChatWidget {
                 </button>
 
                 <!-- Chat Window -->
-                <div id="chatWindow" class="chat-window hidden">
+                <div id="chatWindow" class="chat-window">
                     <div class="chat-header">
                         <span>SOPORTE SNEAKERS SHOP</span>
                         <button id="chatClose" class="chat-close" aria-label="Cerrar chat"><i class="fas fa-times"></i></button>
@@ -275,13 +275,15 @@ class ChatWidget {
         // Intentar enviar al backend si está disponible
         try {
             if (window.api && window.api.sendChatMessage) {
-                const user = window.authManager?.getUser();
-                const response = await window.api.sendChatMessage({
+                const user = window.authManager?.currentUser || (typeof window.authManager?.getUser === 'function' ? window.authManager.getUser() : null);
+                const isUser = !!(user && user.id);
+                const payload = {
                     message,
-                    user_id: user?.id || null,
-                    visitor_name: user ? null : 'Visitante',
-                    visitor_email: user ? null : null
-                });
+                    user_id: isUser ? user.id : null,
+                    visitor_name: isUser ? null : 'Visitante',
+                    visitor_email: isUser ? null : 'visitante@temp.local'
+                };
+                const response = await window.api.sendChatMessage(payload);
 
                 if (response.success) {
                     const systemMsgHTML = `
@@ -329,6 +331,7 @@ class ChatWidget {
             </div>
         `;
         body.insertAdjacentHTML('beforeend', systemMsgHTML);
+        this.scrollToBottom();
     }
 
     scrollToBottom() {

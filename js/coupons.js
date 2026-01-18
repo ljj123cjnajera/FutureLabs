@@ -33,9 +33,9 @@ class CouponsManager {
     this.renderCouponForm(this.containerId);
 
     if (!this.availableCouponsLoaded && !this.availableCouponsLoading) {
-      this.loadAvailableCoupons().catch((error) =>
-        if (window.Logger) window.Logger.error('Error inicializando cupones:', error)
-      );
+      this.loadAvailableCoupons().catch((error) => {
+        if (window.Logger) window.Logger.error('Error inicializando cupones:', error);
+      });
     }
   }
 

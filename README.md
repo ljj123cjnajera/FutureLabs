@@ -25,8 +25,8 @@ Sneakers Shop es una plataforma moderna de e-commerce especializada en calzado y
 ### ⚠️ En Progreso
 - 💳 **Pagos reales** - Stripe configurado pero requiere API keys
 - 📧 **Emails** - Requiere configurar Resend API key
-- 💬 **Chat en vivo** - Estructura básica implementada
-- 🎁 **Sistema de puntos** - Backend listo, falta conexión con checkout
+- 💬 **Chat en vivo** - Widget + backend /chat/send; visitantes con placeholder
+- 🎁 **Sistema de puntos** - Conectado a checkout (usar máx, cupón, expected_total)
 
 ## 🛠️ Tecnologías
 

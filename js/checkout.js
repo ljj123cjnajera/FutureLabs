@@ -378,6 +378,9 @@ class CheckoutManager {
                     <button class="payment-tab ${this.paymentMethod === 'cash' ? 'active' : ''}" onclick="checkoutManager.setPayment('cash')">
                         <i class="fas fa-money-bill"></i> EFECTIVO
                     </button>
+                    <button class="payment-tab ${this.paymentMethod === 'bank_transfer' ? 'active' : ''}" onclick="checkoutManager.setPayment('bank_transfer')">
+                        <i class="fas fa-university"></i> TRANSFERENCIA
+                    </button>
                 </div>
 
                 ${this.paymentMethod === 'card' ? `
@@ -406,6 +409,11 @@ class CheckoutManager {
                     <div style="padding:20px; text-align:center; border: 2px solid var(--black); margin-top: 1rem;">
                         <p><strong>Pago en Efectivo</strong></p>
                         <p>El pago se realizará al momento de la entrega.</p>
+                    </div>
+                ` : this.paymentMethod === 'bank_transfer' ? `
+                    <div style="padding:20px; text-align:center; border: 2px solid var(--black); margin-top: 1rem;">
+                        <p><strong>Transferencia Bancaria</strong></p>
+                        <p>Te enviaremos los datos bancarios por email al confirmar el pedido.</p>
                     </div>
                 ` : '<div style="padding:20px; text-align:center;">Redirección después de confirmar el pedido.</div>'}
 
@@ -464,7 +472,7 @@ class CheckoutManager {
                 <div class="review-block">
                     <h4>MÉTODO DE PAGO:</h4>
                     <p><strong>${this.getPaymentMethodName(this.paymentMethod)}</strong></p>
-                    ${this.paymentMethod === 'yape' || this.paymentMethod === 'plin' ? `
+                    ${this.paymentMethod === 'yape' || this.paymentMethod === 'plin' || this.paymentMethod === 'bank_transfer' ? `
                     <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem;">
                         <i class="fas fa-info-circle"></i> Recibirás las instrucciones de pago por email después de confirmar el pedido.
                     </p>
