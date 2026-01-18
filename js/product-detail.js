@@ -216,15 +216,15 @@ document.addEventListener('DOMContentLoaded', async function () {
             <!-- Right Column: Product Info -->
             <div class="product-info-detail">
                 <div class="product-header-group">
-                    <div class="product-meta-header" style="display:flex; justify-content:space-between; align-items:center;">
-                        <p class="product-brand" style="font-weight: 800; text-transform: uppercase; color: #666; margin-bottom: 0.5rem; letter-spacing: 0.1em;">${product.brand || 'MARCA'}</p>
+                    <div class="product-meta-header">
+                        <p class="product-brand">${product.brand || 'MARCA'}</p>
                         <div class="product-rating-detail">
                             <span class="stars-detail">★★★★★</span>
                             <span class="rating-text-detail">(${product.rating_count || 12} reviews)</span>
                         </div>
                     </div>
                     <!-- Mini Trust -->
-                    <div class="payment-trust-mini" style="display: flex; gap: 15px; margin-top: 10px; font-size: 0.75rem; color: #666; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                    <div class="payment-trust-mini">
                         <span><i class="fas fa-mobile-alt" aria-hidden="true"></i> Yape/Plin</span>
                         <span><i class="fas fa-lock" aria-hidden="true"></i> Compra Segura</span>
                         <span><i class="fas fa-shipping-fast" aria-hidden="true"></i> Envío Inmediato</span>
@@ -233,44 +233,44 @@ document.addEventListener('DOMContentLoaded', async function () {
                 
                 <!-- Stock Urgency Badge -->
                 ${product.stock_quantity !== undefined && product.stock_quantity > 0 && product.stock_quantity <= 5 ? `
-                <div class="stock-urgency-banner" style="background: #fff3cd; border: 2px solid #ffc107; padding: 15px; margin-bottom: 1.5rem; border-radius: 4px;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <i class="fas fa-exclamation-triangle" style="color: #ff9800; font-size: 1.5rem;" aria-hidden="true"></i>
+                <div class="stock-urgency-banner">
+                    <div>
+                        <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                         <div>
-                            <strong style="color: #d32f2f; text-transform: uppercase; font-weight: 900;">¡ÚLTIMAS UNIDADES!</strong>
-                            <p style="margin: 5px 0 0 0; color: #666; font-size: 0.9rem;">Solo quedan ${product.stock_quantity} pares disponibles</p>
+                            <strong>¡ÚLTIMAS UNIDADES!</strong>
+                            <p>Solo quedan ${product.stock_quantity} pares disponibles</p>
                         </div>
                     </div>
                 </div>
                 ` : ''}
                 
-                <div class="product-description-detail" style="font-size: 1.1rem; line-height: 1.6; margin-bottom: 2rem;">
+                <div class="product-description-detail">
                     ${product.description || 'La máxima expresión del estilo urbano. Diseñados para destacar y construidos para durar.'}
                 </div>
                 
                 <!-- Key Features -->
-                <div class="product-features-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 2rem; padding: 20px; background: #f8f9fa; border-radius: 4px;">
-                    <div class="feature-item" style="display: flex; align-items: center; gap: 10px;">
-                        <i class="fas fa-check-circle" style="color: #4caf50; font-size: 1.2rem;" aria-hidden="true"></i>
-                        <span style="font-size: 0.9rem; font-weight: 600;">100% Auténtico</span>
+                <div class="product-features-grid">
+                    <div class="feature-item">
+                        <i class="fas fa-check-circle" aria-hidden="true"></i>
+                        <span>100% Auténtico</span>
                     </div>
-                    <div class="feature-item" style="display: flex; align-items: center; gap: 10px;">
-                        <i class="fas fa-shipping-fast" style="color: #2196f3; font-size: 1.2rem;" aria-hidden="true"></i>
-                        <span style="font-size: 0.9rem; font-weight: 600;">Envío Gratis S/150+</span>
+                    <div class="feature-item">
+                        <i class="fas fa-shipping-fast" aria-hidden="true"></i>
+                        <span>Envío Gratis S/150+</span>
                     </div>
-                    <div class="feature-item" style="display: flex; align-items: center; gap: 10px;">
-                        <i class="fas fa-undo" style="color: #ff9800; font-size: 1.2rem;" aria-hidden="true"></i>
-                        <span style="font-size: 0.9rem; font-weight: 600;">30 Días Devolución</span>
+                    <div class="feature-item">
+                        <i class="fas fa-undo" aria-hidden="true"></i>
+                        <span>30 Días Devolución</span>
                     </div>
-                    <div class="feature-item" style="display: flex; align-items: center; gap: 10px;">
-                        <i class="fas fa-shield-alt" style="color: #9c27b0; font-size: 1.2rem;" aria-hidden="true"></i>
-                        <span style="font-size: 0.9rem; font-weight: 600;">Garantía Oficial</span>
+                    <div class="feature-item">
+                        <i class="fas fa-shield-alt" aria-hidden="true"></i>
+                        <span>Garantía Oficial</span>
                     </div>
                 </div>
                 
                 <div class="size-selector-container">
                     <div class="size-selector-header">
-                        <span class="size-label" style="font-weight: 800; text-transform: uppercase;">SELECCIONA TU TALLA (US)</span>
+                        <span class="size-label">SELECCIONA TU TALLA (US)</span>
                         <span class="size-guide-link" onclick="openSizeGuideModal()">
                             <i class="fas fa-ruler-combined"></i> GUÍA DE TALLAS
                         </span>
@@ -281,29 +281,29 @@ document.addEventListener('DOMContentLoaded', async function () {
                     </div>
                 </div>
                 
-                <div class="product-actions-detail" style="margin-top: 2rem; display: flex; gap: 15px; flex-wrap: wrap;">
-                    <button class="btn-add-cart-detail" onclick="window.addToCart()" id="addToCartBtn" style="flex: 1; min-width: 200px;">
+                <div class="product-actions-detail">
+                    <button class="btn-add-cart-detail" onclick="window.addToCart()" id="addToCartBtn">
                         <i class="fas fa-shopping-cart"></i> AGREGAR AL CARRITO
                     </button>
-                    <button class="btn-buy-now-detail" onclick="window.buyNow()" id="buyNowBtn" style="flex: 1; min-width: 200px;">
+                    <button class="btn-buy-now-detail" onclick="window.buyNow()" id="buyNowBtn">
                         <i class="fas fa-bolt"></i> COMPRAR AHORA
                     </button>
-                    <button class="btn-wishlist-detail" onclick="window.toggleWishlist()" id="wishlistBtn" style="padding: 15px 20px; background: white; border: 2px solid #000; color: #000; cursor: pointer; font-weight: 700; border-radius: 4px;">
+                    <button class="btn-wishlist-detail" onclick="window.toggleWishlist()" id="wishlistBtn">
                         <i class="far fa-heart" id="wishlistIcon"></i>
                     </button>
                 </div>
                 
-                <div class="product-price-detail" style="margin-top: 2rem; padding-top: 2rem; border-top: 2px solid #eee;">
+                <div class="product-price-detail">
                     ${product.discount_price && product.discount_price < product.price ? `
-                        <div style="display: flex; align-items: baseline; gap: 15px;">
-                            <span class="price-original" style="font-size: 1.5rem; color: #999; text-decoration: line-through;">S/ ${parseFloat(product.price).toFixed(2)}</span>
-                            <span class="price-discount" style="font-size: 2.5rem; font-weight: 900; color: #d32f2f;">S/ ${parseFloat(product.discount_price).toFixed(2)}</span>
-                            <span class="discount-badge" style="background: #d32f2f; color: #fff; padding: 5px 10px; border-radius: 4px; font-size: 0.9rem; font-weight: 700;">
+                        <div>
+                            <span class="price-original">S/ ${parseFloat(product.price).toFixed(2)}</span>
+                            <span class="price-discount">S/ ${parseFloat(product.discount_price).toFixed(2)}</span>
+                            <span class="discount-badge">
                                 ${Math.round(((product.price - product.discount_price) / product.price) * 100)}% OFF
                             </span>
                         </div>
                     ` : `
-                        <span class="price-current" style="font-size: 2.5rem; font-weight: 900; color: #000;">S/ ${parseFloat(product.price || 0).toFixed(2)}</span>
+                        <span class="price-current">S/ ${parseFloat(product.price || 0).toFixed(2)}</span>
                     `}
                 </div>
             </div>
