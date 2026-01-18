@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 if (window.Logger) window.Logger.error('Error initializing header:', e);
             }
         }
-
+        
         const footerContainer = document.getElementById('mainFooter');
         if (footerContainer && !footerContainer.innerHTML.trim()) {
             try {
@@ -35,9 +35,9 @@ document.addEventListener('DOMContentLoaded', async function () {
     const productId = urlParams.get('id');
     window.currentProductId = productId;
 
-    // Inicializar selectedSize global SOLAMENTE
+    // Inicializar selectedSize global
     window.selectedSize = null;
-    // let selectedSize = null; // REMOVED to prevent scope duplication
+    let selectedSize = null;
 
     // Cargar producto
     async function loadProduct() {
@@ -45,22 +45,34 @@ document.addEventListener('DOMContentLoaded', async function () {
         if (!container) return;
 
         if (!productId) {
-            // ... (error handling code remains same) ...
             if (window.LoadingStates) {
                 window.LoadingStates.empty('productDetailContainer', {
                     title: 'Producto no encontrado',
                     message: 'El producto que buscas no existe',
                     icon: 'fas fa-exclamation-triangle',
                     actionLabel: 'Ver productos',
-                    onAction: () => window.location.href = 'products.html'
+                    onAction: () => {
+                        window.location.href = 'products.html';
+                    }
                 });
+            } else {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 100px;">
+                        <i class="fas fa-exclamation-triangle fa-3x" style="color: #e74c3c; margin-bottom: 20px;"></i>
+                        <h2>Producto no encontrado</h2>
+                        <p>El producto que buscas no existe</p>
+                    </div>
+                `;
             }
             return;
         }
 
         // Show loading state
         if (window.LoadingStates) {
-            window.LoadingStates.show('productDetailContainer', { message: 'Cargando producto...', type: 'spinner' });
+            window.LoadingStates.show('productDetailContainer', {
+                message: 'Cargando producto...',
+                type: 'spinner'
+            });
         }
 
         try {
@@ -71,71 +83,61 @@ document.addEventListener('DOMContentLoaded', async function () {
                     await new Promise(resolve => setTimeout(resolve, 100));
                     apiRetries++;
                 }
-                if (!window.api) throw new Error('API no disponible. Por favor, recarga la página.');
+                if (!window.api) {
+                    throw new Error('API no disponible. Por favor, recarga la página.');
+                }
             }
 
             // 1. API Call
             const response = await window.api.getProduct(productId);
             let product = null;
 
-            // 2. ROBUST Response Parsing (Deep Search)
-            // Debug log to help trace the issue
-            if (window.Logger) window.Logger.log('📦 Raw Product Response:', response);
-
+            // 2. Parsed Response (Handle various API formats)
             if (response && response.success && response.data) {
-                // Case A: Standard Envelope { success: true, data: { ... } }
-                // Check if 'data' IS the product or CONTAINS the product
-                if (response.data.price !== undefined || response.data.name) {
-                    product = response.data;
-                } else if (response.data.product) {
-                    // Case B: Nested { data: { product: { ... } } }
-                    product = response.data.product;
-                } else {
-                    // Fallback: Assume data is the product
-                    product = response.data;
-                }
+                product = response.data;
             } else if (response && response.id) {
-                // Case C: Direct Object { id: "...", name: "..." }
                 product = response;
-            } else if (response && response.product) {
-                // Case D: Root property { product: { ... } }
-                product = response.product;
+            } else if (response && response.data && response.data.product) {
+                product = response.data.product;
+            } else if (response && !response.success) {
+                throw new Error(response.message || 'Producto no encontrado en la API');
             }
 
-            // 3. Final Validation
-            if (!product || (!product.name && !product.price)) {
-                throw new Error('Datos del producto incompletos o no encontrados.');
-            }
+            // 3. Validate Data
+            if (product) {
+                window.currentProduct = product;
 
-            // SUCCESS
-            window.currentProduct = product;
-
-            // Hide loading state
-            if (window.LoadingStates) window.LoadingStates.hide('productDetailContainer');
-
-            // Normalizar y validar imágenes usando utilidad compartida
-            let galleryImages = [];
-
-            // 1. Intentar normalizar product.images
-            if (product.images) {
-                galleryImages = window.Utils?.normalizeImageUrls?.(product.images, '') || [];
-            }
-
-            // 2. Fallback a image_url si no hay imágenes válidas
-            if (galleryImages.length === 0 && product.image_url) {
-                const imageUrl = window.Utils?.isValidImageUrl?.(product.image_url) ? product.image_url : '';
-                if (imageUrl) {
-                    galleryImages = [imageUrl];
+                // Hide loading state
+                if (window.LoadingStates) {
+                    window.LoadingStates.hide('productDetailContainer');
                 }
-            }
 
-            // 3. Fallback final a placeholder SVG (ya que placeholder.jpg no existe)
-            if (galleryImages.length === 0) {
-                galleryImages = ["data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Crect fill='%23e5e7eb' width='400' height='400'/%3E%3Ctext fill='%236b7280' font-family='system-ui, -apple-system, sans-serif' font-size='28' font-weight='900' x='50%25' y='45%25' text-anchor='middle'%3ESNEAKERS%3C/text%3E%3Ctext fill='%236b7280' font-family='system-ui, -apple-system, sans-serif' font-size='28' font-weight='900' x='50%25' y='60%25' text-anchor='middle'%3ESHOP%3C/text%3E%3C/svg%3E"];
-            }
+                // Normalizar y validar imágenes usando utilidad compartida
+                let galleryImages = [];
+                
+                // 1. Intentar normalizar product.images
+                if (product.images) {
+                    galleryImages = window.Utils?.normalizeImageUrls?.(product.images, '') || [];
+                }
+                
+                // 2. Fallback a image_url si no hay imágenes válidas
+                if (galleryImages.length === 0 && product.image_url) {
+                    const imageUrl = window.Utils?.isValidImageUrl?.(product.image_url) ? product.image_url : '';
+                    if (imageUrl) {
+                        galleryImages = [imageUrl];
+                    }
+                }
+                
+                // 3. Fallback final a placeholder SVG (ya que placeholder.jpg no existe)
+                if (galleryImages.length === 0) {
+                    galleryImages = ["data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Crect fill='%23e5e7eb' width='400' height='400'/%3E%3Ctext fill='%236b7280' font-family='system-ui, -apple-system, sans-serif' font-size='28' font-weight='900' x='50%25' y='45%25' text-anchor='middle'%3ESNEAKERS%3C/text%3E%3Ctext fill='%236b7280' font-family='system-ui, -apple-system, sans-serif' font-size='28' font-weight='900' x='50%25' y='60%25' text-anchor='middle'%3ESHOP%3C/text%3E%3C/svg%3E"];
+                }
 
-            renderProductDetails(product, container, galleryImages);
-            return;
+                renderProductDetails(product, container, galleryImages);
+                return;
+            } else {
+                throw new Error('Producto no encontrado en la API');
+            }
 
         } catch (error) {
             if (window.ErrorHandler) {
@@ -176,7 +178,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     function renderProductDetails(product, container, galleryImages) {
         // Update live viewers count (simulated for conversion)
         updateLiveViewers(product.id);
-
+        
         // SEO ENGINE UPDATE
         if (window.SeoManager) {
             window.SeoManager.updateProductSEO({
@@ -309,20 +311,18 @@ document.addEventListener('DOMContentLoaded', async function () {
         (async function initGallery() {
             const galleryContainer = document.getElementById('productGallery');
             if (!galleryContainer || galleryImages.length === 0) return;
-
-            // Wait for ProductGallery to be available (max 1.5 seconds)
-            let retries = 0;
-            const maxRetries = 15;
-            while (!window.productGallery && !window.ProductGallery && retries < maxRetries) {
-                await new Promise(resolve => setTimeout(resolve, 100));
-                retries++;
-            }
-
+            
+            // OPTIMIZED: Wait for ProductGallery to be available (max 1.5 seconds)
+            await window.Utils?.waitFor?.(
+                () => window.productGallery || window.ProductGallery,
+                { maxRetries: 15, delay: 100 }
+            ) || await new Promise(resolve => setTimeout(resolve, 100)); // Fallback
+            
             // Try using existing productGallery instance
             if (window.productGallery && typeof window.productGallery.render === 'function') {
                 window.productGallery.render(galleryImages, product);
                 return;
-            }
+            } 
             // Try creating new ProductGallery instance
             if (window.ProductGallery && typeof window.ProductGallery === 'function') {
                 try {
@@ -335,14 +335,14 @@ document.addEventListener('DOMContentLoaded', async function () {
                     if (window.Logger) window.Logger.warn('Error initializing ProductGallery:', e);
                 }
             }
-
+            
             // Fallback: simple gallery HTML if ProductGallery not available
             if (window.Logger) window.Logger.warn('ProductGallery not available, using fallback');
             const svgPlaceholder = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Crect fill='%23e5e7eb' width='400' height='400'/%3E%3Ctext fill='%236b7280' font-family='system-ui, -apple-system, sans-serif' font-size='28' font-weight='900' x='50%25' y='45%25' text-anchor='middle'%3ESNEAKERS%3C/text%3E%3Ctext fill='%236b7280' font-family='system-ui, -apple-system, sans-serif' font-size='28' font-weight='900' x='50%25' y='60%25' text-anchor='middle'%3ESHOP%3C/text%3E%3C/svg%3E";
             const validImages = galleryImages.filter(img => img && typeof img === 'string' && img.trim() !== '' && !img.includes('undefined') && !img.includes('null'));
             const displayImages = validImages.length > 0 ? validImages : [svgPlaceholder];
             const productName = product?.name || 'Producto';
-
+            
             const fallbackHTML = displayImages.map((img, index) => `
                 <div class="gallery-image-wrapper">
                     <img src="${img}" 
@@ -359,12 +359,12 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         // Render size selector
         renderSizeSelector(product);
-
+        
         // OPTIMIZED: Update wishlist button state (use requestAnimationFrame for better timing)
         requestAnimationFrame(() => {
             updateWishlistButton();
         });
-
+        
         // OPTIMIZED: Add to recently viewed and render immediately
         if (window.recentlyViewed) {
             window.recentlyViewed.add(product);
@@ -373,7 +373,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 window.recentlyViewed.render('recentlyViewedGrid', { limit: 6, hideWhenEmpty: true });
             });
         }
-
+        
         // OPTIMIZED: Load related products after a short delay (reduced from 1000ms to 300ms)
         if (window.relatedProducts) {
             setTimeout(() => {
@@ -388,20 +388,20 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         // Common US sizes for sneakers
         const sizes = ['6', '6.5', '7', '7.5', '8', '8.5', '9', '9.5', '10', '10.5', '11', '11.5', '12', '12.5', '13'];
-
+        
         grid.innerHTML = sizes.map(size => {
-            const stock = window.productSizeStock && window.productSizeStock[size] !== undefined
-                ? window.productSizeStock[size]
-                : (product.stock_quantity !== undefined ? product.stock_quantity : 10); // Default to 10 if undefined
+            const stock = window.productSizeStock && window.productSizeStock[size] !== undefined 
+                ? window.productSizeStock[size] 
+                : (product.stock_quantity || 0);
             const isAvailable = stock > 0;
             const isLowStock = stock > 0 && stock <= 3;
-
+            
             return `
                 <button 
                     class="size-option ${!isAvailable ? 'out-of-stock' : ''} ${isLowStock ? 'low-stock' : ''}" 
                     data-size="${size}"
-                    data-size="${size}"
                     ${!isAvailable ? 'disabled' : ''}
+                    onclick="selectSize('${size}')"
                 >
                     ${size}
                     ${isLowStock ? '<span class="stock-badge">¡Últimas!</span>' : ''}
@@ -411,7 +411,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         // Add click handlers
         grid.querySelectorAll('.size-option').forEach(btn => {
-            btn.addEventListener('click', function () {
+            btn.addEventListener('click', function() {
                 if (this.disabled) return;
                 selectSize(this.dataset.size);
             });
@@ -419,10 +419,8 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     function selectSize(size) {
-        // Update GLOBAL variable strictly
+        selectedSize = size;
         window.selectedSize = size;
-
-        if (window.Logger) window.Logger.log('📏 Size Selected:', size);
 
         // Update UI
         document.querySelectorAll('.size-option').forEach(btn => {
@@ -442,7 +440,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     // Agregar al carrito - Asegurar que esté disponible globalmente
     window.addToCart = async function () {
         if (window.Logger) window.Logger.log('🛒 addToCart llamado');
-
+        
         const product = window.currentProduct;
         if (!product) {
             if (window.Logger) window.Logger.error('❌ Producto no disponible en window.currentProduct');
@@ -451,7 +449,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
             return;
         }
-
+        
         if (window.Logger) window.Logger.log('✅ Producto encontrado:', product.id || product.product_id);
 
         const productId = product.id || product.product_id;
@@ -509,17 +507,15 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
 
         try {
-            // Esperar a que cartEngine esté disponible (con más tiempo)
-            let retries = 0;
-            const maxRetries = 50; // 5 segundos
-            while (!window.cartEngine && !window.cartManager && retries < maxRetries) {
-                await new Promise(resolve => setTimeout(resolve, 100));
-                retries++;
-            }
+            // OPTIMIZED: Esperar a que cartEngine esté disponible (con más tiempo)
+            await window.Utils?.waitFor?.(
+                () => window.cartEngine || window.cartManager,
+                { maxRetries: 50, delay: 100 }
+            ) || await new Promise(resolve => setTimeout(resolve, 100)); // Fallback
 
             // Usar cartManager como alias si cartEngine no está disponible
             let cart = window.cartEngine || window.cartManager;
-
+            
             if (!cart) {
                 // Intentar inicializar manualmente si no está disponible
                 if (window.CartEngine) {
@@ -530,7 +526,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                     await new Promise(resolve => setTimeout(resolve, 500));
                     cart = window.cartEngine || window.cartManager;
                 }
-
+                
                 if (!cart) {
                     throw new Error('CartEngine no disponible. Por favor, recarga la página.');
                 }
@@ -540,7 +536,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
             // Agregar al carrito con size
             const success = await cart.add(productId, 1, { size: currentSelectedSize });
-
+            
             if (success === true) {
                 // Éxito - la notificación ya se muestra en cartEngine.add()
                 return;
@@ -617,17 +613,15 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
 
         try {
-            // Esperar a que cartEngine esté disponible
-            let retries = 0;
-            const maxRetries = 50;
-            while (!window.cartEngine && !window.cartManager && retries < maxRetries) {
-                await new Promise(resolve => setTimeout(resolve, 100));
-                retries++;
-            }
+            // OPTIMIZED: Esperar a que cartEngine esté disponible
+            await window.Utils?.waitFor?.(
+                () => window.cartEngine || window.cartManager,
+                { maxRetries: 50, delay: 100 }
+            ) || await new Promise(resolve => setTimeout(resolve, 100)); // Fallback
 
             // Usar cartManager como alias si cartEngine no está disponible
             let cart = window.cartEngine || window.cartManager;
-
+            
             if (!cart) {
                 if (window.CartEngine) {
                     if (window.Logger) window.Logger.log('🔧 Inicializando CartEngine manualmente para buyNow...');
@@ -636,7 +630,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                     await new Promise(resolve => setTimeout(resolve, 500));
                     cart = window.cartEngine || window.cartManager;
                 }
-
+                
                 if (!cart) {
                     throw new Error('CartEngine no disponible. Por favor, recarga la página.');
                 }
@@ -646,13 +640,13 @@ document.addEventListener('DOMContentLoaded', async function () {
 
             // Agregar al carrito
             const success = await cart.add(productId, 1, { size: currentSelectedSize });
-
+            
             if (success !== false) {
                 // Actualizar contador de carrito
                 if (window.Components && window.Components.updateCartCount) {
                     window.Components.updateCartCount();
                 }
-
+                
                 if (window.notifications) {
                     window.notifications.success('Redirigiendo al checkout...', 'El producto se agregó al carrito');
                 }
@@ -691,7 +685,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     window.openSizeGuideModal = openSizeGuideModal;
 
     // Wishlist toggle function
-    window.toggleWishlist = async function () {
+    window.toggleWishlist = async function() {
         const product = window.currentProduct;
         if (!product) {
             if (window.notifications) {
@@ -709,15 +703,14 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
 
         try {
-            // Wait for wishlistManager if not available
+            // OPTIMIZED: Wait for wishlistManager if not available
             if (!window.wishlistManager) {
-                let retries = 0;
-                while (!window.wishlistManager && retries < 20) {
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                    retries++;
-                }
+                await window.Utils?.waitFor?.(
+                    () => window.wishlistManager,
+                    { maxRetries: 20, delay: 100 }
+                ) || await new Promise(resolve => setTimeout(resolve, 100)); // Fallback
             }
-
+            
             // Initialize wishlistManager if needed (works for both authenticated and guest users)
             if (window.wishlistManager && (!window.wishlistManager.lists || window.wishlistManager.lists.length === 0)) {
                 try {
@@ -730,14 +723,14 @@ document.addEventListener('DOMContentLoaded', async function () {
             if (window.wishlistManager) {
                 // Check state BEFORE toggle (sync, not async for localStorage)
                 const wasInWishlist = window.wishlistManager.isInWishlist(productId);
-
+                
                 // Perform toggle
                 const success = await window.wishlistManager.toggle(productId);
-
+                
                 if (success) {
                     // After toggle, the state is opposite of what it was before
                     const isNowInWishlist = !wasInWishlist;
-
+                    
                     // Update button icon based on NEW state
                     const icon = document.getElementById('wishlistIcon');
                     const btn = document.getElementById('wishlistBtn');
@@ -752,12 +745,12 @@ document.addEventListener('DOMContentLoaded', async function () {
                             btn.classList.remove('active');
                         }
                     }
-
+                    
                     // Update wishlist count if available
                     if (window.wishlistManager.updateWishlistCount) {
                         window.wishlistManager.updateWishlistCount();
                     }
-
+                    
                     // Sync toggle buttons
                     if (window.wishlistManager.syncToggleButtons) {
                         window.wishlistManager.syncToggleButtons();
@@ -811,7 +804,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             const isInWishlist = window.wishlistManager.isInWishlist(productId);
             const icon = document.getElementById('wishlistIcon');
             const btn = document.getElementById('wishlistBtn');
-
+            
             if (icon && btn) {
                 if (isInWishlist) {
                     icon.className = 'fas fa-heart';
@@ -850,15 +843,14 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     // Initialize reviews after product loads
     if (productId) {
-        // Wait for reviewsManager if not available
+        // OPTIMIZED: Wait for reviewsManager if not available
         if (!window.reviewsManager) {
-            let retries = 0;
-            while (!window.reviewsManager && retries < 20) {
-                await new Promise(resolve => setTimeout(resolve, 100));
-                retries++;
-            }
+            await window.Utils?.waitFor?.(
+                () => window.reviewsManager,
+                { maxRetries: 20, delay: 100 }
+            ) || await new Promise(resolve => setTimeout(resolve, 100)); // Fallback
         }
-
+        
         if (window.reviewsManager) {
             try {
                 await window.reviewsManager.init(productId, {
