@@ -79,14 +79,30 @@ class ProductGallery {
 
     // Brutalist V3 Grid Render
     // Outputs direct <div>s to be styled by CSS Grid in pdp-brutalist.css
-    const html = this.images.map((img, index) => `
+    const productName = product?.name || 'Producto';
+    const validImages = this.images.filter(img => {
+        if (!img || typeof img !== 'string') return false;
+        const trimmed = img.trim();
+        return trimmed !== '' && 
+               !trimmed.includes('undefined') && 
+               !trimmed.includes('null') &&
+               (trimmed.startsWith('http') || trimmed.startsWith('/') || trimmed.startsWith('assets/') || trimmed.startsWith('data:'));
+    });
+    
+    // Si no hay imágenes válidas, usar placeholder SVG
+    const displayImages = validImages.length > 0 ? validImages : [
+        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Crect fill='%23e5e7eb' width='400' height='400'/%3E%3Ctext fill='%236b7280' font-family='system-ui, -apple-system, sans-serif' font-size='28' font-weight='900' x='50%25' y='45%25' text-anchor='middle'%3ESNEAKERS%3C/text%3E%3Ctext fill='%236b7280' font-family='system-ui, -apple-system, sans-serif' font-size='28' font-weight='900' x='50%25' y='60%25' text-anchor='middle'%3ESHOP%3C/text%3E%3C/svg%3E"
+    ];
+    
+    const html = displayImages.map((img, index) => `
         <div class="gallery-image-wrapper" onclick="productGallery.openLightbox(${index})">
             <img src="${img}" 
                  class="gallery-image" 
-                 alt="${product.name} - View ${index + 1}" 
+                 alt="${productName} - Vista ${index + 1}" 
                  loading="${index === 0 ? 'eager' : 'lazy'}"
                  decoding="async"
-                 fetchpriority="${index === 0 ? 'high' : 'low'}">
+                 fetchpriority="${index === 0 ? 'high' : 'low'}"
+                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'400\\' height=\\'400\\' viewBox=\\'0 0 400 400\\'%3E%3Crect fill=\\'%23e5e7eb\\' width=\\'400\\' height=\\'400\\'/%3E%3Ctext fill=\\'%236b7280\\' font-family=\\'system-ui, -apple-system, sans-serif\\' font-size=\\'28\\' font-weight=\\'900\\' x=\\'50%25\\' y=\\'45%25\\' text-anchor=\\'middle\\'%3ESNEAKERS%3C/text%3E%3Ctext fill=\\'%236b7280\\' font-family=\\'system-ui, -apple-system, sans-serif\\' font-size=\\'28\\' font-weight=\\'900\\' x=\\'50%25\\' y=\\'60%25\\' text-anchor=\\'middle\\'%3ESHOP%3C/text%3E%3C/svg%3E'">
         </div>
     `).join('');
 

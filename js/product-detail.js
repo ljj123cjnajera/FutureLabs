@@ -129,9 +129,9 @@ document.addEventListener('DOMContentLoaded', async function () {
                     }
                 }
                 
-                // 3. Fallback final a placeholder
+                // 3. Fallback final a placeholder SVG (ya que placeholder.jpg no existe)
                 if (galleryImages.length === 0) {
-                    galleryImages = ['assets/images/products/placeholder.jpg'];
+                    galleryImages = ["data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Crect fill='%23e5e7eb' width='400' height='400'/%3E%3Ctext fill='%236b7280' font-family='system-ui, -apple-system, sans-serif' font-size='28' font-weight='900' x='50%25' y='45%25' text-anchor='middle'%3ESNEAKERS%3C/text%3E%3Ctext fill='%236b7280' font-family='system-ui, -apple-system, sans-serif' font-size='28' font-weight='900' x='50%25' y='60%25' text-anchor='middle'%3ESHOP%3C/text%3E%3C/svg%3E"];
                 }
 
                 renderProductDetails(product, container, galleryImages);

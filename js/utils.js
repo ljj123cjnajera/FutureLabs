@@ -208,10 +208,13 @@
     /**
      * Normaliza un array o string de imágenes a un array válido de URLs
      * @param {Array|string|*} images - Las imágenes a normalizar (array, JSON string, o string directo)
-     * @param {string} fallback - URL de fallback si no hay imágenes válidas
+     * @param {string} fallback - URL de fallback si no hay imágenes válidas (default: SVG placeholder)
      * @returns {Array<string>} - Array de URLs de imágenes válidas
      */
-    function normalizeImageUrls(images, fallback = 'assets/images/products/placeholder.jpg') {
+    function normalizeImageUrls(images, fallback = null) {
+        // SVG placeholder por defecto si no se especifica fallback
+        const defaultPlaceholder = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Crect fill='%23e5e7eb' width='400' height='400'/%3E%3Ctext fill='%236b7280' font-family='system-ui, -apple-system, sans-serif' font-size='28' font-weight='900' x='50%25' y='45%25' text-anchor='middle'%3ESNEAKERS%3C/text%3E%3Ctext fill='%236b7280' font-family='system-ui, -apple-system, sans-serif' font-size='28' font-weight='900' x='50%25' y='60%25' text-anchor='middle'%3ESHOP%3C/text%3E%3C/svg%3E";
+        const finalFallback = fallback || defaultPlaceholder;
         let imageArray = [];
         
         // 1. Si es un array válido
