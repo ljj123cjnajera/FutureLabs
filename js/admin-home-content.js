@@ -1106,9 +1106,18 @@ function previewBenefitImage(input) {
 }
 
 // Instanciar y hacer global cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', () => {
+(function() {
+  function initAdminHomeContent() {
     if (!window.adminHomeContent) {
-        window.adminHomeContent = new AdminHomeContent();
+      window.adminHomeContent = new AdminHomeContent();
+      window.adminHomeContent.init();
     }
-});
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAdminHomeContent);
+  } else {
+    initAdminHomeContent();
+  }
+})();
 
