@@ -13,20 +13,76 @@ class RelatedProducts {
 
   async loadRelatedProducts() {
     try {
-      // Obtener ID del producto desde la URL
+      // Obtener ID del producto desde la URL o del producto actual
       const urlParams = new URLSearchParams(window.location.search);
-      const productId = urlParams.get('id');
+      let productId = urlParams.get('id') || window.currentProductId;
+
+      if (!productId && window.currentProduct) {
+        productId = window.currentProduct.id;
+      }
 
       if (!productId) return;
 
-      // Obtener productos relacionados
-      const response = await window.api.getRelatedProducts(productId, 4);
+      // Obtener productos relacionados desde API
+      let relatedProducts = [];
+      
+      try {
+        const response = await window.api.getRelatedProducts(productId, 4);
+        if (response && response.success && response.data && response.data.related_products) {
+          relatedProducts = response.data.related_products;
+        } else if (response && Array.isArray(response)) {
+          relatedProducts = response;
+        } else if (response && response.data && Array.isArray(response.data)) {
+          relatedProducts = response.data;
+        }
+      } catch (apiError) {
+        if (window.Logger) window.Logger.warn('API de productos relacionados no disponible, usando fallback');
+        // Fallback: obtener productos de la misma marca o categoría
+        relatedProducts = await this.getFallbackRelatedProducts(productId);
+      }
 
-      if (response.success && response.data.related_products.length > 0) {
-        this.renderRelatedProducts(response.data.related_products);
+      if (relatedProducts && relatedProducts.length > 0) {
+        this.renderRelatedProducts(relatedProducts);
       }
     } catch (error) {
-      console.error('Error loading related products:', error);
+      if (window.Logger) window.Logger.error('Error loading related products:', error);
+    }
+  }
+  
+  async getFallbackRelatedProducts(productId) {
+    try {
+      if (!window.currentProduct) {
+        // Si no tenemos el producto actual, obtenerlo
+        const product = await window.api.getProduct(productId);
+        if (product && product.data) {
+          window.currentProduct = product.data;
+        }
+      }
+      
+      if (!window.currentProduct) return [];
+      
+      // Buscar productos de la misma marca o categoría
+      const filters = {
+        limit: 4,
+        brand: window.currentProduct.brand
+      };
+      
+      const response = await window.api.getProducts(filters);
+      let products = [];
+      
+      if (response && Array.isArray(response)) {
+        products = response;
+      } else if (response && response.data && Array.isArray(response.data.products)) {
+        products = response.data.products;
+      } else if (response && response.data && Array.isArray(response.data)) {
+        products = response.data;
+      }
+      
+      // Filtrar el producto actual
+      return products.filter(p => p.id !== productId).slice(0, 4);
+    } catch (error) {
+      if (window.Logger) window.Logger.error('Error en fallback de productos relacionados:', error);
+      return [];
     }
   }
 
@@ -88,11 +144,7 @@ const relatedProducts = new RelatedProducts();
 
 // Funciones globales
 async function addToCart(productId) {
-  try {
-    await window.cartManager.add(productId, 1);
-    window.notifications.show('Producto agregado al carrito', 'success');
-  } catch (error) {
-    window.notifications.show('Error al agregar al carrito', 'error');
-  }
+  // Redirigir a product-detail para seleccionar talla
+  window.location.href = `product-detail.html?id=${productId}`;
 }
 

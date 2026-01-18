@@ -732,7 +732,7 @@ class AdminManager {
         window.notifications?.success(`Se cargaron ${orders.length} pedido${orders.length !== 1 ? 's' : ''}`);
       }
     } catch (error) {
-      console.error('Error loading orders:', error);
+      if (window.Logger) window.Logger.error('Error loading orders:', error);
       const errorMsg = error.message || error.status === 401 ? 'Sesión expirada. Por favor, inicia sesión nuevamente.' : 'Error desconocido al cargar pedidos';
       tbody.innerHTML = `
         <tr>

@@ -141,13 +141,15 @@ class SneakersAPI {
   // Helper para hacer requests
   async request(endpoint, options = {}) {
     // Override: Always use Real Backend
-    const method = options.method ? options.method.toUpperCase() : 'GET';
+    const method = (options.method && typeof options.method === 'string') ? options.method.toUpperCase() : 'GET';
     let effectiveEndpoint = endpoint;
 
-    // Parameter anti-cache (Safari)
-    if (method === 'GET') {
-      const separator = endpoint.includes('?') ? '&' : '?';
-      effectiveEndpoint = `${endpoint}${separator}_=${Date.now()}`;
+    // Parameter anti-cache (Safari) - only add if endpoint is valid
+    if (method === 'GET' && endpoint && endpoint.trim() !== '') {
+      // Clean endpoint of any trailing spaces
+      const cleanEndpoint = endpoint.trim();
+      const separator = cleanEndpoint.includes('?') ? '&' : '?';
+      effectiveEndpoint = `${cleanEndpoint}${separator}_=${Date.now()}`;
     }
 
     const performRequest = async (retrying = false) => {
@@ -297,8 +299,33 @@ class SneakersAPI {
   // ========== PRODUCTOS ==========
 
   async getProducts(filters = {}) {
-    const params = new URLSearchParams(filters);
-    return this.request(`/products?${params.toString()}`);
+    if (window.Logger) window.Logger.log('🔵 [API] getProducts called with filters:', filters);
+    // Clean filters - remove undefined/null/empty values, spaces, and convert booleans
+    const cleanFilters = {};
+    Object.keys(filters).forEach(key => {
+      // Skip empty keys, undefined, null, empty strings, or keys with only spaces
+      if (!key || key.trim() === '') return;
+      const value = filters[key];
+      if (value !== undefined && value !== null && value !== '' && value !== ' ') {
+        // Convert boolean to string 'true' or 'false'
+        if (typeof value === 'boolean') {
+          cleanFilters[key.trim()] = value.toString();
+        } else if (typeof value === 'string' && value.trim() !== '') {
+          cleanFilters[key.trim()] = value.trim();
+        } else if (typeof value === 'number') {
+          cleanFilters[key.trim()] = value.toString();
+        }
+      }
+    });
+    
+    // Only create params if we have valid filters
+    let queryString = '';
+    if (Object.keys(cleanFilters).length > 0) {
+      const params = new URLSearchParams(cleanFilters);
+      queryString = params.toString();
+    }
+    
+    return this.request(`/products${queryString ? `?${queryString}` : ''}`);
   }
 
   async getProductById(id) {
@@ -382,24 +409,36 @@ class SneakersAPI {
     return this.request('/cart');
   }
 
-  async addToCart(productId, quantity = 1) {
+  async addToCart(productId, quantity = 1, options = {}) {
+    const payload = { product_id: productId, quantity };
+    if (options.size) {
+      payload.size = options.size;
+    }
     return this.request('/cart/add', {
       method: 'POST',
-      body: JSON.stringify({ product_id: productId, quantity })
+      body: JSON.stringify(payload)
     });
   }
 
-  async updateCartItem(productId, quantity) {
+  async updateCartItem(productId, quantity, options = {}) {
+    const payload = { product_id: productId, quantity };
+    if (options.size) {
+      payload.size = options.size;
+    }
     return this.request('/cart/update', {
       method: 'PUT',
-      body: JSON.stringify({ product_id: productId, quantity })
+      body: JSON.stringify(payload)
     });
   }
 
-  async removeFromCart(productId) {
+  async removeFromCart(productId, options = {}) {
+    const payload = { product_id: productId };
+    if (options.size) {
+      payload.size = options.size;
+    }
     return this.request('/cart/remove', {
       method: 'DELETE',
-      body: JSON.stringify({ product_id: productId })
+      body: JSON.stringify(payload)
     });
   }
 

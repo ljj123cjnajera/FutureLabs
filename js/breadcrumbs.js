@@ -69,9 +69,11 @@ class Breadcrumbs {
 
   formatCategory(categorySlug) {
     // Convertir slug a nombre legible
+    if (!categorySlug || typeof categorySlug !== 'string') return '';
     return categorySlug
       .split('-')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .map(word => word && word.length > 0 ? word.charAt(0).toUpperCase() + word.slice(1) : '')
+      .filter(word => word.length > 0)
       .join(' ');
   }
 

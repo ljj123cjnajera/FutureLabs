@@ -13,11 +13,7 @@ class WishlistManager {
     async init() {
         this.syncToggleButtons();
 
-        if (!window.authManager?.isAuthenticated()) {
-            if (window.Logger) window.Logger.log('⏳ Usuario no autenticado, wishlist no disponible');
-            return;
-        }
-
+        // Cargar wishlist (localStorage si no está autenticado, API si está autenticado)
         await this.load();
     }
 
@@ -26,16 +22,39 @@ class WishlistManager {
 
         try {
             this.isLoading = true;
-            const response = await window.api.getWishlist();
+            
+            // Si está autenticado, cargar desde API
+            if (window.authManager?.isAuthenticated()) {
+                const response = await window.api.getWishlist();
 
-            if (response.success) {
-                this.lists = response.data.lists || [];
-                this.stats = response.data.stats || { total_items: 0, total_lists: 0 };
+                if (response.success) {
+                    this.lists = response.data.lists || [];
+                    this.stats = response.data.stats || { total_items: 0, total_lists: 0 };
 
-                if (!this.activeListId || !this.lists.find(list => list.id === this.activeListId)) {
-                    const defaultList = this.lists.find(list => list.is_default);
-                    this.activeListId = defaultList ? defaultList.id : this.lists[0]?.id || null;
+                    if (!this.activeListId || !this.lists.find(list => list.id === this.activeListId)) {
+                        const defaultList = this.lists.find(list => list.is_default);
+                        this.activeListId = defaultList ? defaultList.id : this.lists[0]?.id || null;
+                    }
+
+                    this.updateWishlistCount();
+                    this.syncToggleButtons();
+                    this.emitUpdate();
                 }
+            } else {
+                // Si no está autenticado, cargar desde localStorage
+                const localWishlist = JSON.parse(localStorage.getItem('brutalist_wishlist') || '[]');
+                // Crear una lista por defecto para usuarios no autenticados
+                this.lists = [{
+                    id: 'local_default',
+                    name: 'Mi Lista de Favoritos',
+                    is_default: true,
+                    items: localWishlist.map(productId => ({ product_id: productId }))
+                }];
+                this.activeListId = 'local_default';
+                this.stats = { 
+                    total_items: localWishlist.length, 
+                    total_lists: 1 
+                };
 
                 this.updateWishlistCount();
                 this.syncToggleButtons();
@@ -43,6 +62,21 @@ class WishlistManager {
             }
         } catch (error) {
             if (window.Logger) window.Logger.error('❌ Error al cargar wishlist:', error);
+            // Fallback a localStorage si hay error
+            const localWishlist = JSON.parse(localStorage.getItem('brutalist_wishlist') || '[]');
+            this.lists = [{
+                id: 'local_default',
+                name: 'Mi Lista de Favoritos',
+                is_default: true,
+                items: localWishlist.map(productId => ({ product_id: productId }))
+            }];
+            this.activeListId = 'local_default';
+            this.stats = { 
+                total_items: localWishlist.length, 
+                total_lists: 1 
+            };
+            this.updateWishlistCount();
+            this.syncToggleButtons();
         } finally {
             this.isLoading = false;
         }
@@ -78,6 +112,16 @@ class WishlistManager {
     }
 
     getItem(productId, listId = null) {
+        // Si no está autenticado, verificar localStorage
+        if (!window.authManager?.isAuthenticated()) {
+            const localWishlist = JSON.parse(localStorage.getItem('brutalist_wishlist') || '[]');
+            if (localWishlist.includes(productId)) {
+                return { product_id: productId, list_id: 'local_default' };
+            }
+            return null;
+        }
+        
+        // Si está autenticado, usar API data
         if (listId) {
             const list = this.getListById(listId);
             return list?.items?.find(item => item.product_id === productId) || null;
@@ -90,6 +134,42 @@ class WishlistManager {
 
         return null;
     }
+    
+    async syncLocalToAPI() {
+        // Sincronizar wishlist de localStorage a API cuando el usuario inicia sesión
+        if (!window.authManager?.isAuthenticated()) {
+            return;
+        }
+        
+        try {
+            const localWishlist = JSON.parse(localStorage.getItem('brutalist_wishlist') || '[]');
+            if (localWishlist.length > 0) {
+                let syncedCount = 0;
+                let failedCount = 0;
+                
+                for (const productId of localWishlist) {
+                    try {
+                        await window.api.addToWishlist(productId);
+                        syncedCount++;
+                    } catch (e) {
+                        failedCount++;
+                        if (window.Logger) window.Logger.warn('Error syncing wishlist item to API:', e);
+                    }
+                }
+                
+                if (syncedCount > 0) {
+                    localStorage.removeItem('brutalist_wishlist');
+                    if (window.Logger) window.Logger.log(`✅ ${syncedCount} items de wishlist sincronizados desde localStorage a API`);
+                    
+                    if (failedCount > 0 && window.notifications) {
+                        window.notifications.info('Favoritos sincronizados', `${syncedCount} productos sincronizados. ${failedCount} productos no pudieron sincronizarse.`);
+                    }
+                }
+            }
+        } catch (e) {
+            if (window.Logger) window.Logger.error('Error in syncLocalToAPI wishlist:', e);
+        }
+    }
 
     async setActiveList(listId) {
         if (this.activeListId === listId) {
@@ -101,48 +181,94 @@ class WishlistManager {
     }
 
     async add(productId, { listId = null } = {}) {
-        if (!window.authManager?.isAuthenticated()) {
-            window.notifications?.warning?.('Inicia sesión para guardar productos en tu wishlist');
-            window.modalManager?.showLogin?.();
-            return false;
-        }
+        // Si está autenticado, usar API
+        if (window.authManager?.isAuthenticated()) {
+            const targetListId = listId || this.activeListId || this.getDefaultList()?.id;
 
-        const targetListId = listId || this.activeListId || this.getDefaultList()?.id;
-
-        try {
-            await window.api.addToWishlist(productId, targetListId);
-            await this.load();
-            window.notifications?.success?.('Producto agregado a tu wishlist');
-            return true;
-        } catch (error) {
-            if (window.Logger) window.Logger.error('❌ Error al agregar a wishlist:', error);
-            window.notifications?.error?.(error.message || 'Error al agregar a tu wishlist');
-            return false;
+            try {
+                await window.api.addToWishlist(productId, targetListId);
+                await this.load();
+                window.notifications?.success?.('Producto agregado a tu wishlist');
+                return true;
+            } catch (error) {
+                if (window.Logger) window.Logger.error('❌ Error al agregar a wishlist:', error);
+                window.notifications?.error?.(error.message || 'Error al agregar a tu wishlist');
+                return false;
+            }
+        } else {
+            // Si no está autenticado, usar localStorage
+            try {
+                let localWishlist = JSON.parse(localStorage.getItem('brutalist_wishlist') || '[]');
+                
+                // Evitar duplicados
+                if (!localWishlist.includes(productId)) {
+                    localWishlist.push(productId);
+                    localStorage.setItem('brutalist_wishlist', JSON.stringify(localWishlist));
+                    
+                    // Actualizar estado local
+                    await this.load();
+                    window.notifications?.success?.('Producto agregado a favoritos');
+                    return true;
+                } else {
+                    window.notifications?.info?.('Ya está en favoritos');
+                    return true;
+                }
+            } catch (error) {
+                if (window.Logger) window.Logger.error('❌ Error al agregar a favoritos:', error);
+                window.notifications?.error?.('Error al agregar a favoritos');
+                return false;
+            }
         }
     }
 
     async remove(productId, { listId = null } = {}) {
-        try {
-            let targetListId = listId;
+        // Si está autenticado, usar API
+        if (window.authManager?.isAuthenticated()) {
+            try {
+                let targetListId = listId;
 
-            if (!targetListId) {
-                const item = this.getItem(productId);
-                targetListId = item?.list_id;
+                if (!targetListId) {
+                    const item = this.getItem(productId);
+                    targetListId = item?.list_id;
+                }
+
+                await window.api.removeFromWishlist(productId, targetListId);
+                await this.load();
+                window.notifications?.success?.('Producto eliminado de tu wishlist');
+                return true;
+            } catch (error) {
+                if (window.Logger) window.Logger.error('❌ Error al eliminar de wishlist:', error);
+                window.notifications?.error?.(error.message || 'Error al eliminar de tu wishlist');
+                return false;
             }
-
-            await window.api.removeFromWishlist(productId, targetListId);
-            await this.load();
-            window.notifications?.success?.('Producto eliminado de tu wishlist');
-            return true;
-        } catch (error) {
-            if (window.Logger) window.Logger.error('❌ Error al eliminar de wishlist:', error);
-            window.notifications?.error?.(error.message || 'Error al eliminar de tu wishlist');
-            return false;
+        } else {
+            // Si no está autenticado, usar localStorage
+            try {
+                let localWishlist = JSON.parse(localStorage.getItem('brutalist_wishlist') || '[]');
+                localWishlist = localWishlist.filter(id => id !== productId);
+                localStorage.setItem('brutalist_wishlist', JSON.stringify(localWishlist));
+                
+                // Actualizar estado local
+                await this.load();
+                window.notifications?.success?.('Producto eliminado de favoritos');
+                return true;
+            } catch (error) {
+                if (window.Logger) window.Logger.error('❌ Error al eliminar de favoritos:', error);
+                window.notifications?.error?.('Error al eliminar de favoritos');
+                return false;
+            }
         }
     }
 
     isInWishlist(productId, listId = null) {
-        return !!this.getItem(productId, listId);
+        // Si está autenticado, usar API data
+        if (window.authManager?.isAuthenticated()) {
+            return !!this.getItem(productId, listId);
+        } else {
+            // Si no está autenticado, verificar localStorage
+            const localWishlist = JSON.parse(localStorage.getItem('brutalist_wishlist') || '[]');
+            return localWishlist.includes(productId);
+        }
     }
 
     async toggle(productId, options = {}) {
@@ -162,7 +288,7 @@ class WishlistManager {
             );
             return true;
         } catch (error) {
-            console.error('❌ Error al limpiar wishlist:', error);
+            if (window.Logger) window.Logger.error('❌ Error al limpiar wishlist:', error);
             window.notifications?.error?.(error.message || 'Error al limpiar wishlist');
             return false;
         }

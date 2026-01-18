@@ -142,7 +142,7 @@ body {
 }
 
 /* ============================================
-   5. PAGINATION
+   5. PAGINATION (MEJORADA)
    ============================================ */
 .pagination-brutalist {
     display: flex;
@@ -151,50 +151,95 @@ body {
     gap: 0.5rem;
     flex-wrap: wrap;
     margin-top: 3rem;
+    padding: 1rem 0;
 }
 
-.pagination-brutalist .btn {
-    min-width: 50px;
+.pagination-brutalist .pagination-btn {
+    min-width: 48px;
+    min-height: 48px;
     padding: 0.75rem 1rem;
     border: 2px solid var(--black);
     background: var(--white);
     color: var(--black);
     font-weight: 700;
+    font-size: 0.95rem;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    position: relative;
 }
 
-.pagination-brutalist .btn:hover:not(:disabled) {
+.pagination-brutalist .pagination-btn:hover:not(:disabled) {
     background: var(--black);
     color: var(--white);
     transform: translateY(-2px);
     box-shadow: 4px 4px 0 var(--accent);
 }
 
-.pagination-brutalist .btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+.pagination-brutalist .pagination-btn:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 2px 2px 0 var(--accent);
 }
 
-.pagination-brutalist .btn-black {
+.pagination-brutalist .pagination-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: var(--gray-100);
+    border-color: var(--gray-300);
+}
+
+.pagination-brutalist .pagination-btn.btn-black,
+.pagination-brutalist .pagination-btn.active {
     background: var(--black);
     color: var(--white);
+    box-shadow: 4px 4px 0 var(--accent);
+    font-weight: 900;
+}
+
+.pagination-brutalist .pagination-btn.btn-black:hover,
+.pagination-brutalist .pagination-btn.active:hover {
+    transform: translateY(-2px);
+    box-shadow: 6px 6px 0 var(--accent);
 }
 
 .pagination-ellipsis {
     padding: 0.75rem 0.5rem;
     font-weight: 700;
     color: var(--gray-600);
+    display: flex;
+    align-items: center;
+}
+
+.pagination-text-mobile {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .pagination-text-mobile {
+        display: inline;
+    }
+    
+    .pagination-brutalist .pagination-btn {
+        min-width: 44px;
+        min-height: 44px;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+    }
 }
 
 /* ============================================
-   3. PRODUCTS PAGE LAYOUT
+   3. PRODUCTS PAGE LAYOUT - UNIFICADO CON INDEX
    ============================================ */
 .products-hero-section {
-    background: linear-gradient(135deg, var(--black) 0%, #1a1a1a 100%);
+    background: var(--black);
     color: var(--white);
     padding: 4rem 0;
     margin-bottom: 3rem;
+    position: relative;
+    border-bottom: 4px solid var(--black);
 }
 
 .products-hero-content {
@@ -203,6 +248,8 @@ body {
     align-items: center;
     flex-wrap: wrap;
     gap: 2rem;
+    position: relative;
+    z-index: 1;
 }
 
 .hero-text {
@@ -221,18 +268,23 @@ body {
 }
 
 .hero-title {
-    font-size: 3.5rem;
+    font-family: 'Poppins', sans-serif;
     font-weight: 900;
+    font-size: clamp(3.5rem, 8vw, 7rem);
+    line-height: 0.9;
     text-transform: uppercase;
-    line-height: 1.1;
-    margin: 0 0 1rem 0;
+    margin-bottom: 1.5rem;
+    color: var(--white);
+    text-shadow: 10px 10px 0 rgba(0, 0, 0, 0.5);
     letter-spacing: -0.02em;
 }
 
 .hero-description {
-    font-size: 1.1rem;
+    font-size: 1.25rem;
+    font-weight: 500;
+    max-width: 600px;
+    margin-bottom: 2.5rem;
     color: var(--gray-300);
-    max-width: 500px;
     line-height: 1.6;
 }
 
@@ -247,10 +299,11 @@ body {
 
 .stat-value {
     display: block;
-    font-size: 3rem;
+    font-size: clamp(3rem, 6vw, 5rem);
     font-weight: 900;
     line-height: 1;
     color: var(--accent);
+    text-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
 }
 
 .stat-label {
@@ -467,8 +520,8 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
-    padding: 1rem;
-    background: var(--gray-50);
+    padding: 1rem 2rem;
+    background: var(--white);
     border: 2px solid var(--black);
     flex-wrap: wrap;
     gap: 1rem;
@@ -556,12 +609,13 @@ body {
     box-shadow: 4px 4px 0 var(--accent);
 }
 
-/* Grid/List View */
+/* Grid/List View - UNIFICADO CON INDEX */
 .product-grid-v3 {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 2rem;
-    min-height: 50vh;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    width: 100%;
+    margin-bottom: var(--spacing-4xl);
 }
 
 .product-grid-v3.list-view {
@@ -588,6 +642,25 @@ body {
     font-weight: 600;
 }
 
+/* Sidebar Overlay for Mobile */
+.products-sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.products-sidebar-overlay.active {
+    display: block;
+    opacity: 1;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
     .products-layout {
@@ -604,6 +677,7 @@ body {
         transition: left 0.3s ease;
         overflow-y: auto;
         max-height: 100vh;
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
     }
 
     .products-sidebar.active {
@@ -620,13 +694,27 @@ body {
 }
 
 @media (max-width: 768px) {
+    .products-hero-section {
+        padding: 2rem 0;
+    }
+
     .hero-title {
-        font-size: 2.5rem;
+        font-size: 2rem;
+    }
+
+    .hero-description {
+        font-size: 0.95rem;
+    }
+
+    .stat-value {
+        font-size: 2rem;
     }
 
     .products-toolbar {
         flex-direction: column;
         align-items: stretch;
+        padding: 0.75rem;
+        gap: 0.75rem;
     }
 
     .toolbar-left,
@@ -635,13 +723,40 @@ body {
         justify-content: space-between;
     }
 
+    .results-count {
+        font-size: 0.85rem;
+    }
+
+    .sort-select {
+        font-size: 0.85rem;
+        padding: 0.5rem 0.75rem;
+    }
+
     .product-grid-v3 {
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
         gap: 1rem;
     }
 
     .product-grid-v3.list-view .product-card {
-        grid-template-columns: 120px 1fr;
+        grid-template-columns: 100px 1fr;
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .product-grid-v3.list-view .product-image-container {
+        width: 100px;
+        height: 100px;
+    }
+
+    .pagination-brutalist {
+        gap: 0.25rem;
+        margin-top: 2rem;
+    }
+
+    .pagination-brutalist .btn {
+        min-width: 40px;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
     }
 }
 

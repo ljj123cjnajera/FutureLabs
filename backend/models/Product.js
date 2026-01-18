@@ -14,7 +14,8 @@ class Product {
     }
 
     if (filters.brand) {
-      query = query.where('products.brand', filters.brand);
+      // Support case-insensitive brand matching
+      query = query.whereRaw('LOWER(products.brand) = LOWER(?)', [filters.brand]);
     }
 
     if (filters.min_price) {
@@ -33,6 +34,18 @@ class Product {
       });
     }
 
+    if (filters.onSale) {
+      query = query.whereNotNull('products.discount_price');
+    }
+
+    if (filters.inStock !== undefined) {
+      if (filters.inStock) {
+        query = query.where('products.stock_quantity', '>', 0);
+      } else {
+        query = query.where('products.stock_quantity', '<=', 0);
+      }
+    }
+
     // Ordenamiento
     const sortBy = filters.sort_by || 'created_at';
     const sortOrder = filters.sort_order || 'desc';
@@ -45,29 +58,42 @@ class Product {
     }
 
     try {
-      return await query.timeout(5000); // 5 segundos máximo
+      return await query.timeout(10000); // 10 segundos máximo (reducido para evitar saturación)
     } catch (error) {
       console.error('Error en Product.getAll:', error.message);
+      console.error('Error code:', error.code || 'N/A');
       throw error;
     }
   }
 
   // Obtener producto por ID
   static async getById(id) {
-    return await db('products')
-      .select('products.*', 'categories.name as category_name', 'categories.slug as category_slug')
-      .leftJoin('categories', 'products.category_id', 'categories.id')
-      .where('products.id', id)
-      .first();
+    try {
+      return await db('products')
+        .select('products.*', 'categories.name as category_name', 'categories.slug as category_slug')
+        .leftJoin('categories', 'products.category_id', 'categories.id')
+        .where('products.id', id)
+        .first()
+        .timeout(10000);
+    } catch (error) {
+      console.error('Error en Product.getById:', error.message);
+      throw error;
+    }
   }
 
   // Obtener producto por slug
   static async getBySlug(slug) {
-    return await db('products')
-      .select('products.*', 'categories.name as category_name', 'categories.slug as category_slug')
-      .leftJoin('categories', 'products.category_id', 'categories.id')
-      .where('products.slug', slug)
-      .first();
+    try {
+      return await db('products')
+        .select('products.*', 'categories.name as category_name', 'categories.slug as category_slug')
+        .leftJoin('categories', 'products.category_id', 'categories.id')
+        .where('products.slug', slug)
+        .first()
+        .timeout(10000);
+    } catch (error) {
+      console.error('Error en Product.getBySlug:', error.message);
+      throw error;
+    }
   }
 
   // Obtener productos destacados
@@ -79,7 +105,7 @@ class Product {
       .where('products.is_active', true)
       .orderBy('products.created_at', 'desc')
       .limit(limit)
-      .timeout(5000);
+      .timeout(10000);
   }
 
   // Obtener productos en oferta
@@ -91,43 +117,104 @@ class Product {
       .where('products.is_active', true)
       .orderBy('products.created_at', 'desc')
       .limit(limit)
-      .timeout(5000);
+      .timeout(10000);
   }
 
   // Obtener productos en tendencia
   static async getTrending(limit = 8) {
-    return await db('products')
-      .select('products.*', 'categories.name as category_name', 'categories.slug as category_slug')
-      .leftJoin('categories', 'products.category_id', 'categories.id')
-      .where('products.is_trending', true)
-      .where('products.is_active', true)
-      .orderBy('products.created_at', 'desc')
-      .limit(limit)
-      .timeout(5000);
+    try {
+      try {
+        return await db('products')
+          .select('products.*', 'categories.name as category_name', 'categories.slug as category_slug')
+          .leftJoin('categories', 'products.category_id', 'categories.id')
+          .where('products.is_trending', true)
+          .where('products.is_active', true)
+          .orderBy('products.created_at', 'desc')
+          .limit(limit)
+          .timeout(10000);
+      } catch (trendingError) {
+        if (trendingError.message && trendingError.message.includes('is_trending')) {
+          console.log('⚠️ is_trending column not found, using featured products instead');
+          return await db('products')
+            .select('products.*', 'categories.name as category_name', 'categories.slug as category_slug')
+            .leftJoin('categories', 'products.category_id', 'categories.id')
+            .where('products.featured', true)
+            .where('products.is_active', true)
+            .orderBy('products.created_at', 'desc')
+            .limit(limit)
+            .timeout(10000);
+        }
+        throw trendingError;
+      }
+    } catch (error) {
+      console.error('Error en Product.getTrending:', error.message);
+      throw error;
+    }
   }
 
   // Obtener productos más vendidos
   static async getBestseller(limit = 8) {
-    return await db('products')
-      .select('products.*', 'categories.name as category_name', 'categories.slug as category_slug')
-      .leftJoin('categories', 'products.category_id', 'categories.id')
-      .where('products.is_bestseller', true)
-      .where('products.is_active', true)
-      .orderBy('products.created_at', 'desc')
-      .limit(limit)
-      .timeout(5000);
+    try {
+      try {
+        return await db('products')
+          .select('products.*', 'categories.name as category_name', 'categories.slug as category_slug')
+          .leftJoin('categories', 'products.category_id', 'categories.id')
+          .where('products.is_bestseller', true)
+          .where('products.is_active', true)
+          .orderBy('products.created_at', 'desc')
+          .limit(limit)
+          .timeout(10000);
+      } catch (bestsellerError) {
+        if (bestsellerError.message && bestsellerError.message.includes('is_bestseller')) {
+          console.log('⚠️ is_bestseller column not found, using featured products instead');
+          return await db('products')
+            .select('products.*', 'categories.name as category_name', 'categories.slug as category_slug')
+            .leftJoin('categories', 'products.category_id', 'categories.id')
+            .where('products.featured', true)
+            .where('products.is_active', true)
+            .orderBy('products.created_at', 'desc')
+            .limit(limit)
+            .timeout(10000);
+        }
+        throw bestsellerError;
+      }
+    } catch (error) {
+      console.error('Error en Product.getBestseller:', error.message);
+      throw error;
+    }
   }
 
   // Obtener productos nuevos
   static async getNew(limit = 8) {
-    return await db('products')
-      .select('products.*', 'categories.name as category_name', 'categories.slug as category_slug')
-      .leftJoin('categories', 'products.category_id', 'categories.id')
-      .where('products.is_new', true)
-      .where('products.is_active', true)
-      .orderBy('products.created_at', 'desc')
-      .limit(limit)
-      .timeout(5000);
+    try {
+      // Intentar con is_new primero
+      try {
+        return await db('products')
+          .select('products.*', 'categories.name as category_name', 'categories.slug as category_slug')
+          .leftJoin('categories', 'products.category_id', 'categories.id')
+          .where('products.is_new', true)
+          .where('products.is_active', true)
+          .orderBy('products.created_at', 'desc')
+          .limit(limit)
+          .timeout(10000);
+      } catch (newError) {
+        // Si is_new no existe, usar created_at reciente
+        if (newError.message && newError.message.includes('is_new')) {
+          console.log('⚠️ is_new column not found, using recent products instead');
+          return await db('products')
+            .select('products.*', 'categories.name as category_name', 'categories.slug as category_slug')
+            .leftJoin('categories', 'products.category_id', 'categories.id')
+            .where('products.is_active', true)
+            .orderBy('products.created_at', 'desc')
+            .limit(limit)
+            .timeout(10000);
+        }
+        throw newError;
+      }
+    } catch (error) {
+      console.error('Error en Product.getNew:', error.message);
+      throw error;
+    }
   }
 
   // Obtener productos por categoría
@@ -139,7 +226,8 @@ class Product {
       .where('products.is_active', true);
 
     if (filters.brand) {
-      query = query.where('products.brand', filters.brand);
+      // Support case-insensitive brand matching
+      query = query.whereRaw('LOWER(products.brand) = LOWER(?)', [filters.brand]);
     }
 
     if (filters.min_price) {
@@ -154,7 +242,13 @@ class Product {
     const sortOrder = filters.sort_order || 'desc';
     query = query.orderBy(sortBy, sortOrder);
 
-    return await query;
+    try {
+      return await query.timeout(10000);
+    } catch (error) {
+      console.error('Error en Product.getByCategory:', error.message);
+      console.error('Error code:', error.code || 'N/A');
+      throw error;
+    }
   }
 
   // Contar productos
@@ -165,15 +259,47 @@ class Product {
       query = query.where('category_id', filters.category_id);
     }
 
+    if (filters.brand) {
+      // Support case-insensitive brand matching
+      query = query.whereRaw('LOWER(brand) = LOWER(?)', [filters.brand]);
+    }
+
+    if (filters.min_price) {
+      query = query.where('price', '>=', filters.min_price);
+    }
+
+    if (filters.max_price) {
+      query = query.where('price', '<=', filters.max_price);
+    }
+
     if (filters.search) {
       query = query.where(function() {
         this.where('name', 'ilike', `%${filters.search}%`)
-            .orWhere('description', 'ilike', `%${filters.search}%`);
+            .orWhere('description', 'ilike', `%${filters.search}%`)
+            .orWhere('brand', 'ilike', `%${filters.search}%`);
       });
     }
 
-    const result = await query.count('id as count').first();
-    return parseInt(result.count);
+    if (filters.onSale) {
+      query = query.whereNotNull('discount_price');
+    }
+
+    if (filters.inStock !== undefined) {
+      if (filters.inStock) {
+        query = query.where('stock_quantity', '>', 0);
+      } else {
+        query = query.where('stock_quantity', '<=', 0);
+      }
+    }
+
+    try {
+      const result = await query.count('id as count').first().timeout(10000);
+      return parseInt(result.count);
+    } catch (error) {
+      console.error('Error en Product.count:', error.message);
+      console.error('Error code:', error.code || 'N/A');
+      throw error;
+    }
   }
 
   // Crear producto

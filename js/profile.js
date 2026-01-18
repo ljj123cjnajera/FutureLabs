@@ -69,50 +69,115 @@ async function loadOrders() {
     const container = document.getElementById('ordersList');
     if (!container) return;
 
+    // Show loading state
+    if (window.LoadingStates) {
+        window.LoadingStates.show('ordersList', {
+            message: 'Cargando pedidos...',
+            type: 'spinner'
+        });
+    } else {
+        container.innerHTML = '<div class="loading-brutalist">CARGANDO PEDIDOS...</div>';
+    }
+
     try {
+        if (!window.api) {
+            throw new Error('API no disponible');
+        }
+
         const res = await window.api.getOrders();
-        const orders = res.data?.orders || [];
+        
+        // Handle different response formats
+        let orders = [];
+        if (res && res.success && res.data) {
+            orders = res.data.orders || res.data || [];
+        } else if (Array.isArray(res)) {
+            orders = res;
+        } else if (res && res.data && Array.isArray(res.data)) {
+            orders = res.data;
+        }
+
+        // Hide loading state
+        if (window.LoadingStates) {
+            window.LoadingStates.hide('ordersList');
+        }
 
         setIdText('totalOrders', orders.length);
 
-        const totalSpent = orders.reduce((acc, o) => acc + parseFloat(o.total), 0);
+        const totalSpent = orders.reduce((acc, o) => acc + parseFloat(o.total || 0), 0);
         setIdText('totalSpent', `S/ ${totalSpent.toFixed(2)}`);
 
         if (orders.length === 0) {
-            container.innerHTML = `
-                <div style="padding: 4rem 2rem; border: 2px dashed var(--black); text-align: center; background: var(--gray-100);">
-                    <i class="fas fa-box-open" style="font-size: 3rem; margin-bottom: 1rem; color: var(--gray-400);"></i>
-                    <h3 style="font-weight: 900; text-transform: uppercase;">NO HAY PEDIDOS</h3>
-                    <p style="margin-bottom: 2rem;">Asegura tu primer par para empezar a construir tu historial.</p>
-                    <a href="products.html" class="btn btn-primary">EMPEZAR A COMPRAR</a>
-                </div>`;
+            if (window.LoadingStates) {
+                window.LoadingStates.empty('ordersList', {
+                    title: 'No hay pedidos',
+                    message: 'Asegura tu primer par para empezar a construir tu historial.',
+                    icon: 'fas fa-box-open',
+                    actionLabel: 'EMPEZAR A COMPRAR',
+                    actionUrl: 'products.html'
+                });
+            } else {
+                container.innerHTML = `
+                    <div style="padding: 4rem 2rem; border: 2px dashed var(--black); text-align: center; background: var(--gray-100);">
+                        <i class="fas fa-box-open" style="font-size: 3rem; margin-bottom: 1rem; color: var(--gray-400);"></i>
+                        <h3 style="font-weight: 900; text-transform: uppercase;">NO HAY PEDIDOS</h3>
+                        <p style="margin-bottom: 2rem;">Asegura tu primer par para empezar a construir tu historial.</p>
+                        <a href="products.html" class="btn btn-primary">EMPEZAR A COMPRAR</a>
+                    </div>`;
+            }
             return;
         }
 
-        container.innerHTML = orders.map(order => `
-            <div class="order-item">
-                <div class="order-header">
-                    <span class="order-id">#${order.id}</span>
-                    <span class="order-status">${order.status}</span>
+        container.innerHTML = orders.map(order => {
+            const statusColors = {
+                'pending': '#FFA500',
+                'processing': '#0066CC',
+                'shipped': '#0066CC',
+                'delivered': '#28A745',
+                'cancelled': '#DC3545'
+            };
+            const statusColor = statusColors[order.status?.toLowerCase()] || '#666';
+            
+            return `
+                <div class="order-item" style="border: 3px solid var(--black); padding: 1.5rem; margin-bottom: 1rem; background: var(--white);">
+                    <div class="order-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <span class="order-id" style="font-weight: 900; font-size: 1.2rem;">#${order.order_number || order.id}</span>
+                        <span class="order-status" style="padding: 0.5rem 1rem; background: ${statusColor}; color: white; font-weight: 700; text-transform: uppercase; font-size: 0.8rem;">${order.status || 'PENDIENTE'}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 1rem;">
+                        <span><i class="fas fa-calendar"></i> ${new Date(order.created_at).toLocaleDateString('es-PE')}</span>
+                        <span style="font-weight: 800; font-size: 1.1rem;">S/ ${parseFloat(order.total || order.total_amount || 0).toFixed(2)}</span>
+                    </div>
+                    <button class="btn-save" style="width: 100%; font-size: 0.9rem; padding: 0.75rem;" onclick="window.location.href='order-success.html?id=${order.id}'">
+                        <i class="fas fa-receipt"></i> VER DETALLES
+                    </button>
                 </div>
-                <div style="display: flex; justify-content: space-between; font-size: 0.9rem;">
-                    <span>${new Date(order.created_at).toLocaleDateString()}</span>
-                    <span style="font-weight: 800;">S/ ${parseFloat(order.total).toFixed(2)}</span>
-                </div>
-                <button class="btn-save" style="margin-top: 1rem; font-size: 0.8rem; padding: 0.5rem 1rem;" onclick="window.location.href='order-success.html?id=${order.id}'">VER RECIBO</button>
-            </div>
-        `).join('');
+            `;
+        }).join('');
 
     } catch (e) {
-        if (window.Logger) window.Logger.error('Orders API Error:', e);
-        container.innerHTML = `
-            <div style="padding: 2rem; border: 2px dashed var(--error); text-align: center; color: var(--error);">
-                <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
-                <h3>NO SE PUDO CARGAR EL HISTORIAL</h3>
-                <p>La conexión del sistema falló. Por favor, inténtalo de nuevo más tarde.</p>
-                <button onclick="loadOrders()" class="btn btn-sm btn-outline-white" style="margin-top:1rem; border-color:var(--error); color:var(--error);">REINTENTAR</button>
-            </div>
-        `;
+        if (window.ErrorHandler) {
+            window.ErrorHandler.api(e, 'loadOrders', 'No se pudieron cargar los pedidos. Por favor, intenta de nuevo.');
+        } else {
+            if (window.Logger) window.Logger.error('Orders API Error:', e);
+        }
+        
+        if (window.LoadingStates) {
+            window.LoadingStates.error('ordersList', {
+                title: 'Error al cargar pedidos',
+                message: 'La conexión del sistema falló. Por favor, inténtalo de nuevo más tarde.',
+                retryLabel: 'REINTENTAR',
+                retryCallback: 'loadOrders()'
+            });
+        } else {
+            container.innerHTML = `
+                <div style="padding: 2rem; border: 2px dashed var(--error); text-align: center; color: var(--error);">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                    <h3>NO SE PUDO CARGAR EL HISTORIAL</h3>
+                    <p>La conexión del sistema falló. Por favor, inténtalo de nuevo más tarde.</p>
+                    <button onclick="loadOrders()" class="btn btn-sm btn-outline-white" style="margin-top:1rem; border-color:var(--error); color:var(--error);">REINTENTAR</button>
+                </div>
+            `;
+        }
     }
 }
 
@@ -120,23 +185,67 @@ async function loadWishlist() {
     const container = document.getElementById('wishlistGrid');
     if (!container) return;
 
+    // Show loading state
+    if (window.LoadingStates) {
+        window.LoadingStates.show('wishlistGrid', {
+            message: 'Cargando favoritos...',
+            type: 'spinner'
+        });
+    } else {
+        container.innerHTML = '<div class="loading-brutalist">CARGANDO FAVORITOS...</div>';
+    }
+
     // Real Wishlist Load
     try {
-        const res = await window.api.getWishlist();
         let items = [];
         
-        // Handle different response formats
-        if (res && res.success && res.data) {
-            if (Array.isArray(res.data)) {
-                items = res.data;
-            } else if (res.data.items) {
-                items = res.data.items;
-            } else if (res.data.lists && Array.isArray(res.data.lists)) {
-                // Flatten lists
-                items = res.data.lists.flatMap(list => list.items || []);
+        // Si está autenticado, cargar desde API
+        if (window.authManager?.isAuthenticated() && window.api) {
+            const res = await window.api.getWishlist();
+            
+            // Handle different response formats
+            if (res && res.success && res.data) {
+                if (Array.isArray(res.data)) {
+                    items = res.data;
+                } else if (res.data.items) {
+                    items = res.data.items;
+                } else if (res.data.lists && Array.isArray(res.data.lists)) {
+                    // Flatten lists
+                    items = res.data.lists.flatMap(list => list.items || []);
+                }
+            } else if (Array.isArray(res)) {
+                items = res;
             }
-        } else if (Array.isArray(res)) {
-            items = res;
+        } else {
+            // Si no está autenticado, cargar desde localStorage
+            const localWishlist = JSON.parse(localStorage.getItem('brutalist_wishlist') || '[]');
+            
+            // Cargar información de productos desde localStorage o mostrar IDs
+            if (localWishlist.length > 0) {
+                // Intentar cargar productos desde API si está disponible
+                if (window.api) {
+                    try {
+                        const products = await Promise.all(
+                            localWishlist.map(id => 
+                                window.api.getProduct(id).catch(() => null)
+                            )
+                        );
+                        items = products
+                            .filter(p => p && p.success && p.data)
+                            .map(p => ({ product: p.data }));
+                    } catch (e) {
+                        // Si falla, usar IDs directamente
+                        items = localWishlist.map(id => ({ product: { id, name: `Producto ${id}`, price: 0 } }));
+                    }
+                } else {
+                    items = localWishlist.map(id => ({ product: { id, name: `Producto ${id}`, price: 0 } }));
+                }
+            }
+        }
+        
+        // Hide loading state
+        if (window.LoadingStates) {
+            window.LoadingStates.hide('wishlistGrid');
         }
 
         if (items.length > 0) {
@@ -390,50 +499,66 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     if (headerContainer && window.Components) {
         headerContainer.innerHTML = window.Components.getHeader(true, true);
+        // initHeader() ya inicializa: CartDrawer, SearchOverlay, CartCounter
         window.Components.initHeader();
-        window.Components.initSearch();
-        window.Components.initCartCounter();
+        // Solo initSearch() necesita llamarse explícitamente si no se llamó desde initHeader
+        if (window.Components.initSearch && !window.searchInitialized) {
+            window.Components.initSearch();
+        }
     }
 
     if (footerContainer && window.Components) {
         footerContainer.innerHTML = window.Components.getFooter();
     }
 
-    // Verificar autenticación con retry mejorado
-    let retries = 0;
-    const maxRetries = 10; // Aumentado para dar más tiempo
+    // Verificar autenticación mejorado
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+        window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.pathname);
+        return;
+    }
 
-    const checkAuth = setInterval(async () => {
-        retries++;
-        
-        // Verificar token primero
-        const token = localStorage.getItem('auth_token');
-        if (!token) {
-            if (retries >= 3) {
-                clearInterval(checkAuth);
-                window.location.href = 'login.html';
-                return;
+    // Esperar a que API esté lista
+    const waitForAPI = async () => {
+        let attempts = 0;
+        while (!window.api && attempts < 20) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
+        }
+        return !!window.api;
+    };
+
+    // Inicializar perfil
+    waitForAPI().then(async (apiReady) => {
+        if (!apiReady) {
+            if (window.notifications) {
+                window.notifications.error('Error', 'No se pudo conectar con el servidor. Por favor, recarga la página.');
             }
             return;
         }
 
-        // Si hay token, intentar inicializar aunque authManager no esté listo
-        if (token && (window.authManager?.isAuthenticated() || retries >= 5)) {
-            clearInterval(checkAuth);
-            try {
-                await initializeProfile();
-            } catch (error) {
-                if (window.Logger) window.Logger.error('Error initializing profile:', error);
-                // Continuar de todas formas para mostrar la UI
+        // Verificar autenticación con API
+        try {
+            const isAuth = window.authManager?.isAuthenticated?.() || false;
+            if (!isAuth) {
+                // Intentar verificar con API
+                try {
+                    await window.api.getCurrentUser();
+                } catch (e) {
+                    window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.pathname);
+                    return;
+                }
             }
-        } else if (retries >= maxRetries) {
-            clearInterval(checkAuth);
-            // Si después de muchos intentos no hay authManager, redirigir
-            if (!window.authManager) {
-                window.location.href = 'login.html';
+
+            // Inicializar perfil
+            await initializeProfile();
+        } catch (error) {
+            if (window.Logger) window.Logger.error('Error initializing profile:', error);
+            if (window.ErrorHandler) {
+                window.ErrorHandler.api(error, 'initializeProfile', 'No se pudo cargar el perfil. Por favor, intenta de nuevo.');
             }
         }
-    }, 300);
+    });
 
     setupLoyaltyButtons();
     updateLoyaltyUI(0);
@@ -550,6 +675,10 @@ async function loadUserData() {
     if (emailEl) emailEl.textContent = '...';
 
     try {
+        if (!window.api) {
+            throw new Error('API no disponible');
+        }
+
         const response = await window.api.getProfile();
 
         let user = null;
@@ -561,6 +690,8 @@ async function loadUserData() {
             user = response;
         } else if (response && response.data && response.data.id) {
             user = response.data;
+        } else if (response && !response.success) {
+            throw new Error(response.message || 'Error al cargar perfil');
         }
 
         if (user) {
@@ -582,19 +713,15 @@ async function loadUserData() {
             if (emailInput) emailInput.value = user.email || '';
             if (phoneInput) phoneInput.value = user.phone || '';
         } else {
-            if (nameEl) nameEl.textContent = 'Error al cargar';
-            if (emailEl) emailEl.textContent = '';
-            if (window.notifications) {
-                window.notifications.error('Error', 'No se pudieron cargar los datos del perfil');
-            }
+            throw new Error('No se recibieron datos del usuario');
         }
     } catch (error) {
         if (window.Logger) window.Logger.error('Error loading user data:', error);
+        if (window.ErrorHandler) {
+            window.ErrorHandler.api(error, 'loadUserData', 'No se pudieron cargar los datos del perfil. Por favor, intenta de nuevo.');
+        }
         if (nameEl) nameEl.textContent = 'Error';
         if (emailEl) emailEl.textContent = '';
-        if (window.notifications) {
-            window.notifications.error('Error', 'No se pudieron cargar los datos del perfil');
-        }
     }
 }
 
@@ -656,7 +783,14 @@ async function loadStats() {
         }
 
         // Show loading state
-        container.innerHTML = '<div class="loading-brutalist">CARGANDO DIRECCIONES...</div>';
+        if (window.LoadingStates) {
+            window.LoadingStates.show('addressList', {
+                message: 'Cargando direcciones...',
+                type: 'spinner'
+            });
+        } else {
+            container.innerHTML = '<div class="loading-brutalist">CARGANDO DIRECCIONES...</div>';
+        }
 
         try {
             if (!window.api) {
@@ -664,6 +798,11 @@ async function loadStats() {
             }
 
             const response = await window.api.getAddresses();
+            
+            // Hide loading state
+            if (window.LoadingStates) {
+                window.LoadingStates.hide('addressList');
+            }
 
         let addresses = [];
         if (response && response.success) {
@@ -675,16 +814,26 @@ async function loadStats() {
         }
 
         if (addresses.length === 0) {
-            container.innerHTML = `
-                <div style="grid-column: 1/-1; padding: 4rem 2rem; border: 2px dashed var(--black); text-align: center; background: var(--gray-100);">
-                    <i class="fas fa-map-marker-alt" style="font-size: 3rem; margin-bottom: 1rem; color: var(--gray-400);"></i>
-                    <h3 style="font-weight: 900; text-transform: uppercase; margin-bottom: 1rem;">NO HAY DIRECCIONES GUARDADAS</h3>
-                    <p style="margin-bottom: 2rem;">Agrega una dirección para facilitar tus compras.</p>
-                    <button class="btn btn-primary" onclick="toggleAddressForm()">
-                        <i class="fas fa-plus"></i> AGREGAR DIRECCIÓN
-                    </button>
-                </div>
-            `;
+            if (window.LoadingStates) {
+                window.LoadingStates.empty('addressList', {
+                    title: 'No hay direcciones guardadas',
+                    message: 'Agrega una dirección para facilitar tus compras.',
+                    icon: 'fas fa-map-marker-alt',
+                    actionLabel: 'AGREGAR DIRECCIÓN',
+                    actionCallback: 'toggleAddressForm()'
+                });
+            } else {
+                container.innerHTML = `
+                    <div style="grid-column: 1/-1; padding: 4rem 2rem; border: 2px dashed var(--black); text-align: center; background: var(--gray-100);">
+                        <i class="fas fa-map-marker-alt" style="font-size: 3rem; margin-bottom: 1rem; color: var(--gray-400);"></i>
+                        <h3 style="font-weight: 900; text-transform: uppercase; margin-bottom: 1rem;">NO HAY DIRECCIONES GUARDADAS</h3>
+                        <p style="margin-bottom: 2rem;">Agrega una dirección para facilitar tus compras.</p>
+                        <button class="btn btn-primary" onclick="toggleAddressForm()">
+                            <i class="fas fa-plus"></i> AGREGAR DIRECCIÓN
+                        </button>
+                    </div>
+                `;
+            }
             return;
         }
 
@@ -718,15 +867,29 @@ async function loadStats() {
             `;
         }).join('');
     } catch (error) {
-        if (window.Logger) window.Logger.error('Addresses API Error:', error);
-        container.innerHTML = `
-            <div style="grid-column: 1/-1; padding: 2rem; border: 2px dashed #dc3545; text-align: center; color: #dc3545;">
-                <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
-                <h3>ERROR AL CARGAR DIRECCIONES</h3>
-                <p>No se pudieron cargar las direcciones. Verifica tu conexión.</p>
-                <button onclick="loadAddresses()" class="btn btn-outline" style="margin-top: 1rem; border-color: #dc3545; color: #dc3545;">REINTENTAR</button>
-            </div>
-        `;
+        if (window.ErrorHandler) {
+            window.ErrorHandler.api(error, 'loadAddresses', 'No se pudieron cargar las direcciones. Por favor, intenta de nuevo.');
+        } else {
+            if (window.Logger) window.Logger.error('Addresses API Error:', error);
+        }
+        
+        if (window.LoadingStates) {
+            window.LoadingStates.error('addressList', {
+                title: 'Error al cargar direcciones',
+                message: 'No se pudieron cargar las direcciones. Verifica tu conexión.',
+                retryLabel: 'REINTENTAR',
+                retryCallback: 'loadAddresses()'
+            });
+        } else {
+            container.innerHTML = `
+                <div style="grid-column: 1/-1; padding: 2rem; border: 2px dashed #dc3545; text-align: center; color: #dc3545;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                    <h3>ERROR AL CARGAR DIRECCIONES</h3>
+                    <p>No se pudieron cargar las direcciones. Verifica tu conexión.</p>
+                    <button onclick="loadAddresses()" class="btn btn-outline" style="margin-top: 1rem; border-color: #dc3545; color: #dc3545;">REINTENTAR</button>
+                </div>
+            `;
+        }
     }
 }
 
@@ -758,7 +921,7 @@ async function loadLoyaltyPoints() {
             }
         }
     } catch (error) {
-        console.error('Error loading loyalty points:', error);
+        if (window.Logger) window.Logger.error('Error loading loyalty points:', error);
     }
 }
 
@@ -778,7 +941,7 @@ async function loadLoyaltyTransactions() {
 
 async function loadLoyaltyTransactionsInContainer(container) {
     if (!container) {
-        console.warn('⚠️ Loyalty history container not found');
+        if (window.Logger) window.Logger.warn('⚠️ Loyalty history container not found');
         return;
     }
 
@@ -829,7 +992,7 @@ async function loadLoyaltyTransactionsInContainer(container) {
             `;
         }
     } catch (error) {
-        console.error('Error loading loyalty transactions:', error);
+        if (window.Logger) window.Logger.error('Error loading loyalty transactions:', error);
         container.innerHTML = `
             <div style="padding: 2rem; text-align: center; color: #dc3545;">
                 <i class="fas fa-exclamation-triangle"></i>
@@ -878,7 +1041,7 @@ async function handleProfileUpdate(e) {
             }
         }
     } catch (error) {
-        console.error('Error updating profile:', error);
+        if (window.Logger) window.Logger.error('Error updating profile:', error);
         if (window.notifications) {
             window.notifications.error('Error', 'No se pudo actualizar el perfil. Por favor, intenta de nuevo.');
         }
@@ -910,7 +1073,7 @@ if (personalDataForm) {
                 }
             }
         } catch (error) {
-            console.error('Error updating profile:', error);
+            if (window.Logger) window.Logger.error('Error updating profile:', error);
             if (window.notifications) {
                 window.notifications.error('Error', 'No se pudo actualizar el perfil. Por favor, intenta de nuevo.');
             }
@@ -952,7 +1115,7 @@ if (changePasswordForm) {
                 }
             }
         } catch (error) {
-            console.error('Error changing password:', error);
+            if (window.Logger) window.Logger.error('Error changing password:', error);
             if (window.notifications) {
                 window.notifications.error('Error', 'No se pudo cambiar la contraseña. Por favor, intenta de nuevo.');
             }
@@ -1034,11 +1197,11 @@ async function editAddress(addressId) {
             document.getElementById('addressCountry').value = addr.country || 'Perú';
             document.getElementById('addressIsDefault').checked = addr.is_default;
         } else {
-            console.error('Error fetching address:', response.message);
+            if (window.Logger) window.Logger.error('Error fetching address:', response.message);
             window.notifications.error('No se pudo cargar la dirección.');
         }
     } catch (error) {
-        console.error('Error loading address details:', error);
+        if (window.Logger) window.Logger.error('Error loading address details:', error);
         window.notifications.error('Error de conexión al cargar dirección.');
     }
 }
@@ -1078,9 +1241,39 @@ document.getElementById('addressModal')?.addEventListener('click', function (e) 
 const logoutButton = document.getElementById('logoutButton');
 if (logoutButton) {
     logoutButton.addEventListener('click', async function () {
-        if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+        // Usar notificación en lugar de confirm nativo
+        const confirmed = await new Promise((resolve) => {
+            if (window.notifications) {
+                // Crear modal de confirmación personalizado
+                const modal = document.createElement('div');
+                modal.className = 'confirmation-modal';
+                modal.innerHTML = `
+                    <div class="confirmation-content">
+                        <h3>¿Cerrar sesión?</h3>
+                        <p>¿Estás seguro de que quieres cerrar sesión?</p>
+                        <div class="confirmation-buttons">
+                            <button class="btn btn-black" onclick="this.closest('.confirmation-modal').dataset.result='true'; this.closest('.confirmation-modal').remove(); resolve(true);">SÍ</button>
+                            <button class="btn btn-outline" onclick="this.closest('.confirmation-modal').remove(); resolve(false);">NO</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                modal.dataset.result = 'false';
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.remove();
+                        resolve(false);
+                    }
+                });
+            } else {
+                // Fallback a confirm nativo si no hay sistema de notificaciones
+                resolve(confirm('¿Estás seguro de que quieres cerrar sesión?'));
+            }
+        });
+        
+        if (confirmed) {
             try {
-                console.log('🔴 [PROFILE] Cerrando sesión...');
+                if (window.Logger) window.Logger.log('🔴 [PROFILE] Cerrando sesión...');
 
                 // Llamar a logout de authManager
                 if (window.authManager) {
@@ -1103,7 +1296,7 @@ if (logoutButton) {
                 }, 500);
 
             } catch (error) {
-                console.error('Error al cerrar sesión:', error);
+                if (window.Logger) window.Logger.error('Error al cerrar sesión:', error);
                 if (window.notifications) {
                     window.notifications.error('Error al cerrar sesión');
                 }
@@ -1163,7 +1356,7 @@ window.handleSaveAddress = async function (e) {
             throw new Error(response?.message || 'Error al guardar dirección');
         }
     } catch (err) {
-        console.error('Error saving address:', err);
+        if (window.Logger) window.Logger.error('Error saving address:', err);
         if (window.notifications) {
             window.notifications.error('Error', err.message || 'No se pudo guardar la dirección');
         }
@@ -1189,7 +1382,7 @@ window.deleteAddress = async function (id) {
             }
         }
     } catch (e) {
-        console.error('Error deleting address:', e);
+        if (window.Logger) window.Logger.error('Error deleting address:', e);
         if (window.notifications) {
             window.notifications.error('Error', 'No se pudo eliminar la dirección. Por favor, intenta de nuevo.');
         }

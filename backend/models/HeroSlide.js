@@ -9,7 +9,7 @@ class HeroSlide {
         query = query.where('is_active', true);
       }
       
-      return await query.orderBy('order_index', 'asc').timeout(5000); // 5 segundos máximo
+      return await query.orderBy('order_index', 'asc').timeout(10000);
     } catch (error) {
       console.error('Error en HeroSlide.getAll:', error.message);
       throw error;

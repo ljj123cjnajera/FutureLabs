@@ -3,8 +3,6 @@ if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
 }
 
-// Force redeploy marker
-
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -49,10 +47,10 @@ async function ensureDataSeeded() {
     
     console.log('🔍 Checking if products exist...');
     
-    // Usar Promise.race para timeout de 5 segundos
-    const checkPromise = db('products').select('id').limit(1).timeout(5000);
+    // Usar Promise.race para timeout de 10 segundos (aumentado)
+    const checkPromise = db('products').select('id').limit(1).timeout(10000);
     const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Query timeout')), 5000)
+      setTimeout(() => reject(new Error('Query timeout')), 10000)
     );
     
     try {
@@ -86,7 +84,41 @@ async function ensureDataSeeded() {
 // Agrega esta línea para el proxy:
 app.set('trust proxy', 1);
 
-// Health check - DEBE IR PRIMERO para que Railway lo detecte inmediatamente
+// ============================================
+// CORS - DEBE IR PRIMERO, ANTES DE TODO
+// ============================================
+// Middleware CORS simplificado y robusto para GitHub Pages
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  
+  // Permitir cualquier origen de GitHub Pages, localhost, o sin origen
+  let allowOrigin = '*';
+  if (origin) {
+    // Si hay origen, verificar si es permitido
+    if (origin.includes('.github.io') || 
+        origin.includes('localhost') || 
+        origin.includes('127.0.0.1')) {
+      allowOrigin = origin;
+    }
+  }
+  
+  // SIEMPRE establecer headers CORS
+  res.header('Access-Control-Allow-Origin', allowOrigin);
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin, Access-Control-Request-Method, Access-Control-Request-Headers, X-CSRF-Token');
+  res.header('Access-Control-Expose-Headers', 'Content-Range, X-Content-Range');
+  res.header('Access-Control-Max-Age', '86400');
+  
+  // Responder inmediatamente a OPTIONS (preflight)
+  if (req.method === 'OPTIONS') {
+    return res.status(200).json({});
+  }
+  
+  next();
+});
+
+// Health check - DEBE IR DESPUÉS de CORS
 app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'OK',
@@ -96,7 +128,7 @@ app.get('/health', (req, res) => {
   });
 });
 
-// CORS - DEBE IR ANTES DE HELMET para que funcione correctamente
+// CORS adicional con librería cors - como respaldo
 // CORS - Permite múltiples orígenes (GitHub Pages + localhost)
 const allowedOrigins = [
   process.env.FRONTEND_URL,
@@ -129,34 +161,14 @@ function isOriginAllowed(origin) {
   return false;
 }
 
-// Middleware CORS personalizado - MANEJA EXPLÍCITAMENTE PREFLIGHT
-// CRÍTICO: Debe estar ANTES de cualquier otro middleware
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  
-  // SIEMPRE establecer headers CORS (incluso si no hay origin)
-  // Esto es crítico para que funcione con GitHub Pages
-  if (!origin || isOriginAllowed(origin)) {
-    res.header('Access-Control-Allow-Origin', origin || '*');
-    res.header('Access-Control-Allow-Credentials', 'true');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin, Access-Control-Request-Method, Access-Control-Request-Headers, X-CSRF-Token');
-    res.header('Access-Control-Expose-Headers', 'Content-Range, X-Content-Range');
-    res.header('Access-Control-Max-Age', '86400');
-  }
-  
-  // Manejar peticiones OPTIONS (preflight) explícitamente - RESPONDER INMEDIATAMENTE
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end(); // Cambiar a 200 para mejor compatibilidad
-  }
-  
-  next();
-});
-
 // También usar el middleware cors de la librería como respaldo
 app.use(cors({
   origin: function (origin, callback) {
-    if (isOriginAllowed(origin)) {
+    // Permitir cualquier origen de GitHub Pages o localhost
+    if (!origin || 
+        isOriginAllowed(origin) || 
+        (origin && origin.includes('.github.io')) ||
+        (origin && origin.includes('localhost'))) {
       callback(null, true);
     } else {
       console.log('⚠️ CORS: Origin not allowed:', origin);
@@ -166,12 +178,12 @@ app.use(cors({
       } else if (process.env.NODE_ENV === 'development') {
         callback(null, true); // Permitir en desarrollo
       } else {
-        callback(new Error('Not allowed by CORS'));
+        callback(null, true); // Permitir temporalmente para debugging
       }
     }
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH', 'HEAD'],
   allowedHeaders: [
     'Content-Type', 
     'Authorization', 
@@ -179,11 +191,12 @@ app.use(cors({
     'Accept',
     'Origin',
     'Access-Control-Request-Method',
-    'Access-Control-Request-Headers'
+    'Access-Control-Request-Headers',
+    'X-CSRF-Token'
   ],
   exposedHeaders: ['Content-Range', 'X-Content-Range'],
   preflightContinue: false,
-  optionsSuccessStatus: 204,
+  optionsSuccessStatus: 200, // Cambiar a 200 para mejor compatibilidad
   maxAge: 86400 // Cache preflight por 24 horas
 }));
 

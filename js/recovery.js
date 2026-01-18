@@ -50,15 +50,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Mostrar token solo en desarrollo para facilitar pruebas
                 if (response.resetToken) {
-                    console.log('🔑 Token de recuperación (DEV):', response.resetToken);
+                    if (window.Logger) window.Logger.log('🔑 Token de recuperación (DEV):', response.resetToken);
                     // No usamos alert en producción, pero útil aquí si no hay servidor de correo real
-                    console.info('Usa este token para resetear la contraseña en /reset-password.html?token=' + response.resetToken);
+                    if (window.Logger) window.Logger.info('Usa este token para resetear la contraseña en /reset-password.html?token=' + response.resetToken);
                 }
             } else {
                 window.notifications?.error?.(response.message || 'Error al enviar instrucciones');
             }
         } catch (error) {
-            console.error('Error al enviar instrucciones:', error);
+            if (window.Logger) window.Logger.error('Error al enviar instrucciones:', error);
             window.notifications?.error?.('Error al conectar con el servidor');
         } finally {
             if (submitBtn) {

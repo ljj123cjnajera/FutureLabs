@@ -41,25 +41,48 @@ class QuickView {
   }
 
   setupEventListeners() {
+    // Limpiar listeners anteriores si existen
+    this.cleanup();
+    
     // Cerrar al hacer click en overlay
-    document.addEventListener('click', (e) => {
+    this.overlayClickHandler = (e) => {
       if (e.target.classList.contains('quick-view-overlay')) {
         this.close();
       }
-    });
+    };
+    document.addEventListener('click', this.overlayClickHandler);
 
     // Cerrar con botón X
     const closeBtn = document.getElementById('quickViewClose');
     if (closeBtn) {
-      closeBtn.addEventListener('click', () => this.close());
+      this.closeBtnHandler = () => this.close();
+      closeBtn.addEventListener('click', this.closeBtnHandler);
     }
 
     // Cerrar con ESC
-    document.addEventListener('keydown', (e) => {
+    this.escapeKeyHandler = (e) => {
       if (e.key === 'Escape' && this.modal?.classList.contains('active')) {
         this.close();
       }
-    });
+    };
+    document.addEventListener('keydown', this.escapeKeyHandler);
+  }
+  
+  cleanup() {
+    // Remover event listeners para prevenir memory leaks
+    if (this.overlayClickHandler) {
+      document.removeEventListener('click', this.overlayClickHandler);
+      this.overlayClickHandler = null;
+    }
+    if (this.escapeKeyHandler) {
+      document.removeEventListener('keydown', this.escapeKeyHandler);
+      this.escapeKeyHandler = null;
+    }
+    const closeBtn = document.getElementById('quickViewClose');
+    if (closeBtn && this.closeBtnHandler) {
+      closeBtn.removeEventListener('click', this.closeBtnHandler);
+      this.closeBtnHandler = null;
+    }
   }
 
   async show(productId) {
@@ -215,24 +238,20 @@ class QuickView {
       document.body.style.overflow = '';
       this.currentProduct = null;
     }
+    // Limpiar listeners cuando se cierra
+    this.cleanup();
   }
 
   async addToCart(productId) {
-    try {
-      if (window.cartManager) {
-        await window.cartManager.add(productId, 1);
-        if (window.notifications) {
-          window.notifications.success('Producto agregado al carrito');
-        }
-        // Cerrar modal después de agregar
-        setTimeout(() => this.close(), 500);
-      }
-    } catch (error) {
-      if (window.Logger) window.Logger.error('Error agregando al carrito:', error);
-      if (window.notifications) {
-        window.notifications.error('Error al agregar producto');
-      }
+    // IMPORTANTE: Quick View no puede agregar sin seleccionar talla
+    // Redirigir a product-detail para seleccionar talla
+    this.close();
+    if (window.notifications) {
+      window.notifications.info('Selecciona una Talla', 'Redirigiendo a la página del producto...');
     }
+    setTimeout(() => {
+      window.location.href = `product-detail.html?id=${productId}`;
+    }, 300);
   }
 
   buyNow(productId) {

@@ -72,8 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (response && response.success) {
                         if (window.notifications) {
                             window.notifications.success('Mensaje enviado', 'Te contactaremos pronto a ' + formData.email);
-                        } else {
-                            alert('Mensaje enviado. Te contactaremos pronto.');
                         }
                         form.reset();
                         btn.innerHTML = 'Mensaje Enviado ✓';
@@ -85,12 +83,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         throw new Error(response?.message || 'Error al enviar');
                     }
                 } catch (error) {
-                    console.error('Error sending contact form:', error);
+                    if (window.Logger) window.Logger.error('Error sending contact form:', error);
                     // Fallback: mostrar mensaje de éxito aunque no se haya enviado (para UX)
                     if (window.notifications) {
                         window.notifications.info('Mensaje recibido', 'Gracias por contactarnos. Te responderemos pronto.');
-                    } else {
-                        alert('Gracias por contactarnos. Te responderemos pronto.');
                     }
                     form.reset();
                     btn.innerHTML = originalText;
@@ -101,8 +97,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => {
                     if (window.notifications) {
                         window.notifications.success('Mensaje enviado', 'Te contactaremos pronto a ' + formData.email);
-                    } else {
-                        alert('Mensaje enviado. Te contactaremos pronto.');
                     }
                     form.reset();
                     btn.innerHTML = 'Mensaje Enviado ✓';

@@ -26,23 +26,49 @@ class Cart {
   }
 
   // Obtener item específico del carrito
-  static async getItem(userId, productId) {
-    return await db('cart')
+  // Nota: Por ahora no consideramos size en la búsqueda porque la tabla no tiene columna size
+  // En el futuro, cuando se agregue la columna size, se deberá incluir en el where
+  static async getItem(userId, productId, size = null) {
+    const query = db('cart')
       .where({
         user_id: userId,
         product_id: productId
-      })
-      .first();
+      });
+    
+    // Si en el futuro se agrega columna size, descomentar:
+    // if (size !== null) {
+    //   query.where('size', size);
+    // }
+    
+    return await query.first();
   }
 
   // Agregar producto al carrito
   static async add(userId, productId, quantity = 1) {
+    // Validar stock antes de agregar
+    const product = await db('products')
+      .where({ id: productId })
+      .first();
+
+    if (!product) {
+      throw new Error('Producto no encontrado');
+    }
+
+    if (product.stock_quantity !== null && product.stock_quantity < quantity) {
+      throw new Error(`Stock insuficiente. Disponible: ${product.stock_quantity}, Solicitado: ${quantity}`);
+    }
+
     // Verificar si el producto ya está en el carrito
     const existingItem = await Cart.getItem(userId, productId);
 
     if (existingItem) {
+      // Validar stock para la nueva cantidad total
+      const newTotalQuantity = existingItem.quantity + quantity;
+      if (product.stock_quantity !== null && product.stock_quantity < newTotalQuantity) {
+        throw new Error(`Stock insuficiente. Disponible: ${product.stock_quantity}, Solicitado: ${newTotalQuantity}`);
+      }
       // Actualizar cantidad
-      return await Cart.updateQuantity(userId, productId, existingItem.quantity + quantity);
+      return await Cart.updateQuantity(userId, productId, newTotalQuantity);
     }
 
     // Crear nuevo item
@@ -62,6 +88,19 @@ class Cart {
     if (quantity <= 0) {
       // Si la cantidad es 0 o menos, eliminar el item
       return await Cart.remove(userId, productId);
+    }
+
+    // Validar stock antes de actualizar
+    const product = await db('products')
+      .where({ id: productId })
+      .first();
+
+    if (!product) {
+      throw new Error('Producto no encontrado');
+    }
+
+    if (product.stock_quantity !== null && product.stock_quantity < quantity) {
+      throw new Error(`Stock insuficiente. Disponible: ${product.stock_quantity}, Solicitado: ${quantity}`);
     }
 
     const [item] = await db('cart')

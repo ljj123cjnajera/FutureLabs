@@ -18,8 +18,39 @@ document.addEventListener('DOMContentLoaded', () => {
     const registerForm = document.getElementById('registerForm');
 
     if (registerForm) {
+        // Inicializar validación en tiempo real
+        if (window.FormValidator) {
+            window.FormValidator.initRealTime(registerForm);
+        }
+
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+
+            // Validar formulario antes de enviar
+            if (window.FormValidator) {
+                const validation = window.FormValidator.validateForm(registerForm, {
+                    showErrors: true,
+                    focusFirstError: true,
+                    customValidation: (form) => {
+                        // Validar que las contraseñas coincidan si hay campo de confirmación
+                        const password = document.getElementById('registerPassword')?.value;
+                        const confirmPassword = document.getElementById('registerConfirmPassword')?.value;
+                        if (confirmPassword && password !== confirmPassword) {
+                            return {
+                                valid: false,
+                                message: 'Las contraseñas no coinciden'
+                            };
+                        }
+                        return { valid: true };
+                    }
+                });
+                if (!validation.valid) {
+                    if (window.notifications) {
+                        window.notifications.warning('Formulario Inválido', 'Por favor, corrige los errores en el formulario');
+                    }
+                    return;
+                }
+            }
 
             const firstNameInput = document.getElementById('registerFirstName');
             const lastNameInput = document.getElementById('registerLastName');
@@ -31,6 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const email = emailInput ? emailInput.value.trim() : '';
             const password = passwordInput ? passwordInput.value : '';
 
+            // Validaciones adicionales (backup)
             if (!first_name || !last_name || !email || !password) {
                 if (window.notifications) window.notifications.error('Error', 'Todos los campos son obligatorios');
                 return;
@@ -42,10 +74,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const btn = registerForm.querySelector('button[type="submit"]');
-            const originalText = btn ? btn.innerText : 'CREAR CUENTA';
+            const originalText = btn ? btn.innerHTML : 'CREAR CUENTA';
             if (btn) {
                 btn.disabled = true;
-                btn.innerText = 'CREANDO CUENTA...';
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> CREANDO CUENTA...';
             }
 
             try {
@@ -72,11 +104,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     throw new Error(response.message || 'Error al registrar');
                 }
             } catch (error) {
-                if (window.Logger) window.Logger.error('Registration error:', error);
-                if (window.notifications) window.notifications.error('Error de Registro', error.message || 'Intente nuevamente');
+                // Usar error handler si está disponible
+                if (window.ErrorHandler) {
+                    window.ErrorHandler.api(error, 'register', 'No se pudo crear la cuenta. Por favor, intenta de nuevo.');
+                } else {
+                    if (window.Logger) window.Logger.error('Registration error:', error);
+                    if (window.notifications) {
+                        const errorMsg = error.message || error.response?.data?.message || 'No se pudo crear la cuenta. Por favor, intenta de nuevo.';
+                        window.notifications.error('Error de Registro', errorMsg);
+                    }
+                }
                 if (btn) {
                     btn.disabled = false;
-                    btn.innerText = originalText;
+                    btn.innerHTML = originalText;
                 }
             }
         });

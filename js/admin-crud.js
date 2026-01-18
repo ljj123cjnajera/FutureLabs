@@ -172,7 +172,7 @@ class AdminCRUD {
       document.getElementById('productModalTitle').textContent = 'Crear Producto';
       const modal = document.getElementById('productModal');
       if (!modal) {
-        console.error('Modal de producto no encontrado');
+        if (window.Logger) window.Logger.error('Modal de producto no encontrado');
         return;
       }
       this.showModal(modal);
@@ -204,7 +204,7 @@ class AdminCRUD {
       this.isLoading = true;
       const modal = document.getElementById('productModal');
       if (!modal) {
-        console.error('Modal de producto no encontrado');
+        if (window.Logger) window.Logger.error('Modal de producto no encontrado');
         this.isLoading = false;
         return;
       }
@@ -410,7 +410,7 @@ class AdminCRUD {
         modalContent.appendChild(loadingOverlay);
 
         if (modal.style.display !== 'flex') {
-          console.warn('Modal se cerró antes de cargar datos');
+          if (window.Logger) window.Logger.warn('Modal se cerró antes de cargar datos');
           return;
         }
 
@@ -498,7 +498,7 @@ class AdminCRUD {
         modalContent.appendChild(loadingOverlay);
 
         if (modal.style.display !== 'flex') {
-          console.warn('Modal se cerró antes de cargar datos');
+          if (window.Logger) window.Logger.warn('Modal se cerró antes de cargar datos');
           return;
         }
 
@@ -567,7 +567,7 @@ class AdminCRUD {
         modalContent.appendChild(loadingOverlay);
 
         if (modal.style.display !== 'flex') {
-          console.warn('Modal se cerró antes de cargar datos');
+          if (window.Logger) window.Logger.warn('Modal se cerró antes de cargar datos');
           return;
         }
 

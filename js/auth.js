@@ -161,7 +161,10 @@ class AuthManager {
     if (typeof window.notifications !== 'undefined') {
       window.notifications.show(message, type);
     } else {
-      if (window.Logger) window.Logger.log(`[${type.toUpperCase()}] ${message}`);
+      if (window.Logger) {
+        const safeType = (type && typeof type === 'string') ? type.toUpperCase() : 'INFO';
+        window.Logger.log(`[${safeType}] ${message}`);
+      }
     }
   }
 }

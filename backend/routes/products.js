@@ -4,18 +4,43 @@ const Product = require('../models/Product');
 
 // GET /api/products - Obtener todos los productos con filtros
 router.get('/', async (req, res) => {
+  let filters = null;
+  
   try {
-    const filters = {
+    filters = {
       category_id: req.query.category_id,
-      brand: req.query.brand,
-      min_price: req.query.min_price,
-      max_price: req.query.max_price,
+      brand: req.query.brand || req.query.category, // Support category as brand filter
+      min_price: req.query.min_price ? parseFloat(req.query.min_price) : undefined,
+      max_price: req.query.max_price ? parseFloat(req.query.max_price) : undefined,
       search: req.query.search,
       sort_by: req.query.sort_by,
       sort_order: req.query.sort_order,
       page: req.query.page ? parseInt(req.query.page) : undefined,
-      limit: req.query.limit ? parseInt(req.query.limit) : undefined
+      limit: req.query.limit ? parseInt(req.query.limit) : undefined,
+      onSale: req.query.onSale === 'true' || req.query.on_sale === 'true',
+      inStock: req.query.inStock !== undefined ? req.query.inStock === 'true' : undefined
     };
+    
+    // Clean undefined/null/empty values
+    Object.keys(filters).forEach(key => {
+      const value = filters[key];
+      if (value === undefined || value === null || value === '' || 
+          (typeof value === 'string' && value.trim() === '')) {
+        delete filters[key];
+      }
+    });
+    
+    // Capitalize brand if it exists (Jordan, Nike, Adidas, Yeezy)
+    if (filters.brand) {
+      const brandLower = filters.brand.toLowerCase();
+      const brandMap = {
+        'jordan': 'Jordan',
+        'nike': 'Nike',
+        'adidas': 'Adidas',
+        'yeezy': 'Yeezy'
+      };
+      filters.brand = brandMap[brandLower] || filters.brand.charAt(0).toUpperCase() + filters.brand.slice(1).toLowerCase();
+    }
 
     const products = await Product.getAll(filters);
     const total = await Product.count(filters);
@@ -31,10 +56,19 @@ router.get('/', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error obteniendo productos:', error);
+    console.error('Error obteniendo productos:', error.message);
+    console.error('Error stack:', error.stack);
+    if (filters) {
+      console.error('Filters used:', JSON.stringify(filters, null, 2));
+    } else {
+      console.error('Filters: Not initialized (error occurred before filter creation)');
+      console.error('Query params:', JSON.stringify(req.query, null, 2));
+    }
+    
     res.status(500).json({
       success: false,
-      message: 'Error obteniendo productos'
+      message: 'Error obteniendo productos',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
@@ -76,7 +110,8 @@ router.get('/on-sale', async (req, res) => {
     console.error('Error obteniendo productos en oferta:', error);
     res.status(500).json({
       success: false,
-      message: 'Error obteniendo productos en oferta'
+      message: 'Error obteniendo productos en oferta',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
@@ -97,7 +132,8 @@ router.get('/trending', async (req, res) => {
     console.error('Error obteniendo productos en tendencia:', error);
     res.status(500).json({
       success: false,
-      message: 'Error obteniendo productos en tendencia'
+      message: 'Error obteniendo productos en tendencia',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
@@ -118,7 +154,8 @@ router.get('/bestseller', async (req, res) => {
     console.error('Error obteniendo productos más vendidos:', error);
     res.status(500).json({
       success: false,
-      message: 'Error obteniendo productos más vendidos'
+      message: 'Error obteniendo productos más vendidos',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
@@ -139,7 +176,8 @@ router.get('/new', async (req, res) => {
     console.error('Error obteniendo productos nuevos:', error);
     res.status(500).json({
       success: false,
-      message: 'Error obteniendo productos nuevos'
+      message: 'Error obteniendo productos nuevos',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
@@ -167,7 +205,8 @@ router.get('/category/:slug', async (req, res) => {
     console.error('Error obteniendo productos por categoría:', error);
     res.status(500).json({
       success: false,
-      message: 'Error obteniendo productos por categoría'
+      message: 'Error obteniendo productos por categoría',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
@@ -194,7 +233,8 @@ router.get('/:id', async (req, res) => {
     console.error('Error obteniendo producto:', error);
     res.status(500).json({
       success: false,
-      message: 'Error obteniendo producto'
+      message: 'Error obteniendo producto',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
@@ -221,7 +261,8 @@ router.get('/slug/:slug', async (req, res) => {
     console.error('Error obteniendo producto:', error);
     res.status(500).json({
       success: false,
-      message: 'Error obteniendo producto'
+      message: 'Error obteniendo producto',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });

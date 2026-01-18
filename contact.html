@@ -7,13 +7,15 @@
     <title>Contacto - SneakersShop</title>
 
     <!-- CSS Unificado (Streetwear Standard) -->
-    <link rel="stylesheet" href="css/typography.css?v=7.0-CLEAN">
-    <link rel="stylesheet" href="css/home-streetwear.css?v=7.0-CLEAN">
-    <link rel="stylesheet" href="css/header-v3.css?v=7.0-CLEAN">
-    <link rel="stylesheet" href="css/footer-brutalist.css?v=7.0-CLEAN">
-    <link rel="stylesheet" href="css/animations.css?v=7.0-CLEAN">
-    <link rel="stylesheet" href="css/pages-brutalist.css?v=7.0-CLEAN">
-    <link rel="stylesheet" href="css/skeleton.css?v=7.0-CLEAN">
+    <!-- PRIMARY SOURCE OF TRUTH - LOAD ORDER MATTERS -->
+    <link rel="stylesheet" href="css/typography.css?v=8.0-URGENT">
+    <link rel="stylesheet" href="css/home-streetwear.css?v=8.0-URGENT">
+    <link rel="stylesheet" href="css/footer-brutalist.css?v=8.0-URGENT">
+    <link rel="stylesheet" href="css/autocomplete.css?v=8.0-URGENT">
+    <link rel="stylesheet" href="css/header-v3.css?v=8.0-URGENT">
+    <link rel="stylesheet" href="css/animations.css?v=8.0-URGENT">
+    <link rel="stylesheet" href="css/pages-brutalist.css?v=8.0-URGENT">
+    <link rel="stylesheet" href="css/skeleton.css?v=8.0-URGENT">
 
     <!-- CSS Específicos de Página -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -97,13 +99,20 @@
     <!-- Quick View Modal (Placeholder) -->
     <div id="quickViewModal"></div>
 
+    <!-- Core scripts (critical for page functionality) -->
+    <script src="js/logger.js?v=1.0"></script>
+    <script src="js/error-handler.js?v=1.0"></script>
+    <script src="js/loading-states.js?v=1.0"></script>
     <script src="js/api.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/cart.js"></script>
-    <script src="js/components.js"></script>
-    <script src="js/navigation-enhanced.js"></script>
-    <script src="js/notifications.js"></script>
-    <script src="js/contact.js"></script>
+    <script src="js/api.js?v=8.0-CLEAN"></script>
+    <script src="js/components.js?v=8.0-CLEAN"></script>
+    <script src="js/navigation-enhanced.js?v=8.0-CLEAN"></script>
+    <script src="js/auth.js?v=8.0-CLEAN"></script>
+    <script src="js/notifications.js?v=8.0-CLEAN"></script>
+    <script src="js/cart.js?v=8.0-CLEAN"></script>
+    <script src="js/wishlist.js?v=8.0-CLEAN"></script>
+    <!-- Page-specific script -->
+    <script src="js/contact.js?v=8.0-CLEAN"></script>
 </body>
 
 </html>

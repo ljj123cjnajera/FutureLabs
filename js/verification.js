@@ -167,7 +167,7 @@ class VerificationManager {
         }, 1000);
       }
     } catch (error) {
-      console.error('Error verificando código:', error);
+      if (window.Logger) window.Logger.error('Error verificando código:', error);
       this.showError(error.message || 'Código inválido o expirado');
     } finally {
       // Rehabilitar botón
@@ -192,7 +192,7 @@ class VerificationManager {
         this.showSuccess('');
       }, 3000);
     } catch (error) {
-      console.error('Error reenviando código:', error);
+      if (window.Logger) window.Logger.error('Error reenviando código:', error);
       this.showError('Error al reenviar código. Intenta nuevamente.');
     } finally {
       const resendLink = document.getElementById('resendCodeLink');

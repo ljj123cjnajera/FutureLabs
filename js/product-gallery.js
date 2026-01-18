@@ -71,7 +71,7 @@ class ProductGallery {
 
     const container = document.getElementById(this.containerId);
     if (!container) {
-      console.error('Product gallery container not found:', this.containerId);
+      if (window.Logger) window.Logger.error('Product gallery container not found:', this.containerId);
       return;
     }
 
@@ -126,6 +126,7 @@ class ProductGallery {
     if (lightboxImage && this.lightbox) {
       lightboxImage.src = this.images[this.currentIndex];
       lightboxImage.alt = `Imagen ${this.currentIndex + 1} de ${this.images.length}`;
+      lightboxImage.classList.remove('zoomed'); // Reset zoom al cambiar imagen
 
       if (lightboxCounter) {
         lightboxCounter.textContent = `${this.currentIndex + 1} / ${this.images.length}`;
@@ -133,6 +134,22 @@ class ProductGallery {
 
       this.lightbox.classList.add('active');
       document.body.style.overflow = 'hidden';
+      
+      // Agregar listener para zoom con doble click
+      lightboxImage.addEventListener('dblclick', this.toggleZoom.bind(this));
+      lightboxImage.addEventListener('click', (e) => {
+        if (e.target.classList.contains('zoomed')) {
+          this.toggleZoom(e);
+        }
+      });
+    }
+  }
+  
+  // Toggle zoom en imagen
+  toggleZoom(e) {
+    const lightboxImage = document.getElementById('galleryLightboxImage');
+    if (lightboxImage) {
+      lightboxImage.classList.toggle('zoomed');
     }
   }
 

@@ -13,7 +13,7 @@ class RecentlyViewed {
       if (!Array.isArray(parsed)) return [];
       return parsed;
     } catch (error) {
-      console.error('Error leyendo productos vistos recientemente:', error);
+      if (window.Logger) window.Logger.error('Error leyendo productos vistos recientemente:', error);
       return [];
     }
   }
@@ -22,7 +22,7 @@ class RecentlyViewed {
     try {
       localStorage.setItem(this.storageKey, JSON.stringify(products));
     } catch (error) {
-      console.error('Error guardando productos vistos recientemente:', error);
+      if (window.Logger) window.Logger.error('Error guardando productos vistos recientemente:', error);
     }
   }
 
@@ -165,6 +165,10 @@ class RecentlyViewed {
   }
 
   formatCurrency(value) {
+    // Usar utilidad compartida si está disponible, sino fallback
+    if (window.Utils && window.Utils.formatCurrency) {
+      return window.Utils.formatCurrency(value);
+    }
     const amount = Number(value) || 0;
     return `S/ ${amount.toFixed(2)}`;
   }

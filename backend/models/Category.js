@@ -4,10 +4,12 @@ class Category {
   // Obtener todas las categorías (con timeout)
   static async getAll() {
     try {
-      return await db('categories')
+      const categories = await db('categories')
         .select('*')
-        .orderBy('sort_order', 'asc')
-        .timeout(5000); // 5 segundos máximo
+        .orderBy('name', 'asc')
+        .timeout(10000);
+      
+      return categories;
     } catch (error) {
       console.error('Error en Category.getAll:', error.message);
       throw error;

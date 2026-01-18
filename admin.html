@@ -11,9 +11,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Estilos inline removidos - migrados a admin.css -->
 
-    <!-- CSS Unificado (Streetwear Standard) -->
-    <link rel="stylesheet" href="css/home-streetwear.css?v=7.0-CLEAN">
-    <link rel="stylesheet" href="css/admin.css?v=7.0-CLEAN">
+    <!-- PRIMARY SOURCE OF TRUTH - LOAD ORDER MATTERS -->
+    <link rel="stylesheet" href="css/typography.css?v=8.0-URGENT">
+    <link rel="stylesheet" href="css/home-streetwear.css?v=8.0-URGENT">
+    <link rel="stylesheet" href="css/admin.css?v=8.0-URGENT">
 
     <!-- External Fonts (Admin Specific) -->
     <link
@@ -1193,11 +1194,18 @@
 
 
     <!-- Scripts -->
+    <!-- Core scripts (critical for page functionality) -->
     <script src="js/logger.js?v=1.0"></script>
+    <script src="js/error-handler.js?v=1.0"></script>
+    <script src="js/loading-states.js?v=1.0"></script>
+    <script src="js/api.js?v=7.2"></script>
+    <script src="js/components.js?v=7.2"></script>
+    <script src="js/navigation-enhanced.js?v=7.2"></script>
+    <script src="js/auth.js?v=7.2"></script>
+    <script src="js/notifications.js?v=7.2"></script>
+    <!-- External libraries -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="js/api.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/notifications.js"></script>
+    <!-- Admin-specific scripts -->
     <script src="js/admin-home-content.js"></script>
     <script src="js/admin-crud.js"></script>
     <script src="js/admin-coupons.js"></script>

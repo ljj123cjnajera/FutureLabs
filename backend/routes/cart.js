@@ -60,10 +60,15 @@ router.post('/add', authenticateToken, addToCartValidation, async (req, res) => 
       });
     }
 
-    const { product_id, quantity } = req.body;
+    const { product_id, quantity, size } = req.body;
+    // size es opcional y se puede usar en el futuro para variantes
+    // Por ahora lo aceptamos pero no lo guardamos en la BD (la tabla cart no tiene columna size)
+    if (size && process.env.NODE_ENV === 'development') {
+      console.log('📏 Talla recibida:', size, '(no se guarda en BD aún)');
+    }
     console.log('📦 Agregando producto:', product_id, 'cantidad:', quantity || 1);
 
-    const item = await Cart.add(req.user.id, product_id, quantity || 1);
+    const item = await Cart.add(req.user.id, product_id, quantity || 1, size || null);
     console.log('✅ Item agregado al carrito:', item.id);
 
     res.status(201).json({
@@ -74,9 +79,13 @@ router.post('/add', authenticateToken, addToCartValidation, async (req, res) => 
   } catch (error) {
     console.error('❌ Error agregando al carrito:', error.message);
     console.error('Stack:', error.stack);
-    res.status(500).json({
+    
+    // Si es error de stock, retornar 400 (Bad Request)
+    const statusCode = error.message && error.message.includes('Stock insuficiente') ? 400 : 500;
+    
+    res.status(statusCode).json({
       success: false,
-      message: 'Error agregando producto al carrito',
+      message: error.message || 'Error agregando producto al carrito',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
@@ -113,9 +122,14 @@ router.put('/update', authenticateToken, updateQuantityValidation, async (req, r
     });
   } catch (error) {
     console.error('Error actualizando carrito:', error);
-    res.status(500).json({
+    
+    // Si es error de stock, retornar 400 (Bad Request)
+    const statusCode = error.message && error.message.includes('Stock insuficiente') ? 400 : 500;
+    
+    res.status(statusCode).json({
       success: false,
-      message: 'Error actualizando carrito'
+      message: error.message || 'Error actualizando carrito',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });

@@ -23,12 +23,12 @@ class SearchAutocomplete {
     this.searchInput = document.getElementById(this.inputId) || document.getElementById('searchInput');
 
     if (!this.searchInput) {
-      console.log(`⏳ SearchAutocomplete: Input '${this.inputId}' no encontrado, reintentando...`);
+      if (window.Logger) window.Logger.log(`⏳ SearchAutocomplete: Input '${this.inputId}' no encontrado, reintentando...`);
       return;
     }
 
     this.initialized = true;
-    console.log('✅ SearchAutocomplete inicializado correctamente');
+    if (window.Logger) window.Logger.log('✅ SearchAutocomplete inicializado correctamente');
 
     this.searchInput.setAttribute('autocomplete', 'off');
     this.searchInput.setAttribute('role', 'combobox');
@@ -139,7 +139,7 @@ class SearchAutocomplete {
         this.hideSuggestions();
       }
     } catch (error) {
-      console.error('Error fetching suggestions:', error);
+      if (window.Logger) window.Logger.error('Error fetching suggestions:', error);
       this.currentSuggestions = [];
       this.hideSuggestions();
     } finally {
@@ -565,7 +565,7 @@ function initializeAutocomplete() {
       if (searchAutocomplete.initialized || attempts >= maxAttempts) {
         clearInterval(retryInterval);
         if (!searchAutocomplete.initialized) {
-          console.warn('⚠️ SearchAutocomplete no pudo inicializarse después de 5 segundos');
+          if (window.Logger) window.Logger.warn('⚠️ SearchAutocomplete no pudo inicializarse después de 5 segundos');
         }
       }
     }, 100);

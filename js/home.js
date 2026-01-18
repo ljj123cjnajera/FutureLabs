@@ -105,12 +105,14 @@ class HomeEngine {
           headerElement.replaceWith(tempDiv.firstElementChild);
         }
 
+        // initHeader() ya inicializa: CartDrawer, SearchOverlay, CartCounter, Search
+        // No es necesario llamarlos individualmente
         window.Components.initHeader();
-        if (window.Components.initCartDrawer) window.Components.initCartDrawer();
-
-        // Init other header components
-        if (window.Components.initSearch) window.Components.initSearch();
-        if (window.Components.initCartCounter) window.Components.initCartCounter();
+        
+        // Solo initSearch() necesita llamarse explícitamente si no se llamó desde initHeader
+        if (window.Components.initSearch && !window.searchInitialized) {
+          window.Components.initSearch();
+        }
       } else {
         if (window.Logger) window.Logger.warn("⚠️ Header container missing or Components not ready.");
       }
@@ -568,10 +570,10 @@ class HomeEngine {
     const cardsHTML = window.Components && window.Components.getProductCard
       ? products.map(p => window.Components.getProductCard(p)).join('')
       : products.map(p => `
-            <div class="product-card brutalist-fallback">
+            <div class="product-card brutalist-fallback" onclick="window.location.href='product-detail.html?id=${p.id}'">
                 <h3>${p.name}</h3>
                 <p>S/ ${p.price}</p>
-                <button onclick="window.cartManager?.add('${p.id}')">Agregar al Carrito</button>
+                <button onclick="event.stopPropagation(); window.location.href='product-detail.html?id=${p.id}'">Ver Detalles</button>
             </div>
         `).join('');
 
@@ -885,9 +887,9 @@ class HomeEngine {
   async safeLoad(fn, name) {
     try {
       await fn();
-      console.log(`✅ [HomeEngine] ${name} Loaded`);
+      if (window.Logger) window.Logger.log(`✅ [HomeEngine] ${name} Loaded`);
     } catch (e) {
-      console.error(`❌ [HomeEngine] ${name} Failed`, e);
+      if (window.Logger) window.Logger.error(`❌ [HomeEngine] ${name} Failed`, e);
     }
   }
 
@@ -999,7 +1001,13 @@ class HomeEngine {
         if (window.notifications) {
           window.notifications.info('VIDEO PLAYER', 'Feature coming in v7.5 update');
         } else {
-          alert('Video Player loading...');
+          if (window.notifications) {
+            window.notifications.info('Video Player', 'Cargando reproductor...');
+          } else {
+            if (window.notifications) {
+                window.notifications.info('VIDEO PLAYER', 'Feature coming in v7.5 update');
+            }
+          }
         }
       });
     }
@@ -1168,14 +1176,15 @@ class HomeEngine {
 
         // 3. Fallback / Render
         if (!products || products.length === 0) {
-          console.warn(`⚠️ API returned no products for ${category}, utilizing fallback.`);
+          if (window.Logger) window.Logger.warn(`⚠️ API returned no products for ${category}, utilizing fallback.`);
           products = this.getFallbackProducts(category); // Guaranteed data
         }
 
         if (products.length > 0) {
           grid.innerHTML = products.map(p => window.Components.getProductCard(p)).join('');
         } else {
-          grid.innerHTML = `<div class="empty-state">NO WEAPONS FOUND IN SECTOR ${category.toUpperCase()}</div>`;
+          const safeCategory = (category && typeof category === 'string') ? category.toUpperCase() : 'CATEGORÍA';
+          grid.innerHTML = `<div class="empty-state">NO WEAPONS FOUND IN SECTOR ${safeCategory}</div>`;
         }
 
 
@@ -1183,13 +1192,13 @@ class HomeEngine {
         if (seeAll) seeAll.href = `products.html?category=${category}`;
 
       } catch (err) {
-        console.warn('❌ Engine Error:', err);
+        if (window.Logger) window.Logger.warn('❌ Engine Error:', err);
         // Mostrar estado vacío en lugar de productos mock
         grid.innerHTML = `
           <div class="engine-error-state" style="grid-column: 1 / -1; padding: 3rem; text-align: center; border: 2px solid #e0e0e0;">
             <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ff9800; margin-bottom: 1rem;"></i>
             <h3 style="font-weight: 900; text-transform: uppercase; margin-bottom: 0.5rem;">Error al cargar productos</h3>
-            <p style="color: #666; margin-bottom: 1.5rem;">No se pudieron cargar los productos de ${category.toUpperCase()}</p>
+            <p style="color: #666; margin-bottom: 1.5rem;">No se pudieron cargar los productos de ${(category && typeof category === 'string') ? category.toUpperCase() : 'CATEGORÍA'}</p>
             <button onclick="location.reload()" class="btn btn-black">RECARGAR</button>
           </div>
         `;
@@ -1243,7 +1252,8 @@ document.addEventListener('DOMContentLoaded', () => {
   window.homeEngine = new HomeEngine();
 
   // Failsafe: Ensure Footer is visible if Engine hangs
-  setTimeout(() => {
+  // Guardar timeout ID para poder limpiarlo si es necesario
+  const footerFailsafeTimeout = setTimeout(() => {
     const footer = document.getElementById('mainFooter');
     if (footer && (!footer.innerHTML.trim() || footer.offsetHeight < 10)) {
       if (window.Components && window.Components.getFooter) {
@@ -1252,4 +1262,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   }, 2000);
+  
+  // Guardar timeout ID para poder limpiarlo si es necesario
+  if (!window.homeTimeouts) window.homeTimeouts = [];
+  window.homeTimeouts.push(footerFailsafeTimeout);
 });

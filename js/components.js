@@ -5,8 +5,27 @@
 class Components {
   static updateCartCount() {
     try {
-      const cart = JSON.parse(localStorage.getItem('cart')) || [];
-      const count = cart.reduce((total, item) => total + (item.quantity || 1), 0);
+      // Usar brutalist_cart consistentemente (eliminar referencia a 'cart' viejo)
+      let count = 0;
+      
+      // Si está autenticado y cartEngine está disponible, usar su contador
+      if (window.authManager?.isAuthenticated() && window.cartEngine) {
+        // El cartEngine maneja el contador automáticamente desde API
+        // Solo actualizar UI si hay elementos
+        const cartCountElements = document.querySelectorAll('.cart-count');
+        if (cartCountElements.length > 0) {
+          // Intentar obtener desde API si está disponible
+          if (window.cartEngine.isAuthenticated && window.api) {
+            // El contador se actualizará desde el evento cartUpdated
+            return;
+          }
+        }
+      }
+      
+      // Fallback a localStorage (brutalist_cart)
+      const cart = JSON.parse(localStorage.getItem('brutalist_cart') || '[]');
+      count = cart.reduce((total, item) => total + (item.quantity || 1), 0);
+      
       document.querySelectorAll('.cart-count').forEach(el => {
         el.textContent = count;
         // Optional: Hide badge if 0
@@ -214,7 +233,7 @@ class Components {
                         <i class="far fa-user" aria-hidden="true"></i>
                         <span class="desktop-only">CUENTA</span>
                     </a>
-                    <button class="action-btn" onclick="window.location.href='profile.html?tab=wishlist'" aria-label="Lista de deseos">
+                    <button class="action-btn" onclick="event.preventDefault(); window.location.href='profile.html?tab=wishlist'" aria-label="Lista de deseos">
                         <i class="far fa-heart" aria-hidden="true"></i>
                         <span class="action-badge" id="wishlistCount" style="display: none;">0</span>
                         <span class="desktop-only">FAVORITOS</span>
@@ -318,21 +337,146 @@ class Components {
 
   // Inject Cart Logic
   static initCartDrawer() {
+    const cartDrawer = document.getElementById('cartDrawer');
+    const cartDrawerOverlay = document.getElementById('cartDrawerOverlay');
+    
+    if (!cartDrawer || !cartDrawerOverlay) {
+      if (window.Logger) window.Logger.warn('⚠️ Cart drawer elements not found. Make sure getHeader() is called first.');
+      return;
+    }
+    
     window.CartDrawer = {
       open: () => {
-        document.getElementById('cartDrawer').classList.add('active');
-        document.getElementById('cartDrawerOverlay').classList.add('active');
-        document.body.style.overflow = 'hidden';
+        const drawer = document.getElementById('cartDrawer');
+        const overlay = document.getElementById('cartDrawerOverlay');
+        if (drawer && overlay) {
+          drawer.classList.add('active');
+          overlay.classList.add('active');
+          document.body.style.overflow = 'hidden';
+          // Update drawer content when opening
+          window.CartDrawer.update();
+        } else if (window.Logger) {
+          window.Logger.warn('⚠️ Cart drawer elements not found when trying to open');
+        }
       },
       close: () => {
-        document.getElementById('cartDrawer').classList.remove('active');
-        document.getElementById('cartDrawerOverlay').classList.remove('active');
-        document.body.style.overflow = '';
+        const drawer = document.getElementById('cartDrawer');
+        const overlay = document.getElementById('cartDrawerOverlay');
+        if (drawer && overlay) {
+          drawer.classList.remove('active');
+          overlay.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      },
+      update: async () => {
+        const itemsContainer = document.getElementById('cartDrawerItems');
+        const totalElement = document.getElementById('cartDrawerTotal');
+        if (!itemsContainer) return;
+
+        let items = [];
+        let subtotal = 0;
+
+        try {
+          // Try to get items from CartEngine if available
+          if (window.cartEngine) {
+            // Get current cart items
+            if (window.cartEngine.isAuthenticated) {
+              try {
+                const response = await window.cartEngine.api.getCart();
+                if (response && response.success && response.data) {
+                  items = response.data.items || [];
+                  subtotal = response.data.total || 0;
+                } else if (Array.isArray(response)) {
+                  items = response;
+                  subtotal = items.reduce((acc, item) => {
+                    const price = parseFloat(item.discount_price || item.price || 0);
+                    return acc + (price * (item.quantity || 1));
+                  }, 0);
+                }
+              } catch (e) {
+                if (window.Logger) window.Logger.warn('Error loading cart for drawer:', e);
+              }
+            }
+          }
+
+          // Fallback to localStorage if no items from API
+          if (items.length === 0) {
+            const localCart = JSON.parse(localStorage.getItem('brutalist_cart') || '[]');
+            items = localCart;
+            subtotal = items.reduce((acc, item) => {
+              const price = parseFloat(item.discount_price || item.price || 0);
+              return acc + (price * (item.quantity || 1));
+            }, 0);
+          }
+
+          // Render items
+          if (items.length === 0) {
+            itemsContainer.innerHTML = `
+              <div class="empty-cart-message">
+                <p>TU CARRITO ESTÁ VACÍO</p>
+                <button class="btn btn-black" onclick="window.CartDrawer.close()">EMPEZAR A COMPRAR</button>
+              </div>
+            `;
+          } else {
+            itemsContainer.innerHTML = items.map(item => {
+              const productId = item.product_id || item.id;
+              const itemPrice = parseFloat(item.discount_price || item.price || 0);
+              const itemQuantity = item.quantity || 1;
+              const itemTotal = itemPrice * itemQuantity;
+              const itemSize = item.size || null;
+              const sizeParam = itemSize ? `, {size: '${itemSize}'}` : '';
+
+              return `
+                <div class="cart-drawer-item">
+                  <div class="cart-drawer-item-image">
+                    <img src="${item.image_url || 'assets/images/products/placeholder.jpg'}" 
+                         alt="${item.name}" 
+                         loading="lazy"
+                         onerror="this.src='assets/images/products/placeholder.jpg'">
+                  </div>
+                  <div class="cart-drawer-item-details">
+                    <h4>${item.name || 'Producto'}</h4>
+                    ${item.brand ? `<span class="cart-drawer-item-brand">${item.brand}</span>` : ''}
+                    ${itemSize ? `<span class="cart-drawer-item-size">Talla: ${itemSize}</span>` : ''}
+                    <div class="cart-drawer-item-quantity">
+                      <button class="qty-btn" onclick="window.cartEngine?.updateQty(${productId}, ${itemQuantity - 1}${sizeParam})" ${itemQuantity <= 1 ? 'disabled' : ''}>-</button>
+                      <span>${itemQuantity}</span>
+                      <button class="qty-btn" onclick="window.cartEngine?.updateQty(${productId}, ${itemQuantity + 1}${sizeParam})">+</button>
+                    </div>
+                  </div>
+                  <div class="cart-drawer-item-price">
+                    <span>S/ ${itemTotal.toFixed(2)}</span>
+                    <button class="remove-btn" onclick="window.cartEngine?.removeItem(${productId}${sizeParam})" aria-label="Eliminar">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </div>
+              `;
+            }).join('');
+          }
+
+          // Update total
+          if (totalElement) {
+            totalElement.textContent = `S/ ${subtotal.toFixed(2)}`;
+          }
+        } catch (e) {
+          if (window.Logger) window.Logger.error('Error updating cart drawer:', e);
+          itemsContainer.innerHTML = `
+            <div class="empty-cart-message">
+              <p>Error al cargar el carrito</p>
+              <button class="btn btn-black" onclick="window.location.reload()">RECARGAR</button>
+            </div>
+          `;
+        }
       }
     };
   }
 
   static initSearchOverlay() {
+    // Prevenir inicialización duplicada
+    if (window.searchOverlayInitialized) return;
+    window.searchOverlayInitialized = true;
+    
     window.SearchOverlay = {
       open: () => {
         const overlay = document.getElementById('searchOverlay');
@@ -366,7 +510,15 @@ class Components {
   static initHeader() {
     if (window.headerInitialized) return;
     window.headerInitialized = true;
-    // console.log('🔵 [COMPONENTS] initHeader() executed');
+    if (window.Logger) window.Logger.log('🔵 [COMPONENTS] initHeader() executed');
+
+    // Initialize Cart Drawer (must be done after header HTML is injected)
+    this.initCartDrawer();
+    
+    // Initialize Search Overlay
+    this.initSearchOverlay();
+    
+    // MobileMenu is initialized globally below (line 763), no need to init here
 
     // Ticker Animation Logic - Mensajes más convincentes
     const messages = [
@@ -378,14 +530,20 @@ class Components {
     let msgIndex = 0;
     const ticker = document.getElementById('announcementText');
     if (ticker) {
-      setInterval(() => {
+      // Guardar interval ID para poder limpiarlo si es necesario
+      const tickerInterval = setInterval(() => {
         msgIndex = (msgIndex + 1) % messages.length;
         ticker.style.opacity = 0;
         setTimeout(() => {
-          ticker.innerText = messages[msgIndex];
-          ticker.style.opacity = 1;
+          if (ticker) { // Verificar que el elemento aún existe
+            ticker.innerText = messages[msgIndex];
+            ticker.style.opacity = 1;
+          }
         }, 500);
       }, 4000);
+      
+      // Guardar interval ID globalmente para poder limpiarlo
+      window.announcementTickerInterval = tickerInterval;
     }
 
     this.ensureWishlistAssets();
@@ -444,6 +602,10 @@ class Components {
   }
 
   static initSearch() {
+    // Prevenir inicialización duplicada
+    if (window.searchInitialized) return;
+    window.searchInitialized = true;
+    
     // Init logic for Header Search Input
     const input = document.getElementById('headerSearchInput');
     if (input) {
@@ -455,7 +617,14 @@ class Components {
     }
 
     // Keep autocomplete loading if needed but ensure our direct search works
-    this.ensureAutocompleteAssets();
+    // Solo llamar ensureAutocompleteAssets si no está ya inicializando
+    if (!this._autocompleteInitializing) {
+      try {
+        this.ensureAutocompleteAssets();
+      } catch (e) {
+        if (window.Logger) window.Logger.error('Error in initSearch ensureAutocompleteAssets:', e);
+      }
+    }
   }
 
   static submitSearch() {
@@ -523,7 +692,7 @@ class Components {
       document
         .querySelector('script[data-verification-script]')
         .addEventListener('load', () => {
-          console.log('🔵 [COMPONENTS] verification assets loaded (existing)');
+          if (window.Logger) window.Logger.log('🔵 [COMPONENTS] verification assets loaded (existing)');
         }, { once: true });
       return;
     }
@@ -537,6 +706,10 @@ class Components {
 
   static ensureAutocompleteAssets() {
     if (typeof document === 'undefined') return;
+    
+    // Prevenir bucle infinito
+    if (this._autocompleteInitializing) return;
+    this._autocompleteInitializing = true;
 
     if (!document.querySelector('link[data-autocomplete-style]')) {
       const link = document.createElement('link');
@@ -547,19 +720,38 @@ class Components {
     }
 
     const initialize = () => {
-      if (window.searchAutocomplete && typeof window.searchAutocomplete.init === 'function') {
-        window.searchAutocomplete.init();
-      } else if (typeof window.initializeAutocomplete === 'function') {
-        window.initializeAutocomplete();
+      // NO inicializar searchAutocomplete aquí - ya se inicializa automáticamente en autocomplete.js
+      // Solo verificar que el script se cargó correctamente
+      if (window.searchAutocomplete && window.searchAutocomplete.initialized) {
+        // Ya está inicializado, no hacer nada
+        if (window.Logger) window.Logger.log('✅ SearchAutocomplete ya está inicializado');
+      } else if (window.searchAutocomplete && typeof window.searchAutocomplete.init === 'function' && !window.searchAutocomplete.initialized) {
+        // Solo inicializar si no está ya inicializado
+        try {
+          window.searchAutocomplete.init();
+        } catch (e) {
+          if (window.Logger) window.Logger.error('Error initializing searchAutocomplete:', e);
+        }
       }
-      // Additional initializations as per user's instruction
-      if (window.Components.initSearch) window.Components.initSearch();
-      if (window.Components.initSearchOverlay) window.Components.initSearchOverlay();
-      if (window.Components.initCartCounter) window.Components.initCartCounter();
+      // NO llamar initializeAutocomplete() aquí - causa bucle infinito
+      // NO llamar initSearch aquí para evitar bucle infinito
+      // initSearch, initSearchOverlay, initCartCounter ya se llaman desde initHeader
+      // No inicializar aquí para evitar duplicados
     };
 
-    if (window.searchAutocomplete || typeof window.initializeAutocomplete === 'function') {
-      initialize();
+    // NO llamar initialize() si searchAutocomplete ya está inicializado
+    // El script autocomplete.js se inicializa automáticamente
+    if (window.searchAutocomplete && window.searchAutocomplete.initialized) {
+      this._autocompleteInitializing = false;
+      return;
+    }
+    
+    if (window.searchAutocomplete && typeof window.searchAutocomplete.init === 'function') {
+      // Solo inicializar si no está ya inicializado
+      if (!window.searchAutocomplete.initialized) {
+        initialize();
+      }
+      this._autocompleteInitializing = false;
       return;
     }
 
@@ -568,12 +760,24 @@ class Components {
       script.src = 'js/autocomplete.js';
       script.defer = true;
       script.setAttribute('data-autocomplete-script', 'true');
-      script.onload = () => initialize();
+      script.onload = () => {
+        initialize();
+        this._autocompleteInitializing = false;
+      };
+      script.onerror = () => {
+        this._autocompleteInitializing = false;
+      };
       document.body.appendChild(script);
+    } else {
+      this._autocompleteInitializing = false;
     }
   }
 
   static initCartCounter() {
+    // Prevenir inicialización duplicada
+    if (window.cartCounterInitialized) return;
+    window.cartCounterInitialized = true;
+    
     // Actualizar contador de carrito
     document.addEventListener('cartUpdated', (e) => {
       const cartCount = document.querySelector('.cart-count');
@@ -602,19 +806,52 @@ class Components {
     } catch (e) { }
 
 
-    // SVG Data URI Placeholder (Light Grey with Text)
-    const placeholderImg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Crect fill='%23f3f4f6' width='400' height='400'/%3E%3Ctext fill='%239ca3af' font-family='sans-serif' font-size='24' font-weight='bold' x='50%25' y='50%25' text-anchor='middle' dy='.3em'%3ESNEAKERS SHOP%3C/text%3E%3C/svg%3E";
+    // SVG Data URI Placeholder (More visible with better contrast)
+    const placeholderImg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Crect fill='%23e5e7eb' width='400' height='400'/%3E%3Ctext fill='%236b7280' font-family='system-ui, -apple-system, sans-serif' font-size='28' font-weight='900' x='50%25' y='45%25' text-anchor='middle'%3ESNEAKERS%3C/text%3E%3Ctext fill='%236b7280' font-family='system-ui, -apple-system, sans-serif' font-size='28' font-weight='900' x='50%25' y='60%25' text-anchor='middle'%3ESHOP%3C/text%3E%3C/svg%3E";
+
+    // Normalize image URL - validate before using
+    let imageUrl = placeholderImg;
+    if (product.image_url && 
+        product.image_url.trim() !== '' && 
+        !product.image_url.includes('undefined') &&
+        !product.image_url.includes('null') &&
+        (product.image_url.startsWith('http') || product.image_url.startsWith('/') || product.image_url.startsWith('assets/'))) {
+      imageUrl = product.image_url;
+    } else if (Array.isArray(product.images) && product.images.length > 0 && product.images[0]) {
+      const firstImg = product.images[0];
+      if (firstImg && firstImg.trim() !== '' && !firstImg.includes('undefined')) {
+        imageUrl = firstImg;
+      }
+    } else if (typeof product.images === 'string' && product.images.trim() !== '') {
+      try {
+        const parsed = JSON.parse(product.images);
+        if (Array.isArray(parsed) && parsed.length > 0 && parsed[0]) {
+          const parsedImg = parsed[0];
+          if (parsedImg && parsedImg.trim() !== '' && !parsedImg.includes('undefined')) {
+            imageUrl = parsedImg;
+          }
+        }
+      } catch (e) {
+        // Not valid JSON, use placeholder
+      }
+    }
+
+    // Always use placeholder if image URL is invalid
+    if (!imageUrl || imageUrl === '' || imageUrl.includes('undefined') || imageUrl.includes('null')) {
+      imageUrl = placeholderImg;
+    }
 
     return `
-      <div class="product-card" onclick="window.location.href='product-detail.html?id=${product.id}'">
-        <div class="product-image-container">
-          <img src="${product.image_url || placeholderImg}" 
+      <div class="product-card">
+        <div class="product-image-container" onclick="window.location.href='product-detail.html?id=${product.id}'">
+          <img src="${imageUrl}" 
                class="product-image"
-               alt="${product.name}" 
+               alt="${product.name || 'Producto'}" 
                loading="lazy"
                decoding="async"
-               fetchpriority="low"
-               onerror="this.onerror=null; this.src='${placeholderImg}'">
+               onerror="this.onerror=null; this.src='${placeholderImg}'; this.style.display='block';"
+               onload="this.style.display='block';"
+               style="display: block; min-height: 100%; object-fit: cover;">
           
           <div class="product-badges">
             ${discount > 0 ? `<span class="product-badge product-badge-sale">-${Math.round(discount)}% OFF</span>` : ''}
@@ -641,7 +878,7 @@ class Components {
 
         <div class="product-content">
           <span class="product-category">${product.brand || 'Sneakers'}</span>
-          <h3 class="product-title">${product.name}</h3>
+          <h3 class="product-title" onclick="window.location.href='product-detail.html?id=${product.id}'" style="cursor: pointer;">${product.name}</h3>
           
           <div class="product-price-container">
             <div class="product-price">
@@ -652,15 +889,15 @@ class Components {
                 <span class="product-price-current">S/ ${parseFloat(product.price).toFixed(2)}</span>
               `}
             </div>
-            <button class="btn-quick-add" onclick="event.preventDefault(); event.stopPropagation(); window.cartManager?.add(${product.id ? `'${product.id}'` : 'null'}, 1); window.notifications?.success('AÑADIDO', '${product.name.replace(/'/g, "\\'")} al carrito');" aria-label="Agregar ${product.name.replace(/"/g, '&quot;')} al carrito">
-                <i class="fas fa-plus" aria-hidden="true"></i>
+            <button class="btn-quick-add" onclick="event.preventDefault(); event.stopPropagation(); window.location.href='product-detail.html?id=${product.id}';" aria-label="Ver detalles de ${product.name.replace(/"/g, '&quot;')}">
+                <i class="fas fa-eye" aria-hidden="true"></i>
             </button>
           </div>
 
           <div class="product-size-preview">${sizeText}</div>
 
-          <button class="product-btn" onclick="event.stopPropagation(); window.cartManager?.add('${product.id}', 1)" aria-label="Agregar ${product.name.replace(/"/g, '&quot;')} al carrito">
-            AGREGAR AL CARRITO
+          <button class="product-btn" onclick="event.stopPropagation(); window.location.href='product-detail.html?id=${product.id}';" aria-label="Ver detalles de ${product.name.replace(/"/g, '&quot;')}">
+            VER DETALLES
           </button>
         </div>
       </div>

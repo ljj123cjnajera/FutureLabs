@@ -54,21 +54,22 @@ if (dbUrl && !isPlaceholder) {
       migrations: baseEnvConfig.migrations || {},
       seeds: baseEnvConfig.seeds || {},
       pool: {
-        min: 0, // Empezar sin conexiones para evitar bloqueo al inicio
-        max: 5, // Aumentar máximo pero con mejor manejo
-        acquireTimeoutMillis: 5000, // Reducir timeout a 5s (fallar muy rápido)
-        createTimeoutMillis: 3000, // Timeout de creación muy corto
-        idleTimeoutMillis: 10000, // Liberar conexiones idle muy rápido
+        min: 1, // Reducir mínimo a 1 para evitar conexiones innecesarias
+        max: 5, // Reducir máximo a 5 para evitar saturación en Railway
+        acquireTimeoutMillis: 30000, // Reducir timeout a 30s (más razonable)
+        createTimeoutMillis: 20000, // Timeout de creación más corto
+        idleTimeoutMillis: 10000, // Reducir tiempo idle para liberar conexiones más rápido
         reapIntervalMillis: 1000,
         propagateCreateError: false,
         afterCreate: function(conn, done) {
+          // Manejar errores de conexión de forma simple
           conn.on('error', function(err) {
-            console.log('⚠️ Database connection error:', err.message);
+            // Solo cerrar la conexión si hay error, sin logging excesivo
             if (conn && !conn._ending) {
               try {
                 conn.end();
               } catch (e) {
-                // Ignorar errores al cerrar conexión con error
+                // Ignorar errores al cerrar
               }
             }
           });

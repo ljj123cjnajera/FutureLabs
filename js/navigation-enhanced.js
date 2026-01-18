@@ -20,8 +20,37 @@ class NavigationEnhanced {
         // Setup dropdowns interactivos
         this.setupDropdowns();
         
-        // Actualizar cada 30 segundos
-        setInterval(() => this.loadCategoryData(), 30000);
+        // Setup header scroll effect
+        this.setupHeaderScroll();
+        
+        // Deshabilitar polling automático - solo cargar una vez
+        // setInterval(() => this.loadCategoryData(), 30000);
+    }
+    
+    setupHeaderScroll() {
+        const header = document.querySelector('.header-v3');
+        if (!header) return;
+        
+        // Guardar referencia al handler para poder limpiarlo
+        this.scrollHandler = () => {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        };
+        
+        window.addEventListener('scroll', this.scrollHandler, { passive: true });
+    }
+    
+    cleanup() {
+        // Remover scroll listener si existe
+        if (this.scrollHandler) {
+            window.removeEventListener('scroll', this.scrollHandler);
+            this.scrollHandler = null;
+        }
     }
 
     async loadCategoryData() {
@@ -212,7 +241,7 @@ class NavigationEnhanced {
             'adidas': 'ADIDAS',
             'new': 'NUEVOS LANZAMIENTOS',
             'sale': 'OFERTAS'
-        }[category] || category.toUpperCase();
+        }[category] || (category && typeof category === 'string' ? category.toUpperCase() : 'CATEGORÍA');
         
         return `
             <div class="nav-dropdown-content">

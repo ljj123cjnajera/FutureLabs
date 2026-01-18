@@ -11,19 +11,26 @@ class SearchEngine {
     }
 
     init() {
-        console.log('🔍 Search Engine Initializing...');
+        if (window.Logger) window.Logger.log('🔍 Search Engine Initializing...');
+
+        // Wait for API to be ready
+        if (!window.api) {
+            if (window.Logger) window.Logger.error('⚠️ [SearchEngine] API not available, retrying...');
+            setTimeout(() => this.init(), 500);
+            return;
+        }
 
         // 1. Headers & Footers
         if (window.Components) {
             const header = document.getElementById('mainHeader');
-            if (header) {
+            if (header && !header.innerHTML.trim()) {
                 header.innerHTML = window.Components.getHeader(true, true);
                 window.Components.initHeader();
                 window.Components.initSearch();
                 window.Components.initCartCounter();
             }
             const footer = document.getElementById('mainFooter');
-            if (footer) {
+            if (footer && !footer.innerHTML.trim()) {
                 footer.innerHTML = window.Components.getFooter();
             }
         }
@@ -37,7 +44,8 @@ class SearchEngine {
 
         // 4. Execute Search
         if (this.query) {
-            document.getElementById('refineInput').value = this.query;
+            const refineInput = document.getElementById('refineInput');
+            if (refineInput) refineInput.value = this.query;
             this.performSearch(this.query);
         } else {
             this.renderEmpty('Escribe una palabra clave para comenzar a buscar.');
@@ -70,44 +78,101 @@ class SearchEngine {
     }
 
     async performSearch(query) {
-        document.getElementById('searchTitle').textContent = `"${query}"`;
-        document.getElementById('resultsCount').textContent = 'Buscando en catálogo...';
-
+        const searchTitle = document.getElementById('searchTitle');
+        const countLabel = document.getElementById('resultsCount');
         const container = document.getElementById('searchResultsGrid');
+        
         if (!container) return;
 
-        if (window.loadingState && window.loadingState.renderLoading) {
-            window.loadingState.renderLoading(container, 'Escaneando catálogo...');
+        if (searchTitle) searchTitle.textContent = `"${query}"`;
+        if (countLabel) countLabel.textContent = 'Buscando en catálogo...';
+
+        // Show loading state
+        if (window.LoadingStates) {
+            window.LoadingStates.show('searchResultsGrid', {
+                message: 'Escaneando catálogo...',
+                type: 'spinner'
+            });
         } else {
-            container.innerHTML = '<div style="text-align: center; padding: 60px;"><div class="loading-spinner"></div><p>Escaneando catálogo...</p></div>';
+            container.innerHTML = '<div style="text-align: center; padding: 60px; grid-column: 1 / -1;"><div class="loading-spinner"></div><p>Escaneando catálogo...</p></div>';
         }
 
         try {
+            if (!window.api) {
+                throw new Error('API no disponible');
+            }
+
             // Real API Call
             const response = await window.api.getProducts({
                 search: query,
-                limit: 50 // Get enough for a full page
+                limit: 100 // Get enough for a full page
             });
 
-            if (response.success) {
-                this.results = response.data.products || response.data || [];
+            // Hide loading state
+            if (window.LoadingStates) {
+                window.LoadingStates.hide('searchResultsGrid');
+            }
 
-                if (this.results.length > 0) {
-                    this.renderResults();
+            // Parse response
+            let products = [];
+            let total = 0;
+
+            if (Array.isArray(response)) {
+                products = response;
+                total = response.length;
+            } else if (response && response.success && response.data) {
+                products = response.data.products || response.data || [];
+                total = response.data.total || products.length;
+            } else if (response && response.data) {
+                products = response.data.products || response.data || [];
+                total = response.data.total || products.length;
+            } else if (response && response.products) {
+                products = response.products;
+                total = response.total || products.length;
+            } else if (response && response.success === false) {
+                throw new Error(response.message || 'Error en la búsqueda');
+            }
+
+            this.results = products;
+
+            if (products.length > 0) {
+                this.renderResults();
+            } else {
+                if (window.LoadingStates) {
+                    window.LoadingStates.empty('searchResultsGrid', {
+                        title: `No se encontraron resultados para "${query}"`,
+                        message: 'Intenta revisar la ortografía o usa palabras clave más generales.',
+                        icon: 'fas fa-search',
+                        actionLabel: 'Volver al inicio',
+                        actionUrl: 'index.html'
+                    });
                 } else {
                     this.renderEmpty(`No se encontraron resultados para "${query}"`);
                 }
-            } else {
-                this.renderEmpty('Servicio de búsqueda no disponible.');
             }
 
         } catch (e) {
-            console.error('Search Failed:', e);
+            if (window.ErrorHandler) {
+                window.ErrorHandler.api(e, 'performSearch', 'No se pudo realizar la búsqueda. Por favor, intenta de nuevo.');
+            } else {
+                if (window.Logger) window.Logger.error('Search Failed:', e);
+            }
+
+            // Hide loading state
+            if (window.LoadingStates) {
+                window.LoadingStates.hide('searchResultsGrid');
+            }
+
             const countLabel = document.getElementById('resultsCount');
             if (countLabel) countLabel.textContent = 'ERROR DE CONEXIÓN';
             
-            if (window.loadingState && window.loadingState.renderError) {
-                window.loadingState.renderError(container, 'No se pudo conectar al servicio de catálogo.');
+            if (window.LoadingStates) {
+                window.LoadingStates.error('searchResultsGrid', {
+                    title: 'Error de conexión',
+                    message: 'No se pudo conectar al servicio de catálogo. Por favor, intenta de nuevo más tarde.',
+                    retryLabel: 'REINTENTAR',
+                    retryCallback: `window.searchEngine.performSearch('${query}')`
+                });
             } else {
                 container.innerHTML = `
                     <div style="text-align: center; padding: 60px; grid-column: 1 / -1;">
@@ -126,30 +191,50 @@ class SearchEngine {
         const countLabel = document.getElementById('resultsCount');
         const itemsLabel = document.getElementById('itemsShowing');
 
-        countLabel.textContent = `${this.results.length} ${this.results.length === 1 ? 'RESULTADO ENCONTRADO' : 'RESULTADOS ENCONTRADOS'}`;
-        itemsLabel.textContent = `Mostrando ${this.results.length} ${this.results.length === 1 ? 'producto' : 'productos'}`;
+        if (!container) return;
 
-        container.innerHTML = this.results.map(product => {
-            // Re-use Component logic if possible, or manual build
-            if (window.Components && window.Components.getProductCard) {
-                return window.Components.getProductCard(product);
-            }
+        if (countLabel) {
+            countLabel.textContent = `${this.results.length} ${this.results.length === 1 ? 'RESULTADO ENCONTRADO' : 'RESULTADOS ENCONTRADOS'}`;
+        }
+        if (itemsLabel) {
+            itemsLabel.textContent = `Mostrando ${this.results.length} ${this.results.length === 1 ? 'producto' : 'productos'}`;
+        }
 
+        // Use Components.getProductCard if available
+        if (window.Components && window.Components.getProductCard) {
+            container.innerHTML = this.results.map(product => window.Components.getProductCard(product)).join('');
+        } else {
             // Manual Fallback Card
-            return `
-                <div class="product-card">
-                    <a href="product-detail.html?id=${product.id}" class="card-img-link">
-                        <img src="${product.image_url || 'img/placeholder.jpg'}" alt="${product.name}">
-                        ${product.stock_quantity === 0 ? '<div class="sold-out-badge">SOLD OUT</div>' : ''}
-                    </a>
-                    <div class="card-info" style="padding: 15px;">
-                        <div class="card-brand">${product.brand || 'FUTURELABS'}</div>
-                        <h3 class="card-title"><a href="product-detail.html?id=${product.id}">${product.name}</a></h3>
-                        <div class="card-price">S/ ${parseFloat(product.price).toFixed(2)}</div>
+            container.innerHTML = this.results.map(product => {
+                const price = parseFloat(product.discount_price || product.price || 0);
+                const originalPrice = product.discount_price && product.discount_price < product.price ? parseFloat(product.price) : null;
+                
+                return `
+                    <div class="product-card" onclick="window.location.href='product-detail.html?id=${product.id}'">
+                        <div class="product-image-container">
+                            <img src="${product.image_url || 'assets/images/products/placeholder.jpg'}" 
+                                 alt="${product.name}" 
+                                 class="product-image"
+                                 loading="lazy"
+                                 onerror="this.src='assets/images/products/placeholder.jpg'">
+                            ${product.stock_quantity === 0 ? '<div class="product-badges"><span class="product-badge sold-out">AGOTADO</span></div>' : ''}
+                        </div>
+                        <div class="product-content">
+                            <span class="product-category">${product.brand || 'SNEAKERS'}</span>
+                            <h3 class="product-title">${product.name}</h3>
+                            <div class="product-price-container">
+                                ${originalPrice ? `
+                                    <span class="product-price-new">S/ ${price.toFixed(2)}</span>
+                                    <span class="product-price-old">S/ ${originalPrice.toFixed(2)}</span>
+                                ` : `
+                                    <span class="product-price-current">S/ ${price.toFixed(2)}</span>
+                                `}
+                            </div>
+                        </div>
                     </div>
-                </div>
-            `;
-        }).join('');
+                `;
+            }).join('');
+        }
     }
 
     renderEmpty(msg) {

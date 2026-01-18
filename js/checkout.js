@@ -37,6 +37,14 @@ class CheckoutManager {
     }
 
     async loadCart() {
+        // Mostrar loading state
+        if (window.LoadingStates && this.formContainer) {
+            window.LoadingStates.show(this.formContainer, { 
+                message: 'Cargando carrito...',
+                type: 'spinner'
+            });
+        }
+
         try {
             // Intentar cargar desde API primero
             if (window.authManager && window.authManager.isAuthenticated() && window.api) {
@@ -46,21 +54,30 @@ class CheckoutManager {
                 } else if (response && Array.isArray(response)) {
                     this.cart = response;
                 } else {
-                    // Fallback a localStorage
-                    const stored = localStorage.getItem('cart') || localStorage.getItem('brutalist_cart');
+                    // Fallback a localStorage (usar brutalist_cart consistentemente)
+                    const stored = localStorage.getItem('brutalist_cart');
                     if (stored) {
                         this.cart = JSON.parse(stored);
                     }
                 }
             } else {
-                // Usuario no autenticado, usar localStorage
-                const stored = localStorage.getItem('cart') || localStorage.getItem('brutalist_cart');
+                // Usuario no autenticado, usar localStorage (brutalist_cart)
+                const stored = localStorage.getItem('brutalist_cart');
                 if (stored) {
                     this.cart = JSON.parse(stored);
                 }
             }
 
             if (!this.cart || this.cart.length === 0) {
+                if (window.LoadingStates && this.formContainer) {
+                    window.LoadingStates.empty(this.formContainer, {
+                        icon: 'fas fa-shopping-cart',
+                        title: 'Carrito Vacío',
+                        message: 'Agrega productos antes de continuar',
+                        actionLabel: 'Ver Productos',
+                        actionUrl: 'products.html'
+                    });
+                }
                 if (window.notifications) {
                     window.notifications.warning('Tu carrito está vacío', 'Agrega productos antes de continuar');
                 }
@@ -70,14 +87,38 @@ class CheckoutManager {
                 return;
             }
         } catch (error) {
-            if (window.Logger) window.Logger.error('Error loading cart:', error);
+            // Usar error handler si está disponible
+            if (window.ErrorHandler) {
+                window.ErrorHandler.api(error, 'loadCart', 'No se pudo cargar el carrito');
+            } else {
+                if (window.Logger) window.Logger.error('Error loading cart:', error);
+                if (window.notifications) {
+                    window.notifications.error('Error', 'No se pudo cargar el carrito. Por favor, intenta de nuevo.');
+                }
+            }
+
+            // Mostrar estado de error
+            if (window.LoadingStates && this.formContainer) {
+                window.LoadingStates.error(this.formContainer, {
+                    title: 'Error al Cargar',
+                    message: 'No se pudo cargar el carrito. Por favor, intenta de nuevo.',
+                    retryLabel: 'Reintentar',
+                    retryCallback: 'window.checkoutManager.loadCart()'
+                });
+            }
+
             // Fallback a localStorage
-            const stored = localStorage.getItem('cart') || localStorage.getItem('brutalist_cart');
+            const stored = localStorage.getItem('brutalist_cart');
             if (stored) {
                 this.cart = JSON.parse(stored);
             }
             if (!this.cart || this.cart.length === 0) {
                 window.location.href = 'cart.html';
+            }
+        } finally {
+            // Ocultar loading state
+            if (window.LoadingStates && this.formContainer) {
+                window.LoadingStates.hide(this.formContainer, false);
             }
         }
     }
@@ -91,9 +132,19 @@ class CheckoutManager {
                 const defaultAddr = this.addresses.find(a => a.is_default);
                 if (defaultAddr) this.selectedAddressId = defaultAddr.id;
                 else if (this.addresses.length > 0) this.selectedAddressId = this.addresses[0].id;
+            } else {
+                // Si no hay direcciones, inicializar array vacío
+                this.addresses = [];
             }
         } catch (e) {
-            if (window.Logger) window.Logger.error('Failed to load addresses:', e);
+            // Usar error handler si está disponible
+            if (window.ErrorHandler) {
+                window.ErrorHandler.api(e, 'loadAddresses', 'No se pudieron cargar las direcciones');
+            } else {
+                if (window.Logger) window.Logger.error('Failed to load addresses:', e);
+            }
+            // Inicializar array vacío en caso de error
+            this.addresses = [];
         }
     }
 
@@ -125,14 +176,14 @@ class CheckoutManager {
         if (this.addresses.length > 0) {
             contentHtml = `
                 <div class="saved-addresses fade-in">
-                    <h3>SELECT SHIPPING ADDRESS</h3>
+                    <h3>SELECCIONAR DIRECCIÓN DE ENVÍO</h3>
                     <div class="address-grid">
                         ${this.addresses.map(addr => `
                             <div class="address-card ${this.selectedAddressId === addr.id ? 'selected' : ''}" 
                                  onclick="checkoutManager.selectAddress('${addr.id}')">
                                 <div class="addr-header">
                                     <strong>${addr.first_name || ''} ${addr.last_name || ''}</strong>
-                                    ${addr.is_default ? '<span class="badge">DEFAULT</span>' : ''}
+                                    ${addr.is_default ? '<span class="badge">PREDETERMINADA</span>' : ''}
                                 </div>
                                 <p>${addr.street_address}</p>
                                 <p>${addr.city}, ${addr.postal_code}</p>
@@ -140,24 +191,24 @@ class CheckoutManager {
                             </div>
                         `).join('')}
                     </div>
-                    <button class="btn btn-outline" style="margin-top:20px" onclick="checkoutManager.toggleNewAddressForm()">+ ADD NEW ADDRESS</button>
+                    <button class="btn btn-outline" style="margin-top:20px" onclick="checkoutManager.toggleNewAddressForm()">+ AGREGAR NUEVA DIRECCIÓN</button>
                     
                     <div id="newAddressFormContainer" style="display:none; margin-top:20px; border-top:1px solid #eee; padding-top:20px;">
                         ${this.getAddressFormHtml()}
                     </div>
 
                     <div class="checkout-actions">
-                        <button class="btn btn-black btn-block" onclick="checkoutManager.nextStep()">CONTINUE TO PAYMENT</button>
+                        <button class="btn btn-black btn-block" onclick="checkoutManager.nextStep()">CONTINUAR AL PAGO</button>
                     </div>
                 </div>
             `;
         } else {
             contentHtml = `
                 <div class="fade-in">
-                    <h3>ADD SHIPPING ADDRESS</h3>
+                    <h3>AGREGAR DIRECCIÓN DE ENVÍO</h3>
                     ${this.getAddressFormHtml()}
                     <div class="checkout-actions">
-                        <button class="btn btn-black btn-block" onclick="checkoutManager.saveNewAddress()">SAVE & CONTINUE</button>
+                        <button class="btn btn-black btn-block" onclick="checkoutManager.saveNewAddress()">GUARDAR Y CONTINUAR</button>
                     </div>
                 </div>
             `;
@@ -220,7 +271,9 @@ class CheckoutManager {
     async saveNewAddress() {
         const form = document.getElementById('addressForm');
         if (!form.checkValidity()) {
-            alert('Please fill all required fields');
+            if (window.notifications) {
+                window.notifications.warning('Campos Requeridos', 'Por favor, completa todos los campos obligatorios');
+            }
             return;
         }
 
@@ -230,9 +283,12 @@ class CheckoutManager {
         addressData.is_default = this.addresses.length === 0;
         addressData.type = 'shipping';
 
+        const btn = document.querySelector('.btn-black');
+        const originalBtnText = btn ? btn.innerHTML : '';
+
         try {
-            const btn = document.querySelector('.btn-black');
-            if (btn) btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SAVING...';
+            if (btn) btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> GUARDANDO...';
+            btn.disabled = true;
 
             const res = await window.api.createAddress(addressData);
             if (res.success) {
@@ -240,39 +296,65 @@ class CheckoutManager {
                 const newAddr = res.data.address || res.data;
                 this.selectedAddressId = newAddr.id;
                 this.renderStep(1); // Go back to rendering list
+                if (window.notifications) {
+                    window.notifications.success('Dirección Guardada', 'La dirección se guardó correctamente');
+                }
             } else {
-                alert('Error saving address: ' + res.message);
-                if (btn) btn.innerHTML = 'SAVE & CONTINUE';
+                if (window.ErrorHandler) {
+                    window.ErrorHandler.handle(res, {
+                        context: 'saveNewAddress',
+                        userMessage: res.message || 'No se pudo guardar la dirección'
+                    });
+                } else if (window.notifications) {
+                    window.notifications.error('Error', res.message || 'No se pudo guardar la dirección');
+                }
             }
         } catch (e) {
-            if (window.Logger) window.Logger.error('Address Save Failed:', e);
-            alert('System Error Saving Address. Please check your connection.');
+            if (window.ErrorHandler) {
+                window.ErrorHandler.api(e, 'saveNewAddress', 'No se pudo guardar la dirección. Verifica tu conexión.');
+            } else {
+                if (window.Logger) window.Logger.error('Address Save Failed:', e);
+                if (window.notifications) {
+                    window.notifications.error('Error', 'No se pudo guardar la dirección. Verifica tu conexión.');
+                }
+            }
+        } finally {
+            if (btn) {
+                btn.innerHTML = originalBtnText || 'GUARDAR Y CONTINUAR';
+                btn.disabled = false;
+            }
         }
     }
 
     renderPayment() {
         const html = `
             <div class="checkout-form-section fade-in">
-                <h2>PAYMENT METHOD</h2>
+                <h2>MÉTODO DE PAGO</h2>
                  <div class="payment-tabs">
                     <button class="payment-tab ${this.paymentMethod === 'card' ? 'active' : ''}" onclick="checkoutManager.setPayment('card')">
-                        <i class="far fa-credit-card"></i> CARD
+                        <i class="far fa-credit-card"></i> TARJETA
                     </button>
-                    <button class="payment-tab ${this.paymentMethod === 'paypal' ? 'active' : ''}" onclick="checkoutManager.setPayment('paypal')">
-                        <i class="fab fa-paypal"></i> PAYPAL
+                    <button class="payment-tab ${this.paymentMethod === 'yape' ? 'active' : ''}" onclick="checkoutManager.setPayment('yape')">
+                        <i class="fas fa-mobile-alt"></i> YAPE
+                    </button>
+                    <button class="payment-tab ${this.paymentMethod === 'plin' ? 'active' : ''}" onclick="checkoutManager.setPayment('plin')">
+                        <i class="fas fa-mobile-alt"></i> PLIN
+                    </button>
+                    <button class="payment-tab ${this.paymentMethod === 'cash' ? 'active' : ''}" onclick="checkoutManager.setPayment('cash')">
+                        <i class="fas fa-money-bill"></i> EFECTIVO
                     </button>
                 </div>
 
                 ${this.paymentMethod === 'card' ? `
                     <form id="paymentForm">
                         <div class="form-group">
-                            <label>CARD NUMBER</label>
+                            <label>NÚMERO DE TARJETA</label>
                             <input type="text" class="input-card" placeholder="4242 4242 4242 4242">
                         </div>
                         <div class="form-row">
                             <div class="form-group half">
-                                <label>EXPIRY</label>
-                                <input type="text" placeholder="MM/YY">
+                                <label>VENCIMIENTO</label>
+                                <input type="text" placeholder="MM/AA">
                             </div>
                             <div class="form-group half">
                                 <label>CVC</label>
@@ -280,11 +362,21 @@ class CheckoutManager {
                             </div>
                         </div>
                     </form>
-                ` : '<div style="padding:20px; text-align:center;">Redirect to PayPal after order placement.</div>'}
+                ` : this.paymentMethod === 'yape' || this.paymentMethod === 'plin' ? `
+                    <div style="padding:20px; text-align:center; border: 2px solid var(--black); margin-top: 1rem;">
+                        <p><strong>Pago con ${this.getPaymentMethodName(this.paymentMethod)}</strong></p>
+                        <p>Se te enviará un código QR o número de cuenta para completar el pago.</p>
+                    </div>
+                ` : this.paymentMethod === 'cash' ? `
+                    <div style="padding:20px; text-align:center; border: 2px solid var(--black); margin-top: 1rem;">
+                        <p><strong>Pago en Efectivo</strong></p>
+                        <p>El pago se realizará al momento de la entrega.</p>
+                    </div>
+                ` : '<div style="padding:20px; text-align:center;">Redirección después de confirmar el pedido.</div>'}
 
                 <div class="checkout-actions">
-                    <button class="btn btn-outline" onclick="checkoutManager.renderStep(1)">BACK</button>
-                    <button class="btn btn-black" onclick="checkoutManager.renderStep(3)">REVIEW ORDER</button>
+                    <button class="btn btn-outline" onclick="checkoutManager.renderStep(1)">VOLVER</button>
+                    <button class="btn btn-black" onclick="checkoutManager.renderStep(3)">REVISAR PEDIDO</button>
                 </div>
             </div>
         `;
@@ -294,6 +386,19 @@ class CheckoutManager {
     setPayment(method) {
         this.paymentMethod = method;
         this.renderPayment();
+    }
+
+    getPaymentMethodName(method) {
+        const methods = {
+            'card': 'Tarjeta de Crédito/Débito',
+            'credit_card': 'Tarjeta de Crédito/Débito',
+            'paypal': 'PayPal',
+            'yape': 'Yape',
+            'plin': 'Plin',
+            'cash': 'Efectivo',
+            'bank_transfer': 'Transferencia Bancaria'
+        };
+        return methods[method] || (method && typeof method === 'string' ? method.toUpperCase() : 'UNKNOWN');
     }
 
     renderReview() {
@@ -310,30 +415,62 @@ class CheckoutManager {
 
         const html = `
             <div class="checkout-form-section fade-in">
-                <h2>REVIEW ORDER</h2>
+                <h2>REVISAR PEDIDO</h2>
                 
                 <div class="review-block">
-                    <h4>SHIPPING TO:</h4>
+                    <h4>ENVIAR A:</h4>
                     <p><strong>${addr.first_name} ${addr.last_name}</strong></p>
-                    <p>${addr.street_address}</p>
-                    <p>${addr.city}, ${addr.postal_code}</p>
-                    <p>${addr.country}</p>
+                    <p>${addr.street_address || addr.street}</p>
+                    <p>${addr.city}${addr.region ? ', ' + addr.region : ''}, ${addr.postal_code}</p>
+                    <p>${addr.country || 'Perú'}</p>
+                    ${addr.phone_number ? `<p><i class="fas fa-phone"></i> ${addr.phone_number}</p>` : ''}
                 </div>
 
                 <div class="review-block">
-                    <h4>PAYMENT:</h4>
-                    <p>${this.paymentMethod.toUpperCase()}</p>
+                    <h4>MÉTODO DE PAGO:</h4>
+                    <p><strong>${this.getPaymentMethodName(this.paymentMethod)}</strong></p>
+                    ${this.paymentMethod === 'yape' || this.paymentMethod === 'plin' ? `
+                    <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem;">
+                        <i class="fas fa-info-circle"></i> Recibirás las instrucciones de pago por email después de confirmar el pedido.
+                    </p>
+                    ` : ''}
                 </div>
 
                 <div class="review-block">
-                    <h4>ITEMS:</h4>
-                    ${this.cart.map(item => `<p>${item.quantity}x ${item.name} - $${item.price}</p>`).join('')}
+                    <h4>PRODUCTOS:</h4>
+                    ${this.cart.map(item => {
+                        const price = parseFloat(item.discount_price || item.price || 0);
+                        const quantity = item.quantity || 1;
+                        const itemTotal = price * quantity;
+                        return `<p>${quantity}x ${item.name}${item.size ? ' (Talla: ' + item.size + ')' : ''} - S/ ${itemTotal.toFixed(2)}</p>`;
+                    }).join('')}
+                </div>
+
+                <div class="review-block" style="border-top: 2px solid var(--black); padding-top: 1rem; margin-top: 1rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>Subtotal:</span>
+                        <span>S/ ${subtotal.toFixed(2)}</span>
+                    </div>
+                    ${discount > 0 ? `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; color: #4caf50;">
+                        <span>Descuento:</span>
+                        <span>-S/ ${discount.toFixed(2)}</span>
+                    </div>
+                    ` : ''}
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>Envío:</span>
+                        <span>${shipping === 0 ? 'GRATIS' : 'S/ ' + shipping.toFixed(2)}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: 900; margin-top: 1rem; padding-top: 1rem; border-top: 2px solid var(--black);">
+                        <span>TOTAL:</span>
+                        <span>S/ ${total.toFixed(2)}</span>
+                    </div>
                 </div>
 
                 <div class="checkout-actions">
-                    <button class="btn btn-outline" onclick="checkoutManager.renderStep(2)">BACK</button>
-                    <button class="btn btn-green btn-block" onclick="checkoutManager.placeOrder()">
-                        PLACE ORDER ($${total.toFixed(2)})
+                    <button class="btn btn-outline" onclick="checkoutManager.renderStep(2)">VOLVER</button>
+                    <button class="btn btn-black btn-block" onclick="checkoutManager.placeOrder()">
+                        <i class="fas fa-lock"></i> CONFIRMAR PEDIDO (S/ ${total.toFixed(2)})
                     </button>
                 </div>
             </div>
@@ -343,52 +480,92 @@ class CheckoutManager {
 
     async placeOrder() {
         const btn = document.querySelector('.btn-green');
+        const originalBtnText = btn ? btn.innerHTML : '';
+        
         if (btn) {
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESSING...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESANDO...';
             btn.disabled = true;
+        }
+
+        // Validaciones antes de procesar
+        if (!this.selectedAddressId) {
+            if (window.notifications) {
+                window.notifications.warning('Dirección Requerida', 'Por favor, selecciona una dirección de envío');
+            }
+            this.renderStep(1);
+            if (btn) {
+                btn.innerHTML = originalBtnText;
+                btn.disabled = false;
+            }
+            return;
+        }
+
+        if (!this.cart || this.cart.length === 0) {
+            if (window.notifications) {
+                window.notifications.warning('Carrito Vacío', 'Tu carrito está vacío');
+            }
+            window.location.href = 'cart.html';
+            return;
         }
 
         try {
             // Prepare Payload
             const orderData = {
                 items: this.cart.map(item => ({
-                    product_id: item.id,
+                    product_id: item.product_id || item.id,
                     quantity: item.quantity,
-                    price: item.price // Optional, backend might verify
+                    price: item.discount_price || item.price // Optional, backend might verify
                 })),
                 shipping_address_id: this.selectedAddressId,
-                payment_method: 'credit_card', // Mapping 'card' to backend enum if needed
+                payment_method: this.paymentMethod === 'card' ? 'credit_card' : this.paymentMethod,
                 payment_details: {
                     provider: 'stripe',
                     transaction_id: 'tx_' + Date.now() // Placeholder for actual gateway integration
                 }
             };
 
-            // console.log('📤 Placing Order:', orderData);
+            if (window.Logger) window.Logger.log('📤 Placing Order:', orderData);
             const response = await window.api.createOrder(orderData);
 
             if (response.success) {
                 if (window.Logger) window.Logger.log('✅ Order Created');
 
-                // Clear Cart
-                localStorage.removeItem('cart');
+                // Clear Cart (usar brutalist_cart consistentemente)
+                localStorage.removeItem('brutalist_cart');
                 localStorage.removeItem('cart_expires'); // If used
 
                 // Update Badge
                 if (window.Components) window.Components.updateCartCount();
 
+                // Show success notification
+                if (window.notifications) {
+                    window.notifications.success('Pedido Creado', 'Tu pedido se ha procesado correctamente');
+                }
+
                 // Redirect to Success Page
                 const orderId = response.data.order ? response.data.order.id : (response.data.id || 'CONFIRMED');
-                window.location.href = `order-success.html?id=${orderId}`;
+                setTimeout(() => {
+                    window.location.href = `order-success.html?id=${orderId}`;
+                }, 1000);
             } else {
                 throw new Error(response.message || 'Failed to create order');
             }
 
         } catch (e) {
-            if (window.Logger) window.Logger.error('Order Error (Real API Failed):', e);
-            alert('Order failed: ' + (e.message || 'Server connection error'));
+            // Usar error handler si está disponible
+            if (window.ErrorHandler) {
+                window.ErrorHandler.api(e, 'placeOrder', 'No se pudo procesar el pedido. Por favor, intenta de nuevo.');
+            } else {
+                if (window.Logger) window.Logger.error('Order Error:', e);
+                if (window.notifications) {
+                    const errorMsg = e.message || e.response?.data?.message || 'No se pudo procesar el pedido. Por favor, intenta de nuevo.';
+                    window.notifications.error('Error al Procesar', errorMsg);
+                }
+            }
+        } finally {
+            // Restaurar botón
             if (btn) {
-                btn.innerHTML = 'PLACE ORDER';
+                btn.innerHTML = originalBtnText;
                 btn.disabled = false;
             }
         }
@@ -397,38 +574,79 @@ class CheckoutManager {
     renderOrderSummary() {
         if (!this.orderSummary) return;
 
-        const total = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        const shipping = total > 150 ? 0 : 15;
-        const finalTotal = total + shipping;
+        // Calculate totals with discount if coupon applied
+        const subtotal = this.cart.reduce((sum, item) => {
+            const price = parseFloat(item.discount_price || item.price || 0);
+            return sum + (price * (item.quantity || 1));
+        }, 0);
+        
+        // Get discount from coupon manager if available
+        const discount = window.couponsManager?.discount || 0;
+        const subtotalAfterDiscount = subtotal - discount;
+        const shipping = subtotalAfterDiscount >= 150 ? 0 : 15;
+        const finalTotal = subtotalAfterDiscount + shipping;
 
         this.orderSummary.innerHTML = `
             <div class="summary-card">
-                <h3>ORDER SUMMARY</h3>
+                <h3>RESUMEN DEL PEDIDO</h3>
                 <div class="summary-items">
-                    ${this.cart.map(item => `
+                    ${this.cart.map(item => {
+                        const price = parseFloat(item.discount_price || item.price || 0);
+                        const quantity = item.quantity || 1;
+                        const itemTotal = price * quantity;
+                        return `
                         <div class="summary-item">
-                            <img src="${item.image}" alt="${item.name}" onerror="this.src='assets/images/products/af1.jpg'">
+                            <img src="${item.image_url || item.image || 'assets/images/products/placeholder.jpg'}" 
+                                 alt="${item.name}" 
+                                 onerror="this.src='assets/images/products/placeholder.jpg'">
                             <div>
                                 <h4>${item.name}</h4>
-                                <p>x${item.quantity} - $${(item.price * item.quantity).toFixed(2)}</p>
+                                <p>x${quantity} - S/ ${itemTotal.toFixed(2)}</p>
+                                ${item.size ? `<p style="font-size: 0.8rem; color: #666;">Talla: ${item.size}</p>` : ''}
                             </div>
                         </div>
-                    `).join('')}
+                    `;
+                    }).join('')}
                 </div>
                 <div class="summary-totals">
-                    <div class="row"><span>Subtotal</span> <span>$${total.toFixed(2)}</span></div>
-                    <div class="row"><span>Shipping</span> <span>${shipping === 0 ? 'FREE' : '$' + shipping.toFixed(2)}</span></div>
-                    <div class="row total"><span>TOTAL</span> <span>$${finalTotal.toFixed(2)}</span></div>
+                    <div class="row"><span>Subtotal</span> <span>S/ ${subtotal.toFixed(2)}</span></div>
+                    ${discount > 0 ? `
+                    <div class="row" style="color: #4caf50;">
+                        <span>Descuento</span> 
+                        <span>-S/ ${discount.toFixed(2)}</span>
+                    </div>
+                    ` : ''}
+                    <div class="row"><span>Envío</span> <span>${shipping === 0 ? 'GRATIS' : 'S/ ' + shipping.toFixed(2)}</span></div>
+                    ${subtotalAfterDiscount < 150 ? `
+                    <div style="font-size: 0.85rem; color: #666; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #eee;">
+                        <i class="fas fa-info-circle"></i> Agrega S/ ${(150 - subtotalAfterDiscount).toFixed(2)} más para envío gratis
+                    </div>
+                    ` : ''}
+                    <div class="row total"><span>TOTAL</span> <span>S/ ${finalTotal.toFixed(2)}</span></div>
                 </div>
+                ${window.couponsManager ? `
+                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 2px solid var(--black);">
+                    <div id="couponSection"></div>
+                </div>
+                ` : ''}
             </div>
         `;
+        
+        // Render coupon section if available
+        if (window.couponsManager) {
+            setTimeout(() => {
+                if (window.couponsManager.renderCouponSection) {
+                    window.couponsManager.renderCouponSection('couponSection');
+                }
+            }, 100);
+        }
     }
 }
 
 // Init
 document.addEventListener('DOMContentLoaded', () => {
     window.checkoutManager = new CheckoutManager();
-    console.log('Secure Checkout Initialized');
+    if (window.Logger) window.Logger.log('Secure Checkout Initialized');
 });
 
 window.scrollToOrderSummary = function () {

@@ -9,10 +9,10 @@ class AdminHomeContent {
     // Agregar event listeners a los formularios
     const heroForm = document.getElementById('heroSlideForm');
     if (heroForm) {
-      console.log('[AdminHomeContent] Listener de HeroSlideForm inicializado');
+      if (window.Logger) window.Logger.log('[AdminHomeContent] Listener de HeroSlideForm inicializado');
       this.attachHeroFormListener(heroForm);
     } else {
-      console.warn('[AdminHomeContent] No se encontró heroSlideForm al inicializar');
+      if (window.Logger) window.Logger.warn('[AdminHomeContent] No se encontró heroSlideForm al inicializar');
     }
 
     const bannerForm = document.getElementById('bannerForm');
@@ -37,7 +37,7 @@ class AdminHomeContent {
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      console.log('[AdminHomeContent] submit HeroSlideForm → saveHeroSlide()');
+      if (window.Logger) window.Logger.log('[AdminHomeContent] submit HeroSlideForm → saveHeroSlide()');
       this.saveHeroSlide();
     });
 
@@ -63,7 +63,7 @@ class AdminHomeContent {
         this.renderHeroSlidesTable(response.data.slides);
       }
     } catch (error) {
-      console.error('Error loading hero slides:', error);
+      if (window.Logger) window.Logger.error('Error loading hero slides:', error);
       window.notifications?.error('Error al cargar hero slides');
     }
   }
@@ -178,7 +178,7 @@ class AdminHomeContent {
   }
 
   async saveHeroSlide() {
-    console.log('[AdminHomeContent] saveHeroSlide() llamado');
+    if (window.Logger) window.Logger.log('[AdminHomeContent] saveHeroSlide() llamado');
     const form = document.getElementById('heroSlideForm');
     this.clearFormErrors(form);
 
@@ -259,7 +259,7 @@ class AdminHomeContent {
         throw new Error(response.message || 'Error al guardar slide');
       }
     } catch (error) {
-      console.error('Error saving hero slide:', error);
+      if (window.Logger) window.Logger.error('Error saving hero slide:', error);
       window.notifications?.error('Error al guardar slide: ' + (error.message || 'Error desconocido'));
     } finally {
       // Restaurar botón
@@ -318,7 +318,7 @@ class AdminHomeContent {
         this.renderBannersTable(response.data.banners);
       }
     } catch (error) {
-      console.error('Error loading banners:', error);
+      if (window.Logger) window.Logger.error('Error loading banners:', error);
       window.notifications?.error('Error al cargar banners');
     }
   }
@@ -532,7 +532,7 @@ class AdminHomeContent {
         throw new Error(response.message || 'Error al guardar banner');
       }
     } catch (error) {
-      console.error('Error saving banner:', error);
+      if (window.Logger) window.Logger.error('Error saving banner:', error);
       window.notifications?.error('Error al guardar banner: ' + (error.message || 'Error desconocido'));
     } finally {
       // Restaurar botón
@@ -569,7 +569,7 @@ class AdminHomeContent {
         this.renderBenefitsTable(response.data.benefits);
       }
     } catch (error) {
-      console.error('Error loading benefits:', error);
+      if (window.Logger) window.Logger.error('Error loading benefits:', error);
       window.notifications?.error('Error al cargar beneficios');
     }
   }
@@ -750,7 +750,7 @@ class AdminHomeContent {
         throw new Error(response.message || 'Error al guardar beneficio');
       }
     } catch (error) {
-      console.error('Error saving benefit:', error);
+      if (window.Logger) window.Logger.error('Error saving benefit:', error);
       window.notifications?.error('Error al guardar beneficio: ' + (error.message || 'Error desconocido'));
     } finally {
       // Restaurar botón
@@ -787,7 +787,7 @@ class AdminHomeContent {
         this.renderHomeSectionsTable(response.data.sections);
       }
     } catch (error) {
-      console.error('Error loading home sections:', error);
+      if (window.Logger) window.Logger.error('Error loading home sections:', error);
       window.notifications?.error('Error al cargar secciones');
     }
   }
@@ -847,7 +847,7 @@ class AdminHomeContent {
           ).join('');
       }
     } catch (error) {
-      console.error('Error loading categories:', error);
+      if (window.Logger) window.Logger.error('Error loading categories:', error);
     }
   }
 
@@ -956,7 +956,7 @@ class AdminHomeContent {
         throw new Error(response.message || 'Error al guardar sección');
       }
     } catch (error) {
-      console.error('Error saving home section:', error);
+      if (window.Logger) window.Logger.error('Error saving home section:', error);
       window.notifications?.error('Error al guardar sección: ' + (error.message || 'Error desconocido'));
     } finally {
       // Restaurar botón

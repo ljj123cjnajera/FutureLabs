@@ -1,6 +1,6 @@
 /**
- * 🛒 CART ENGINE V4 (API Integration + LocalStorage Fallback)
- * Focus: API Integration, Guest Support, Stock Validation, Spanish UI
+ * 🛒 CART ENGINE V5 (API Integration + LocalStorage Fallback + Size Support)
+ * Focus: API Integration, Guest Support, Stock Validation, Size Handling, Spanish UI
  */
 
 class CartEngine {
@@ -15,11 +15,18 @@ class CartEngine {
     this.isAuthenticated = this.checkAuth();
     
     // Restore Global Header/Footer if missing
-    if (window.Components && !document.getElementById('mainHeader')?.innerHTML) {
+    if (window.Components) {
       const header = document.getElementById('mainHeader');
-      if (header) {
+      if (header && !header.innerHTML.trim()) {
         header.innerHTML = window.Components.getHeader(true, true);
         if (window.Components.initHeader) window.Components.initHeader();
+        if (window.Components.initSearch) window.Components.initSearch();
+        if (window.Components.initCartCounter) window.Components.initCartCounter();
+      }
+      
+      const footer = document.getElementById('mainFooter');
+      if (footer && !footer.innerHTML.trim()) {
+        footer.innerHTML = window.Components.getFooter();
       }
     }
 
@@ -41,18 +48,35 @@ class CartEngine {
       const localCart = JSON.parse(localStorage.getItem('brutalist_cart') || '[]');
       if (localCart.length > 0) {
         // Sync each item to API
+        let syncedCount = 0;
+        let failedCount = 0;
+        
         for (const item of localCart) {
           try {
-            await this.api.addToCart(item.id, item.quantity);
+            // Pasar size si existe en el item
+            const options = item.size ? { size: item.size } : {};
+            await this.api.addToCart(item.id || item.product_id, item.quantity || 1, options);
+            syncedCount++;
           } catch (e) {
-            // Item might already exist, continue
+            // Item might already exist or error, continue
+            failedCount++;
+            if (window.Logger) window.Logger.warn('Error syncing item to API:', e);
           }
         }
-        // Clear localStorage after sync
-        localStorage.removeItem('brutalist_cart');
+        
+        // Clear localStorage after sync (solo si al menos uno se sincronizó)
+        if (syncedCount > 0) {
+          localStorage.removeItem('brutalist_cart');
+          if (window.Logger) window.Logger.log(`✅ ${syncedCount} items sincronizados desde localStorage a API`);
+          
+          if (failedCount > 0 && window.notifications) {
+            window.notifications.info('Carrito sincronizado', `${syncedCount} productos sincronizados. ${failedCount} productos no pudieron sincronizarse.`);
+          }
+        }
       }
     } catch (e) {
       // Silent fail, continue with API cart
+      if (window.Logger) window.Logger.error('Error in syncLocalToAPI:', e);
     }
   }
 
@@ -61,11 +85,18 @@ class CartEngine {
     if (!container) return;
 
     // Show loading state
-    container.innerHTML = `
-      <div style="text-align: center; padding: 4rem;">
-        <div class="loading-brutalist">CARGANDO CARRITO...</div>
-      </div>
-    `;
+    if (window.LoadingStates) {
+      window.LoadingStates.show('cartContainer', {
+        message: 'Cargando carrito...',
+        type: 'spinner'
+      });
+    } else {
+      container.innerHTML = `
+        <div style="text-align: center; padding: 4rem;">
+          <div class="loading-brutalist">CARGANDO CARRITO...</div>
+        </div>
+      `;
+    }
 
     let items = [];
     let total = 0;
@@ -75,44 +106,114 @@ class CartEngine {
       if (this.isAuthenticated) {
         // Load from API
         const response = await this.api.getCart();
+        
+        // Handle different response formats
         if (response && response.success && response.data) {
+          // Format: { success: true, data: { items: [], total: 0, count: 0 } }
           items = response.data.items || [];
           subtotal = response.data.total || 0;
-          total = subtotal; // Shipping will be calculated later
+        } else if (response && response.success && Array.isArray(response.data)) {
+          // Format: { success: true, data: [...] }
+          items = response.data;
+          subtotal = items.reduce((acc, item) => {
+            const price = parseFloat(item.discount_price || item.price || 0);
+            return acc + (price * (item.quantity || 1));
+          }, 0);
+        } else if (Array.isArray(response)) {
+          // Format: [...]
+          items = response;
+          subtotal = items.reduce((acc, item) => {
+            const price = parseFloat(item.discount_price || item.price || 0);
+            return acc + (price * (item.quantity || 1));
+          }, 0);
+        } else if (response && response.items) {
+          // Format: { items: [], total: 0 }
+          items = response.items;
+          subtotal = response.total || 0;
+        } else {
+          // Empty cart or unexpected format
+          items = [];
+          subtotal = 0;
         }
+        
+        total = subtotal; // Shipping will be calculated later
+        
+        if (window.Logger) window.Logger.log('✅ Cart loaded from API:', { itemsCount: items.length, subtotal });
       } else {
         // Load from localStorage for guests
         const localCart = JSON.parse(localStorage.getItem('brutalist_cart') || '[]');
         items = localCart;
-        subtotal = items.reduce((acc, item) => acc + (parseFloat(item.price || 0) * (item.quantity || 1)), 0);
+        subtotal = items.reduce((acc, item) => {
+          const price = parseFloat(item.discount_price || item.price || 0);
+          return acc + (price * (item.quantity || 1));
+        }, 0);
         total = subtotal;
+        
+        if (window.Logger) window.Logger.log('✅ Cart loaded from localStorage:', { itemsCount: items.length, subtotal });
+      }
+
+      // Hide loading state
+      if (window.LoadingStates) {
+        window.LoadingStates.hide('cartContainer');
+      }
+
+      if (items.length === 0) {
+        if (window.LoadingStates) {
+          window.LoadingStates.empty('cartContainer', {
+            title: 'Tu carrito está vacío',
+            message: 'Parece que aún no has encontrado tus grails perfectos.',
+            icon: 'fas fa-shopping-cart',
+            actionLabel: 'Comenzar a comprar',
+            actionUrl: 'products.html'
+          });
+        } else {
+          this.renderEmpty(container);
+        }
+      } else {
+        this.render(container, items, subtotal, total);
       }
     } catch (e) {
-      if (window.Logger) window.Logger.error('Error loading cart:', e);
+      if (window.ErrorHandler) {
+        window.ErrorHandler.api(e, 'loadCart', 'No se pudo cargar el carrito. Por favor, intenta de nuevo.');
+      } else {
+        if (window.Logger) window.Logger.error('Error loading cart:', e);
+      }
+
+      // Hide loading state
+      if (window.LoadingStates) {
+        window.LoadingStates.hide('cartContainer');
+      }
+
       // Fallback to localStorage
       if (!this.isAuthenticated) {
         const localCart = JSON.parse(localStorage.getItem('brutalist_cart') || '[]');
         items = localCart;
         subtotal = items.reduce((acc, item) => acc + (parseFloat(item.price || 0) * (item.quantity || 1)), 0);
         total = subtotal;
-      } else {
-        if (window.notifications) {
-          window.notifications.error('Error de Conexión', 'No se pudo cargar el carrito. Por favor, intenta de nuevo.');
+        
+        if (items.length === 0) {
+          if (window.LoadingStates) {
+            window.LoadingStates.empty('cartContainer', {
+              title: 'Tu carrito está vacío',
+              message: 'Parece que aún no has encontrado tus grails perfectos.',
+              icon: 'fas fa-shopping-cart',
+              actionLabel: 'Comenzar a comprar',
+              actionUrl: 'products.html'
+            });
+          } else {
+            this.renderEmpty(container);
+          }
+        } else {
+          this.render(container, items, subtotal, total);
         }
       }
-    }
-
-    if (items.length === 0) {
-      this.renderEmpty(container);
-    } else {
-      this.render(container, items, subtotal, total);
     }
   }
 
   render(container, items, subtotal, total) {
     // Calculate shipping (free over S/ 150)
     const shipping = subtotal >= 150 ? 0 : 15;
-    const finalTotal = total + shipping;
+    const finalTotal = subtotal + shipping;
 
     container.innerHTML = `
             <div class="cart-grid-v3">
@@ -126,6 +227,8 @@ class CartEngine {
                         const stockAvailable = item.stock_quantity !== undefined ? item.stock_quantity : null;
                         const isOutOfStock = stockAvailable !== null && stockAvailable === 0;
                         const isLowStock = stockAvailable !== null && stockAvailable > 0 && stockAvailable < itemQuantity;
+                        const itemSize = item.size || null;
+                        const sizeParam = itemSize ? `, {size: '${itemSize}'}` : '';
 
                         return `
                         <div class="cart-item ${isOutOfStock ? 'out-of-stock' : ''}">
@@ -146,10 +249,11 @@ class CartEngine {
                                     <a href="product-detail.html?id=${productId}">${item.name}</a>
                                 </h3>
                                 ${item.slug ? `<div class="cart-item-slug">SKU: ${item.slug}</div>` : ''}
+                                ${itemSize ? `<div class="cart-item-size" style="margin-top: 0.5rem; font-weight: 600; text-transform: uppercase; color: var(--gray-600);">Talla: ${itemSize}</div>` : ''}
                                 
                                 <div class="quantity-control">
                                     <button class="quantity-btn" 
-                                            onclick="window.cartEngine.updateQty(${productId}, ${itemQuantity - 1})"
+                                            onclick="window.cartEngine.updateQty(${productId}, ${itemQuantity - 1}${sizeParam})"
                                             ${itemQuantity <= 1 ? 'disabled' : ''}
                                             aria-label="Disminuir cantidad">
                                         <i class="fas fa-minus"></i>
@@ -162,7 +266,7 @@ class CartEngine {
                                            readonly
                                            aria-label="Cantidad">
                                     <button class="quantity-btn" 
-                                            onclick="window.cartEngine.updateQty(${productId}, ${itemQuantity + 1})"
+                                            onclick="window.cartEngine.updateQty(${productId}, ${itemQuantity + 1}${sizeParam})"
                                             ${(stockAvailable !== null && itemQuantity >= stockAvailable) ? 'disabled' : ''}
                                             aria-label="Aumentar cantidad">
                                         <i class="fas fa-plus"></i>
@@ -181,7 +285,7 @@ class CartEngine {
                                     <div class="item-total">S/ ${itemTotal.toFixed(2)}</div>
                                 </div>
                                 <button class="btn-remove" 
-                                        onclick="window.cartEngine.removeItem(${productId})"
+                                        onclick="window.cartEngine.removeItem(${productId}${sizeParam})"
                                         aria-label="Eliminar producto">
                                     <i class="fas fa-trash"></i> ELIMINAR
                                 </button>
@@ -249,18 +353,22 @@ class CartEngine {
         `;
   }
 
-  async updateQty(productId, newQty) {
+  async updateQty(productId, newQty, options = {}) {
     if (newQty <= 0) {
-      return this.removeItem(productId);
+      return this.removeItem(productId, options);
     }
 
     try {
       if (this.isAuthenticated) {
-        await this.api.updateCartItem(productId, newQty);
+        await this.api.updateCartItem(productId, newQty, options);
       } else {
         // Update localStorage
         let cart = JSON.parse(localStorage.getItem('brutalist_cart') || '[]');
-        const item = cart.find(i => (i.id === productId || i.product_id === productId));
+        const item = cart.find(i => {
+          const sameProduct = (i.id === productId || i.product_id === productId);
+          const sameSize = (!options.size && !i.size) || (options.size === i.size);
+          return sameProduct && sameSize;
+        });
         if (item) {
           item.quantity = newQty;
           localStorage.setItem('brutalist_cart', JSON.stringify(cart));
@@ -281,14 +389,19 @@ class CartEngine {
     }
   }
 
-  async removeItem(productId) {
+  async removeItem(productId, options = {}) {
     try {
       if (this.isAuthenticated) {
-        await this.api.removeFromCart(productId);
+        await this.api.removeFromCart(productId, options);
       } else {
-        // Remove from localStorage
+        // Remove from localStorage (considerando size si existe)
         let cart = JSON.parse(localStorage.getItem('brutalist_cart') || '[]');
-        cart = cart.filter(i => (i.id !== productId && i.product_id !== productId));
+        cart = cart.filter(i => {
+          const sameProduct = (i.id === productId || i.product_id === productId);
+          const sameSize = (!options.size && !i.size) || (options.size === i.size);
+          // Si no se especifica size, remover todos los items de ese producto
+          return !sameProduct || (options.size && !sameSize);
+        });
         localStorage.setItem('brutalist_cart', JSON.stringify(cart));
       }
 
@@ -308,23 +421,46 @@ class CartEngine {
 
   async add(productId, quantity = 1, options = {}) {
     try {
-      // Validate stock if product data available
-      if (window.currentProduct) {
-        const stock = window.currentProduct.stock_quantity;
-        if (stock !== undefined && stock === 0) {
-          if (window.notifications) {
-            window.notifications.warning('Producto Agotado', 'Este producto no está disponible en este momento.');
+      // Validar stock antes de agregar
+      try {
+        const productResponse = await this.api.getProduct(productId);
+        const product = productResponse?.data || productResponse;
+        
+        if (product) {
+          const stock = product.stock_quantity;
+          if (stock !== undefined && stock === 0) {
+            if (window.notifications) {
+              window.notifications.warning('Producto Agotado', 'Este producto no está disponible en este momento.');
+            }
+            return false;
           }
-          return false;
+          
+          // Validar cantidad vs stock disponible
+          if (stock !== undefined && stock < quantity) {
+            if (window.notifications) {
+              window.notifications.warning('Stock Insuficiente', `Solo hay ${stock} unidades disponibles.`);
+            }
+            return false;
+          }
         }
+      } catch (stockError) {
+        // Si falla la validación de stock, continuar (no bloquear)
+        if (window.Logger) window.Logger.warn('Error validating stock, continuing:', stockError);
       }
 
       if (this.isAuthenticated) {
-        await this.api.addToCart(productId, quantity);
+        // Pasar options (incluyendo size) a la API
+        await this.api.addToCart(productId, quantity, options);
       } else {
         // Add to localStorage
         let cart = JSON.parse(localStorage.getItem('brutalist_cart') || '[]');
-        const existing = cart.find(i => (i.id === productId || i.product_id === productId));
+        
+        // Buscar item existente (considerando size si existe)
+        const existing = cart.find(i => {
+          const sameProduct = (i.id === productId || i.product_id === productId);
+          const sameSize = (!options.size && !i.size) || (options.size === i.size);
+          return sameProduct && sameSize;
+        });
 
         if (existing) {
           existing.quantity += quantity;
@@ -334,7 +470,7 @@ class CartEngine {
             name: 'Producto ' + productId, 
             price: 0, 
             image_url: 'assets/images/products/placeholder.jpg', 
-            brand: 'Marca' 
+            brand: 'Sneakers' 
           };
 
           cart.push({
@@ -343,8 +479,9 @@ class CartEngine {
             name: product.name,
             price: parseFloat(product.discount_price || product.price || 0),
             quantity: quantity,
-            image_url: product.image_url,
-            brand: product.brand
+            image_url: product.image_url || 'assets/images/products/placeholder.jpg',
+            brand: product.brand || 'Sneakers',
+            size: options.size || null
           });
         }
 
@@ -376,6 +513,10 @@ class CartEngine {
     document.dispatchEvent(new CustomEvent('cartUpdated'));
     if (window.Components && window.Components.updateCartCount) {
       window.Components.updateCartCount();
+    }
+    // Update cart drawer if it's open
+    if (window.CartDrawer && document.getElementById('cartDrawer')?.classList.contains('active')) {
+      window.CartDrawer.update();
     }
   }
 }

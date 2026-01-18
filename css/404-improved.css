@@ -1,0 +1,135 @@
+/* 🚫 404 Error Page - Improved Styles */
+
+.error-page {
+    min-height: calc(100vh - 200px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    background: var(--white, #fff);
+}
+
+.error-container {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.error-icon {
+    font-size: 6rem;
+    color: var(--error, #dc3545);
+    margin-bottom: 2rem;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+.error-code {
+    font-family: 'Poppins', sans-serif;
+    font-size: 8rem;
+    font-weight: 900;
+    line-height: 1;
+    margin: 0;
+    color: var(--black, #000);
+    text-transform: uppercase;
+    letter-spacing: -0.05em;
+}
+
+.error-msg {
+    font-family: 'Inter', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin: 1rem 0;
+    color: var(--black, #000);
+    letter-spacing: 0.1em;
+}
+
+.error-desc {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: var(--gray-600, #666);
+    margin: 2rem 0 3rem;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.error-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 3rem;
+}
+
+.error-actions .btn {
+    padding: 1rem 2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 1rem;
+    min-width: 200px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 3px solid var(--black, #000);
+    transition: all 0.2s;
+}
+
+.error-actions .btn-primary {
+    background: var(--black, #000);
+    color: var(--white, #fff);
+}
+
+.error-actions .btn-primary:hover {
+    background: var(--white, #fff);
+    color: var(--black, #000);
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 var(--black, #000);
+}
+
+.error-actions .btn-outline {
+    background: var(--white, #fff);
+    color: var(--black, #000);
+}
+
+.error-actions .btn-outline:hover {
+    background: var(--black, #000);
+    color: var(--white, #fff);
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 var(--black, #000);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .error-code {
+        font-size: 5rem;
+    }
+    
+    .error-msg {
+        font-size: 1.5rem;
+    }
+    
+    .error-desc {
+        font-size: 1rem;
+    }
+    
+    .error-actions {
+        flex-direction: column;
+    }
+    
+    .error-actions .btn {
+        width: 100%;
+    }
+}
