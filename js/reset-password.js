@@ -43,28 +43,39 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="loading-inline"><span class="loading-spinner small"></span> Restableciendo...</span>';
+        // MODERN CORE: Use LoadingStates instead of manual HTML
+        if (window.LoadingStates) {
+            window.LoadingStates.show(form, { type: 'spinner', message: 'Restableciendo...', overlay: true });
+        } else {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="loading-inline"><span class="loading-spinner small"></span> Restableciendo...</span>';
+        }
 
         try {
             const response = await window.api.resetPassword(token, password);
-
             if (response.success) {
-                window.notifications?.success?.('Contraseña restablecida exitosamente');
+                if (window.notifications) window.notifications.success('Contraseña restablecida exitosamente');
                 form.reset();
-
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 2000);
+                setTimeout(() => window.location.href = 'index.html', 2000);
             } else {
-                window.notifications?.error?.(response.message || 'Error al restablecer contraseña');
+                if (window.notifications) window.notifications.error(response.message || 'Error al restablecer contraseña');
             }
         } catch (error) {
-            if (window.Logger) window.Logger.error('Error en resetPassword:', error);
-            window.notifications?.error?.('Error al conectar con el servidor');
+            if (window.ErrorHandler) {
+                window.ErrorHandler.handle(error, {
+                    context: 'resetPassword',
+                    userMessage: 'Error al conectar con el servidor'
+                });
+            } else {
+                if (window.notifications) window.notifications.error('Error al conectar con el servidor');
+            }
         } finally {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = 'Restablecer Contraseña';
+            if (window.LoadingStates) {
+                window.LoadingStates.hide(form);
+            } else {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Restablecer Contraseña';
+            }
         }
     });
 });

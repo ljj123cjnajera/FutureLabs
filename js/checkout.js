@@ -37,39 +37,26 @@ class CheckoutManager {
     }
 
     async loadCart() {
-        // Mostrar loading state
         if (window.LoadingStates && this.formContainer) {
-            window.LoadingStates.show(this.formContainer, { 
-                message: 'Cargando carrito...',
-                type: 'spinner'
-            });
+            window.LoadingStates.show(this.formContainer, { message: 'Cargando carrito...', type: 'spinner' });
         }
 
         try {
             // Intentar cargar desde API primero
             if (window.authManager && window.authManager.isAuthenticated() && window.api) {
                 const response = await window.api.getCart();
-                if (response && response.success && response.data && response.data.items) {
-                    this.cart = response.data.items;
-                } else if (response && Array.isArray(response)) {
-                    this.cart = response;
-                } else {
-                    // Fallback a localStorage (usar brutalist_cart consistentemente)
-                    const stored = localStorage.getItem('brutalist_cart');
-                    if (stored) {
-                        this.cart = JSON.parse(stored);
-                    }
-                }
-            } else {
-                // Usuario no autenticado, usar localStorage (brutalist_cart)
+                this.cart = (response && response.success && response.data && response.data.items) ? response.data.items :
+                    (Array.isArray(response) ? response : []);
+            }
+
+            // Si falla API o está vacio, intentar localStorage
+            if (!this.cart || this.cart.length === 0) {
                 const stored = localStorage.getItem('brutalist_cart');
-                if (stored) {
-                    this.cart = JSON.parse(stored);
-                }
+                if (stored) this.cart = JSON.parse(stored);
             }
 
             if (!this.cart || this.cart.length === 0) {
-                if (window.LoadingStates && this.formContainer) {
+                if (window.LoadingStates) {
                     window.LoadingStates.empty(this.formContainer, {
                         icon: 'fas fa-shopping-cart',
                         title: 'Carrito Vacío',
@@ -78,48 +65,23 @@ class CheckoutManager {
                         actionUrl: 'products.html'
                     });
                 }
-                if (window.notifications) {
-                    window.notifications.warning('Tu carrito está vacío', 'Agrega productos antes de continuar');
-                }
-                setTimeout(() => {
-                    window.location.href = 'cart.html';
-                }, 2000);
+                setTimeout(() => window.location.href = 'cart.html', 2000);
                 return;
             }
         } catch (error) {
-            // Usar error handler si está disponible
             if (window.ErrorHandler) {
                 window.ErrorHandler.api(error, 'loadCart', 'No se pudo cargar el carrito');
             } else {
                 if (window.Logger) window.Logger.error('Error loading cart:', error);
-                if (window.notifications) {
-                    window.notifications.error('Error', 'No se pudo cargar el carrito. Por favor, intenta de nuevo.');
-                }
             }
 
-            // Mostrar estado de error
-            if (window.LoadingStates && this.formContainer) {
-                window.LoadingStates.error(this.formContainer, {
-                    title: 'Error al Cargar',
-                    message: 'No se pudo cargar el carrito. Por favor, intenta de nuevo.',
-                    retryLabel: 'Reintentar',
-                    retryCallback: 'window.checkoutManager.loadCart()'
-                });
-            }
-
-            // Fallback a localStorage
+            // Fallback final a localStorage
             const stored = localStorage.getItem('brutalist_cart');
-            if (stored) {
-                this.cart = JSON.parse(stored);
-            }
-            if (!this.cart || this.cart.length === 0) {
-                window.location.href = 'cart.html';
-            }
+            if (stored) this.cart = JSON.parse(stored);
+
+            if (!this.cart || this.cart.length === 0) window.location.href = 'cart.html';
         } finally {
-            // Ocultar loading state
-            if (window.LoadingStates && this.formContainer) {
-                window.LoadingStates.hide(this.formContainer, false);
-            }
+            if (window.LoadingStates) window.LoadingStates.hide(this.formContainer, false);
         }
     }
 
@@ -127,23 +89,19 @@ class CheckoutManager {
         try {
             const response = await window.api.getAddresses();
             if (response.success) {
-                this.addresses = response.data.addresses || response.data; // Handle potential wrapper
-                // Auto-select default or first
-                const defaultAddr = this.addresses.find(a => a.is_default);
-                if (defaultAddr) this.selectedAddressId = defaultAddr.id;
-                else if (this.addresses.length > 0) this.selectedAddressId = this.addresses[0].id;
+                this.addresses = response.data.addresses || response.data || [];
+                // Auto-select
+                if (this.addresses.length > 0) {
+                    const defaultAddr = this.addresses.find(a => a.is_default);
+                    this.selectedAddressId = defaultAddr ? defaultAddr.id : this.addresses[0].id;
+                }
             } else {
-                // Si no hay direcciones, inicializar array vacío
                 this.addresses = [];
             }
         } catch (e) {
-            // Usar error handler si está disponible
             if (window.ErrorHandler) {
                 window.ErrorHandler.api(e, 'loadAddresses', 'No se pudieron cargar las direcciones');
-            } else {
-                if (window.Logger) window.Logger.error('Failed to load addresses:', e);
             }
-            // Inicializar array vacío en caso de error
             this.addresses = [];
         }
     }
@@ -314,9 +272,6 @@ class CheckoutManager {
                 window.ErrorHandler.api(e, 'saveNewAddress', 'No se pudo guardar la dirección. Verifica tu conexión.');
             } else {
                 if (window.Logger) window.Logger.error('Address Save Failed:', e);
-                if (window.notifications) {
-                    window.notifications.error('Error', 'No se pudo guardar la dirección. Verifica tu conexión.');
-                }
             }
         } finally {
             if (btn) {
@@ -439,11 +394,11 @@ class CheckoutManager {
                 <div class="review-block">
                     <h4>PRODUCTOS:</h4>
                     ${this.cart.map(item => {
-                        const price = parseFloat(item.discount_price || item.price || 0);
-                        const quantity = item.quantity || 1;
-                        const itemTotal = price * quantity;
-                        return `<p>${quantity}x ${item.name}${item.size ? ' (Talla: ' + item.size + ')' : ''} - S/ ${itemTotal.toFixed(2)}</p>`;
-                    }).join('')}
+            const price = parseFloat(item.discount_price || item.price || 0);
+            const quantity = item.quantity || 1;
+            const itemTotal = price * quantity;
+            return `<p>${quantity}x ${item.name}${item.size ? ' (Talla: ' + item.size + ')' : ''} - S/ ${itemTotal.toFixed(2)}</p>`;
+        }).join('')}
                 </div>
 
                 <div class="review-block" style="border-top: 2px solid var(--black); padding-top: 1rem; margin-top: 1rem;">
@@ -481,7 +436,7 @@ class CheckoutManager {
     async placeOrder() {
         const btn = document.querySelector('.btn-green');
         const originalBtnText = btn ? btn.innerHTML : '';
-        
+
         if (btn) {
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESANDO...';
             btn.disabled = true;
@@ -580,7 +535,7 @@ class CheckoutManager {
             const price = parseFloat(item.discount_price || item.price || 0);
             return sum + (price * (item.quantity || 1));
         }, 0);
-        
+
         // Get discount from coupon manager if available
         const discount = window.couponsManager?.discount || 0;
         const subtotalAfterDiscount = subtotal - discount;
@@ -592,10 +547,10 @@ class CheckoutManager {
                 <h3>RESUMEN DEL PEDIDO</h3>
                 <div class="summary-items">
                     ${this.cart.map(item => {
-                        const price = parseFloat(item.discount_price || item.price || 0);
-                        const quantity = item.quantity || 1;
-                        const itemTotal = price * quantity;
-                        return `
+            const price = parseFloat(item.discount_price || item.price || 0);
+            const quantity = item.quantity || 1;
+            const itemTotal = price * quantity;
+            return `
                         <div class="summary-item">
                             <img src="${item.image_url || item.image || 'assets/images/products/placeholder.jpg'}" 
                                  alt="${item.name}" 
@@ -607,7 +562,7 @@ class CheckoutManager {
                             </div>
                         </div>
                     `;
-                    }).join('')}
+        }).join('')}
                 </div>
                 <div class="summary-totals">
                     <div class="row"><span>Subtotal</span> <span>S/ ${subtotal.toFixed(2)}</span></div>
@@ -632,7 +587,7 @@ class CheckoutManager {
                 ` : ''}
             </div>
         `;
-        
+
         // Render coupon section if available
         if (window.couponsManager) {
             setTimeout(() => {
