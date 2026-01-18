@@ -191,6 +191,61 @@
         return sanitized;
     }
 
+    /**
+     * Valida si una URL de imagen es válida
+     * @param {string} url - La URL a validar
+     * @returns {boolean} - true si la URL es válida, false en caso contrario
+     */
+    function isValidImageUrl(url) {
+        if (!url || typeof url !== 'string') return false;
+        const trimmed = url.trim();
+        return trimmed !== '' && 
+               !trimmed.includes('undefined') && 
+               !trimmed.includes('null') &&
+               (trimmed.startsWith('http') || trimmed.startsWith('/') || trimmed.startsWith('assets/') || trimmed.startsWith('data:'));
+    }
+
+    /**
+     * Normaliza un array o string de imágenes a un array válido de URLs
+     * @param {Array|string|*} images - Las imágenes a normalizar (array, JSON string, o string directo)
+     * @param {string} fallback - URL de fallback si no hay imágenes válidas
+     * @returns {Array<string>} - Array de URLs de imágenes válidas
+     */
+    function normalizeImageUrls(images, fallback = 'assets/images/products/placeholder.jpg') {
+        let imageArray = [];
+        
+        // 1. Si es un array válido
+        if (Array.isArray(images) && images.length > 0) {
+            imageArray = images.filter(isValidImageUrl);
+        } 
+        // 2. Si es un string JSON
+        else if (images && typeof images === 'string') {
+            try {
+                const parsed = JSON.parse(images);
+                if (Array.isArray(parsed)) {
+                    imageArray = parsed.filter(isValidImageUrl);
+                } else if (isValidImageUrl(parsed)) {
+                    imageArray = [parsed];
+                } else if (isValidImageUrl(images)) {
+                    // Si no es JSON válido pero es una URL válida directa
+                    imageArray = [images];
+                }
+            } catch (e) {
+                // Si no es JSON válido, verificar si es una URL válida directa
+                if (isValidImageUrl(images)) {
+                    imageArray = [images];
+                }
+            }
+        }
+        
+        // Fallback si no hay imágenes válidas
+        if (imageArray.length === 0 && fallback) {
+            imageArray = [fallback];
+        }
+        
+        return imageArray;
+    }
+
     // Exportar al scope global
     window.Utils = {
         formatCurrency,
@@ -204,7 +259,9 @@
         throttle,
         formatNumber,
         getURLParam,
-        updateURLParams
+        updateURLParams,
+        isValidImageUrl,
+        normalizeImageUrls
     };
 
     // También exportar funciones individuales para compatibilidad
