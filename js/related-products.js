@@ -139,8 +139,10 @@ class RelatedProducts {
   }
 }
 
-// Inicializar productos relacionados
-const relatedProducts = new RelatedProducts();
+// Inicializar productos relacionados - singleton instance
+if (!window.relatedProducts) {
+    window.relatedProducts = new RelatedProducts();
+}
 
 // Funciones globales
 async function addToCart(productId) {

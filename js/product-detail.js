@@ -354,6 +354,18 @@ document.addEventListener('DOMContentLoaded', async function () {
         
         // Update wishlist button state
         setTimeout(() => updateWishlistButton(), 500);
+        
+        // Add to recently viewed
+        if (window.recentlyViewed) {
+            window.recentlyViewed.add(product);
+        }
+        
+        // Load related products after product loads
+        if (window.relatedProducts) {
+            setTimeout(() => {
+                window.relatedProducts.loadRelatedProducts();
+            }, 1000);
+        }
     }
 
     function renderSizeSelector(product) {
@@ -802,15 +814,14 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     }
 
+    // Recently viewed functionality - initialize after product loads
     const clearRecentlyViewedBtn = document.getElementById('clearRecentlyViewedBtn');
     if (clearRecentlyViewedBtn) {
         clearRecentlyViewedBtn.addEventListener('click', () => {
-            window.recentlyViewed?.clearAndRender('recentlyViewedGrid', { hideWhenEmpty: true });
+            if (window.recentlyViewed) {
+                window.recentlyViewed.clearAndRender('recentlyViewedGrid', { hideWhenEmpty: true });
+            }
         });
-    }
-
-    if (window.recentlyViewed) {
-        window.recentlyViewed.render('recentlyViewedGrid', { limit: 6, hideWhenEmpty: true });
     }
 
     // Actualizar contador de carrito

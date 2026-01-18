@@ -30,11 +30,8 @@ class CatalogEngine {
     }
 
     async init() {
-        if (window.Logger) window.Logger.log('📦 [CatalogEngine] V3 Initialized');
-
         // Wait for API to be ready
         if (!window.api) {
-            if (window.Logger) window.Logger.error('⚠️ [CatalogEngine] API not available, retrying...');
             setTimeout(() => this.init(), 500);
             return;
         }
@@ -334,10 +331,7 @@ class CatalogEngine {
 
     render(products) {
         const container = document.getElementById('productsContainer');
-        if (!container) {
-            if (window.Logger) window.Logger.error('❌ [CatalogEngine] productsContainer not found!');
-            return;
-        }
+        if (!container) return;
 
 
         // Use LoadingStates for empty state
@@ -386,7 +380,7 @@ class CatalogEngine {
                     try {
                         return window.Components.getProductCard(p);
                     } catch (e) {
-                        if (window.Logger) window.Logger.error('Error rendering product card:', e, p);
+                        if (window.Logger) window.Logger.error('Error rendering product card:', e);
                         return '';
                     }
                 }).filter(html => html).join('');
@@ -941,7 +935,6 @@ window.applyPriceFilter = function() {
 function initCatalogEngine() {
     // Wait for API to be available
     if (!window.api) {
-        if (window.Logger) window.Logger.warn('⚠️ [CatalogEngine] API not ready, retrying...');
         setTimeout(initCatalogEngine, 100);
         return;
     }
