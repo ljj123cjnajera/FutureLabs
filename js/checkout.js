@@ -14,8 +14,35 @@ class CheckoutManager {
         this.addresses = [];
         this.selectedAddressId = null;
         this.paymentMethod = 'card'; // Default
+        this.loyaltyPointsAvailable = 0;
+        this.loyaltyPointsUsed = 0;
 
         this.init();
+    }
+
+    /** Totales: subtotal, cupón, puntos, envío, total. 100 pts = S/ 1; máx 20% con puntos. */
+    getTotals() {
+        const subtotal = this.cart.reduce((sum, i) => {
+            const p = parseFloat(i.discount_price || i.price || 0);
+            return sum + (p * (i.quantity || 1));
+        }, 0);
+        const couponDiscount = (window.couponsManager && window.couponsManager.getDiscount) ? window.couponsManager.getDiscount() : 0;
+        const subtotalAfterCoupon = Math.max(0, subtotal - couponDiscount);
+        const maxPointsSoles = subtotalAfterCoupon * 0.2;
+        const maxPointsToUse = Math.min(this.loyaltyPointsAvailable, Math.floor(maxPointsSoles * 100));
+        const effectivePoints = Math.min(this.loyaltyPointsUsed, maxPointsToUse);
+        const loyaltyDiscount = effectivePoints / 100;
+        const subtotalAfterLoyalty = Math.max(0, subtotalAfterCoupon - loyaltyDiscount);
+        const shipping = subtotalAfterLoyalty >= 150 ? 0 : 15;
+        const total = subtotalAfterLoyalty + shipping;
+        return {
+            subtotal,
+            couponDiscount,
+            loyaltyDiscount,
+            shipping,
+            total,
+            loyaltyPointsEffective: effectivePoints
+        };
     }
 
     async init() {
@@ -46,10 +73,28 @@ class CheckoutManager {
         // 2. Load Data
         await this.loadCart();
         await this.loadAddresses();
+        await this.loadLoyaltyInfo();
 
         // 3. Render
         this.renderOrderSummary();
         this.renderStep(1);
+
+        window.addEventListener('couponUpdated', () => {
+            this.renderOrderSummary();
+            if (this.currentStep === 3) this.renderReview();
+        });
+    }
+
+    async loadLoyaltyInfo() {
+        if (!window.authManager || !window.authManager.isAuthenticated() || !window.api) return;
+        try {
+            const res = await window.api.getLoyaltyPoints();
+            this.loyaltyPointsAvailable = (res && res.success && res.data && res.data.points != null)
+                ? Math.max(0, parseInt(res.data.points, 10)) : 0;
+        } catch (e) {
+            if (window.Logger) window.Logger.warn('Checkout: no se pudieron cargar puntos:', e);
+            this.loyaltyPointsAvailable = 0;
+        }
     }
 
     async loadCart() {
@@ -398,20 +443,15 @@ class CheckoutManager {
         }
 
         let addr = this.addresses.find(a => a.id == this.selectedAddressId);
-
-        // Use Guest Address if applicable
         if (this.selectedAddressId === 'GUEST_ADDR' && this.guestAddress) {
             addr = this.guestAddress;
         }
 
-        const cartTotal = this.cart.reduce((sum, i) => sum + (i.price * i.quantity), 0);
-        const shipping = cartTotal > 150 ? 0 : 15;
-        const total = cartTotal + shipping;
+        const t = this.getTotals();
 
         const html = `
             <div class="checkout-form-section fade-in">
                 <h2>REVISAR PEDIDO</h2>
-                
                 <div class="review-block">
                     <h4>ENVIAR A:</h4>
                     <p><strong>${addr.first_name} ${addr.last_name}</strong></p>
@@ -421,7 +461,6 @@ class CheckoutManager {
                     <p>${addr.country || 'Perú'}</p>
                     ${addr.phone_number ? `<p><i class="fas fa-phone"></i> ${addr.phone_number}</p>` : ''}
                 </div>
-
                 <div class="review-block">
                     <h4>MÉTODO DE PAGO:</h4>
                     <p><strong>${this.getPaymentMethodName(this.paymentMethod)}</strong></p>
@@ -431,42 +470,44 @@ class CheckoutManager {
                     </p>
                     ` : ''}
                 </div>
-
                 <div class="review-block">
                     <h4>PRODUCTOS:</h4>
                     ${this.cart.map(item => {
-            const price = parseFloat(item.discount_price || item.price || 0);
-            const quantity = item.quantity || 1;
-            const itemTotal = price * quantity;
-            return `<p>${quantity}x ${item.name}${item.size ? ' (Talla: ' + item.size + ')' : ''} - S/ ${itemTotal.toFixed(2)}</p>`;
-        }).join('')}
+                        const price = parseFloat(item.discount_price || item.price || 0);
+                        const q = item.quantity || 1;
+                        return `<p>${q}x ${item.name}${item.size ? ' (Talla: ' + item.size + ')' : ''} - S/ ${(price * q).toFixed(2)}</p>`;
+                    }).join('')}
                 </div>
-
                 <div class="review-block" style="border-top: 2px solid var(--black); padding-top: 1rem; margin-top: 1rem;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
                         <span>Subtotal:</span>
-                        <span>S/ ${subtotal.toFixed(2)}</span>
+                        <span>S/ ${t.subtotal.toFixed(2)}</span>
                     </div>
-                    ${discount > 0 ? `
+                    ${t.couponDiscount > 0 ? `
                     <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; color: #4caf50;">
-                        <span>Descuento:</span>
-                        <span>-S/ ${discount.toFixed(2)}</span>
+                        <span>Descuento (cupón):</span>
+                        <span>-S/ ${t.couponDiscount.toFixed(2)}</span>
+                    </div>
+                    ` : ''}
+                    ${t.loyaltyDiscount > 0 ? `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; color: #4caf50;">
+                        <span>Descuento (puntos):</span>
+                        <span>-S/ ${t.loyaltyDiscount.toFixed(2)}</span>
                     </div>
                     ` : ''}
                     <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
                         <span>Envío:</span>
-                        <span>${shipping === 0 ? 'GRATIS' : 'S/ ' + shipping.toFixed(2)}</span>
+                        <span>${t.shipping === 0 ? 'GRATIS' : 'S/ ' + t.shipping.toFixed(2)}</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: 900; margin-top: 1rem; padding-top: 1rem; border-top: 2px solid var(--black);">
                         <span>TOTAL:</span>
-                        <span>S/ ${total.toFixed(2)}</span>
+                        <span>S/ ${t.total.toFixed(2)}</span>
                     </div>
                 </div>
-
                 <div class="checkout-actions">
                     <button class="btn btn-outline" onclick="checkoutManager.renderStep(2)">VOLVER</button>
-                    <button class="btn btn-black btn-block" onclick="checkoutManager.placeOrder()">
-                        <i class="fas fa-lock"></i> CONFIRMAR PEDIDO (S/ ${total.toFixed(2)})
+                    <button class="btn btn-black btn-block btn-confirm-order" onclick="checkoutManager.placeOrder()">
+                        <i class="fas fa-lock"></i> CONFIRMAR PEDIDO (S/ ${t.total.toFixed(2)})
                     </button>
                 </div>
             </div>
@@ -475,7 +516,7 @@ class CheckoutManager {
     }
 
     async placeOrder() {
-        const btn = document.querySelector('.btn-green');
+        const btn = document.querySelector('.btn-confirm-order') || document.querySelector('.btn-black.btn-block');
         const originalBtnText = btn ? btn.innerHTML : '';
 
         if (btn) {
@@ -483,50 +524,41 @@ class CheckoutManager {
             btn.disabled = true;
         }
 
-        // Validaciones antes de procesar
         if (!this.selectedAddressId) {
-            if (window.notifications) {
-                window.notifications.warning('Dirección Requerida', 'Por favor, selecciona una dirección de envío');
-            }
+            if (window.notifications) window.notifications.warning('Dirección Requerida', 'Por favor, selecciona una dirección de envío');
             this.renderStep(1);
-            if (btn) {
-                btn.innerHTML = originalBtnText;
-                btn.disabled = false;
-            }
+            if (btn) { btn.innerHTML = originalBtnText; btn.disabled = false; }
             return;
         }
 
         if (!this.cart || this.cart.length === 0) {
-            if (window.notifications) {
-                window.notifications.warning('Carrito Vacío', 'Tu carrito está vacío');
-            }
+            if (window.notifications) window.notifications.warning('Carrito Vacío', 'Tu carrito está vacío');
             window.location.href = 'cart.html';
             return;
         }
 
+        const t = this.getTotals();
+
         try {
-            // Prepare Payload
             const orderData = {
                 items: this.cart.map(item => ({
                     product_id: item.product_id || item.id,
                     quantity: item.quantity,
-                    price: item.discount_price || item.price, // Optional, backend might verify
-                    size: item.size || null // Include size if available
+                    price: item.discount_price || item.price,
+                    size: item.size || null
                 })),
-                payment_method: this.paymentMethod === 'card' ? 'credit_card' : this.paymentMethod,
+                payment_method: this.paymentMethod === 'card' ? 'stripe' : this.paymentMethod,
                 payment_details: {
                     provider: 'stripe',
-                    transaction_id: 'tx_' + Date.now() // Placeholder for actual gateway integration
-                }
+                    transaction_id: 'tx_' + Date.now()
+                },
+                coupon_code: (window.couponsManager && window.couponsManager.getAppliedCoupon && window.couponsManager.getAppliedCoupon()) ? window.couponsManager.getAppliedCoupon().code : undefined,
+                loyalty_points_used: t.loyaltyPointsEffective > 0 ? t.loyaltyPointsEffective : undefined,
+                expected_total: t.total
             };
 
-            // Handle Address (Guest vs Auth)
             if (this.selectedAddressId === 'GUEST_ADDR' && this.guestAddress) {
-                // If backend supports raw address object:
                 orderData.shipping_address = this.guestAddress;
-                // If backend requires discrete fields, spread them:
-                // ...this.guestAddress
-
                 if (this.guestEmail) orderData.email = this.guestEmail;
             } else {
                 orderData.shipping_address_id = this.selectedAddressId;
@@ -557,7 +589,7 @@ class CheckoutManager {
                 // If guest email is present, pass it
                 if (orderData.email) {
                     redirectUrl += `&email=${encodeURIComponent(orderData.email)}`;
-                } else if (!window.authManager.isAuthenticated() && this.guestEmail) {
+                } else if (!(window.authManager && window.authManager.isAuthenticated && window.authManager.isAuthenticated()) && this.guestEmail) {
                     redirectUrl += `&email=${encodeURIComponent(this.guestEmail)}`;
                 }
 
@@ -591,56 +623,53 @@ class CheckoutManager {
     renderOrderSummary() {
         if (!this.orderSummary) return;
 
-        // Calculate totals with discount if coupon applied
-        const subtotal = this.cart.reduce((sum, item) => {
-            const price = parseFloat(item.discount_price || item.price || 0);
-            return sum + (price * (item.quantity || 1));
-        }, 0);
-
-        // Get discount from coupon manager if available
-        const discount = window.couponsManager?.discount || 0;
-        const subtotalAfterDiscount = subtotal - discount;
-        const shipping = subtotalAfterDiscount >= 150 ? 0 : 15;
-        const finalTotal = subtotalAfterDiscount + shipping;
+        const t = this.getTotals();
+        const subtotalAfterCoupon = t.subtotal - t.couponDiscount;
+        const maxPointsSoles = subtotalAfterCoupon * 0.2;
+        const maxPointsToUse = Math.min(this.loyaltyPointsAvailable, Math.floor(maxPointsSoles * 100));
 
         this.orderSummary.innerHTML = `
             <div class="summary-card">
                 <h3>RESUMEN DEL PEDIDO</h3>
                 <div class="summary-items">
                     ${this.cart.map(item => {
-            const price = parseFloat(item.discount_price || item.price || 0);
-            const quantity = item.quantity || 1;
-            const itemTotal = price * quantity;
-            return `
+                        const price = parseFloat(item.discount_price || item.price || 0);
+                        const q = item.quantity || 1;
+                        return `
                         <div class="summary-item">
-                            <img src="${item.image_url || item.image || 'assets/images/products/placeholder.jpg'}" 
-                                 alt="${item.name}" 
-                                 onerror="this.src='assets/images/products/placeholder.jpg'">
+                            <img src="${item.image_url || item.image || 'assets/images/products/placeholder.jpg'}" alt="${item.name}" onerror="this.src='assets/images/products/placeholder.jpg'">
                             <div>
                                 <h4>${item.name}</h4>
-                                <p>x${quantity} - S/ ${itemTotal.toFixed(2)}</p>
+                                <p>x${q} - S/ ${(price * q).toFixed(2)}</p>
                                 ${item.size ? `<p style="font-size: 0.8rem; color: #666;">Talla: ${item.size}</p>` : ''}
                             </div>
-                        </div>
-                    `;
-        }).join('')}
+                        </div>`;
+                    }).join('')}
                 </div>
                 <div class="summary-totals">
-                    <div class="row"><span>Subtotal</span> <span>S/ ${subtotal.toFixed(2)}</span></div>
-                    ${discount > 0 ? `
-                    <div class="row" style="color: #4caf50;">
-                        <span>Descuento</span> 
-                        <span>-S/ ${discount.toFixed(2)}</span>
-                    </div>
-                    ` : ''}
-                    <div class="row"><span>Envío</span> <span>${shipping === 0 ? 'GRATIS' : 'S/ ' + shipping.toFixed(2)}</span></div>
-                    ${subtotalAfterDiscount < 150 ? `
+                    <div class="row"><span>Subtotal</span> <span>S/ ${t.subtotal.toFixed(2)}</span></div>
+                    ${t.couponDiscount > 0 ? `<div class="row" style="color: #4caf50;"><span>Descuento (cupón)</span> <span>-S/ ${t.couponDiscount.toFixed(2)}</span></div>` : ''}
+                    ${t.loyaltyDiscount > 0 ? `<div class="row" style="color: #4caf50;"><span>Descuento (puntos)</span> <span>-S/ ${t.loyaltyDiscount.toFixed(2)}</span></div>` : ''}
+                    <div class="row"><span>Envío</span> <span>${t.shipping === 0 ? 'GRATIS' : 'S/ ' + t.shipping.toFixed(2)}</span></div>
+                    ${(t.subtotal - t.couponDiscount - t.loyaltyDiscount) < 150 ? `
                     <div style="font-size: 0.85rem; color: #666; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #eee;">
-                        <i class="fas fa-info-circle"></i> Agrega S/ ${(150 - subtotalAfterDiscount).toFixed(2)} más para envío gratis
+                        <i class="fas fa-info-circle"></i> Agrega S/ ${(150 - (t.subtotal - t.couponDiscount - t.loyaltyDiscount)).toFixed(2)} más para envío gratis
                     </div>
                     ` : ''}
-                    <div class="row total"><span>TOTAL</span> <span>S/ ${finalTotal.toFixed(2)}</span></div>
+                    <div class="row total"><span>TOTAL</span> <span>S/ ${t.total.toFixed(2)}</span></div>
                 </div>
+                ${this.loyaltyPointsAvailable > 0 ? `
+                <div class="loyalty-checkout-block" style="margin-top: 1rem; padding-top: 1rem; border-top: 2px solid var(--black);">
+                    <h4 style="font-size: 0.9rem; margin-bottom: 0.5rem;"><i class="fas fa-coins"></i> Puntos (${this.loyaltyPointsAvailable} disponibles ≈ S/ ${(this.loyaltyPointsAvailable / 100).toFixed(2)})</h4>
+                    ${maxPointsToUse > 0 ? `
+                    <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                        <button type="button" class="btn btn-outline" style="font-size: 0.85rem; padding: 0.35rem 0.6rem;" onclick="checkoutManager.setLoyaltyMax()">Usar máx (${maxPointsToUse} pts)</button>
+                        ${t.loyaltyPointsEffective > 0 ? `<button type="button" class="btn btn-ghost" style="font-size: 0.85rem;" onclick="checkoutManager.setLoyaltyZero()">Quitar</button>` : ''}
+                        ${t.loyaltyPointsEffective > 0 ? `<span style="font-size: 0.9rem;">→ -S/ ${t.loyaltyDiscount.toFixed(2)}</span>` : ''}
+                    </div>
+                    ` : '<p style="font-size: 0.85rem; color: #666;">Máx 20% del subtotal con puntos. Aumenta tu compra para usar más.</p>'}
+                </div>
+                ` : ''}
                 ${window.couponsManager ? `
                 <div style="margin-top: 1rem; padding-top: 1rem; border-top: 2px solid var(--black);">
                     <div id="couponSection"></div>
@@ -649,14 +678,30 @@ class CheckoutManager {
             </div>
         `;
 
-        // Render coupon section if available
         if (window.couponsManager) {
-            setTimeout(() => {
-                if (window.couponsManager.renderCouponSection) {
-                    window.couponsManager.renderCouponSection('couponSection');
+            window.couponsManager.setCartContext(this.cart, t.subtotal);
+            const cup = document.getElementById('couponSection');
+            if (cup) {
+                if (window.couponsManager.renderCouponForm) {
+                    window.couponsManager.renderCouponForm('couponSection');
                 }
-            }, 100);
+            }
         }
+    }
+
+    setLoyaltyMax() {
+        const t = this.getTotals();
+        const sub = t.subtotal - t.couponDiscount;
+        const maxPts = Math.min(this.loyaltyPointsAvailable, Math.floor((sub * 0.2) * 100));
+        this.loyaltyPointsUsed = maxPts;
+        this.renderOrderSummary();
+        if (this.currentStep === 3) this.renderReview();
+    }
+
+    setLoyaltyZero() {
+        this.loyaltyPointsUsed = 0;
+        this.renderOrderSummary();
+        if (this.currentStep === 3) this.renderReview();
     }
 }
 

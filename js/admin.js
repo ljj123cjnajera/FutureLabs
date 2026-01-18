@@ -243,8 +243,9 @@ class AdminManager {
   }
 
   setupNavigation() {
-    document.querySelectorAll('.menu-item').forEach(item => {
-      item.addEventListener('click', () => {
+    document.querySelectorAll('.menu-item[data-section]').forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
         const section = item.dataset.section;
         this.showSection(section);
       });
@@ -252,17 +253,22 @@ class AdminManager {
   }
 
   showSection(section) {
+    if (!section) return;
+    var menuEl = document.querySelector(`[data-section="${section}"]`);
+    var contentEl = document.getElementById(section);
+    if (!menuEl || !contentEl) return;
+
     // Actualizar menú
     document.querySelectorAll('.menu-item').forEach(item => {
       item.classList.remove('active');
     });
-    document.querySelector(`[data-section="${section}"]`).classList.add('active');
+    menuEl.classList.add('active');
 
     // Actualizar contenido
     document.querySelectorAll('.section').forEach(sec => {
       sec.classList.remove('active');
     });
-    document.getElementById(section).classList.add('active');
+    contentEl.classList.add('active');
 
     // Actualizar título
     const titles = {

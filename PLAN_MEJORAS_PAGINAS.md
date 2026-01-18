@@ -78,9 +78,9 @@
 - [x] 404.html - ✅ Corregido (footer agregado)
 
 ### Páginas Admin
-- [ ] admin.html - ⚠️ Revisar
-- [ ] admin-login.html - ⚠️ Revisar
-- [ ] admin-coupons.html - ⚠️ Revisar
+- [x] admin.html - ✅ Revisado: notifications.css, enlace Cupones→admin-coupons, showSection con guards
+- [x] admin-login.html - ✅ Revisado: CSS reducido (auth-brutalist), scripts mínimos (logger, error-handler, loading-states, api, admin-login)
+- [x] admin-coupons.html - ✅ Revisado: fuentes al inicio, utils.js, CSS sin header/footer/autocomplete
 
 ### Otras
 - [ ] order-success.html - ⚠️ Revisar

@@ -6,14 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Cupones - Admin SneakersShop</title>
     <meta name="description" content="Panel de administración para gestionar cupones de descuento">
-    
-    <!-- CSS Core -->
-    <!-- PRIMARY SOURCE OF TRUTH - LOAD ORDER MATTERS -->
+
+    <!-- Fonts (antes de estilos que usan Koulen, Space Mono) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Koulen&family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- CSS Core - Admin (sin header/footer/autocomplete; layout propio) -->
     <link rel="stylesheet" href="css/typography.css?v=8.0-URGENT">
     <link rel="stylesheet" href="css/home-streetwear.css?v=8.0-URGENT">
-    <link rel="stylesheet" href="css/footer-brutalist.css?v=8.0-URGENT">
-    <link rel="stylesheet" href="css/autocomplete.css?v=8.0-URGENT">
-    <link rel="stylesheet" href="css/header-v3.css?v=8.0-URGENT">
     <link rel="stylesheet" href="css/admin.css?v=8.0-URGENT">
     <link rel="stylesheet" href="css/notifications.css?v=8.0-URGENT">
     <link rel="stylesheet" href="css/animations.css?v=8.0-URGENT">
@@ -165,14 +167,6 @@
             cursor: pointer;
         }
     </style>
-
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Koulen&family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body>
@@ -286,17 +280,16 @@
         </div>
     </div>
 
-    <!-- Scripts -->
-    <!-- Core scripts (critical for page functionality) -->
+    <!-- Scripts: orden estándar (utils para escapeHTML en admin-coupons) -->
     <script src="js/logger.js?v=1.0"></script>
     <script src="js/error-handler.js?v=1.0"></script>
     <script src="js/loading-states.js?v=1.0"></script>
+    <script src="js/utils.js?v=1.0"></script>
     <script src="js/api.js?v=8.0-CLEAN"></script>
     <script src="js/components.js?v=8.0-CLEAN"></script>
     <script src="js/navigation-enhanced.js?v=8.0-CLEAN"></script>
     <script src="js/auth.js?v=8.0-CLEAN"></script>
     <script src="js/notifications.js?v=8.0-CLEAN"></script>
-    <!-- Page-specific script -->
     <script src="js/admin-coupons.js?v=8.0-CLEAN"></script>
     <script>
         // Init logic for admin

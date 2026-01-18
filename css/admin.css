@@ -161,6 +161,12 @@ h6 {
     width: 0;
 }
 
+/* Enlaces en el menú (ej. Cupones -> admin-coupons.html) */
+a.menu-item {
+    text-decoration: none;
+    color: inherit;
+}
+
 .menu-item i {
     width: 20px;
     text-align: center;
