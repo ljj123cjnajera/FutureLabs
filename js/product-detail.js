@@ -113,25 +113,46 @@ document.addEventListener('DOMContentLoaded', async function () {
                     window.LoadingStates.hide('productDetailContainer');
                 }
 
-                // Normalizar imágenes
+                // Normalizar y validar imágenes
                 let galleryImages = [];
+                
+                // Helper para validar URL de imagen
+                const isValidImageUrl = (url) => {
+                    if (!url || typeof url !== 'string') return false;
+                    const trimmed = url.trim();
+                    return trimmed !== '' && 
+                           !trimmed.includes('undefined') && 
+                           !trimmed.includes('null') &&
+                           (trimmed.startsWith('http') || trimmed.startsWith('/') || trimmed.startsWith('assets/') || trimmed.startsWith('data:'));
+                };
+                
+                // 1. Intentar usar product.images como array
                 if (Array.isArray(product.images) && product.images.length > 0) {
-                    galleryImages = product.images;
-                } else if (product.images && typeof product.images === 'string') {
+                    galleryImages = product.images.filter(isValidImageUrl);
+                } 
+                // 2. Intentar parsear product.images como JSON string
+                else if (product.images && typeof product.images === 'string') {
                     try {
                         const parsed = JSON.parse(product.images);
                         if (Array.isArray(parsed)) {
-                            galleryImages = parsed.filter(img => img && img.trim() !== '');
+                            galleryImages = parsed.filter(isValidImageUrl);
+                        } else if (isValidImageUrl(parsed)) {
+                            galleryImages = [parsed];
                         }
                     } catch (e) {
-                        // Si no es JSON válido, usar image_url
+                        // Si no es JSON válido, verificar si es una URL válida directa
+                        if (isValidImageUrl(product.images)) {
+                            galleryImages = [product.images];
+                        }
                     }
                 }
                 
-                if (galleryImages.length === 0 && product.image_url) {
+                // 3. Fallback a image_url
+                if (galleryImages.length === 0 && isValidImageUrl(product.image_url)) {
                     galleryImages = [product.image_url];
                 }
                 
+                // 4. Fallback final a placeholder
                 if (galleryImages.length === 0) {
                     galleryImages = ['assets/images/products/placeholder.jpg'];
                 }
