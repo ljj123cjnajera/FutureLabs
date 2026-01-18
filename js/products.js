@@ -399,36 +399,20 @@ class CatalogEngine {
                 const svgPlaceholder = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Crect fill='%23e5e7eb' width='400' height='400'/%3E%3Ctext fill='%236b7280' font-family='system-ui, -apple-system, sans-serif' font-size='28' font-weight='900' x='50%25' y='45%25' text-anchor='middle'%3ESNEAKERS%3C/text%3E%3Ctext fill='%236b7280' font-family='system-ui, -apple-system, sans-serif' font-size='28' font-weight='900' x='50%25' y='60%25' text-anchor='middle'%3ESHOP%3C/text%3E%3C/svg%3E";
                 
                 const cardsHTML = products.map(p => {
-                // Normalize image URL - validate before using
+                // Normalize image URL using shared utility
                 let imageUrl = svgPlaceholder;
-                if (p.image_url && 
-                    p.image_url.trim() !== '' && 
-                    !p.image_url.includes('undefined') &&
-                    !p.image_url.includes('null') &&
-                    (p.image_url.startsWith('http') || p.image_url.startsWith('/') || p.image_url.startsWith('assets/'))) {
-                    imageUrl = p.image_url;
-                } else if (Array.isArray(p.images) && p.images.length > 0 && p.images[0]) {
-                    const firstImg = p.images[0];
-                    if (firstImg && firstImg.trim() !== '' && !firstImg.includes('undefined')) {
-                        imageUrl = firstImg;
-                    }
-                } else if (typeof p.images === 'string') {
-                    try {
-                        const parsed = JSON.parse(p.images);
-                        if (Array.isArray(parsed) && parsed.length > 0 && parsed[0]) {
-                            const parsedImg = parsed[0];
-                            if (parsedImg && parsedImg.trim() !== '' && !parsedImg.includes('undefined')) {
-                                imageUrl = parsedImg;
-                            }
-                        }
-                    } catch (e) {
-                        // Not valid JSON, use placeholder
+                
+                // Try to get valid image from product images array
+                if (p.images && window.Utils?.normalizeImageUrls) {
+                    const normalizedImages = window.Utils.normalizeImageUrls(p.images, '');
+                    if (normalizedImages.length > 0) {
+                        imageUrl = normalizedImages[0];
                     }
                 }
                 
-                // Always use placeholder if image URL is invalid
-                if (!imageUrl || imageUrl === '' || imageUrl.includes('undefined') || imageUrl.includes('null')) {
-                    imageUrl = svgPlaceholder;
+                // Fallback to image_url if no valid images found
+                if (imageUrl === svgPlaceholder && p.image_url && window.Utils?.isValidImageUrl?.(p.image_url)) {
+                    imageUrl = p.image_url;
                 }
                 
                 return `
