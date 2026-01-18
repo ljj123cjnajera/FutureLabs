@@ -35,24 +35,43 @@ class AdminCoupons {
             return;
         }
 
-        tbody.innerHTML = this.coupons.map(coupon => `
+        // Usar escapeHTML para prevenir XSS
+        const escapeHtml = window.Utils?.escapeHTML || ((text) => {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        });
+
+        tbody.innerHTML = this.coupons.map(coupon => {
+            const couponId = escapeHtml(coupon.id || '');
+            const couponCode = escapeHtml(coupon.code || 'N/A');
+            const couponValue = parseFloat(coupon.value || 0);
+            const couponType = coupon.type === 'percentage' ? 'Porcentaje' : 'Monto Fijo';
+            const displayValue = coupon.type === 'percentage' ? `${couponValue}%` : `S/ ${couponValue.toFixed(2)}`;
+            const expiresAt = coupon.expires_at ? new Date(coupon.expires_at).toLocaleDateString('es-PE') : 'Sin expiración';
+            const usageCount = parseInt(coupon.usage_count || 0);
+            const maxUses = coupon.max_uses || '∞';
+            const minPurchase = coupon.min_purchase_amount ? `S/ ${parseFloat(coupon.min_purchase_amount).toFixed(2)}` : '-';
+
+            return `
             <tr>
-                <td><span class="badge badge-info">${coupon.code}</span></td>
-                <td>${coupon.type === 'percentage' ? coupon.value + '%' : 'S/ ' + parseFloat(coupon.value).toFixed(2)}</td>
-                <td>${coupon.type === 'percentage' ? 'Porcentaje' : 'Monto Fijo'}</td>
-                <td>${coupon.expires_at ? new Date(coupon.expires_at).toLocaleDateString() : 'Sin expiración'}</td>
-                <td>${coupon.usage_count} / ${coupon.max_uses || '∞'}</td>
-                <td>${coupon.min_purchase_amount ? 'S/ ' + parseFloat(coupon.min_purchase_amount).toFixed(2) : '-'}</td>
+                <td><span class="badge badge-info">${couponCode}</span></td>
+                <td>${displayValue}</td>
+                <td>${couponType}</td>
+                <td>${expiresAt}</td>
+                <td>${usageCount} / ${maxUses}</td>
+                <td>${minPurchase}</td>
                 <td>
-                    <button class="btn-action btn-edit" onclick="window.adminCoupons.openModal('${coupon.id}')">
+                    <button class="btn-action btn-edit" onclick="window.adminCoupons.openModal('${couponId}')">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn-action btn-delete" onclick="window.adminCoupons.deleteCoupon('${coupon.id}')">
+                    <button class="btn-action btn-delete" onclick="window.adminCoupons.deleteCoupon('${couponId}')">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
             </tr>
-        `).join('');
+        `;
+        }).join('');
     }
 
     renderEmpty() {

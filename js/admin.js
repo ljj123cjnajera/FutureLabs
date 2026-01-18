@@ -572,12 +572,28 @@ class AdminManager {
     try {
       const response = await window.api.getCategories();
 
-      if (response.success) {
-        const categories = response.data.categories;
+      if (response.success && response.data) {
+        const categories = response.data.categories || [];
         const select = document.getElementById('productCategory');
+        
+        if (!select) {
+          if (window.Logger) window.Logger.warn('productCategory select no encontrado');
+          return;
+        }
+
+        // Usar escapeHTML para prevenir XSS
+        const escapeHtml = window.Utils?.escapeHTML || ((text) => {
+          const div = document.createElement('div');
+          div.textContent = text;
+          return div.innerHTML;
+        });
 
         select.innerHTML = '<option value="">Seleccionar...</option>' +
-          categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
+          categories.map(cat => {
+            const catId = escapeHtml(cat.id || '');
+            const catName = escapeHtml(cat.name || 'Sin nombre');
+            return `<option value="${catId}">${catName}</option>`;
+          }).join('');
       }
     } catch (error) {
       if (window.Logger) window.Logger.error('Error loading categories for modal:', error);

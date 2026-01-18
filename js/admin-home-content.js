@@ -589,6 +589,13 @@ class AdminHomeContent {
       return;
     }
 
+    // Usar escapeHTML para prevenir XSS
+    const escapeHtml = window.Utils?.escapeHTML || ((text) => {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    });
+
     container.innerHTML = `
       <table>
         <thead>
@@ -601,20 +608,28 @@ class AdminHomeContent {
           </tr>
         </thead>
         <tbody>
-          ${benefits.map(benefit => `
+          ${benefits.map(benefit => {
+            const benefitId = escapeHtml(benefit.id || '');
+            const benefitTitle = escapeHtml(benefit.title || 'Sin título');
+            const benefitIcon = escapeHtml(benefit.icon || '');
+            const orderIndex = parseInt(benefit.order_index || 0);
+            const isActive = benefit.is_active ? '<span style="color: green;">Activo</span>' : '<span style="color: red;">Inactivo</span>';
+            
+            return `
             <tr>
-              <td>${benefit.order_index || 0}</td>
-              <td>${benefit.title}</td>
+              <td>${orderIndex}</td>
+              <td>${benefitTitle}</td>
               <td>
-                ${benefit.icon ? `<i class="${benefit.icon}"></i>` : '-'}
+                ${benefitIcon ? `<i class="${benefitIcon}"></i>` : '-'}
               </td>
-              <td>${benefit.is_active ? '<span style="color: green;">Activo</span>' : '<span style="color: red;">Inactivo</span>'}</td>
+              <td>${isActive}</td>
               <td>
-                <button class="btn-small" onclick="adminHomeContent.editBenefit('${benefit.id}')">Editar</button>
-                <button class="btn-small btn-danger" onclick="adminHomeContent.deleteBenefit('${benefit.id}')">Eliminar</button>
+                <button class="btn-small" onclick="window.adminHomeContent?.editBenefit('${benefitId}')">Editar</button>
+                <button class="btn-small btn-danger" onclick="window.adminHomeContent?.deleteBenefit('${benefitId}')">Eliminar</button>
               </td>
             </tr>
-          `).join('')}
+          `;
+          }).join('')}
         </tbody>
       </table>
     `;

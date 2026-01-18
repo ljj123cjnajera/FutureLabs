@@ -708,21 +708,44 @@ class AdminCRUD {
     }
 
     try {
+      // Validar campos requeridos
+      const nameInput = document.getElementById('productName');
+      const priceInput = document.getElementById('productPrice');
+      const stockInput = document.getElementById('productStock');
+      const categoryInput = document.getElementById('productCategory');
+      const brandInput = document.getElementById('productBrand');
+
+      if (!nameInput || !nameInput.value.trim()) {
+        throw new Error('El nombre del producto es requerido');
+      }
+      if (!priceInput || !priceInput.value || parseFloat(priceInput.value) <= 0) {
+        throw new Error('El precio debe ser mayor a 0');
+      }
+      if (!stockInput || !stockInput.value || parseInt(stockInput.value) < 0) {
+        throw new Error('El stock debe ser mayor o igual a 0');
+      }
+      if (!categoryInput || !categoryInput.value) {
+        throw new Error('Debes seleccionar una categoría');
+      }
+      if (!brandInput || !brandInput.value.trim()) {
+        throw new Error('La marca es requerida');
+      }
+
       // 1. Collect Data
       const data = {
-        name: document.getElementById('productName').value,
-        slug: document.getElementById('productSlug').value,
-        description: document.getElementById('productDescription').value,
-        price: parseFloat(document.getElementById('productPrice').value),
-        discount_price: document.getElementById('productDiscountPrice').value ? parseFloat(document.getElementById('productDiscountPrice').value) : null,
-        stock_quantity: parseInt(document.getElementById('productStock').value),
-        category_id: document.getElementById('productCategory').value,
-        brand: document.getElementById('productBrand').value,
-        sku: document.getElementById('productSKU').value,
-        image_url: document.getElementById('productImage').value,
-        weight: document.getElementById('productWeight') ? parseFloat(document.getElementById('productWeight').value) : null,
-        dimensions: document.getElementById('productDimensions') ? document.getElementById('productDimensions').value : null,
-        is_active: document.getElementById('productIsActive').checked,
+        name: nameInput.value.trim(),
+        slug: document.getElementById('productSlug').value.trim(),
+        description: document.getElementById('productDescription')?.value?.trim() || '',
+        price: parseFloat(priceInput.value),
+        discount_price: document.getElementById('productDiscountPrice')?.value ? parseFloat(document.getElementById('productDiscountPrice').value) : null,
+        stock_quantity: parseInt(stockInput.value),
+        category_id: categoryInput.value,
+        brand: brandInput.value.trim(),
+        sku: document.getElementById('productSKU')?.value?.trim() || null,
+        image_url: document.getElementById('productImage')?.value?.trim() || null,
+        weight: document.getElementById('productWeight')?.value ? parseFloat(document.getElementById('productWeight').value) : null,
+        dimensions: document.getElementById('productDimensions')?.value?.trim() || null,
+        is_active: document.getElementById('productIsActive')?.checked ?? true,
         featured: document.getElementById('productFeatured')?.checked || false,
         is_new: document.getElementById('productIsNew')?.checked || false,
         is_trending: document.getElementById('productIsTrending')?.checked || false,
@@ -774,15 +797,32 @@ class AdminCRUD {
   async saveCategory() {
     if (this.isLoading) return;
     this.isLoading = true;
-    const form = document.getElementById('categoryForm');
+    
+    const submitBtn = document.querySelector('#categoryForm button[type="submit"]');
+    const originalBtnText = submitBtn ? submitBtn.innerHTML : 'Guardar';
+    if (submitBtn) {
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+      submitBtn.disabled = true;
+    }
 
     try {
+      // Validar campos requeridos
+      const nameInput = document.getElementById('categoryName');
+      const slugInput = document.getElementById('categorySlug');
+
+      if (!nameInput || !nameInput.value.trim()) {
+        throw new Error('El nombre de la categoría es requerido');
+      }
+      if (!slugInput || !slugInput.value.trim()) {
+        throw new Error('El slug de la categoría es requerido');
+      }
+
       const data = {
-        name: document.getElementById('categoryName').value,
-        slug: document.getElementById('categorySlug').value,
-        description: document.getElementById('categoryDescription').value,
-        image_url: document.getElementById('categoryImage').value,
-        is_active: document.getElementById('categoryIsActive').checked
+        name: nameInput.value.trim(),
+        slug: slugInput.value.trim(),
+        description: document.getElementById('categoryDescription')?.value?.trim() || '',
+        image_url: document.getElementById('categoryImage')?.value?.trim() || null,
+        is_active: document.getElementById('categoryIsActive')?.checked ?? true
       };
 
       const endpoint = this.currentEditId ? `/admin/categories/${this.currentEditId}` : '/admin/categories';
@@ -798,9 +838,14 @@ class AdminCRUD {
         throw new Error(response.message || 'Error al guardar categoría');
       }
     } catch (error) {
-      window.notifications?.error(error.message);
+      if (window.Logger) window.Logger.error('Save Category Error:', error);
+      window.notifications?.error(error.message || 'Error al guardar categoría');
     } finally {
       this.isLoading = false;
+      if (submitBtn) {
+        submitBtn.innerHTML = originalBtnText;
+        submitBtn.disabled = false;
+      }
     }
   }
 
