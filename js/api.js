@@ -180,7 +180,6 @@ class SneakersAPI {
           throw netError;
         }
 
-        // console.log('📥 Response status:', response.status);
 
         const parseResponse = async (resp) => {
           let data = {};

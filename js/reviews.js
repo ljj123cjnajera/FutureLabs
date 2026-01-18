@@ -557,6 +557,11 @@ class ReviewsManager {
   }
 
   escapeHTML(value) {
+    // Usar utilidad centralizada para escapar HTML
+    if (window.Utils && window.Utils.escapeHTML) {
+      return window.Utils.escapeHTML(value);
+    }
+    // Fallback si Utils no está disponible
     if (!value) return '';
     return value.replace(/[&<>"']/g, (char) => {
       const map = {

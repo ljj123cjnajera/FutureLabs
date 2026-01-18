@@ -339,6 +339,11 @@ class ChatWidget {
     }
 
     escapeHtml(text) {
+        // Usar utilidad centralizada para escapar HTML
+        if (window.Utils && window.Utils.escapeHTML) {
+            return window.Utils.escapeHTML(text);
+        }
+        // Fallback si Utils no está disponible
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
