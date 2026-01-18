@@ -21,6 +21,22 @@ class CheckoutManager {
     async init() {
         if (window.Logger) window.Logger.log('💳 CheckoutManager V2 Starting...');
 
+        // 0. Initialize UI Components (Header/Footer)
+        if (window.Components) {
+            const headerContainer = document.getElementById('mainHeader');
+            if (headerContainer) {
+                // Use simplified=true for header to keep checkout clean but consistent
+                headerContainer.innerHTML = window.Components.getHeader(true, true);
+                if (window.Components.initHeader) window.Components.initHeader();
+                if (window.Components.initSearch) window.Components.initSearch();
+            }
+
+            const footerContainer = document.getElementById('mainFooter');
+            if (footerContainer) {
+                footerContainer.innerHTML = window.Components.getFooter();
+            }
+        }
+
         // 1. Auth Guard - REMOVED for Guest Checkout
         // if (!window.authManager || !window.authManager.isAuthenticated()) {
         //     window.location.href = 'login.html?returnUrl=checkout.html';
