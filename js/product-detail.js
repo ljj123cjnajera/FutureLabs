@@ -1,11 +1,5 @@
 // Inicializar header dinámico y cargar producto
 document.addEventListener('DOMContentLoaded', async function () {
-    console.log("🚀 SNEAKERS SHOP: Product Detail Script v9.0-NUCLEAR Loaded");
-    console.log("🔍 Checking for legacy conflicts...", {
-        oldSelectSize: window.selectSize,
-        currentProductId: window.currentProductId,
-        domGrid: document.getElementById('sizeSelectorGrid')
-    });
     // Esperar a que componentes críticos estén disponibles
     let retries = 0;
     while ((!window.Components || !window.api) && retries < 30) {
@@ -447,20 +441,16 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     // Agregar al carrito - Asegurar que esté disponible globalmente
     window.addToCart = async function () {
-        console.log("🛒 [DEBUG] addToCart ENTERED");
         if (window.Logger) window.Logger.log('🛒 addToCart llamado');
 
         const product = window.currentProduct;
         if (!product) {
-            console.error("❌ [DEBUG] No product in window.currentProduct");
             if (window.Logger) window.Logger.error('❌ Producto no disponible en window.currentProduct');
             if (window.notifications) {
                 window.notifications.error('Error', 'Producto no disponible');
             }
             return;
         }
-
-        console.log("✅ [DEBUG] Product found:", product);
 
         if (window.Logger) window.Logger.log('✅ Producto encontrado:', product.id || product.product_id);
 
@@ -483,7 +473,6 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         // Obtener talla seleccionada (puede ser local o global)
         const currentSelectedSize = window.selectedSize || null;
-        console.log("📏 [DEBUG] Selected Size:", currentSelectedSize);
 
         // VALIDACIÓN DE TALLA
         if (!currentSelectedSize) {
@@ -585,14 +574,12 @@ document.addEventListener('DOMContentLoaded', async function () {
                 // Error manejado en cartEngine.add()
                 // Restaurar botón inmediatamente
             } else {
-                console.warn('⚠️ cart.add returned unexpected result:', success);
                 // Caso inesperado
                 if (window.notifications) {
                     window.notifications.warning('Error', 'No se pudo agregar el producto al carrito.');
                 }
             }
         } catch (e) {
-            console.error('❌ CRITICAL ERROR in addToCart:', e);
             if (window.Logger) window.Logger.error('Error adding to cart:', e);
             if (window.notifications) {
                 const errorMsg = e.message || 'No se pudo agregar el producto. Por favor, intenta de nuevo.';
