@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     // Inicializar selectedSize global
     window.selectedSize = null;
-    let selectedSize = null;
+    // let selectedSize = null; // Variable removed to prioritize window.selectedSize
 
     // Cargar producto
     async function loadProduct() {
@@ -375,45 +375,13 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     }
 
-    function renderSizeSelector(product) {
-        const grid = document.getElementById('sizeSelectorGrid');
-        if (!grid) return;
-
-        // Common US sizes for sneakers
-        const sizes = ['6', '6.5', '7', '7.5', '8', '8.5', '9', '9.5', '10', '10.5', '11', '11.5', '12', '12.5', '13'];
-
-        grid.innerHTML = sizes.map(size => {
-            const stock = window.productSizeStock && window.productSizeStock[size] !== undefined
-                ? window.productSizeStock[size]
-                : (product.stock_quantity || 0);
-            const isAvailable = stock > 0;
-            const isLowStock = stock > 0 && stock <= 3;
-
-            return `
-                <button 
-                    class="size-option ${!isAvailable ? 'out-of-stock' : ''} ${isLowStock ? 'low-stock' : ''}" 
-                    data-size="${size}"
-                    ${!isAvailable ? 'disabled' : ''}
-                    type="button"
-                    onclick="window.selectSize('${size}')"
-                >
-                    ${size}
-                    ${isLowStock ? '<span class="stock-badge">¡Últimas!</span>' : ''}
-                </button>
-            `;
-        }).join('');
-
-        // Nuclear Fix: Force explicit onclick assignment if needed, although inline attribute handles it
-        // We leave this empty or for logging, as we moved logic to inline onclick
-    }
-
-    // Expose explicitly to window scope before usage
+    // --- 4. GLOBAL HELPER FUNCTIONS (Refactored to Top Level) ---
     window.selectSize = selectSize;
 
     function selectSize(size) {
         // Update variables
-        selectedSize = size;
         window.selectedSize = size;
+        // selectedSize = size; // Remove local reference
 
         // Update UI logic - Force reflow and strict class adding
         const allBtns = document.querySelectorAll('.size-option');
@@ -422,6 +390,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             btn.classList.remove('selected');
             btn.style.background = ''; // Clear inline styles if any
             btn.style.color = '';
+            btn.style.borderColor = '';
 
             // Add to target
             if (btn.dataset.size === size) {
@@ -440,7 +409,34 @@ document.addEventListener('DOMContentLoaded', async function () {
         if (window.Logger) window.Logger.log('📏 Talla seleccionada (Global):', size);
     }
 
-    window.selectSize = selectSize;
+    function renderSizeSelector(product) {
+        const grid = document.getElementById('sizeSelectorGrid');
+        if (!grid) return;
+
+        // Common US sizes for sneakers
+        const sizes = ['6', '6.5', '7', '7.5', '8', '8.5', '9', '9.5', '10', '10.5', '11', '11.5', '12', '12.5', '13'];
+
+        grid.innerHTML = sizes.map(size => {
+            const stock = window.productSizeStock && window.productSizeStock[size] !== undefined
+                ? window.productSizeStock[size]
+                : (product.stock_quantity || 0);
+            const isAvailable = stock > 0;
+            const isLowStock = stock > 0 && stock <= 3;
+
+            return `
+            <button 
+                class="size-option ${!isAvailable ? 'out-of-stock' : ''} ${isLowStock ? 'low-stock' : ''}" 
+                data-size="${size}"
+                ${!isAvailable ? 'disabled' : ''}
+                type="button"
+                onclick="window.selectSize('${size}')"
+            >
+                ${size}
+                ${isLowStock ? '<span class="stock-badge">¡Últimas!</span>' : ''}
+            </button>
+        `;
+        }).join('');
+    }
 
     // Agregar al carrito - Asegurar que esté disponible globalmente
     window.addToCart = async function () {
