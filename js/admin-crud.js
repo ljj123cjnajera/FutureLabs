@@ -884,23 +884,53 @@ class AdminCRUD {
   async saveReview() {
     if (this.isLoading) return;
     this.isLoading = true;
+
+    const submitBtn = document.querySelector('#reviewForm button[type="submit"]');
+    const originalBtnText = submitBtn ? submitBtn.innerHTML : 'Guardar';
+    if (submitBtn) {
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+      submitBtn.disabled = true;
+    }
+
     try {
+      // Validar campos requeridos
+      const ratingInput = document.getElementById('reviewRating');
+      const isApprovedInput = document.getElementById('reviewIsApproved');
+
+      if (!ratingInput || !ratingInput.value) {
+        throw new Error('El rating es requerido');
+      }
+
+      const rating = parseInt(ratingInput.value);
+      if (isNaN(rating) || rating < 1 || rating > 5) {
+        throw new Error('El rating debe ser un número entre 1 y 5');
+      }
+
       const data = {
-        rating: parseInt(document.getElementById('reviewRating').value),
-        title: document.getElementById('reviewTitle').value,
-        comment: document.getElementById('reviewComment').value,
-        status: document.getElementById('reviewStatus').value
+        rating: rating,
+        title: document.getElementById('reviewTitle')?.value?.trim() || null,
+        comment: document.getElementById('reviewComment')?.value?.trim() || null,
+        is_approved: isApprovedInput?.checked || false
       };
+
       const response = await window.api.request(`/admin/reviews/${this.currentEditId}`, { method: 'PUT', body: JSON.stringify(data) });
       if (response.success) {
         window.notifications?.success('Reseña actualizada');
         this.closeModal(document.getElementById('reviewModal'));
         if (window.adminManager) window.adminManager.loadReviews();
       } else {
-        throw new Error(response.message);
+        throw new Error(response.message || 'Error al guardar reseña');
       }
-    } catch (e) { window.notifications?.error(e.message); }
-    finally { this.isLoading = false; }
+    } catch (error) {
+      if (window.Logger) window.Logger.error('Save Review Error:', error);
+      window.notifications?.error(error.message || 'Error al guardar reseña');
+    } finally {
+      this.isLoading = false;
+      if (submitBtn) {
+        submitBtn.innerHTML = originalBtnText;
+        submitBtn.disabled = false;
+      }
+    }
   }
 
   // ===== PRODUCTS =====

@@ -867,24 +867,46 @@ class AdminManager {
           return;
         }
 
-        tbody.innerHTML = reviews.map(review => `
+        // Usar escapeHTML para prevenir XSS
+        const escapeHtml = (text) => {
+          if (window.Utils && window.Utils.escapeHTML) {
+            return window.Utils.escapeHTML(text);
+          }
+          const div = document.createElement('div');
+          div.textContent = text;
+          return div.innerHTML;
+        };
+
+        tbody.innerHTML = reviews.map(review => {
+          const reviewId = escapeHtml(review.id || '');
+          const firstName = escapeHtml(review.first_name || '');
+          const lastName = escapeHtml(review.last_name || '');
+          const productName = escapeHtml(review.product_name || 'Sin producto');
+          const reviewTitle = escapeHtml(review.title || '-');
+          const rating = parseInt(review.rating || 0);
+          const ratingStars = '★'.repeat(Math.max(0, Math.min(5, rating))) + '☆'.repeat(Math.max(0, 5 - rating));
+          const isApproved = review.is_approved ? 'Sí' : 'No';
+          const reviewIdShort = review.id ? escapeHtml(review.id.substring(0, 8)) + '...' : 'N/A';
+
+          return `
               <tr>
-                <td>${review.id.substring(0, 8)}...</td>
-                <td>${review.first_name} ${review.last_name}</td>
-                <td>${review.product_name}</td>
-                <td>${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}</td>
-                <td>${review.title || '-'}</td>
-                <td><span class="badge badge-${review.is_approved ? 'success' : 'warning'}">${review.is_approved ? 'Sí' : 'No'}</span></td>
+                <td>${reviewIdShort}</td>
+                <td>${firstName} ${lastName}</td>
+                <td>${productName}</td>
+                <td>${ratingStars}</td>
+                <td>${reviewTitle}</td>
+                <td><span class="badge badge-${review.is_approved ? 'success' : 'warning'}">${isApproved}</span></td>
                 <td>
-                  <button class="btn-action btn-edit" onclick="window.editReview('${review.id}')">
+                  <button class="btn-action btn-edit" onclick="window.editReview('${reviewId}')">
                     <i class="fas fa-edit"></i>
                   </button>
-                  <button class="btn-action btn-delete" onclick="window.deleteReview('${review.id}')">
+                  <button class="btn-action btn-delete" onclick="window.deleteReview('${reviewId}')">
                     <i class="fas fa-trash"></i>
                   </button>
                 </td>
               </tr>
-            `).join('');
+            `;
+        }).join('');
 
         // Mostrar toast de éxito
         window.notifications?.success(`Se cargaron ${reviews.length} reseña${reviews.length !== 1 ? 's' : ''}`);
