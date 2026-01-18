@@ -870,7 +870,7 @@ class Components {
             <button class="product-quick-action" onclick="event.stopPropagation(); window.wishlistManager?.toggle('${product.id}')" title="Agregar a favoritos" aria-label="Agregar a favoritos">
               <i class="far fa-heart" aria-hidden="true"></i>
             </button>
-            <button class="product-quick-action" onclick="event.stopPropagation(); window.openQuickView?.('${product.id}') || window.quickView?.show('${product.id}')" title="Vista Rápida" aria-label="Vista rápida">
+            <button class="product-quick-action" onclick="event.stopPropagation(); window.location.href='product-detail.html?id=${product.id}'" title="Ver Detalles" aria-label="Ver detalles del producto">
               <i class="fas fa-eye" aria-hidden="true"></i>
             </button>
           </div>

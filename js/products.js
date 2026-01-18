@@ -206,15 +206,7 @@ class CatalogEngine {
             }
 
             // Call API with filters
-            if (window.Logger) window.Logger.log('📦 [CatalogEngine] Loading products with filters:', apiFilters);
-            
             const response = await this.api.getProducts(apiFilters);
-            
-            if (window.Logger) {
-                window.Logger.log('📦 [CatalogEngine] API Response:', response);
-                window.Logger.log('📦 [CatalogEngine] Response type:', typeof response);
-                window.Logger.log('📦 [CatalogEngine] Is Array:', Array.isArray(response));
-            }
             
             // Handle different response formats
             let products = [];
@@ -226,25 +218,21 @@ class CatalogEngine {
                 products = response;
                 total = response.length;
                 pages = Math.ceil(total / this.itemsPerPage);
-                if (window.Logger) window.Logger.log('✅ [CatalogEngine] Parsed as direct array');
             } else if (response && response.success === true && response.data) {
                 // Standard API response: { success: true, data: { products: [], total: X, pages: Y } }
                 products = response.data.products || response.data || [];
                 total = response.data.total !== undefined ? response.data.total : products.length;
                 pages = response.data.pages !== undefined ? response.data.pages : Math.ceil(total / this.itemsPerPage);
-                if (window.Logger) window.Logger.log('✅ [CatalogEngine] Parsed as success response with data');
             } else if (response && response.data) {
                 // Response with data but no success field
                 products = response.data.products || response.data || [];
                 total = response.data.total !== undefined ? response.data.total : products.length;
                 pages = response.data.pages !== undefined ? response.data.pages : Math.ceil(total / this.itemsPerPage);
-                if (window.Logger) window.Logger.log('✅ [CatalogEngine] Parsed as response with data');
             } else if (response && response.products) {
                 // Response with products array directly
                 products = response.products;
                 total = response.total !== undefined ? response.total : products.length;
                 pages = response.pages !== undefined ? response.pages : Math.ceil(total / this.itemsPerPage);
-                if (window.Logger) window.Logger.log('✅ [CatalogEngine] Parsed as response with products');
             } else if (response && response.success === false) {
                 // API returned an error
                 const errorMsg = response.message || 'Error al cargar productos';
@@ -257,7 +245,6 @@ class CatalogEngine {
                 total = 0;
             }
             
-            if (window.Logger) window.Logger.log(`📦 [CatalogEngine] Parsed ${products.length} products, total: ${total}, pages: ${pages}`);
 
             this.allProducts = products;
             this.filteredProducts = products;
@@ -352,11 +339,9 @@ class CatalogEngine {
             return;
         }
 
-        if (window.Logger) window.Logger.log(`📦 [CatalogEngine] Rendering ${products.length} products`);
 
         // Use LoadingStates for empty state
         if (products.length === 0) {
-            if (window.Logger) window.Logger.warn('⚠️ [CatalogEngine] No products to render');
             if (window.LoadingStates) {
                 window.LoadingStates.empty('productsContainer', {
                     title: 'No se encontraron productos',
@@ -410,9 +395,7 @@ class CatalogEngine {
                     container.innerHTML = cardsHTML;
                     // Add 'loaded' class to make grid visible (removes opacity: 0)
                     container.classList.add('loaded');
-                    if (window.Logger) window.Logger.log(`✅ [CatalogEngine] Rendered ${products.length} product cards`);
                 } else {
-                    if (window.Logger) window.Logger.error('⚠️ [CatalogEngine] No product cards generated!');
                     container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 4rem;">Error al renderizar productos</div>';
                     container.classList.add('loaded'); // Still make it visible even on error
                 }
@@ -490,15 +473,13 @@ class CatalogEngine {
                     container.innerHTML = cardsHTML;
                     // Add 'loaded' class to make grid visible (removes opacity: 0)
                     container.classList.add('loaded');
-                    if (window.Logger) window.Logger.log(`✅ [CatalogEngine] Rendered ${products.length} products (fallback)`);
                 } else {
-                    if (window.Logger) window.Logger.error('⚠️ [CatalogEngine] No fallback cards generated!');
                     container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 4rem;">Error al renderizar productos</div>';
                     container.classList.add('loaded'); // Still make it visible even on error
                 }
             }
         } catch (e) {
-            if (window.Logger) window.Logger.error('❌ [CatalogEngine] Error in render():', e);
+            if (window.Logger) window.Logger.error('Error en render():', e);
             if (container) {
                 container.innerHTML = `
                     <div style="grid-column: 1 / -1; text-align: center; padding: 4rem;">
@@ -899,20 +880,8 @@ class CatalogEngine {
             event.stopPropagation();
         }
         
-        // Find product to check stock
-        const product = this.allProducts.find(p => p.id === id || p.id === String(id));
-        if (product && (product.stock_quantity || 0) === 0) {
-            if (window.notifications) {
-                window.notifications.warning('Producto Agotado', 'Este producto no está disponible en este momento.');
-            }
-            return false;
-        }
-        
         // IMPORTANTE: Desde products.html no se puede agregar sin seleccionar talla
-        // Redirigir a product-detail.html para seleccionar talla
-        if (window.notifications) {
-            window.notifications.info('Selecciona una Talla', 'Redirigiendo a la página del producto para seleccionar talla...');
-        }
+        // Redirigir directamente a product-detail.html para seleccionar talla
         window.location.href = `product-detail.html?id=${id}`;
         return false;
     }
