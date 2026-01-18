@@ -174,13 +174,23 @@ class AdminCoupons {
     }
 }
 
-// Inicializar y exponer globalmente
-window.adminCoupons = new AdminCoupons();
-
-// Event Listener para el formulario
-document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('couponForm');
-    if (form) {
+// Inicializar cuando el DOM esté listo
+(function() {
+  function initAdminCoupons() {
+    if (!window.adminCoupons) {
+      window.adminCoupons = new AdminCoupons();
+      
+      // Event Listener para el formulario
+      const form = document.getElementById('couponForm');
+      if (form) {
         form.addEventListener('submit', (e) => window.adminCoupons.saveCoupon(e));
+      }
     }
-});
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAdminCoupons);
+  } else {
+    initAdminCoupons();
+  }
+})();

@@ -2,7 +2,7 @@
 class AdminHomeContent {
   constructor() {
     this.currentEditId = null;
-    this.init();
+    // No inicializar en el constructor - se inicializa después de que el DOM esté listo
   }
 
   init() {

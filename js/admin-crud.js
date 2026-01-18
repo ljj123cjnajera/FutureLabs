@@ -4,7 +4,7 @@ class AdminCRUD {
     this.currentEditId = null;
     this.isInitialized = false;
     this.isLoading = false; // Prevenir múltiples operaciones simultáneas
-    this.init();
+    // No inicializar en el constructor - se inicializa después de que el DOM esté listo
   }
 
   init() {
@@ -985,8 +985,21 @@ class AdminCRUD {
   // ... (Other entity methods truncated for brevity but preserved)
 }
 
-// Inicializar
-window.adminCRUD = new AdminCRUD();
+// Inicializar cuando el DOM esté listo
+(function() {
+  function initAdminCRUD() {
+    if (!window.adminCRUD) {
+      window.adminCRUD = new AdminCRUD();
+      window.adminCRUD.init();
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAdminCRUD);
+  } else {
+    initAdminCRUD();
+  }
+})();
 
 // Image Preview Logic (Moved from inline)
 window.previewProductImage = function (input) {
