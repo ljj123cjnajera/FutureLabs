@@ -223,40 +223,17 @@ class AdminCRUD {
           }
         });
 
-        // Mostrar loading overlay sin reemplazar el contenido completo
+        // MODERN CORE: Usar LoadingStates para overlay
         const modalContent = modal.querySelector('.modal-content');
         if (!modalContent) {
           throw new Error('Contenido del modal no encontrado');
-        }
-
-        // Remover cualquier overlay previo
-        const existingOverlay = document.getElementById('productModalLoading');
-        if (existingOverlay) {
-          existingOverlay.remove();
-        }
-
-        const loadingOverlay = document.createElement('div');
-        loadingOverlay.id = 'productModalLoading';
-        loadingOverlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; pointer-events: auto;';
-        loadingOverlay.innerHTML = '<div style="text-align: center;"><div class="loading-spinner"></div><p style="margin-top: 16px;">Cargando producto...</p></div>';
-
-        // Prevenir que clicks en el overlay cierren el modal
-        loadingOverlay.addEventListener('click', (e) => {
-          e.stopPropagation();
-          e.preventDefault();
-        });
-
-        // Asegurar que modal-content tenga position relative
-        const currentPosition = window.getComputedStyle(modalContent).position;
-        if (currentPosition === 'static') {
-          modalContent.style.position = 'relative';
         }
 
         // Abrir modal ANTES de agregar el overlay
         this.showModal(modal);
 
         // Pequeño delay para asegurar que el modal esté completamente renderizado
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise(resolve => setTimeout(resolve, 150));
 
         // Verificar que el modal sigue abierto
         if (modal.style.display !== 'flex') {
@@ -265,8 +242,39 @@ class AdminCRUD {
           return;
         }
 
-        // Agregar overlay después de que el modal esté visible
-        modalContent.appendChild(loadingOverlay);
+        // MODERN CORE: Mostrar loading overlay usando LoadingStates
+        let loadingOverlay = null;
+        if (window.LoadingStates) {
+          loadingOverlay = window.LoadingStates.show(modalContent, {
+            message: 'Cargando producto...',
+            type: 'spinner',
+            overlay: true
+          });
+          // Prevenir que clicks en el overlay cierren el modal
+          if (loadingOverlay) {
+            loadingOverlay.addEventListener('click', (e) => {
+              e.stopPropagation();
+              e.preventDefault();
+            });
+          }
+        } else {
+          // Fallback manual si LoadingStates no está disponible
+          const existingOverlay = document.getElementById('productModalLoading');
+          if (existingOverlay) existingOverlay.remove();
+          loadingOverlay = document.createElement('div');
+          loadingOverlay.id = 'productModalLoading';
+          loadingOverlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; pointer-events: auto;';
+          loadingOverlay.innerHTML = '<div style="text-align: center;"><div class="loading-spinner"></div><p style="margin-top: 16px;">Cargando producto...</p></div>';
+          loadingOverlay.addEventListener('click', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+          });
+          const currentPosition = window.getComputedStyle(modalContent).position;
+          if (currentPosition === 'static') {
+            modalContent.style.position = 'relative';
+          }
+          modalContent.appendChild(loadingOverlay);
+        }
 
         // Forzar que el modal permanezca visible durante la carga
         const keepModalOpen = () => {
@@ -288,9 +296,13 @@ class AdminCRUD {
           }
           if (window.Logger) window.Logger.log('✅ Producto cargado en modal');
 
-          // Remover loading overlay
-          const overlay = document.getElementById('productModalLoading');
-          if (overlay) overlay.remove();
+          // MODERN CORE: Remover loading overlay usando LoadingStates
+          if (window.LoadingStates) {
+            window.LoadingStates.hide(modalContent, false);
+          } else {
+            const overlay = document.getElementById('productModalLoading');
+            if (overlay) overlay.remove();
+          }
 
           clearInterval(modalCheckInterval);
         } catch (loadError) {
@@ -299,18 +311,30 @@ class AdminCRUD {
         }
       } catch (error) {
         if (window.Logger) window.Logger.error('Error loading product for edit:', error);
-        const overlay = document.getElementById('productModalLoading');
-        if (overlay) {
-          overlay.innerHTML = `
-            <div style="text-align:center; max-width: 280px; color:#ef4444;">
-              <i class="fas fa-exclamation-triangle" style="font-size:32px; margin-bottom:12px;"></i>
-              <p style="margin:0; font-weight:600;">No pudimos cargar el producto.</p>
-              <p style="margin-top:8px; font-size:13px; color:#b91c1c;">${error.message || 'Error desconocido'}</p>
-              <button class="btn-primary" style="margin-top:12px;" onclick="window.adminCRUD?.retryLoadProduct('${id}')">
-                <i class="fas fa-redo"></i> Reintentar
-              </button>
-            </div>
-          `;
+        
+        // MODERN CORE: Mostrar error usando LoadingStates
+        if (window.LoadingStates && modalContent) {
+          window.LoadingStates.error(modalContent, {
+            title: 'Error al cargar producto',
+            message: error.message || 'Error desconocido',
+            retryLabel: 'Reintentar',
+            retryCallback: `window.adminCRUD?.retryLoadProduct('${id}')`
+          });
+        } else {
+          // Fallback manual
+          const overlay = document.getElementById('productModalLoading');
+          if (overlay) {
+            overlay.innerHTML = `
+              <div style="text-align:center; max-width: 280px; color:#ef4444;">
+                <i class="fas fa-exclamation-triangle" style="font-size:32px; margin-bottom:12px;"></i>
+                <p style="margin:0; font-weight:600;">No pudimos cargar el producto.</p>
+                <p style="margin-top:8px; font-size:13px; color:#b91c1c;">${error.message || 'Error desconocido'}</p>
+                <button class="btn-primary" style="margin-top:12px;" onclick="window.adminCRUD?.retryLoadProduct('${id}')">
+                  <i class="fas fa-redo"></i> Reintentar
+                </button>
+              </div>
+            `;
+          }
         }
         if (window.Logger) window.Logger.error('Error stack:', error?.stack || error);
         window.notifications?.error('Error al cargar producto: ' + (error.message || 'Error desconocido'));
@@ -385,29 +409,42 @@ class AdminCRUD {
         this.currentEditId = id;
         document.getElementById('categoryModalTitle').textContent = 'Editar Categoría';
 
-        // Mostrar loading overlay sin reemplazar el contenido completo
+        // MODERN CORE: Usar LoadingStates para overlay
         const modalContent = modal.querySelector('.modal-content');
         if (!modalContent) {
           throw new Error('Contenido del modal no encontrado');
         }
 
-        const loadingOverlay = document.createElement('div');
-        loadingOverlay.id = 'categoryModalLoading';
-        loadingOverlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; pointer-events: auto;';
-        loadingOverlay.innerHTML = '<div style="text-align: center;"><div class="loading-spinner"></div><p style="margin-top: 16px;">Cargando categoría...</p></div>';
-
-        loadingOverlay.addEventListener('click', (e) => {
-          e.stopPropagation();
-        });
-
-        const currentPosition = window.getComputedStyle(modalContent).position;
-        if (currentPosition === 'static') {
-          modalContent.style.position = 'relative';
-        }
-
         this.showModal(modal);
         await new Promise(resolve => setTimeout(resolve, 150));
-        modalContent.appendChild(loadingOverlay);
+
+        // MODERN CORE: Mostrar loading overlay usando LoadingStates
+        if (window.LoadingStates) {
+          const overlay = window.LoadingStates.show(modalContent, {
+            message: 'Cargando categoría...',
+            type: 'spinner',
+            overlay: true
+          });
+          if (overlay) {
+            overlay.addEventListener('click', (e) => {
+              e.stopPropagation();
+            });
+          }
+        } else {
+          // Fallback manual
+          const loadingOverlay = document.createElement('div');
+          loadingOverlay.id = 'categoryModalLoading';
+          loadingOverlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; pointer-events: auto;';
+          loadingOverlay.innerHTML = '<div style="text-align: center;"><div class="loading-spinner"></div><p style="margin-top: 16px;">Cargando categoría...</p></div>';
+          loadingOverlay.addEventListener('click', (e) => {
+            e.stopPropagation();
+          });
+          const currentPosition = window.getComputedStyle(modalContent).position;
+          if (currentPosition === 'static') {
+            modalContent.style.position = 'relative';
+          }
+          modalContent.appendChild(loadingOverlay);
+        }
 
         if (modal.style.display !== 'flex') {
           if (window.Logger) window.Logger.warn('Modal se cerró antes de cargar datos');
@@ -421,9 +458,13 @@ class AdminCRUD {
           return;
         }
 
-        // Remover loading overlay
-        const overlay = document.getElementById('categoryModalLoading');
-        if (overlay) overlay.remove();
+        // MODERN CORE: Remover loading overlay usando LoadingStates
+        if (window.LoadingStates) {
+          window.LoadingStates.hide(modalContent, false);
+        } else {
+          const overlay = document.getElementById('categoryModalLoading');
+          if (overlay) overlay.remove();
+        }
       } catch (error) {
         if (window.Logger) window.Logger.error('Error loading category for edit:', error);
         const overlay = document.getElementById('categoryModalLoading');
@@ -473,29 +514,42 @@ class AdminCRUD {
         this.currentEditId = id;
         document.getElementById('userModalTitle').textContent = 'Editar Usuario';
 
-        // Mostrar loading overlay sin reemplazar el contenido completo
+        // MODERN CORE: Usar LoadingStates para overlay
         const modalContent = modal.querySelector('.modal-content');
         if (!modalContent) {
           throw new Error('Contenido del modal no encontrado');
         }
 
-        const loadingOverlay = document.createElement('div');
-        loadingOverlay.id = 'userModalLoading';
-        loadingOverlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; pointer-events: auto;';
-        loadingOverlay.innerHTML = '<div style="text-align: center;"><div class="loading-spinner"></div><p style="margin-top: 16px;">Cargando usuario...</p></div>';
-
-        loadingOverlay.addEventListener('click', (e) => {
-          e.stopPropagation();
-        });
-
-        const currentPosition = window.getComputedStyle(modalContent).position;
-        if (currentPosition === 'static') {
-          modalContent.style.position = 'relative';
-        }
-
         this.showModal(modal);
         await new Promise(resolve => setTimeout(resolve, 150));
-        modalContent.appendChild(loadingOverlay);
+
+        // MODERN CORE: Mostrar loading overlay usando LoadingStates
+        if (window.LoadingStates) {
+          const overlay = window.LoadingStates.show(modalContent, {
+            message: 'Cargando usuario...',
+            type: 'spinner',
+            overlay: true
+          });
+          if (overlay) {
+            overlay.addEventListener('click', (e) => {
+              e.stopPropagation();
+            });
+          }
+        } else {
+          // Fallback manual
+          const loadingOverlay = document.createElement('div');
+          loadingOverlay.id = 'userModalLoading';
+          loadingOverlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; pointer-events: auto;';
+          loadingOverlay.innerHTML = '<div style="text-align: center;"><div class="loading-spinner"></div><p style="margin-top: 16px;">Cargando usuario...</p></div>';
+          loadingOverlay.addEventListener('click', (e) => {
+            e.stopPropagation();
+          });
+          const currentPosition = window.getComputedStyle(modalContent).position;
+          if (currentPosition === 'static') {
+            modalContent.style.position = 'relative';
+          }
+          modalContent.appendChild(loadingOverlay);
+        }
 
         if (modal.style.display !== 'flex') {
           if (window.Logger) window.Logger.warn('Modal se cerró antes de cargar datos');
@@ -509,13 +563,22 @@ class AdminCRUD {
           return;
         }
 
-        // Remover loading overlay
-        const overlay = document.getElementById('userModalLoading');
-        if (overlay) overlay.remove();
+        // MODERN CORE: Remover loading overlay usando LoadingStates
+        if (window.LoadingStates) {
+          window.LoadingStates.hide(modalContent, false);
+        } else {
+          const overlay = document.getElementById('userModalLoading');
+          if (overlay) overlay.remove();
+        }
       } catch (error) {
         if (window.Logger) window.Logger.error('Error loading user for edit:', error);
-        const overlay = document.getElementById('userModalLoading');
-        if (overlay) overlay.remove();
+        // MODERN CORE: Remover overlay en caso de error
+        if (window.LoadingStates) {
+          window.LoadingStates.hide(modalContent, false);
+        } else {
+          const overlay = document.getElementById('userModalLoading');
+          if (overlay) overlay.remove();
+        }
         this.hideModal(modal);
         window.notifications?.error('Error al cargar usuario: ' + (error.message || 'Error desconocido'));
       } finally {
@@ -542,29 +605,42 @@ class AdminCRUD {
         this.currentEditId = id;
         document.getElementById('reviewModalTitle').textContent = 'Editar Reseña';
 
-        // Mostrar loading overlay sin reemplazar el contenido completo
+        // MODERN CORE: Usar LoadingStates para overlay
         const modalContent = modal.querySelector('.modal-content');
         if (!modalContent) {
           throw new Error('Contenido del modal no encontrado');
         }
 
-        const loadingOverlay = document.createElement('div');
-        loadingOverlay.id = 'reviewModalLoading';
-        loadingOverlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; pointer-events: auto;';
-        loadingOverlay.innerHTML = '<div style="text-align: center;"><div class="loading-spinner"></div><p style="margin-top: 16px;">Cargando reseña...</p></div>';
-
-        loadingOverlay.addEventListener('click', (e) => {
-          e.stopPropagation();
-        });
-
-        const currentPosition = window.getComputedStyle(modalContent).position;
-        if (currentPosition === 'static') {
-          modalContent.style.position = 'relative';
-        }
-
         this.showModal(modal);
         await new Promise(resolve => setTimeout(resolve, 150));
-        modalContent.appendChild(loadingOverlay);
+
+        // MODERN CORE: Mostrar loading overlay usando LoadingStates
+        if (window.LoadingStates) {
+          const overlay = window.LoadingStates.show(modalContent, {
+            message: 'Cargando reseña...',
+            type: 'spinner',
+            overlay: true
+          });
+          if (overlay) {
+            overlay.addEventListener('click', (e) => {
+              e.stopPropagation();
+            });
+          }
+        } else {
+          // Fallback manual
+          const loadingOverlay = document.createElement('div');
+          loadingOverlay.id = 'reviewModalLoading';
+          loadingOverlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; pointer-events: auto;';
+          loadingOverlay.innerHTML = '<div style="text-align: center;"><div class="loading-spinner"></div><p style="margin-top: 16px;">Cargando reseña...</p></div>';
+          loadingOverlay.addEventListener('click', (e) => {
+            e.stopPropagation();
+          });
+          const currentPosition = window.getComputedStyle(modalContent).position;
+          if (currentPosition === 'static') {
+            modalContent.style.position = 'relative';
+          }
+          modalContent.appendChild(loadingOverlay);
+        }
 
         if (modal.style.display !== 'flex') {
           if (window.Logger) window.Logger.warn('Modal se cerró antes de cargar datos');
@@ -578,13 +654,22 @@ class AdminCRUD {
           return;
         }
 
-        // Remover loading overlay
-        const overlay = document.getElementById('reviewModalLoading');
-        if (overlay) overlay.remove();
+        // MODERN CORE: Remover loading overlay usando LoadingStates
+        if (window.LoadingStates) {
+          window.LoadingStates.hide(modalContent, false);
+        } else {
+          const overlay = document.getElementById('reviewModalLoading');
+          if (overlay) overlay.remove();
+        }
       } catch (error) {
         if (window.Logger) window.Logger.error('Error loading review for edit:', error);
-        const overlay = document.getElementById('reviewModalLoading');
-        if (overlay) overlay.remove();
+        // MODERN CORE: Remover overlay en caso de error
+        if (window.LoadingStates) {
+          window.LoadingStates.hide(modalContent, false);
+        } else {
+          const overlay = document.getElementById('reviewModalLoading');
+          if (overlay) overlay.remove();
+        }
         this.hideModal(modal);
         window.notifications?.error('Error al cargar reseña: ' + (error.message || 'Error desconocido'));
       } finally {
