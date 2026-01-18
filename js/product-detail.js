@@ -100,12 +100,13 @@ document.addEventListener('DOMContentLoaded', async function () {
             let product = null;
 
             // 2. Parsed Response (Handle various API formats)
-            if (response && response.success && response.data) {
+            // Fix: Prioritize deep checking for 'product' property to avoid setting product to a wrapper object
+            if (response && response.data && response.data.product) {
+                product = response.data.product;
+            } else if (response && response.success && response.data) {
                 product = response.data;
             } else if (response && response.id) {
                 product = response;
-            } else if (response && response.data && response.data.product) {
-                product = response.data.product;
             } else if (response && !response.success) {
                 throw new Error(response.message || 'Producto no encontrado en la API');
             }
