@@ -1207,7 +1207,13 @@ class HomeEngine {
         if (products.length > 0) {
           grid.innerHTML = products.map(p => window.Components.getProductCard(p)).join('');
         } else {
-          const safeCategory = (category && typeof category === 'string') ? category.toUpperCase() : 'CATEGORÍA';
+          // MODERN CORE: Usar escapeHTML para prevenir XSS
+          const escapeHTML = window.Utils?.escapeHTML || ((text) => {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+          });
+          const safeCategory = escapeHTML((category && typeof category === 'string') ? category.toUpperCase() : 'CATEGORÍA');
           grid.innerHTML = `<div class="empty-state">NO WEAPONS FOUND IN SECTOR ${safeCategory}</div>`;
         }
 
