@@ -538,8 +538,12 @@ class AdminManager {
           return;
         }
 
-        // Escapar HTML para prevenir XSS
+        // Usar utilidad centralizada para escapar HTML (prevenir XSS)
         const escapeHtml = (text) => {
+          if (window.Utils && window.Utils.escapeHTML) {
+            return window.Utils.escapeHTML(text);
+          }
+          // Fallback si Utils no está disponible
           const div = document.createElement('div');
           div.textContent = text;
           return div.innerHTML;
@@ -781,8 +785,12 @@ class AdminManager {
           return;
         }
 
-        // Escapar HTML para prevenir XSS
+        // Usar utilidad centralizada para escapar HTML (prevenir XSS)
         const escapeHtml = (text) => {
+          if (window.Utils && window.Utils.escapeHTML) {
+            return window.Utils.escapeHTML(text);
+          }
+          // Fallback si Utils no está disponible
           const div = document.createElement('div');
           div.textContent = text;
           return div.innerHTML;
