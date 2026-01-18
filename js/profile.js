@@ -95,6 +95,8 @@ async function loadOrders() {
             orders = res.data;
         }
 
+        if (window.Logger) window.Logger.log('📦 Orders loaded:', orders);
+
         // Hide loading state
         if (window.LoadingStates) {
             window.LoadingStates.hide('ordersList');

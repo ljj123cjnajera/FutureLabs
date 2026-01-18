@@ -18,9 +18,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const registerForm = document.getElementById('registerForm');
 
     if (registerForm) {
-        // Inicializar validación en tiempo real
         if (window.FormValidator) {
             window.FormValidator.initRealTime(registerForm);
+        }
+
+        // Check for email in URL (from Guest Checkout)
+        const params = new URLSearchParams(window.location.search);
+        const emailParam = params.get('email');
+        if (emailParam) {
+            const emailInput = document.getElementById('registerEmail');
+            if (emailInput) {
+                emailInput.value = emailParam;
+                // Add a visual cue
+                emailInput.parentElement.classList.add('focused');
+                // Focus password to speed up flow
+                setTimeout(() => {
+                    const passInput = document.getElementById('registerPassword');
+                    if (passInput) passInput.focus();
+                }, 500);
+            }
         }
 
         registerForm.addEventListener('submit', async (e) => {
