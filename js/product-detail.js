@@ -819,7 +819,8 @@ document.addEventListener('DOMContentLoaded', async function () {
     if (clearRecentlyViewedBtn) {
         clearRecentlyViewedBtn.addEventListener('click', () => {
             if (window.recentlyViewed) {
-                window.recentlyViewed.clearAndRender('recentlyViewedGrid', { hideWhenEmpty: true });
+                window.recentlyViewed.clear();
+                window.recentlyViewed.render('recentlyViewedGrid', { limit: 6, hideWhenEmpty: true });
             }
         });
     }
