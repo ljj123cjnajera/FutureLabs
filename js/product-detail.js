@@ -394,7 +394,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                     class="size-option ${!isAvailable ? 'out-of-stock' : ''} ${isLowStock ? 'low-stock' : ''}" 
                     data-size="${size}"
                     ${!isAvailable ? 'disabled' : ''}
-                    onclick="selectSize('${size}')"
+                    type="button"
                 >
                     ${size}
                     ${isLowStock ? '<span class="stock-badge">¡Últimas!</span>' : ''}
@@ -402,16 +402,20 @@ document.addEventListener('DOMContentLoaded', async function () {
             `;
         }).join('');
 
-        // Add click handlers
-        grid.querySelectorAll('.size-option').forEach(btn => {
-            btn.addEventListener('click', function () {
-                if (this.disabled) return;
-                selectSize(this.dataset.size);
-            });
-        });
+        // Robust Event Delegation
+        grid.onclick = function (e) {
+            const btn = e.target.closest('.size-option');
+            if (!btn || btn.disabled) return;
+
+            const size = btn.dataset.size;
+            if (size) {
+                selectSize(size);
+            }
+        };
     }
 
     function selectSize(size) {
+        // Update variables
         selectedSize = size;
         window.selectedSize = size;
 
@@ -426,6 +430,9 @@ document.addEventListener('DOMContentLoaded', async function () {
         // Hide validation message
         const errorMsg = document.getElementById('sizeValidationMsg');
         if (errorMsg) errorMsg.classList.remove('visible');
+
+        // Console visual confirmation (for debugging)
+        if (window.Logger) window.Logger.log('📏 Talla seleccionada:', size);
     }
 
     window.selectSize = selectSize;
