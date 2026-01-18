@@ -862,15 +862,9 @@ class HomeEngine {
       if (btn) {
         e.preventDefault();
         e.stopPropagation();
-        const productId = btn.dataset.id;
-
-        if (window.QuickView) {
-          window.QuickView.open(productId);
-        } else {
-          if (window.Logger) window.Logger.warn('QuickView module not loaded');
-          // Fallback: Redirect
-          window.location.href = `product-detail.html?id=${productId}`;
-        }
+        const productId = btn.dataset.id || btn.dataset.productId;
+        // OPTIMIZED: Quick view replaced with direct navigation to product detail
+        window.location.href = `product-detail.html?id=${productId}`;
       }
     });
   }
