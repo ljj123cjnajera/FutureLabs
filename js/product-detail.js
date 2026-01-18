@@ -358,6 +358,10 @@ document.addEventListener('DOMContentLoaded', async function () {
         // Add to recently viewed
         if (window.recentlyViewed) {
             window.recentlyViewed.add(product);
+            // Render recently viewed after adding product
+            setTimeout(() => {
+                window.recentlyViewed.render('recentlyViewedGrid', { limit: 6, hideWhenEmpty: true });
+            }, 200);
         }
         
         // Load related products after product loads
