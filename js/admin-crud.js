@@ -1058,7 +1058,101 @@ class AdminCRUD {
     if (isBestsellerInput) isBestsellerInput.checked = product.is_bestseller === true;
   }
 
-  // ... (Other entity methods truncated for brevity but preserved)
+  // ===== USERS =====
+  async loadUserForEdit(id) {
+    try {
+      if (window.Logger) window.Logger.log('🔍 Loading user for edit:', id);
+
+      const response = await window.api.request(`/admin/users/${id}`);
+
+      if (!response || !response.success) {
+        throw new Error(response?.message || response?.error || 'Error al obtener usuario');
+      }
+
+      const user = response.data?.user || response.data || response.user;
+      if (!user) {
+        throw new Error('Usuario no encontrado en la respuesta');
+      }
+
+      if (window.Logger) window.Logger.log('👤 User fetched from API:', user);
+
+      this.populateUserForm(user);
+    } catch (error) {
+      if (window.Logger) window.Logger.error('Error loading user for edit:', error);
+      throw error;
+    }
+  }
+
+  populateUserForm(user) {
+    if (!user) {
+      throw new Error('Datos de usuario no disponibles');
+    }
+
+    const firstNameInput = document.getElementById('userFirstName');
+    const lastNameInput = document.getElementById('userLastName');
+    const emailInput = document.getElementById('userEmail');
+    const phoneInput = document.getElementById('userPhone');
+    const roleInput = document.getElementById('userRole');
+    const emailVerifiedInput = document.getElementById('userEmailVerified');
+    const passwordInput = document.getElementById('userPassword');
+
+    if (!firstNameInput || !lastNameInput || !emailInput || !roleInput) {
+      throw new Error('Algunos campos del formulario no se encontraron');
+    }
+
+    firstNameInput.value = user.first_name || '';
+    lastNameInput.value = user.last_name || '';
+    emailInput.value = user.email || '';
+    if (phoneInput) phoneInput.value = user.phone || '';
+    roleInput.value = user.role || 'client';
+    if (emailVerifiedInput) emailVerifiedInput.checked = user.email_verified === true;
+    if (passwordInput) passwordInput.value = ''; // No mostrar contraseña
+  }
+
+  // ===== REVIEWS =====
+  async loadReviewForEdit(id) {
+    try {
+      if (window.Logger) window.Logger.log('🔍 Loading review for edit:', id);
+
+      const response = await window.api.request(`/admin/reviews/${id}`);
+
+      if (!response || !response.success) {
+        throw new Error(response?.message || response?.error || 'Error al obtener reseña');
+      }
+
+      const review = response.data?.review || response.data || response.review;
+      if (!review) {
+        throw new Error('Reseña no encontrada en la respuesta');
+      }
+
+      if (window.Logger) window.Logger.log('⭐ Review fetched from API:', review);
+
+      this.populateReviewForm(review);
+    } catch (error) {
+      if (window.Logger) window.Logger.error('Error loading review for edit:', error);
+      throw error;
+    }
+  }
+
+  populateReviewForm(review) {
+    if (!review) {
+      throw new Error('Datos de reseña no disponibles');
+    }
+
+    const ratingInput = document.getElementById('reviewRating');
+    const titleInput = document.getElementById('reviewTitle');
+    const commentInput = document.getElementById('reviewComment');
+    const isApprovedInput = document.getElementById('reviewIsApproved');
+
+    if (!ratingInput) {
+      throw new Error('Campo de rating no encontrado');
+    }
+
+    ratingInput.value = review.rating || 5;
+    if (titleInput) titleInput.value = review.title || '';
+    if (commentInput) commentInput.value = review.comment || '';
+    if (isApprovedInput) isApprovedInput.checked = review.is_approved === true;
+  }
 }
 
 // Inicializar cuando el DOM esté listo
