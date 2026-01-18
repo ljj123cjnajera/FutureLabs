@@ -788,21 +788,32 @@ class AdminManager {
           return div.innerHTML;
         };
 
-        tbody.innerHTML = users.map(user => `
+        tbody.innerHTML = users.map(user => {
+          const userId = escapeHtml(user.id || '');
+          const firstName = escapeHtml(user.first_name || '');
+          const lastName = escapeHtml(user.last_name || '');
+          const userEmail = escapeHtml(user.email || '');
+          const userRole = user.role || 'client';
+          const emailVerified = user.email_verified ? 'Sí' : 'No';
+          const createdDate = user.created_at ? new Date(user.created_at).toLocaleDateString('es-PE') : 'N/A';
+          const userIdShort = user.id ? escapeHtml(user.id.substring(0, 8)) + '...' : 'N/A';
+
+          return `
               <tr>
-                <td>${user.id.substring(0, 8)}...</td>
-                <td>${user.first_name} ${user.last_name}</td>
-                <td>${user.email}</td>
-                <td><span class="badge badge-${this.getRoleBadgeClass(user.role)}">${this.getRoleText(user.role)}</span></td>
-                <td><span class="badge badge-${user.email_verified ? 'success' : 'warning'}">${user.email_verified ? 'Sí' : 'No'}</span></td>
-                <td>${new Date(user.created_at).toLocaleDateString('es-PE')}</td>
+                <td>${userIdShort}</td>
+                <td>${firstName} ${lastName}</td>
+                <td>${userEmail}</td>
+                <td><span class="badge badge-${this.getRoleBadgeClass(userRole)}">${this.getRoleText(userRole)}</span></td>
+                <td><span class="badge badge-${user.email_verified ? 'success' : 'warning'}">${emailVerified}</span></td>
+                <td>${createdDate}</td>
                 <td>
-                  <button class="btn-action btn-edit" onclick="window.editUser('${user.id}')">
+                  <button class="btn-action btn-edit" onclick="window.editUser('${userId}')">
                     <i class="fas fa-edit"></i>
                   </button>
                 </td>
               </tr>
-            `).join('');
+            `;
+        }).join('');
 
         // Mostrar toast de éxito
         window.notifications?.success(`Se cargaron ${users.length} usuario${users.length !== 1 ? 's' : ''}`);
