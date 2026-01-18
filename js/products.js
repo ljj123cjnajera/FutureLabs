@@ -57,7 +57,7 @@ class CatalogEngine {
         } catch (e) {
             if (window.Logger) window.Logger.warn('Failed to load categories:', e);
         }
-        
+
         try {
             await this.loadBrands();
         } catch (e) {
@@ -66,7 +66,7 @@ class CatalogEngine {
 
         // 🚀 URL PARAMETER HANDLING
         this.applyInitialFilters();
-        
+
         // Load products after applying filters
         await this.loadProducts(this.currentPage);
 
@@ -143,12 +143,12 @@ class CatalogEngine {
     async loadProducts(page = 1) {
         const container = document.getElementById('productsContainer');
         const countLabel = document.getElementById('productCount');
-        
+
         // Show loading state using LoadingStates
-        if (container && window.LoadingStates) {
+        if (window.LoadingStates) {
             window.LoadingStates.show('productsContainer', {
                 message: 'Cargando productos...',
-                type: 'spinner'
+                type: 'skeleton' // Better for grid
             });
         } else if (container) {
             container.innerHTML = `
@@ -204,12 +204,12 @@ class CatalogEngine {
 
             // Call API with filters
             const response = await this.api.getProducts(apiFilters);
-            
+
             // Handle different response formats
             let products = [];
             let total = 0;
             let pages = 1;
-            
+
             if (Array.isArray(response)) {
                 // Direct array response
                 products = response;
@@ -241,7 +241,7 @@ class CatalogEngine {
                 products = [];
                 total = 0;
             }
-            
+
 
             this.allProducts = products;
             this.filteredProducts = products;
@@ -267,22 +267,22 @@ class CatalogEngine {
             this.updatePagination();
             this.updateURL();
             this.updateCounts();
-            
+
             // Update product count in hero section
             if (countLabel) countLabel.textContent = this.totalProducts || 0;
-            
+
         } catch (e) {
+            // Hide Loader
+            if (window.LoadingStates) window.LoadingStates.hide('productsContainer');
+
             if (window.ErrorHandler) {
                 window.ErrorHandler.api(e, 'loadProducts', 'No se pudieron cargar los productos. Por favor, intenta de nuevo.');
             } else {
                 if (window.Logger) window.Logger.error('⚠️ [CatalogEngine] API Failed', e);
             }
-            
-            this.allProducts = [];
-            this.filteredProducts = [];
-            
+
             // Show error state using LoadingStates
-            if (container && window.LoadingStates) {
+            if (window.LoadingStates) {
                 window.LoadingStates.error('productsContainer', {
                     title: 'Error al cargar productos',
                     message: 'No se pudieron cargar los productos. Por favor, intenta de nuevo.',
@@ -303,7 +303,7 @@ class CatalogEngine {
     }
 
     getSortField() {
-        switch(this.currentSort) {
+        switch (this.currentSort) {
             case 'price-asc':
             case 'price-desc':
                 return 'price';
@@ -317,7 +317,7 @@ class CatalogEngine {
     }
 
     getSortOrder() {
-        switch(this.currentSort) {
+        switch (this.currentSort) {
             case 'price-asc':
             case 'name-asc':
                 return 'asc';
@@ -384,7 +384,7 @@ class CatalogEngine {
                         return '';
                     }
                 }).filter(html => html).join('');
-                
+
                 if (cardsHTML) {
                     container.innerHTML = cardsHTML;
                     // Add 'loaded' class to make grid visible (removes opacity: 0)
@@ -397,40 +397,40 @@ class CatalogEngine {
                 // Fallback just in case (Brutalist V3 Structure)
                 // SVG Placeholder (more visible with better contrast)
                 const svgPlaceholder = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Crect fill='%23e5e7eb' width='400' height='400'/%3E%3Ctext fill='%236b7280' font-family='system-ui, -apple-system, sans-serif' font-size='28' font-weight='900' x='50%25' y='45%25' text-anchor='middle'%3ESNEAKERS%3C/text%3E%3Ctext fill='%236b7280' font-family='system-ui, -apple-system, sans-serif' font-size='28' font-weight='900' x='50%25' y='60%25' text-anchor='middle'%3ESHOP%3C/text%3E%3C/svg%3E";
-                
+
                 const cardsHTML = products.map(p => {
-                // Normalize image URL using shared utility
-                let imageUrl = svgPlaceholder;
-                
-                // Try to get valid image from product images array
-                if (p.images && window.Utils?.normalizeImageUrls) {
-                    const normalizedImages = window.Utils.normalizeImageUrls(p.images, '');
-                    if (normalizedImages.length > 0) {
-                        imageUrl = normalizedImages[0];
+                    // Normalize image URL using shared utility
+                    let imageUrl = svgPlaceholder;
+
+                    // Try to get valid image from product images array
+                    if (p.images && window.Utils?.normalizeImageUrls) {
+                        const normalizedImages = window.Utils.normalizeImageUrls(p.images, '');
+                        if (normalizedImages.length > 0) {
+                            imageUrl = normalizedImages[0];
+                        }
                     }
-                }
-                
-                // Fallback to image_url if no valid images found
-                if (imageUrl === svgPlaceholder && p.image_url && window.Utils?.isValidImageUrl?.(p.image_url)) {
-                    imageUrl = p.image_url;
-                }
-                
-                // Usar escapeHTML para prevenir XSS
-                const escapeHtml = window.Utils?.escapeHTML || ((text) => {
-                    const div = document.createElement('div');
-                    div.textContent = text;
-                    return div.innerHTML;
-                });
 
-                const productId = escapeHtml(p.id || '');
-                const productName = escapeHtml(p.name || 'Producto');
-                const productBrand = escapeHtml(p.brand || 'SNEAKERS');
-                const productBadge = p.badge ? escapeHtml(p.badge) : '';
-                const currentPrice = parseFloat(p.discount_price || p.price || 0).toFixed(2);
-                const originalPrice = p.discount_price && p.discount_price < p.price ? parseFloat(p.price).toFixed(2) : null;
-                const isOutOfStock = (p.stock_quantity || 0) === 0;
+                    // Fallback to image_url if no valid images found
+                    if (imageUrl === svgPlaceholder && p.image_url && window.Utils?.isValidImageUrl?.(p.image_url)) {
+                        imageUrl = p.image_url;
+                    }
 
-                return `
+                    // Usar escapeHTML para prevenir XSS
+                    const escapeHtml = window.Utils?.escapeHTML || ((text) => {
+                        const div = document.createElement('div');
+                        div.textContent = text;
+                        return div.innerHTML;
+                    });
+
+                    const productId = escapeHtml(p.id || '');
+                    const productName = escapeHtml(p.name || 'Producto');
+                    const productBrand = escapeHtml(p.brand || 'SNEAKERS');
+                    const productBadge = p.badge ? escapeHtml(p.badge) : '';
+                    const currentPrice = parseFloat(p.discount_price || p.price || 0).toFixed(2);
+                    const originalPrice = p.discount_price && p.discount_price < p.price ? parseFloat(p.price).toFixed(2) : null;
+                    const isOutOfStock = (p.stock_quantity || 0) === 0;
+
+                    return `
                 <div class="product-card" onclick="window.location.href='product-detail.html?id=${productId}'">
                     <div class="product-image-container">
                         <img src="${imageUrl}" 
@@ -461,7 +461,7 @@ class CatalogEngine {
                 </div>
             `;
                 }).filter(html => html).join('');
-                
+
                 if (cardsHTML) {
                     container.innerHTML = cardsHTML;
                     // Add 'loaded' class to make grid visible (removes opacity: 0)
@@ -505,7 +505,7 @@ class CatalogEngine {
                 radio.checked = false;
             }
         });
-        
+
         // Also update any button filters if they exist
         document.querySelectorAll('.btn-filter').forEach(btn => {
             const btnBrand = btn.getAttribute('onclick')?.match(/filter\(['"](.*?)['"]\)/)?.[1];
@@ -570,26 +570,26 @@ class CatalogEngine {
         };
         this.currentSort = 'newest';
         this.currentPage = 1;
-        
+
         // Reset all filter inputs
         const sortSelect = document.getElementById('sortSelect');
         if (sortSelect) sortSelect.value = 'newest';
-        
+
         const searchInput = document.getElementById('productSearchInput');
         if (searchInput) searchInput.value = '';
-        
+
         const minPriceInput = document.getElementById('minPrice');
         if (minPriceInput) minPriceInput.value = '';
-        
+
         const maxPriceInput = document.getElementById('maxPrice');
         if (maxPriceInput) maxPriceInput.value = '';
-        
+
         const onSaleFilter = document.getElementById('onSaleFilter');
         if (onSaleFilter) onSaleFilter.checked = false;
-        
+
         const inStockFilter = document.getElementById('inStockFilter');
         if (inStockFilter) inStockFilter.checked = false; // Match default inStock: false
-        
+
         // Reset brand radio buttons
         const brandRadios = document.querySelectorAll('input[name="brand"]');
         brandRadios.forEach(radio => {
@@ -599,13 +599,13 @@ class CatalogEngine {
                 radio.checked = false;
             }
         });
-        
+
         // Reset category radio buttons
         const categoryRadios = document.querySelectorAll('input[name="category"]');
         categoryRadios.forEach(radio => {
             radio.checked = false;
         });
-        
+
         this.updateFilterButtons('all');
         this.loadProducts(1);
     }
@@ -621,11 +621,11 @@ class CatalogEngine {
     updateCounts() {
         const resultsCount = document.getElementById('resultsCount');
         const totalCount = document.getElementById('totalCount');
-        
+
         // Show current page results count
         const start = (this.currentPage - 1) * this.itemsPerPage + 1;
         const end = Math.min(this.currentPage * this.itemsPerPage, this.totalProducts);
-        
+
         if (resultsCount) {
             if (this.totalProducts > 0) {
                 resultsCount.textContent = `${start}-${end}`;
@@ -673,9 +673,9 @@ class CatalogEngine {
         }
 
         paginationContainer.style.display = 'flex';
-        
+
         let paginationHTML = '';
-        
+
         // Previous button
         paginationHTML += `
             <button class="btn btn-outline" 
@@ -690,7 +690,7 @@ class CatalogEngine {
         const maxVisible = 5;
         let startPage = Math.max(1, this.currentPage - Math.floor(maxVisible / 2));
         let endPage = Math.min(this.totalPages, startPage + maxVisible - 1);
-        
+
         if (endPage - startPage < maxVisible - 1) {
             startPage = Math.max(1, endPage - maxVisible + 1);
         }
@@ -745,7 +745,7 @@ class CatalogEngine {
         try {
             const response = await this.api.getCategories();
             let categories = [];
-            
+
             if (Array.isArray(response)) {
                 categories = response;
             } else if (response && response.data) {
@@ -769,7 +769,7 @@ class CatalogEngine {
             // Load brands from products - use smaller limit to avoid timeouts
             const response = await this.api.getProducts({ limit: 100 });
             let products = [];
-            
+
             if (Array.isArray(response)) {
                 products = response;
             } else if (response && response.data) {
@@ -785,7 +785,7 @@ class CatalogEngine {
                     brandsSet.add(p.brand.toLowerCase());
                 }
             });
-            
+
             this.brands = Array.from(brandsSet).sort();
             this.renderBrandsFilter();
         } catch (e) {
@@ -840,7 +840,7 @@ class CatalogEngine {
     setViewMode(mode) {
         this.viewMode = mode;
         localStorage.setItem('productsViewMode', mode);
-        
+
         const container = document.getElementById('productsContainer');
         if (container) {
             if (mode === 'list') {
@@ -848,7 +848,7 @@ class CatalogEngine {
             } else {
                 container.classList.remove('list-view');
             }
-            
+
             // Re-render to apply view mode changes
             if (this.allProducts.length > 0) {
                 this.render(this.allProducts);
@@ -872,7 +872,7 @@ class CatalogEngine {
             event.preventDefault();
             event.stopPropagation();
         }
-        
+
         // IMPORTANTE: Desde products.html no se puede agregar sin seleccionar talla
         // Redirigir directamente a product-detail.html para seleccionar talla
         window.location.href = `product-detail.html?id=${id}`;
@@ -881,14 +881,14 @@ class CatalogEngine {
 }
 
 // Global functions
-window.toggleFiltersSidebar = function() {
+window.toggleFiltersSidebar = function () {
     const sidebar = document.getElementById('productsSidebar');
     const overlay = document.querySelector('.products-sidebar-overlay');
-    
+
     if (sidebar) {
         const isActive = sidebar.classList.contains('active');
         sidebar.classList.toggle('active');
-        
+
         // Create or toggle overlay
         if (!overlay) {
             const newOverlay = document.createElement('div');
@@ -906,7 +906,7 @@ window.toggleFiltersSidebar = function() {
                 }, 300);
             }
         }
-        
+
         // Prevent body scroll when sidebar is open
         if (sidebar.classList.contains('active')) {
             document.body.style.overflow = 'hidden';
@@ -916,13 +916,13 @@ window.toggleFiltersSidebar = function() {
     }
 };
 
-window.setViewMode = function(mode) {
+window.setViewMode = function (mode) {
     if (window.catalogEngine) {
         window.catalogEngine.setViewMode(mode);
     }
 };
 
-window.applyPriceFilter = function() {
+window.applyPriceFilter = function () {
     const min = document.getElementById('minPrice')?.value;
     const max = document.getElementById('maxPrice')?.value;
     if (window.catalogEngine) {
@@ -937,7 +937,7 @@ function initCatalogEngine() {
         setTimeout(initCatalogEngine, 100);
         return;
     }
-    
+
     // Wait for DOM to be ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {

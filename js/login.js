@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (window.Components.initSearch) window.Components.initSearch();
             if (window.Components.initCartCounter) window.Components.initCartCounter();
         }
-        
+
         const footerContainer = document.getElementById('mainFooter');
         if (footerContainer && !footerContainer.innerHTML.trim()) {
             footerContainer.innerHTML = window.Components.getFooter();
@@ -48,54 +48,48 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             }
 
-            const btn = form.querySelector('.btn-auth');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> INICIANDO SESIÓN...';
-            btn.disabled = true;
-
-            const email = form.querySelector('input[type="email"]').value.trim();
-            const password = form.querySelector('input[type="password"]').value;
-
-            // Get return URL from Query Param OR LocalStorage
-            const urlParams = new URLSearchParams(window.location.search);
-            let returnUrl = urlParams.get('returnUrl');
-
-            if (!returnUrl) {
-                returnUrl = localStorage.getItem('redirect_after_login') || 'profile.html';
-                localStorage.removeItem('redirect_after_login'); // Clean up
-            }
-
             try {
+                // MODERN CORE: Use LoadingStates
+                if (window.LoadingStates) {
+                    window.LoadingStates.show(form, { type: 'spinner', message: 'Iniciando sesión...', overlay: true });
+                } else {
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> INICIANDO SESIÓN...';
+                    btn.disabled = true;
+                }
+
                 if (window.authManager) {
                     if (window.Logger) window.Logger.log('🔐 Attempting login for:', email);
                     const success = await window.authManager.login(email, password);
 
                     if (success) {
                         if (window.Logger) window.Logger.log('✅ Login successful, redirecting to:', returnUrl);
-                        // AuthManager handles notifications and token storage
                         setTimeout(() => {
                             window.location.href = returnUrl;
-                        }, 500); // 500ms delay
+                        }, 500);
                     } else {
                         if (window.Logger) window.Logger.warn('❌ Login failed');
-                        btn.innerHTML = originalText;
-                        btn.disabled = false;
+                        if (window.LoadingStates) window.LoadingStates.hide(form);
+                        else {
+                            btn.innerHTML = originalText;
+                            btn.disabled = false;
+                        }
                     }
                 } else {
                     throw new Error('AuthManager no está disponible');
                 }
             } catch (error) {
-                // Usar error handler si está disponible
+                if (window.LoadingStates) window.LoadingStates.hide(form);
+
                 if (window.ErrorHandler) {
-                    window.ErrorHandler.api(error, 'login', 'No se pudo iniciar sesión. Por favor, verifica tus credenciales.');
+                    window.ErrorHandler.api(error, 'login', 'No se pudo iniciar sesión.');
                 } else {
-                    if (window.Logger) window.Logger.error('Login error:', error);
-                    if (window.notifications) {
-                        window.notifications.error('Error', 'No se pudo iniciar sesión. Por favor, intenta de nuevo.');
-                    }
+                    if (window.notifications) window.notifications.error('Error', 'No se pudo iniciar sesión.');
                 }
-                btn.innerHTML = originalText;
-                btn.disabled = false;
+
+                if (!window.LoadingStates) {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
             }
         });
     }
