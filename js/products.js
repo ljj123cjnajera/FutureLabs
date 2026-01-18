@@ -456,7 +456,7 @@ class CatalogEngine {
                             <button class="product-btn" onclick="event.stopPropagation(); window.location.href='product-detail.html?id=${productId}';" aria-label="Ver detalles" style="flex: 1; background: transparent; border: 1px solid var(--black); color: var(--black);">
                                 VER DETALLES
                             </button>
-                            <button class="product-btn-add" onclick="event.stopPropagation(); window.location.href='product-detail.html?id=${productId}';" aria-label="Agregar al carrito" style="flex: 1; background: var(--black); color: var(--white); border: 1px solid var(--black); font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;" ${isOutOfStock ? 'disabled style="opacity: 0.5; cursor: not-allowed; background: var(--gray-400);"' : ''}>
+                            <button class="product-btn-add" onclick="event.stopPropagation(); window.quickView ? window.quickView.show('${productId}') : window.location.href='product-detail.html?id=${productId}'" aria-label="Agregar al carrito" style="flex: 1; background: var(--black); color: var(--white); border: 1px solid var(--black); font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;" ${isOutOfStock ? 'disabled style="opacity: 0.5; cursor: not-allowed; background: var(--gray-400);"' : ''}>
                                 <i class="fas fa-shopping-cart"></i> ${isOutOfStock ? 'AGOTADO' : 'AGREGAR'}
                             </button>
                         </div>

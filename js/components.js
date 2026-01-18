@@ -894,10 +894,10 @@ class Components {
           <div class="product-size-preview">${sizeText}</div>
 
           <div class="product-card-actions" style="display: flex; gap: 8px; margin-top: 12px;">
-              <button class="product-btn" onclick="event.stopPropagation(); window.location.href='product-detail.html?id=${product.id}';" aria-label="Ver detalles" style="flex: 1; background: transparent; border: 1px solid var(--black); color: var(--black);">
+              <button class="product-btn" onclick="event.stopPropagation(); window.location.href='product-detail.html?id=${product.id}'" aria-label="Ver detalles" style="flex: 1; background: transparent; border: 1px solid var(--black); color: var(--black);">
                 VER DETALLES
               </button>
-              <button class="product-btn-add" onclick="event.stopPropagation(); window.location.href='product-detail.html?id=${product.id}';" aria-label="Agregar al carrito" style="flex: 1; background: var(--black); color: var(--white); border: 1px solid var(--black); font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+              <button class="product-btn-add" onclick="event.stopPropagation(); window.quickView ? window.quickView.show('${product.id}') : window.location.href='product-detail.html?id=${product.id}'" aria-label="Agregar al carrito" style="flex: 1; background: var(--black); color: var(--white); border: 1px solid var(--black); font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
                 <i class="fas fa-shopping-cart"></i> AGREGAR
               </button>
           </div>
