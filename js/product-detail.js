@@ -803,12 +803,10 @@ document.addEventListener('DOMContentLoaded', async function () {
             if (icon && btn) {
                 if (isInWishlist) {
                     icon.className = 'fas fa-heart';
-                    btn.style.background = '#d32f2f';
-                    btn.style.color = '#fff';
+                    btn.classList.add('active');
                 } else {
                     icon.className = 'far fa-heart';
-                    btn.style.background = 'white';
-                    btn.style.color = '#000';
+                    btn.classList.remove('active');
                 }
             }
         } catch (e) {
