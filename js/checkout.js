@@ -514,7 +514,8 @@ class CheckoutManager {
                 items: this.cart.map(item => ({
                     product_id: item.product_id || item.id,
                     quantity: item.quantity,
-                    price: item.discount_price || item.price // Optional, backend might verify
+                    price: item.discount_price || item.price, // Optional, backend might verify
+                    size: item.size || null // Include size if available
                 })),
                 shipping_address_id: this.selectedAddressId,
                 payment_method: this.paymentMethod === 'card' ? 'credit_card' : this.paymentMethod,
