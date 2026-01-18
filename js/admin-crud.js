@@ -223,98 +223,33 @@ class AdminCRUD {
           }
         });
 
-        // Mostrar loading overlay sin reemplazar el contenido completo
         const modalContent = modal.querySelector('.modal-content');
-        if (!modalContent) {
-          throw new Error('Contenido del modal no encontrado');
-        }
+        if (!modalContent) throw new Error('Contenido del modal no encontrado');
 
-        // Remover cualquier overlay previo
-        const existingOverlay = document.getElementById('productModalLoading');
-        if (existingOverlay) {
-          existingOverlay.remove();
-        }
-
-        const loadingOverlay = document.createElement('div');
-        loadingOverlay.id = 'productModalLoading';
-        loadingOverlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; pointer-events: auto;';
-        loadingOverlay.innerHTML = '<div style="text-align: center;"><div class="loading-spinner"></div><p style="margin-top: 16px;">Cargando producto...</p></div>';
-
-        // Prevenir que clicks en el overlay cierren el modal
-        loadingOverlay.addEventListener('click', (e) => {
-          e.stopPropagation();
-          e.preventDefault();
-        });
-
-        // Asegurar que modal-content tenga position relative
-        const currentPosition = window.getComputedStyle(modalContent).position;
-        if (currentPosition === 'static') {
-          modalContent.style.position = 'relative';
-        }
-
-        // Abrir modal ANTES de agregar el overlay
+        // Abrir modal ANTES de mostrar loader
         this.showModal(modal);
 
-        // Pequeño delay para asegurar que el modal esté completamente renderizado
-        await new Promise(resolve => setTimeout(resolve, 200));
-
-        // Verificar que el modal sigue abierto
-        if (modal.style.display !== 'flex') {
-          if (window.Logger) window.Logger.warn('Modal se cerró antes de agregar overlay');
-          this.isLoading = false;
-          return;
+        // UI: Loading Overlay
+        if (window.LoadingStates) {
+          window.LoadingStates.show(modalContent, {
+            message: 'Cargando producto...',
+            overlay: true,
+            type: 'spinner'
+          });
         }
 
-        // Agregar overlay después de que el modal esté visible
-        modalContent.appendChild(loadingOverlay);
+        await this.loadProductForEdit(id);
+        if (window.Logger) window.Logger.log('✅ Producto cargado en modal');
 
-        // Forzar que el modal permanezca visible durante la carga
-        const keepModalOpen = () => {
-          if (modal.style.display !== 'flex') {
-            if (window.Logger) window.Logger.warn('⚠️ Modal se cerró, reabriendo...');
-            this.showModal(modal);
-          }
-        };
-
-        const modalCheckInterval = setInterval(keepModalOpen, 50);
-
-        try {
-          await this.loadProductForEdit(id);
-
-          // Verificar nuevamente que el modal sigue abierto
-          if (modal.style.display !== 'flex') {
-            if (window.Logger) window.Logger.warn('⚠️ Modal se cerró durante la carga, reabriendo...');
-            this.showModal(modal);
-          }
-          if (window.Logger) window.Logger.log('✅ Producto cargado en modal');
-
-          // Remover loading overlay
-          const overlay = document.getElementById('productModalLoading');
-          if (overlay) overlay.remove();
-
-          clearInterval(modalCheckInterval);
-        } catch (loadError) {
-          clearInterval(modalCheckInterval);
-          throw loadError;
-        }
       } catch (error) {
         if (window.Logger) window.Logger.error('Error loading product for edit:', error);
-        const overlay = document.getElementById('productModalLoading');
-        if (overlay) {
-          overlay.innerHTML = `
-            <div style="text-align:center; max-width: 280px; color:#ef4444;">
-              <i class="fas fa-exclamation-triangle" style="font-size:32px; margin-bottom:12px;"></i>
-              <p style="margin:0; font-weight:600;">No pudimos cargar el producto.</p>
-              <p style="margin-top:8px; font-size:13px; color:#b91c1c;">${error.message || 'Error desconocido'}</p>
-              <button class="btn-primary" style="margin-top:12px;" onclick="window.adminCRUD?.retryLoadProduct('${id}')">
-                <i class="fas fa-redo"></i> Reintentar
-              </button>
-            </div>
-          `;
-        }
-        if (window.Logger) window.Logger.error('Error stack:', error?.stack || error);
+
+        if (window.LoadingStates) window.LoadingStates.hide(modalContent);
+        this.hideModal(modal);
         window.notifications?.error('Error al cargar producto: ' + (error.message || 'Error desconocido'));
       } finally {
+        const modalContent = modal.querySelector('.modal-content');
+        if (window.LoadingStates) window.LoadingStates.hide(modalContent);
         this.isLoading = false;
       }
     };
@@ -385,52 +320,28 @@ class AdminCRUD {
         this.currentEditId = id;
         document.getElementById('categoryModalTitle').textContent = 'Editar Categoría';
 
-        // Mostrar loading overlay sin reemplazar el contenido completo
         const modalContent = modal.querySelector('.modal-content');
-        if (!modalContent) {
-          throw new Error('Contenido del modal no encontrado');
-        }
-
-        const loadingOverlay = document.createElement('div');
-        loadingOverlay.id = 'categoryModalLoading';
-        loadingOverlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; pointer-events: auto;';
-        loadingOverlay.innerHTML = '<div style="text-align: center;"><div class="loading-spinner"></div><p style="margin-top: 16px;">Cargando categoría...</p></div>';
-
-        loadingOverlay.addEventListener('click', (e) => {
-          e.stopPropagation();
-        });
-
-        const currentPosition = window.getComputedStyle(modalContent).position;
-        if (currentPosition === 'static') {
-          modalContent.style.position = 'relative';
-        }
+        if (!modalContent) throw new Error('Contenido del modal no encontrado');
 
         this.showModal(modal);
-        await new Promise(resolve => setTimeout(resolve, 150));
-        modalContent.appendChild(loadingOverlay);
 
-        if (modal.style.display !== 'flex') {
-          if (window.Logger) window.Logger.warn('Modal se cerró antes de cargar datos');
-          return;
+        if (window.LoadingStates) {
+          window.LoadingStates.show(modalContent, {
+            message: 'Cargando categoría...',
+            overlay: true,
+            type: 'spinner'
+          });
         }
 
         await this.loadCategoryForEdit(id);
 
-        if (modal.style.display !== 'flex') {
-          if (window.Logger) window.Logger.warn('Modal se cerró durante la carga de datos');
-          return;
-        }
-
-        // Remover loading overlay
-        const overlay = document.getElementById('categoryModalLoading');
-        if (overlay) overlay.remove();
       } catch (error) {
         if (window.Logger) window.Logger.error('Error loading category for edit:', error);
-        const overlay = document.getElementById('categoryModalLoading');
-        if (overlay) overlay.remove();
         this.hideModal(modal);
         window.notifications?.error('Error al cargar categoría: ' + (error.message || 'Error desconocido'));
       } finally {
+        const modalContent = modal.querySelector('.modal-content');
+        if (window.LoadingStates) window.LoadingStates.hide(modalContent);
         this.isLoading = false;
       }
     };
@@ -473,52 +384,29 @@ class AdminCRUD {
         this.currentEditId = id;
         document.getElementById('userModalTitle').textContent = 'Editar Usuario';
 
-        // Mostrar loading overlay sin reemplazar el contenido completo
         const modalContent = modal.querySelector('.modal-content');
-        if (!modalContent) {
-          throw new Error('Contenido del modal no encontrado');
-        }
-
-        const loadingOverlay = document.createElement('div');
-        loadingOverlay.id = 'userModalLoading';
-        loadingOverlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; pointer-events: auto;';
-        loadingOverlay.innerHTML = '<div style="text-align: center;"><div class="loading-spinner"></div><p style="margin-top: 16px;">Cargando usuario...</p></div>';
-
-        loadingOverlay.addEventListener('click', (e) => {
-          e.stopPropagation();
-        });
-
-        const currentPosition = window.getComputedStyle(modalContent).position;
-        if (currentPosition === 'static') {
-          modalContent.style.position = 'relative';
-        }
+        if (!modalContent) throw new Error('Contenido del modal no encontrado');
 
         this.showModal(modal);
-        await new Promise(resolve => setTimeout(resolve, 150));
-        modalContent.appendChild(loadingOverlay);
 
-        if (modal.style.display !== 'flex') {
-          if (window.Logger) window.Logger.warn('Modal se cerró antes de cargar datos');
-          return;
+        if (window.LoadingStates) {
+          window.LoadingStates.show(modalContent, {
+            message: 'Cargando usuario...',
+            overlay: true,
+            type: 'spinner'
+          });
         }
 
         await this.loadUserForEdit(id);
 
-        if (modal.style.display !== 'flex') {
-          if (window.Logger) window.Logger.warn('Modal se cerró durante la carga de datos');
-          return;
-        }
-
-        // Remover loading overlay
-        const overlay = document.getElementById('userModalLoading');
-        if (overlay) overlay.remove();
       } catch (error) {
         if (window.Logger) window.Logger.error('Error loading user for edit:', error);
-        const overlay = document.getElementById('userModalLoading');
-        if (overlay) overlay.remove();
+
         this.hideModal(modal);
         window.notifications?.error('Error al cargar usuario: ' + (error.message || 'Error desconocido'));
       } finally {
+        const modalContent = modal.querySelector('.modal-content');
+        if (window.LoadingStates) window.LoadingStates.hide(modalContent);
         this.isLoading = false;
       }
     };
@@ -542,52 +430,29 @@ class AdminCRUD {
         this.currentEditId = id;
         document.getElementById('reviewModalTitle').textContent = 'Editar Reseña';
 
-        // Mostrar loading overlay sin reemplazar el contenido completo
         const modalContent = modal.querySelector('.modal-content');
-        if (!modalContent) {
-          throw new Error('Contenido del modal no encontrado');
-        }
-
-        const loadingOverlay = document.createElement('div');
-        loadingOverlay.id = 'reviewModalLoading';
-        loadingOverlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; pointer-events: auto;';
-        loadingOverlay.innerHTML = '<div style="text-align: center;"><div class="loading-spinner"></div><p style="margin-top: 16px;">Cargando reseña...</p></div>';
-
-        loadingOverlay.addEventListener('click', (e) => {
-          e.stopPropagation();
-        });
-
-        const currentPosition = window.getComputedStyle(modalContent).position;
-        if (currentPosition === 'static') {
-          modalContent.style.position = 'relative';
-        }
+        if (!modalContent) throw new Error('Contenido del modal no encontrado');
 
         this.showModal(modal);
-        await new Promise(resolve => setTimeout(resolve, 150));
-        modalContent.appendChild(loadingOverlay);
 
-        if (modal.style.display !== 'flex') {
-          if (window.Logger) window.Logger.warn('Modal se cerró antes de cargar datos');
-          return;
+        if (window.LoadingStates) {
+          window.LoadingStates.show(modalContent, {
+            message: 'Cargando reseña...',
+            overlay: true,
+            type: 'spinner'
+          });
         }
 
         await this.loadReviewForEdit(id);
 
-        if (modal.style.display !== 'flex') {
-          if (window.Logger) window.Logger.warn('Modal se cerró durante la carga de datos');
-          return;
-        }
-
-        // Remover loading overlay
-        const overlay = document.getElementById('reviewModalLoading');
-        if (overlay) overlay.remove();
       } catch (error) {
         if (window.Logger) window.Logger.error('Error loading review for edit:', error);
-        const overlay = document.getElementById('reviewModalLoading');
-        if (overlay) overlay.remove();
+
         this.hideModal(modal);
         window.notifications?.error('Error al cargar reseña: ' + (error.message || 'Error desconocido'));
       } finally {
+        const modalContent = modal.querySelector('.modal-content');
+        if (window.LoadingStates) window.LoadingStates.hide(modalContent);
         this.isLoading = false;
       }
     };
@@ -701,9 +566,20 @@ class AdminCRUD {
     if (this.isLoading) return;
     this.isLoading = true;
 
+    // UI: Loading
+    const form = document.getElementById('productForm');
+    if (window.LoadingStates) {
+      window.LoadingStates.show(form, {
+        message: 'Guardando cambios...',
+        overlay: true,
+        type: 'spinner'
+      });
+    }
+
+    // Fallback manual (si LoadingStates falla o no existe, pero admin-crud generalmente asume core systems)
     const submitBtn = document.querySelector('#productForm button[type="submit"]');
     const originalBtnText = submitBtn ? submitBtn.innerHTML : 'Guardar';
-    if (submitBtn) {
+    if (!window.LoadingStates && submitBtn) {
       submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
       submitBtn.disabled = true;
     }
@@ -798,10 +674,14 @@ class AdminCRUD {
   async saveCategory() {
     if (this.isLoading) return;
     this.isLoading = true;
-    
+
     const submitBtn = document.querySelector('#categoryForm button[type="submit"]');
     const originalBtnText = submitBtn ? submitBtn.innerHTML : 'Guardar';
-    if (submitBtn) {
+    // UI: Loading
+    const form = document.getElementById('categoryForm');
+    if (window.LoadingStates) {
+      window.LoadingStates.show(form, { message: 'Guardando categoría...', overlay: true, type: 'spinner' });
+    } else if (submitBtn) {
       submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
       submitBtn.disabled = true;
     }
@@ -819,8 +699,8 @@ class AdminCRUD {
       }
 
       const data = {
-        name: nameInput.value.trim(),
-        slug: slugInput.value.trim(),
+        name: document.getElementById('categoryName').value.trim(),
+        slug: document.getElementById('categorySlug').value.trim(),
         description: document.getElementById('categoryDescription')?.value?.trim() || '',
         image_url: document.getElementById('categoryImage')?.value?.trim() || null,
         is_active: document.getElementById('categoryIsActive')?.checked ?? true
@@ -843,6 +723,9 @@ class AdminCRUD {
       window.notifications?.error(error.message || 'Error al guardar categoría');
     } finally {
       this.isLoading = false;
+      const form = document.getElementById('categoryForm');
+      if (window.LoadingStates) window.LoadingStates.hide(form);
+
       if (submitBtn) {
         submitBtn.innerHTML = originalBtnText;
         submitBtn.disabled = false;
@@ -878,6 +761,8 @@ class AdminCRUD {
     } catch (e) {
       window.notifications?.error(e.message);
     } finally {
+      const form = document.getElementById('userForm');
+      if (window.LoadingStates) window.LoadingStates.hide(form);
       this.isLoading = false;
     }
   }
@@ -927,6 +812,9 @@ class AdminCRUD {
       window.notifications?.error(error.message || 'Error al guardar reseña');
     } finally {
       this.isLoading = false;
+      const form = document.getElementById('reviewForm');
+      if (window.LoadingStates) window.LoadingStates.hide(form);
+
       if (submitBtn) {
         submitBtn.innerHTML = originalBtnText;
         submitBtn.disabled = false;
@@ -1156,7 +1044,7 @@ class AdminCRUD {
 }
 
 // Inicializar cuando el DOM esté listo
-(function() {
+(function () {
   function initAdminCRUD() {
     if (!window.adminCRUD) {
       window.adminCRUD = new AdminCRUD();
