@@ -511,12 +511,10 @@ document.addEventListener('DOMContentLoaded', async function () {
         footerContainer.innerHTML = window.Components.getFooter();
     }
 
-    // Verificar autenticación mejorado
-    const token = localStorage.getItem('auth_token');
-    if (!token) {
-        window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.pathname);
-        return;
-    }
+    // Verificar si se está accediendo solo a favoritos (permitido para invitados)
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get('tab');
+    const isWishlistOnly = tabParam === 'wishlist';
 
     // Esperar a que API esté lista
     const waitForAPI = async () => {
@@ -537,6 +535,33 @@ document.addEventListener('DOMContentLoaded', async function () {
             return;
         }
 
+        // Si solo se está accediendo a favoritos, permitir invitados
+        if (isWishlistOnly) {
+            // Inicializar solo favoritos para invitados
+            const wishlistTab = document.getElementById('wishlist');
+            if (wishlistTab) {
+                // Ocultar otras secciones que requieren autenticación
+                document.querySelectorAll('.account-section').forEach(section => {
+                    if (section.id !== 'wishlist') {
+                        section.style.display = 'none';
+                    }
+                });
+                // Mostrar solo favoritos
+                wishlistTab.classList.add('active');
+                wishlistTab.style.display = 'block';
+                // Cargar wishlist (funciona para invitados)
+                await loadWishlist();
+            }
+            return;
+        }
+
+        // Para otras secciones, requerir autenticación
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+            window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.pathname);
+            return;
+        }
+
         // Verificar autenticación con API
         try {
             const isAuth = window.authManager?.isAuthenticated?.() || false;
@@ -550,7 +575,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 }
             }
 
-            // Inicializar perfil
+            // Inicializar perfil completo
             await initializeProfile();
         } catch (error) {
             if (window.Logger) window.Logger.error('Error initializing profile:', error);
