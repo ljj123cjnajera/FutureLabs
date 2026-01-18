@@ -88,6 +88,47 @@
     }
 
     /**
+     * Espera un número determinado de milisegundos (async/await friendly)
+     * @param {number} ms - Milisegundos a esperar
+     * @returns {Promise} Promise que se resuelve después del delay
+     */
+    function wait(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    /**
+     * Espera hasta que una condición sea verdadera (con timeout)
+     * @param {Function} condition - Función que retorna boolean
+     * @param {Object} options - Opciones { maxRetries: 50, delay: 100, timeout: 5000 }
+     * @returns {Promise<boolean>} true si la condición se cumplió, false si timeout
+     */
+    async function waitFor(condition, options = {}) {
+        const {
+            maxRetries = 50,
+            delay = 100,
+            timeout = null
+        } = options;
+
+        const maxTime = timeout || (maxRetries * delay);
+        const startTime = Date.now();
+
+        for (let retries = 0; retries < maxRetries; retries++) {
+            if (condition()) {
+                return true;
+            }
+
+            // Verificar timeout si está configurado
+            if (timeout && (Date.now() - startTime) >= timeout) {
+                return false;
+            }
+
+            await wait(delay);
+        }
+
+        return false;
+    }
+
+    /**
      * Debounce function - Limita la frecuencia de ejecución de una función
      * @param {Function} func - Función a ejecutar
      * @param {number} wait - Tiempo de espera en ms
@@ -258,6 +299,8 @@
         sanitizeString,
         escapeHTML,
         sanitizeForHTML,
+        wait,
+        waitFor,
         debounce,
         throttle,
         formatNumber,

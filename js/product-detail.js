@@ -1,11 +1,10 @@
 // Inicializar header dinámico y cargar producto
 document.addEventListener('DOMContentLoaded', async function () {
-    // Esperar a que componentes críticos estén disponibles
-    let retries = 0;
-    while ((!window.Components || !window.api) && retries < 30) {
-        await new Promise(resolve => setTimeout(resolve, 100));
-        retries++;
-    }
+    // OPTIMIZED: Esperar a que componentes críticos estén disponibles usando utilidad
+    await window.Utils?.waitFor?.(
+        () => window.Components && window.api,
+        { maxRetries: 30, delay: 100 }
+    ) || await new Promise(resolve => setTimeout(resolve, 100)); // Fallback si Utils no está disponible
 
     // Inicializar header y footer
     if (window.Components) {
