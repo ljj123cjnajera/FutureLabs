@@ -332,13 +332,18 @@ document.addEventListener('DOMContentLoaded', async function () {
             // Fallback: simple gallery HTML if ProductGallery not available
             if (!window.productGallery || typeof window.productGallery.render !== 'function') {
                 if (window.Logger) window.Logger.warn('ProductGallery not available, using fallback');
-                const fallbackHTML = galleryImages.map(img => `
+                const svgPlaceholder = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Crect fill='%23e5e7eb' width='400' height='400'/%3E%3Ctext fill='%236b7280' font-family='system-ui, -apple-system, sans-serif' font-size='28' font-weight='900' x='50%25' y='45%25' text-anchor='middle'%3ESNEAKERS%3C/text%3E%3Ctext fill='%236b7280' font-family='system-ui, -apple-system, sans-serif' font-size='28' font-weight='900' x='50%25' y='60%25' text-anchor='middle'%3ESHOP%3C/text%3E%3C/svg%3E";
+                const validImages = galleryImages.filter(img => img && typeof img === 'string' && img.trim() !== '' && !img.includes('undefined') && !img.includes('null'));
+                const displayImages = validImages.length > 0 ? validImages : [svgPlaceholder];
+                const productName = product?.name || 'Producto';
+                
+                const fallbackHTML = displayImages.map((img, index) => `
                     <div class="gallery-image-wrapper">
-                        <img src="${img || 'assets/images/products/placeholder.jpg'}" 
-                             alt="${product.name || 'Producto'}" 
+                        <img src="${img}" 
+                             alt="${productName} - Vista ${index + 1}" 
                              class="gallery-image" 
-                             loading="lazy"
-                             onerror="this.src='assets/images/products/placeholder.jpg'">
+                             loading="${index === 0 ? 'eager' : 'lazy'}"
+                             onerror="this.src='${svgPlaceholder}'">
                     </div>
                 `).join('');
                 if (galleryContainer) {
