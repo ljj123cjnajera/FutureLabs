@@ -2,7 +2,7 @@
 class AdminManager {
   constructor() {
     this.currentSection = 'dashboard';
-    this.init();
+    // No inicializar en el constructor - se inicializa manualmente después de que dependencias estén cargadas
   }
 
   async init() {
