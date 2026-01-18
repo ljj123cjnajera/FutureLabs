@@ -838,14 +838,30 @@ document.addEventListener('DOMContentLoaded', async function () {
     // Cargar producto al iniciar
     await loadProduct();
 
-    if (productId && window.reviewsManager) {
-        await window.reviewsManager.init(productId, {
-            statsContainerId: 'reviewsStats',
-            listContainerId: 'reviewsList',
-            formContainerId: 'reviewFormContainer',
-            filterContainerId: 'reviewsFilterButtons',
-            sortSelectId: 'reviewsSortSelect',
-            writeButtonId: 'writeReviewBtn'
-        });
+    // Initialize reviews after product loads
+    if (productId) {
+        // Wait for reviewsManager if not available
+        if (!window.reviewsManager) {
+            let retries = 0;
+            while (!window.reviewsManager && retries < 20) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                retries++;
+            }
+        }
+        
+        if (window.reviewsManager) {
+            try {
+                await window.reviewsManager.init(productId, {
+                    statsContainerId: 'reviewsStats',
+                    listContainerId: 'reviewsList',
+                    formContainerId: 'reviewFormContainer',
+                    filterContainerId: 'reviewsFilterButtons',
+                    sortSelectId: 'reviewsSortSelect',
+                    writeButtonId: 'writeReviewBtn'
+                });
+            } catch (e) {
+                if (window.Logger) window.Logger.error('Error initializing reviews:', e);
+            }
+        }
     }
 });
