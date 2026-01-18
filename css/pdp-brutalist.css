@@ -440,6 +440,16 @@
     color: var(--white);
 }
 
+.btn-wishlist-detail.active {
+    background: #d32f2f;
+    color: var(--white);
+    border-color: #d32f2f;
+}
+
+.btn-wishlist-detail.active .fa-heart {
+    color: var(--white);
+}
+
 /* 14. PRODUCT PRICE DETAIL */
 .product-price-detail {
     margin-top: 2rem;
