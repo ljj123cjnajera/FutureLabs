@@ -415,32 +415,47 @@ class CatalogEngine {
                     imageUrl = p.image_url;
                 }
                 
+                // Usar escapeHTML para prevenir XSS
+                const escapeHtml = window.Utils?.escapeHTML || ((text) => {
+                    const div = document.createElement('div');
+                    div.textContent = text;
+                    return div.innerHTML;
+                });
+
+                const productId = escapeHtml(p.id || '');
+                const productName = escapeHtml(p.name || 'Producto');
+                const productBrand = escapeHtml(p.brand || 'SNEAKERS');
+                const productBadge = p.badge ? escapeHtml(p.badge) : '';
+                const currentPrice = parseFloat(p.discount_price || p.price || 0).toFixed(2);
+                const originalPrice = p.discount_price && p.discount_price < p.price ? parseFloat(p.price).toFixed(2) : null;
+                const isOutOfStock = (p.stock_quantity || 0) === 0;
+
                 return `
-                <div class="product-card" onclick="window.location.href='product-detail.html?id=${p.id}'">
+                <div class="product-card" onclick="window.location.href='product-detail.html?id=${productId}'">
                     <div class="product-image-container">
                         <img src="${imageUrl}" 
                              class="product-image" 
-                             alt="${p.name || 'Producto'}" 
+                             alt="${productName}" 
                              loading="lazy"
                              onerror="this.onerror=null; this.src='${svgPlaceholder}'; this.style.display='block';"
                              onload="this.style.display='block';"
                              style="display: block; min-height: 100%; object-fit: cover;">
-                        ${p.badge ? `<div class="product-badges"><span class="product-badge">${p.badge}</span></div>` : ''}
-                        ${(p.stock_quantity || 0) === 0 ? '<div class="product-badges"><span class="product-badge sold-out">AGOTADO</span></div>' : ''}
+                        ${productBadge ? `<div class="product-badges"><span class="product-badge">${productBadge}</span></div>` : ''}
+                        ${isOutOfStock ? '<div class="product-badges"><span class="product-badge sold-out">AGOTADO</span></div>' : ''}
                     </div>
                     <div class="product-content">
-                        <span class="product-category">${p.brand || 'SNEAKERS'}</span>
-                        <h3 class="product-title">${p.name}</h3>
+                        <span class="product-category">${productBrand}</span>
+                        <h3 class="product-title">${productName}</h3>
                         
                         <div class="product-price-container">
-                             <span class="product-price-current">S/ ${(p.discount_price || p.price || 0).toFixed(2)}</span>
-                             ${p.discount_price && p.discount_price < p.price ? `<span class="product-price-old" style="text-decoration: line-through; color: var(--gray-500); margin-left: 0.5rem; font-size: 0.9rem;">S/ ${p.price.toFixed(2)}</span>` : ''}
+                             <span class="product-price-current">S/ ${currentPrice}</span>
+                             ${originalPrice ? `<span class="product-price-old" style="text-decoration: line-through; color: var(--gray-500); margin-left: 0.5rem; font-size: 0.9rem;">S/ ${originalPrice}</span>` : ''}
                         </div>
                         
                         <button class="product-btn" 
-                                onclick="event.stopPropagation(); window.location.href='product-detail.html?id=${p.id}';"
-                                ${(p.stock_quantity || 0) === 0 ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
-                            <i class="fas fa-eye"></i> ${(p.stock_quantity || 0) === 0 ? 'AGOTADO' : 'VER DETALLES'}
+                                onclick="event.stopPropagation(); window.location.href='product-detail.html?id=${productId}';"
+                                ${isOutOfStock ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
+                            <i class="fas fa-eye"></i> ${isOutOfStock ? 'AGOTADO' : 'VER DETALLES'}
                         </button>
                     </div>
                 </div>
