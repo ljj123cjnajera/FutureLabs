@@ -1,5 +1,11 @@
 // Inicializar header dinámico y cargar producto
 document.addEventListener('DOMContentLoaded', async function () {
+    console.log("🚀 SNEAKERS SHOP: Product Detail Script v9.0-NUCLEAR Loaded");
+    console.log("🔍 Checking for legacy conflicts...", {
+        oldSelectSize: window.selectSize,
+        currentProductId: window.currentProductId,
+        domGrid: document.getElementById('sizeSelectorGrid')
+    });
     // Esperar a que componentes críticos estén disponibles
     let retries = 0;
     while ((!window.Components || !window.api) && retries < 30) {
@@ -419,7 +425,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         grid.innerHTML = sizes.map(size => {
             const stock = window.productSizeStock && window.productSizeStock[size] !== undefined
                 ? window.productSizeStock[size]
-                : (product.stock_quantity || 0);
+                : (product.stock_quantity !== undefined ? product.stock_quantity : 10);
             const isAvailable = stock > 0;
             const isLowStock = stock > 0 && stock <= 3;
 
