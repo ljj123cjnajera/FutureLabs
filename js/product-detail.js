@@ -147,6 +147,10 @@ document.addEventListener('DOMContentLoaded', async function () {
                 }
             }
 
+            renderProductDetails(product, container, galleryImages);
+            return;
+
+
         } catch (error) {
             if (window.ErrorHandler) {
                 window.ErrorHandler.api(error, 'loadProduct', 'No se pudo cargar el producto. Por favor, intenta de nuevo.');
