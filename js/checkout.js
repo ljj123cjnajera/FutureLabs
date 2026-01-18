@@ -536,8 +536,17 @@ class CheckoutManager {
 
                 // Redirect to Success Page
                 const orderId = response.data.order ? response.data.order.id : (response.data.id || 'CONFIRMED');
+                let redirectUrl = `order-success.html?id=${orderId}`;
+
+                // If guest email is present, pass it
+                if (orderData.email) {
+                    redirectUrl += `&email=${encodeURIComponent(orderData.email)}`;
+                } else if (!window.authManager.isAuthenticated() && this.guestEmail) {
+                    redirectUrl += `&email=${encodeURIComponent(this.guestEmail)}`;
+                }
+
                 setTimeout(() => {
-                    window.location.href = `order-success.html?id=${orderId}`;
+                    window.location.href = redirectUrl;
                 }, 1000);
             } else {
                 throw new Error(response.message || 'Failed to create order');

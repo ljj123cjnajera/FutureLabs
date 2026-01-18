@@ -33,6 +33,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (email) {
         const el = document.getElementById('customerEmail');
         if (el) el.textContent = email;
+
+        // CHECK AUTH STATE & SHOW UPSELL
+        const isGuest = !window.authManager || !window.authManager.isAuthenticated();
+
+        if (isGuest) {
+            // 1. Hide "View Order" button (requires auth)
+            const viewBtn = document.getElementById('viewOrderBtn');
+            if (viewBtn) viewBtn.style.display = 'none';
+
+            // 2. Show Upsell
+            const upsell = document.getElementById('guestUpsell');
+            const upsellEmail = document.getElementById('upsellEmail');
+            const registerLink = document.getElementById('registerLink');
+
+            if (upsell) {
+                upsell.style.display = 'block';
+                if (upsellEmail) upsellEmail.textContent = email;
+                if (registerLink) registerLink.href = `register.html?email=${encodeURIComponent(email)}`;
+            }
+        }
+
     } else if (window.authManager && window.authManager.currentUser) {
         const el = document.getElementById('customerEmail');
         if (el) el.textContent = window.authManager.currentUser.email;
