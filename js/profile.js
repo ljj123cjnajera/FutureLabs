@@ -108,11 +108,22 @@ async function loadOrders() {
         setIdText('totalSpent', `S/ ${totalSpent.toFixed(2)}`);
 
         if (orders.length === 0) {
-            // ... (keep empty state)
             if (window.LoadingStates) {
-                // ...
+                window.LoadingStates.empty('ordersList', {
+                    title: 'No hay pedidos',
+                    message: 'Asegura tu primer par para empezar a construir tu historial.',
+                    icon: 'fas fa-box-open',
+                    actionLabel: 'EMPEZAR A COMPRAR',
+                    actionUrl: 'products.html'
+                });
             } else {
-                // ...
+                container.innerHTML = `
+                    <div style="padding: 4rem 2rem; border: 2px dashed var(--black); text-align: center; background: var(--gray-100);">
+                        <i class="fas fa-box-open" style="font-size: 3rem; margin-bottom: 1rem; color: var(--gray-400);"></i>
+                        <h3 style="font-weight: 900; text-transform: uppercase;">NO HAY PEDIDOS</h3>
+                        <p style="margin-bottom: 2rem;">Asegura tu primer par para empezar a construir tu historial.</p>
+                        <a href="products.html" class="btn btn-primary">EMPEZAR A COMPRAR</a>
+                    </div>`;
             }
             return;
         }
