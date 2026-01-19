@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (el) el.textContent = email;
 
         // CHECK AUTH STATE & SHOW UPSELL
-        const isGuest = !window.authManager || !window.authManager.isAuthenticated();
+        const isGuest = !(window.authManager && typeof window.authManager.isAuthenticated === 'function' && window.authManager.isAuthenticated());
 
         if (isGuest) {
             // 1. Hide "View Order" button (requires auth)

@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="css/header-v3.css?v=8.0-URGENT">
     <link rel="stylesheet" href="css/product-cards.css?v=8.0-URGENT">
     <link rel="stylesheet" href="css/products-streetwear.css?v=8.0-URGENT">
+    <link rel="stylesheet" href="css/skeleton.css?v=8.0-URGENT">
     <link rel="stylesheet" href="css/animations.css?v=8.0-URGENT">
     <link rel="stylesheet" href="css/notifications.css?v=8.0-URGENT">
 
@@ -90,6 +91,28 @@
             font-size: 4rem;
             margin-bottom: 20px;
             color: #ccc;
+        }
+
+        @media (max-width: 768px) {
+            .search-results-header {
+                padding: 100px 1rem 2rem;
+            }
+            .search-query-display {
+                font-size: 2.5rem;
+            }
+            .search-filters-bar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.75rem;
+                padding: 1rem;
+            }
+            .grid-container {
+                padding: 2rem 1rem;
+            }
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+                gap: 1.5rem;
+            }
         }
     </style>
 </head>

@@ -61,7 +61,7 @@
 - [x] profile.html - ✅ OK
 - [x] about.html - ✅ OK
 - [x] contact.html - ✅ OK
-- [x] search.html - ⚠️ Necesita revisión CSS
+- [x] search.html - ✅ skeleton.css, media queries móvil (header, filtros, grid)
 
 ### Páginas de Autenticación
 - [x] login.html - ✅ Corregido (footer agregado)
@@ -83,12 +83,12 @@
 - [x] admin-coupons.html - ✅ Revisado: fuentes al inicio, utils.js, CSS sin header/footer/autocomplete
 
 ### Otras
-- [ ] order-success.html - ⚠️ Revisar
+- [x] order-success.html - ✅ OK: preconnect + fuentes; header/footer inyectados; logger, error-handler, loading-states, api, components, auth, notifications, cart, wishlist
 
 ## 🚀 PRÓXIMOS PASOS
 
-1. Verificar y corregir páginas admin
-2. Mejorar search.html (CSS)
-3. Agregar error-handler y loading-states a todas
-4. Mejorar responsive design
+1. ~~Verificar y corregir páginas admin~~ ✅
+2. ~~Mejorar search.html (CSS)~~ ✅ skeleton, media queries móvil
+3. Agregar error-handler y loading-states a todas (revisar páginas que falten)
+4. Mejorar responsive design en resto de páginas
 5. Optimizar performance
