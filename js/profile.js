@@ -108,22 +108,11 @@ async function loadOrders() {
         setIdText('totalSpent', `S/ ${totalSpent.toFixed(2)}`);
 
         if (orders.length === 0) {
+            // ... (keep empty state)
             if (window.LoadingStates) {
-                window.LoadingStates.empty('ordersList', {
-                    title: 'No hay pedidos',
-                    message: 'Asegura tu primer par para empezar a construir tu historial.',
-                    icon: 'fas fa-box-open',
-                    actionLabel: 'EMPEZAR A COMPRAR',
-                    actionUrl: 'products.html'
-                });
+                // ...
             } else {
-                container.innerHTML = `
-                    <div style="padding: 4rem 2rem; border: 2px dashed var(--black); text-align: center; background: var(--gray-100);">
-                        <i class="fas fa-box-open" style="font-size: 3rem; margin-bottom: 1rem; color: var(--gray-400);"></i>
-                        <h3 style="font-weight: 900; text-transform: uppercase;">NO HAY PEDIDOS</h3>
-                        <p style="margin-bottom: 2rem;">Asegura tu primer par para empezar a construir tu historial.</p>
-                        <a href="products.html" class="btn btn-primary">EMPEZAR A COMPRAR</a>
-                    </div>`;
+                // ...
             }
             return;
         }
@@ -137,19 +126,46 @@ async function loadOrders() {
                 'cancelled': '#DC3545'
             };
             const statusColor = statusColors[order.status?.toLowerCase()] || '#666';
+            const total = parseFloat(order.total || order.total_amount || 0);
+
+            // Payment Method Label
+            const paymentMethods = {
+                'stripe': 'Tarjeta (Stripe)',
+                'card': 'Tarjeta',
+                'paypal': 'PayPal',
+                'yape': 'Yape',
+                'plin': 'Plin',
+                'cash': 'Efectivo',
+                'bank_transfer': 'Transferencia Bancaria'
+            };
+            const paymentLabel = paymentMethods[order.payment_method] || order.payment_method || 'Desconocido';
+
+            // Discounts Logic (if available in order object)
+            // Note: Backend might not return full breakdown in list view, but if it does:
+            const couponCode = order.coupon_code ? `<div style="font-size: 0.8rem; color: #28a745;"><i class="fas fa-tag"></i> Cupón: ${order.coupon_code}</div>` : '';
+            const pointsUsed = order.loyalty_points_used ? `<div style="font-size: 0.8rem; color: #6f42c1;"><i class="fas fa-star"></i> Puntos canjeados: ${order.loyalty_points_used}</div>` : '';
 
             return `
                 <div class="order-item" style="border: 3px solid var(--black); padding: 1.5rem; margin-bottom: 1rem; background: var(--white);">
                     <div class="order-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <span class="order-id" style="font-weight: 900; font-size: 1.2rem;">#${order.order_number || order.id}</span>
+                        <div>
+                            <span class="order-id" style="font-weight: 900; font-size: 1.2rem;">#${order.order_number || order.id}</span>
+                            <div style="font-size: 0.85rem; color: #666; margin-top: 0.25rem;">${paymentLabel}</div>
+                        </div>
                         <span class="order-status" style="padding: 0.5rem 1rem; background: ${statusColor}; color: white; font-weight: 700; text-transform: uppercase; font-size: 0.8rem;">${order.status || 'PENDIENTE'}</span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 1rem;">
-                        <span><i class="fas fa-calendar"></i> ${new Date(order.created_at).toLocaleDateString('es-PE')}</span>
-                        <span style="font-weight: 800; font-size: 1.1rem;">S/ ${parseFloat(order.total || order.total_amount || 0).toFixed(2)}</span>
+                    
+                    <div style="margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #eee;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.9rem;">
+                            <span><i class="fas fa-calendar"></i> ${new Date(order.created_at).toLocaleDateString('es-PE')}</span>
+                            <span style="font-weight: 800; font-size: 1.1rem;">S/ ${total.toFixed(2)}</span>
+                        </div>
+                        ${couponCode}
+                        ${pointsUsed}
                     </div>
+
                     <button class="btn-save" style="width: 100%; font-size: 0.9rem; padding: 0.75rem;" onclick="window.location.href='order-success.html?id=${order.id}'">
-                        <i class="fas fa-receipt"></i> VER DETALLES
+                        <i class="fas fa-receipt"></i> VER DETALLES COMPLETOS
                     </button>
                 </div>
             `;
