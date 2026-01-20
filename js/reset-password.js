@@ -19,11 +19,14 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // Auto-fill token from URL
+    // Auto-fill token from URL y ocultar campo si viene del enlace de email
     const urlParams = new URLSearchParams(window.location.search);
     const tokenParam = urlParams.get('token');
-    if (tokenParam) {
-        document.getElementById('token').value = tokenParam;
+    const tokenInput = document.getElementById('token');
+    const tokenGroup = form.querySelector('.form-group');
+    if (tokenParam && tokenInput) {
+        tokenInput.value = tokenParam;
+        if (tokenGroup) tokenGroup.style.display = 'none';
     }
 
     form.addEventListener('submit', async (e) => {

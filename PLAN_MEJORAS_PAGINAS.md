@@ -61,7 +61,7 @@
 - [x] profile.html - ✅ OK
 - [x] about.html - ✅ OK
 - [x] contact.html - ✅ OK
-- [x] search.html - ✅ skeleton.css, media queries móvil (header, filtros, grid)
+- [x] search.html - ✅ skeleton en loading, media 600px (filtros, grid 1 col), typography→variables
 
 ### Páginas de Autenticación
 - [x] login.html - ✅ Corregido (footer agregado)
@@ -91,4 +91,4 @@
 2. ~~Mejorar search.html (CSS)~~ ✅ skeleton, media queries móvil
 3. ~~Agregar error-handler y loading-states a todas~~ ✅ (todas las .html los incluyen)
 4. ~~Mejorar responsive: faq, terms, profile, 404~~ ✅ faq/legal layouts en pages-brutalist; profile en account-brutalist; 404 footer, .btn-home, breakpoint 600px
-5. Optimizar performance (preload críticos, defer no críticos, lazy images)
+5. ~~Optimizar performance (preload críticos, defer no críticos, lazy images)~~ ✅ preload typography+imagen hero en index; getProductCard ya usa loading=lazy

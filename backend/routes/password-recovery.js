@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
+const emailService = require('../services/emailService');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 
@@ -36,16 +37,24 @@ router.post('/request', async (req, res) => {
       password_reset_token: resetToken,
       password_reset_expires: resetTokenExpiry
     });
-    
-    // TODO: Enviar email con el token
-    // Por ahora, devolvemos el token en la respuesta (solo para desarrollo)
-    console.log('Token de recuperación:', resetToken);
-    
+
+    // Enviar email con el enlace de restablecimiento
+    try {
+      const userName = [user.first_name, user.last_name].filter(Boolean).join(' ') || user.email?.split('@')[0] || 'usuario';
+      await emailService.sendPasswordResetLink(user.email, resetToken, userName);
+    } catch (err) {
+      if (err.message === 'RESEND_NO_CONFIGURED') {
+        console.log('⚠️  Resend no configurado. En desarrollo el token se puede mostrar en consola.');
+      } else {
+        console.error('Error enviando email de recuperación:', err.message);
+      }
+      // No fallamos la petición: por seguridad no revelamos si el email existe
+    }
+
     res.json({
       success: true,
       message: 'Si el email existe, recibirás instrucciones para recuperar tu contraseña',
-      // Solo en desarrollo
-      ...(process.env.NODE_ENV === 'development' && { resetToken })
+      ...(process.env.NODE_ENV === 'development' && !process.env.RESEND_API_KEY && { resetToken })
     });
   } catch (error) {
     console.error('Error requesting password recovery:', error);
@@ -76,7 +85,7 @@ router.post('/reset', async (req, res) => {
     }
     
     // Buscar usuario por token
-    const user = await User.findByPasswordResetToken(token);
+    const user = await User.getByResetToken(token);
     
     if (!user) {
       return res.status(400).json({

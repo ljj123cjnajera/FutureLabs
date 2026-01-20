@@ -79,7 +79,64 @@ class EmailService {
     }
   }
 
-  // Enviar código de recuperación de contraseña
+  // Enviar link de recuperación de contraseña (token en URL)
+  async sendPasswordResetLink(email, resetToken, userName) {
+    try {
+      if (!process.env.RESEND_API_KEY) {
+        console.log('⚠️  Resend no configurado, no se puede enviar email de recuperación');
+        throw new Error('RESEND_NO_CONFIGURED');
+      }
+
+      const baseUrl = process.env.FRONTEND_URL || 'https://ljj123cjnajera.github.io/FutureLabs';
+      const resetLink = `${baseUrl.replace(/\/$/, '')}/reset-password.html?token=${encodeURIComponent(resetToken)}`;
+
+      const html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; color: white; border-radius: 10px 10px 0 0; }
+            .content { background: #f9f9f9; padding: 30px; margin-top: -5px; border-radius: 0 0 10px 10px; }
+            .button { display: inline-block; padding: 15px 30px; background: #667eea; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+            .footer { margin-top: 20px; text-align: center; color: #666; font-size: 12px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header"><h1>🔐 SneakersShop</h1><p>Recupera tu contraseña</p></div>
+            <div class="content">
+              <h2>¡Hola ${userName || 'usuario'}!</h2>
+              <p>Recibimos una solicitud para restablecer tu contraseña.</p>
+              <p><a href="${resetLink}" class="button">RESTABLECER CONTRASEÑA</a></p>
+              <p style="color:#666;font-size:14px;">Este enlace caduca en <strong>1 hora</strong>. Si no solicitaste esto, ignora este correo.</p>
+              <p style="color:#999;font-size:12px;word-break:break-all;">Si el botón no funciona, copia: ${resetLink}</p>
+            </div>
+            <div class="footer"><p>© ${new Date().getFullYear()} SneakersShop. No respondas a este correo.</p></div>
+          </div>
+        </body>
+        </html>
+      `;
+
+      await this.resend.emails.send({
+        from: process.env.EMAIL_FROM || 'FutureLabs <no-reply@futurelabs.website>',
+        to: email,
+        subject: 'Restablece tu contraseña - SneakersShop',
+        html
+      });
+
+      console.log(`✅ Email de recuperación enviado a ${email}`);
+      return true;
+    } catch (error) {
+      if (error.message === 'RESEND_NO_CONFIGURED') throw error;
+      console.error('❌ Error enviando email de recuperación:', error.message);
+      throw error;
+    }
+  }
+
+  // Enviar código de recuperación de contraseña (6 dígitos, flujo alternativo)
   async sendPasswordResetCode(email, code, userName) {
     try {
       // Si no hay API key de Resend, lanzar error

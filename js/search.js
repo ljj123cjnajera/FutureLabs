@@ -87,11 +87,11 @@ class SearchEngine {
         if (searchTitle) searchTitle.textContent = `"${query}"`;
         if (countLabel) countLabel.textContent = 'Buscando en catálogo...';
 
-        // Show loading state
+        // Show loading state (skeleton en grid de productos)
         if (window.LoadingStates) {
             window.LoadingStates.show('searchResultsGrid', {
                 message: 'Escaneando catálogo...',
-                type: 'spinner'
+                type: 'skeleton'
             });
         } else {
             container.innerHTML = '<div style="text-align: center; padding: 60px; grid-column: 1 / -1;"><div class="loading-spinner"></div><p>Escaneando catálogo...</p></div>';
