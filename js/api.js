@@ -249,6 +249,20 @@ class SneakersAPI {
     return response;
   }
 
+  async requestPasswordRecovery(email) {
+    return this.request('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email })
+    });
+  }
+
+  async resetPassword(token, newPassword) {
+    return this.request('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ token, new_password: newPassword })
+    });
+  }
+
   async logout() {
     if (window.Logger) window.Logger.log('🚪 API.logout() - Iniciando...');
     try {
@@ -316,14 +330,14 @@ class SneakersAPI {
         }
       }
     });
-    
+
     // Only create params if we have valid filters
     let queryString = '';
     if (Object.keys(cleanFilters).length > 0) {
       const params = new URLSearchParams(cleanFilters);
       queryString = params.toString();
     }
-    
+
     return this.request(`/products${queryString ? `?${queryString}` : ''}`);
   }
 
