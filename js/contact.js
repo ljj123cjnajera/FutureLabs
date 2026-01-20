@@ -61,12 +61,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // Intentar enviar al backend si existe endpoint
             if (window.api && window.api.request) {
                 try {
-                    const response = await window.api.request('/api/contact', {
+                    const response = await window.api.request('/contact', {
                         method: 'POST',
-                        body: JSON.stringify(formData),
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
+                        body: JSON.stringify(formData)
                     });
 
                     if (response && response.success) {

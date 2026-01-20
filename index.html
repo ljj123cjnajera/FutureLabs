@@ -137,7 +137,7 @@
     <!-- Hero Slider -->
     <main id="main-content">
         <section class="hero-section" aria-label="Hero slider">
-            <div id="heroSlidesContainer" class="hero-slides">
+            <div id="heroSlidesContainer" class="hero-slides" tabindex="0" aria-label="Carrusel hero. Flecha izquierda o derecha para cambiar de imagen.">
                 <!-- Static Slide 1 (Critical Rendering Path) -->
                 <div class="slide active hero-bg-1">
                     <div class="slide-content">
@@ -193,6 +193,7 @@
                 </div>
             </div>
             <div id="heroSliderDots" class="hero-dots"></div>
+            <p id="heroSlideStatus" class="sr-only" aria-live="polite" aria-atomic="true"></p>
         </section>
 
         <!-- Brand Marquee Compacto -->
@@ -246,8 +247,8 @@
                     </div>
 
                     <!-- Dynamic Grid Container -->
+                    <p id="engineProductCount" class="sr-only" aria-live="polite" aria-atomic="true"></p>
                     <div id="engineGrid" class="product-grid-v3 engine-grid-container">
-
                         <!-- JS will inject cards here -->
                     </div>
 

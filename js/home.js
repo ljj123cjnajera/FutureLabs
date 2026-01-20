@@ -214,11 +214,14 @@ class HomeEngine {
       if (dotsContainer) {
         const slideCount = existingSlides.length;
         dotsContainer.innerHTML = Array.from({ length: slideCount }, (_, index) => `
-          <button class="slider-dot ${index === 0 ? 'active' : ''}" onclick="window.homeEngine.goToSlide(${index})"></button>
+          <button class="slider-dot ${index === 0 ? 'active' : ''}" onclick="window.homeEngine.goToSlide(${index})" aria-label="Ir a diapositiva ${index + 1}"></button>
         `).join('');
       }
+      const st0 = document.getElementById('heroSlideStatus');
+      if (st0) st0.textContent = `Slide 1 de ${existingSlides.length}`;
       this.startSliderAutoPlay(existingSlides.length);
       this.setupHeroTouch(container, existingSlides.length);
+      this.setupHeroKeyboard(container, existingSlides.length);
       return; // Salir sin reemplazar el contenido
     }
 
@@ -299,12 +302,15 @@ class HomeEngine {
 
     if (dotsContainer) {
       dotsContainer.innerHTML = slides.map((_, index) => `
-                <button class="slider-dot ${index === 0 ? 'active' : ''}" onclick="window.homeEngine.goToSlide(${index})"></button>
+                <button class="slider-dot ${index === 0 ? 'active' : ''}" onclick="window.homeEngine.goToSlide(${index})" aria-label="Ir a diapositiva ${index + 1}"></button>
             `).join('');
     }
 
+    const st = document.getElementById('heroSlideStatus');
+    if (st) st.textContent = `Slide 1 de ${slides.length}`;
     this.startSliderAutoPlay(slides.length);
     this.setupHeroTouch(container, slides.length);
+    this.setupHeroKeyboard(container, slides.length);
   }
 
   startSliderAutoPlay(count) {
@@ -319,8 +325,11 @@ class HomeEngine {
   goToSlide(index) {
     const slides = document.querySelectorAll('.slide');
     const dots = document.querySelectorAll('.slider-dot');
+    const n = slides.length;
     slides.forEach((s, i) => s.classList.toggle('active', i === index));
     dots.forEach((d, i) => d.classList.toggle('active', i === index));
+    const st = document.getElementById('heroSlideStatus');
+    if (st && n) st.textContent = `Slide ${index + 1} de ${n}`;
   }
 
   setupHeroTouch(container, count) {
@@ -349,6 +358,19 @@ class HomeEngine {
         this.goToSlide((current - 1 + count) % count);
       }
     };
+  }
+
+  setupHeroKeyboard(container, count) {
+    if (!container || count <= 1) return;
+    if (container.dataset.heroKeyboard === '1') return;
+    container.dataset.heroKeyboard = '1';
+    container.addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      const current = Array.from(document.querySelectorAll('.slide')).findIndex(s => s.classList.contains('active'));
+      if (e.key === 'ArrowLeft') this.goToSlide((current - 1 + count) % count);
+      else this.goToSlide((current + 1) % count);
+      e.preventDefault();
+    });
   }
 
   // ==========================================
@@ -1215,6 +1237,10 @@ class HomeEngine {
         // 4. Update "See All" Link
         if (seeAll) seeAll.href = `products.html?category=${category}`;
 
+        // 5. Anunciar cantidad para lectores de pantalla
+        const ec = document.getElementById('engineProductCount');
+        if (ec) ec.textContent = (products && products.length) ? `${products.length} productos en ${(category || '').toUpperCase()}` : 'Sin productos';
+
       } catch (err) {
         if (window.Logger) window.Logger.warn('❌ Engine Error:', err);
         // Mostrar estado vacío en lugar de productos mock
@@ -1226,6 +1252,8 @@ class HomeEngine {
             <button onclick="location.reload()" class="btn btn-black">RECARGAR</button>
           </div>
         `;
+        const ecc = document.getElementById('engineProductCount');
+        if (ecc) ecc.textContent = 'Error al cargar productos';
       } finally {
         // 5. Reveal
         if (window.LoadingStates) {

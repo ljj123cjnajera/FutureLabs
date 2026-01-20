@@ -347,6 +347,16 @@ body.loaded #preloader {
     transform: scale(1.2);
 }
 
+.slider-dot:focus-visible {
+    outline: 2px solid var(--accent, #ffc107);
+    outline-offset: 2px;
+}
+
+.hero-slides:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.9);
+    outline-offset: 2px;
+}
+
 .slide .btn {
     padding: 1.25rem 3rem;
     font-size: 1.2rem;

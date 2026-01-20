@@ -95,5 +95,6 @@
 
 ## 🆕 PRÓXIMOS (opcionales)
 - ~~Accesibilidad: funnel cart/checkout~~ ✅ checkout: pasos role=list+listitem, aria-current en JS, #checkoutContent role=status aria-live; cart: summary-shipping-note role=status+aria-label
-- Accesibilidad: slider home/products (teclado, focus-visible, productsCount aria-live)
-- Recuperación: FRONTEND_URL en backend para enlaces según deploy
+- ~~Accesibilidad: slider home/products (teclado, focus-visible, productsCount aria-live)~~ ✅ hero: teclado Arrow L/R, aria-label dots, heroSlideStatus aria-live, focus-visible; engine: engineProductCount aria-live
+- ~~Recuperación: FRONTEND_URL en backend~~ ✅ env.example comentario CORS+enlaces correo
+- contact: ruta /contact (sin /api); opcional LoadingStates
