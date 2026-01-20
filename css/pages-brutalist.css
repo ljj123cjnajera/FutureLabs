@@ -137,6 +137,10 @@
 }
 
 @media (max-width: 768px) {
+    .page-hero {
+        padding: 2rem 1rem;
+    }
+    .page-hero .hero-title { font-size: 2rem; line-height: 1.2; }
     .contact-layout {
         grid-template-columns: 1fr;
     }

@@ -32,6 +32,31 @@
     }
 }
 
+@media (max-width: 600px) {
+    .cart-header-container { padding-left: 1rem; padding-right: 1rem; }
+    .cart-grid-v3 { gap: 1.5rem; margin-top: 1rem; }
+    .cart-item {
+        grid-template-columns: 70px 1fr;
+        grid-template-rows: auto auto;
+        gap: 0.75rem;
+        padding: 1rem;
+    }
+    .cart-item-image img { height: 70px; }
+    .cart-item-details { grid-column: 2; }
+    .cart-item-price-col {
+        grid-column: 1 / -1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        padding-top: 0.75rem;
+        border-top: 2px solid var(--black);
+    }
+    .cart-item-title { font-size: 1rem; }
+    .quantity-control { margin-top: 0.5rem; }
+}
+
 /* ============================================
    2. CART ITEMS (THE MONOLITH LIST)
    ============================================ */
