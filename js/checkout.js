@@ -83,6 +83,35 @@ class CheckoutManager {
             this.renderOrderSummary();
             if (this.currentStep === 3) this.renderReview();
         });
+
+        this.setupNavButtons();
+        this.updateNavButtons();
+    }
+
+    setupNavButtons() {
+        var self = this;
+        var prev = document.getElementById('btnPrevious');
+        var next = document.getElementById('btnNext');
+        if (prev) prev.addEventListener('click', function () {
+            if (self.currentStep === 1) window.location.href = 'cart.html';
+            else if (self.currentStep === 2) self.renderStep(1);
+            else if (self.currentStep === 3) self.renderStep(2);
+        });
+        if (next) next.addEventListener('click', function () {
+            if (self.currentStep === 1) self.nextStep();
+            else if (self.currentStep === 2) self.renderStep(3);
+            else if (self.currentStep === 3) self.placeOrder();
+        });
+    }
+
+    updateNavButtons() {
+        var n = this.currentStep;
+        var next = document.getElementById('btnNext');
+        var prev = document.getElementById('btnPrevious');
+        if (!next || !prev) return;
+        if (n === 4) return;
+        prev.textContent = n === 1 ? 'CARRITO' : 'VOLVER';
+        next.textContent = n === 1 ? 'CONTINUAR' : n === 2 ? 'REVISAR PEDIDO' : 'CONFIRMAR PEDIDO';
     }
 
     async loadLoyaltyInfo() {
@@ -177,12 +206,16 @@ class CheckoutManager {
             s.classList.toggle('completed', sNum < step);
         });
 
+        var nav = document.getElementById('checkoutNavigation');
+        if (nav) nav.style.display = step === 4 ? 'none' : '';
+
         // Render Content
         if (step === 1) this.renderShipping();
         else if (step === 2) this.renderPayment();
         else if (step === 3) this.renderReview();
         else if (step === 4) this.renderSuccess();
 
+        this.updateNavButtons();
         window.scrollTo(0, 0);
     }
 
@@ -236,8 +269,12 @@ class CheckoutManager {
         this.formContainer.innerHTML = contentHtml;
     }
 
+    isGuest() {
+        return !(window.authManager && typeof window.authManager.isAuthenticated === 'function' && window.authManager.isAuthenticated());
+    }
+
     getAddressFormHtml() {
-        const isGuest = !window.authManager || !window.authManager.isAuthenticated();
+        var isGuest = this.isGuest();
         return `
             <form id="addressForm">
                 ${isGuest ? `
@@ -282,6 +319,20 @@ class CheckoutManager {
         `;
     }
 
+    nextStep() {
+        if (this.currentStep === 1) {
+            if (this.addresses.length === 0) {
+                if (window.notifications) window.notifications.warning('Dirección requerida', 'Completa el formulario y haz clic en GUARDAR Y CONTINUAR.');
+                return;
+            }
+            if (this.addresses.length > 0 && !this.selectedAddressId) {
+                if (window.notifications) window.notifications.warning('Selecciona una dirección', 'Elige una dirección de envío para continuar.');
+                return;
+            }
+            this.renderStep(2);
+        }
+    }
+
     selectAddress(id) {
         this.selectedAddressId = id;
         this.renderShipping(); // Re-render to update selection visual
@@ -295,69 +346,55 @@ class CheckoutManager {
     }
 
     async saveNewAddress() {
-        const form = document.getElementById('addressForm');
+        var form = document.getElementById('addressForm');
+        if (!form) return;
         if (!form.checkValidity()) {
-            if (window.notifications) {
-                window.notifications.warning('Campos Requeridos', 'Por favor, completa todos los campos obligatorios');
-            }
+            form.reportValidity();
+            if (window.notifications) window.notifications.warning('Campos requeridos', 'Completa todos los campos marcados como obligatorios.');
             return;
         }
 
-        const formData = new FormData(form);
-        const addressData = Object.fromEntries(formData);
+        var formData = new FormData(form);
+        var addressData = Object.fromEntries(formData);
 
-        // Handle Guest Flow
-        if (!window.authManager || !window.authManager.isAuthenticated()) {
+        if (this.isGuest()) {
             this.guestAddress = addressData;
-            this.guestEmail = addressData.email;
+            this.guestEmail = addressData.email || null;
             this.selectedAddressId = 'GUEST_ADDR';
-
-            // Advance to Payment immediately
             this.renderStep(2);
             return;
         }
 
-        // Handle Auth Flow
         addressData.is_default = this.addresses.length === 0;
         addressData.type = 'shipping';
 
-        const btn = document.querySelector('.btn-black');
-        const originalBtnText = btn ? btn.innerHTML : '';
+        var btn = this.formContainer.querySelector('button.btn-black') || document.querySelector('#checkoutContent button.btn-black');
+        var originalBtnText = btn ? btn.innerHTML : '';
 
         try {
-            if (btn) btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> GUARDANDO...';
-            btn.disabled = true;
+            if (btn) { btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> GUARDANDO...'; btn.disabled = true; }
 
-            const res = await window.api.createAddress(addressData);
-            if (res.success) {
-                await this.loadAddresses(); // Refresh list
-                const newAddr = res.data.address || res.data;
-                this.selectedAddressId = newAddr.id;
-                this.renderStep(1); // Go back to rendering list
-                if (window.notifications) {
-                    window.notifications.success('Dirección Guardada', 'La dirección se guardó correctamente');
-                }
+            if (!window.api || typeof window.api.createAddress !== 'function') {
+                throw new Error('El servicio no está disponible. Verifica tu conexión.');
+            }
+            var res = await window.api.createAddress(addressData);
+            if (res && res.success) {
+                await this.loadAddresses();
+                var newAddr = (res.data && res.data.address) ? res.data.address : (res.data || res.address || res);
+                this.selectedAddressId = newAddr && newAddr.id ? newAddr.id : this.selectedAddressId;
+                if (window.notifications) window.notifications.success('Dirección guardada', 'La dirección se guardó correctamente.');
+                this.renderStep(2);
             } else {
-                if (window.ErrorHandler) {
-                    window.ErrorHandler.handle(res, {
-                        context: 'saveNewAddress',
-                        userMessage: res.message || 'No se pudo guardar la dirección'
-                    });
-                } else if (window.notifications) {
-                    window.notifications.error('Error', res.message || 'No se pudo guardar la dirección');
-                }
+                var msg = (res && res.message) ? res.message : 'No se pudo guardar la dirección.';
+                if (window.ErrorHandler && res) window.ErrorHandler.handle(res, { context: 'saveNewAddress', userMessage: msg });
+                if (window.notifications) window.notifications.error('Error', msg);
             }
         } catch (e) {
-            if (window.ErrorHandler) {
-                window.ErrorHandler.api(e, 'saveNewAddress', 'No se pudo guardar la dirección. Verifica tu conexión.');
-            } else {
-                if (window.Logger) window.Logger.error('Address Save Failed:', e);
-            }
+            if (window.ErrorHandler) window.ErrorHandler.api(e, 'saveNewAddress', 'No se pudo guardar la dirección. Verifica tu conexión.');
+            if (window.notifications) window.notifications.error('Error', e && e.message ? e.message : 'No se pudo guardar la dirección. Verifica tu conexión.');
+            if (window.Logger) window.Logger.error('saveNewAddress error:', e);
         } finally {
-            if (btn) {
-                btn.innerHTML = originalBtnText || 'GUARDAR Y CONTINUAR';
-                btn.disabled = false;
-            }
+            if (btn) { btn.innerHTML = originalBtnText || 'GUARDAR Y CONTINUAR'; btn.disabled = false; }
         }
     }
 
@@ -523,24 +560,40 @@ class CheckoutManager {
         this.formContainer.innerHTML = html;
     }
 
+    renderSuccess() {
+        this.formContainer.innerHTML = `
+            <div class="checkout-form-section fade-in" style="text-align: center; padding: 3rem 2rem;">
+                <div style="font-size: 4rem; margin-bottom: 1.5rem; color: var(--black);"><i class="fas fa-check-circle"></i></div>
+                <h2 style="font-size: 1.75rem; font-weight: 900; text-transform: uppercase; margin-bottom: 1rem;">PEDIDO CONFIRMADO</h2>
+                <p style="font-size: 1.1rem; color: var(--gray-600); margin-bottom: 1.5rem;">Redirigiendo a la página de confirmación...</p>
+                <div class="loading-spinner" style="margin: 0 auto 1.5rem;"></div>
+                <p style="font-size: 0.9rem; color: var(--gray-500);"><a href="order-success.html" style="color: var(--black); text-decoration: underline;">Haz clic aquí</a> si no eres redirigido.</p>
+            </div>
+        `;
+    }
+
     async placeOrder() {
-        const btn = document.querySelector('.btn-confirm-order') || document.querySelector('.btn-black.btn-block');
-        const originalBtnText = btn ? btn.innerHTML : '';
+        var btn = document.querySelector('.btn-confirm-order') || document.querySelector('.btn-black.btn-block');
+        var navNext = document.getElementById('btnNext');
+        var originalBtnText = btn ? btn.innerHTML : '';
 
         if (btn) {
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESANDO...';
             btn.disabled = true;
         }
+        if (navNext) navNext.disabled = true;
 
         if (!this.selectedAddressId) {
             if (window.notifications) window.notifications.warning('Dirección Requerida', 'Por favor, selecciona una dirección de envío');
             this.renderStep(1);
             if (btn) { btn.innerHTML = originalBtnText; btn.disabled = false; }
+            if (navNext) navNext.disabled = false;
             return;
         }
 
         if (!this.cart || this.cart.length === 0) {
             if (window.notifications) window.notifications.warning('Carrito Vacío', 'Tu carrito está vacío');
+            if (navNext) navNext.disabled = false;
             window.location.href = 'cart.html';
             return;
         }
@@ -585,25 +638,20 @@ class CheckoutManager {
                 // Update Badge
                 if (window.Components) window.Components.updateCartCount();
 
-                // Show success notification
                 if (window.notifications) {
                     window.notifications.success('Pedido Creado', 'Tu pedido se ha procesado correctamente');
                 }
 
-                // Redirect to Success Page
-                const orderId = response.data.order ? response.data.order.id : (response.data.id || 'CONFIRMED');
-                let redirectUrl = `order-success.html?id=${orderId}`;
-
-                // If guest email is present, pass it
+                var orderId = response.data.order ? response.data.order.id : (response.data.id || 'CONFIRMED');
+                var redirectUrl = `order-success.html?id=${orderId}`;
                 if (orderData.email) {
                     redirectUrl += `&email=${encodeURIComponent(orderData.email)}`;
                 } else if (!(window.authManager && window.authManager.isAuthenticated && window.authManager.isAuthenticated()) && this.guestEmail) {
                     redirectUrl += `&email=${encodeURIComponent(this.guestEmail)}`;
                 }
 
-                setTimeout(() => {
-                    window.location.href = redirectUrl;
-                }, 1000);
+                this.renderStep(4);
+                setTimeout(function () { window.location.href = redirectUrl; }, 1200);
             } else {
                 throw new Error(response.message || 'Failed to create order');
             }
@@ -620,11 +668,11 @@ class CheckoutManager {
                 }
             }
         } finally {
-            // Restaurar botón
             if (btn) {
                 btn.innerHTML = originalBtnText;
                 btn.disabled = false;
             }
+            if (navNext) navNext.disabled = false;
         }
     }
 
