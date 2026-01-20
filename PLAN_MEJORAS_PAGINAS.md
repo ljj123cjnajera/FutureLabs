@@ -54,7 +54,7 @@
 
 ### Páginas Principales
 - [x] index.html - ✅ OK
-- [x] products.html - ✅ OK
+- [x] products.html - ✅ products-streetwear 600px (grid 1 col, hero, toolbar, pagination)
 - [x] product-detail.html - ✅ OK
 - [x] cart.html - ✅ OK
 - [x] checkout.html - ✅ OK

@@ -906,3 +906,36 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+@media (max-width: 600px) {
+    .products-hero-section {
+        padding: 1.5rem 0;
+    }
+    .hero-title {
+        font-size: 1.5rem;
+    }
+    .products-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    .product-grid-v3 {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    .product-grid-v3.list-view .product-card {
+        grid-template-columns: 80px 1fr;
+        padding: 0.75rem;
+    }
+    .product-grid-v3.list-view .product-image-container {
+        width: 80px;
+        height: 80px;
+    }
+    .products-toolbar {
+        padding: 0.5rem;
+    }
+    .pagination-brutalist .btn {
+        min-width: 36px;
+        padding: 0.4rem 0.5rem;
+        font-size: 0.8rem;
+    }
+}
