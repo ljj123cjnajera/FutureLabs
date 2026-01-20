@@ -224,7 +224,7 @@ class CheckoutManager {
         try {
             var r = await window.api.getCart();
             if (r && r.success && r.data && r.data.items && r.data.items.length) this.cart = r.data.items;
-        } catch (_) {}
+        } catch (_) { }
     }
 
     renderStep(step) {
@@ -564,10 +564,10 @@ class CheckoutManager {
                 <div class="review-block">
                     <h4>PRODUCTOS:</h4>
                     ${this.cart.map(item => {
-                        const price = parseFloat(item.discount_price || item.price || 0);
-                        const q = item.quantity || 1;
-                        return `<p>${q}x ${item.name}${item.size ? ' (Talla: ' + item.size + ')' : ''} - S/ ${(price * q).toFixed(2)}</p>`;
-                    }).join('')}
+            const price = parseFloat(item.discount_price || item.price || 0);
+            const q = item.quantity || 1;
+            return `<p>${q}x ${item.name}${item.size ? ' (Talla: ' + item.size + ')' : ''} - S/ ${(price * q).toFixed(2)}</p>`;
+        }).join('')}
                 </div>
                 <div class="review-block" style="border-top: 2px solid var(--black); padding-top: 1rem; margin-top: 1rem;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
@@ -694,6 +694,12 @@ class CheckoutManager {
 
         try {
             var orderData = {
+                items: this.cart.map(item => ({
+                    product_id: item.product_id || item.id,
+                    quantity: item.quantity,
+                    price: item.discount_price || item.price,
+                    size: item.size || null
+                })),
                 payment_method: this.paymentMethod === 'card' ? 'stripe' : this.paymentMethod,
                 coupon_code: (window.couponsManager && window.couponsManager.getAppliedCoupon && window.couponsManager.getAppliedCoupon()) ? window.couponsManager.getAppliedCoupon().code : undefined,
                 loyalty_points_used: t.loyaltyPointsEffective > 0 ? t.loyaltyPointsEffective : undefined,
@@ -776,9 +782,9 @@ class CheckoutManager {
                 <h3>RESUMEN DEL PEDIDO</h3>
                 <div class="summary-items">
                     ${this.cart.map(item => {
-                        const price = parseFloat(item.discount_price || item.price || 0);
-                        const q = item.quantity || 1;
-                        return `
+            const price = parseFloat(item.discount_price || item.price || 0);
+            const q = item.quantity || 1;
+            return `
                         <div class="summary-item">
                             <img src="${item.image_url || item.image || 'assets/images/products/placeholder.jpg'}" alt="${item.name}" onerror="this.src='assets/images/products/placeholder.jpg'">
                             <div>
@@ -787,7 +793,7 @@ class CheckoutManager {
                                 ${item.size ? `<p style="font-size: 0.8rem; color: #666;">Talla: ${item.size}</p>` : ''}
                             </div>
                         </div>`;
-                    }).join('')}
+        }).join('')}
                 </div>
                 <div class="summary-totals">
                     <div class="row"><span>Subtotal</span> <span>S/ ${t.subtotal.toFixed(2)}</span></div>
