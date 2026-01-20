@@ -65,6 +65,26 @@
     margin-right: auto;
 }
 
+.btn-home {
+    display: inline-block;
+    padding: 1rem 2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 1rem;
+    border: 3px solid var(--black, #000);
+    background: var(--black, #000);
+    color: var(--white, #fff);
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.btn-home:hover {
+    background: var(--white, #fff);
+    color: var(--black, #000);
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 var(--black, #000);
+}
+
 .error-actions {
     display: flex;
     gap: 1rem;
@@ -131,5 +151,26 @@
     
     .error-actions .btn {
         width: 100%;
+    }
+}
+
+@media (max-width: 600px) {
+    .error-container {
+        padding: 0 1rem;
+    }
+    .error-code {
+        font-size: 4rem;
+    }
+    .error-msg {
+        font-size: 1.25rem;
+    }
+    .error-desc {
+        font-size: 0.95rem;
+        margin: 1.5rem 0 2rem;
+    }
+    .btn-home {
+        width: 100%;
+        text-align: center;
+        padding: 0.875rem 1.5rem;
     }
 }

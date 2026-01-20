@@ -21,6 +21,30 @@ body {
     .account-container {
         grid-template-columns: 1fr;
         gap: 2rem;
+        padding: 1.5rem 1rem;
+    }
+    .account-sidebar {
+        position: static;
+    }
+    .section-title {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .account-container {
+        padding: 1rem;
+        gap: 1.5rem;
+    }
+    .section-title {
+        font-size: 1.75rem;
+    }
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    .account-nav-btn {
+        padding: 0.875rem;
+        font-size: 0.9rem;
     }
 }
 

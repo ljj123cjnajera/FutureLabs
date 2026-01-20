@@ -136,6 +136,63 @@
     padding: var(--spacing-lg) 0;
 }
 
+/* FAQ: layout principal + sidebar */
+.faq-layout {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 2rem;
+    align-items: start;
+}
+
+.faq-sidebar {
+    position: sticky;
+    top: 100px;
+}
+
+.faq-hero-meta,
+.legal-hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.meta-card {
+    border: 2px solid rgba(255,255,255,0.3);
+    padding: 0.75rem 1.25rem;
+    min-width: 140px;
+}
+
+.faq-search-card {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+}
+
+.faq-search-card input { flex: 1; min-width: 200px; padding: 0.75rem 1rem; border: 2px solid var(--border-color, #ddd); }
+
+/* Legal: layout contenido + sidebar */
+.legal-layout {
+    display: grid;
+    grid-template-columns: 1fr 260px;
+    gap: 2rem;
+    align-items: start;
+}
+
+.legal-sidebar {
+    position: sticky;
+    top: 100px;
+}
+
+.legal-toc ul { list-style: none; padding: 0; margin: 0; }
+.legal-toc a { display: block; padding: 0.5rem 0; border-bottom: 1px solid #eee; text-decoration: none; color: inherit; font-size: 0.9rem; }
+.legal-toc a:hover, .legal-toc a.is-active { font-weight: 700; }
+.legal-aside-card { border: 2px solid var(--black); padding: 1.25rem; margin-bottom: 1.5rem; }
+.legal-aside-card ul { list-style: none; padding: 0; margin: 0; }
+.legal-aside-card a { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0; text-decoration: none; color: inherit; }
+
 @media (max-width: 768px) {
     .page-hero {
         padding: 2rem 1rem;
@@ -144,6 +201,34 @@
     .contact-layout {
         grid-template-columns: 1fr;
     }
+    .faq-layout,
+    .legal-layout {
+        grid-template-columns: 1fr;
+    }
+    .faq-sidebar,
+    .legal-sidebar {
+        position: static;
+    }
+    .faq-hero-meta,
+    .legal-hero-meta {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    .meta-card { min-width: 0; }
+    .faq-search-card {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .faq-search-card input { min-width: 0; }
+    .hero-actions {
+        flex-direction: column;
+    }
+    .hero-actions .btn { width: 100%; justify-content: center; }
+}
+
+@media (max-width: 600px) {
+    .page-hero { padding: 1.5rem 1rem; }
+    .hero-title { font-size: 1.75rem; }
 }
 
 .contact-form-card {

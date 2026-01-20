@@ -90,5 +90,5 @@
 1. ~~Verificar y corregir páginas admin~~ ✅
 2. ~~Mejorar search.html (CSS)~~ ✅ skeleton, media queries móvil
 3. ~~Agregar error-handler y loading-states a todas~~ ✅ (todas las .html los incluyen)
-4. Mejorar responsive: cart (cart-item móvil), pages-brutalist (page-hero, contact-layout); pendiente: faq, terms, profile, 404
-5. Optimizar performance
+4. ~~Mejorar responsive: faq, terms, profile, 404~~ ✅ faq/legal layouts en pages-brutalist; profile en account-brutalist; 404 footer, .btn-home, breakpoint 600px
+5. Optimizar performance (preload críticos, defer no críticos, lazy images)
