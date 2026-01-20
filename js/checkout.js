@@ -230,11 +230,13 @@ class CheckoutManager {
     renderStep(step) {
         this.currentStep = step;
 
-        // Update Stepper UI
+        // Update Stepper UI + aria-current para lectores de pantalla
         this.steps.forEach(s => {
             const sNum = parseInt(s.dataset.step);
             s.classList.toggle('active', sNum === step);
             s.classList.toggle('completed', sNum < step);
+            if (sNum === step) s.setAttribute('aria-current', 'step');
+            else s.removeAttribute('aria-current');
         });
 
         var nav = document.getElementById('checkoutNavigation');

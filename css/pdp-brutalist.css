@@ -559,3 +559,26 @@
     margin-left: 10px;
     font-weight: 800;
 }
+
+@media (max-width: 600px) {
+    .product-detail-page {
+        padding-top: 1rem;
+        padding-bottom: 5rem;
+    }
+    .product-detail-layout {
+        gap: 1.25rem;
+    }
+    .product-title-large {
+        font-size: 1.75rem;
+    }
+    .product-price-large, .price-current, .price-discount {
+        font-size: 1.5rem;
+    }
+    .sticky-mobile-atc {
+        padding: 0.75rem;
+    }
+    .sticky-mobile-atc .btn-massive {
+        font-size: 0.95rem;
+        padding: 0.85rem;
+    }
+}

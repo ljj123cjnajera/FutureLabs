@@ -311,8 +311,8 @@ class CartEngine {
                         <span>${shipping === 0 ? 'GRATIS' : `S/ ${shipping.toFixed(2)}`}</span>
                     </div>
                     ${subtotal < 150 ? `
-                    <div class="summary-shipping-note" style="font-size: 0.85rem; color: #666; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #eee;">
-                        <i class="fas fa-info-circle"></i> Agrega S/ ${(150 - subtotal).toFixed(2)} más para envío gratis
+                    <div class="summary-shipping-note" role="status" aria-label="Faltan S/ ${(150 - subtotal).toFixed(2)} para envío gratis. Añade más productos." style="font-size: 0.85rem; color: #666; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #eee;">
+                        <i class="fas fa-info-circle" aria-hidden="true"></i> Agrega S/ ${(150 - subtotal).toFixed(2)} más para envío gratis
                     </div>
                     ` : ''}
 

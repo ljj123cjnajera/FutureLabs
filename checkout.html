@@ -18,8 +18,7 @@
 
     <!-- Canonical -->
     <link rel="canonical" href="https://ljj123cjnajera.github.io/FutureLabs/checkout.html">
-    <!-- Google Fonts - Fuentes Profesionales -->
-    <!-- Google Fonts - Fuentes Profesionales -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -45,8 +44,6 @@
 
 
     <div class="checkout-page">
-        <!-- Brutalist Title -->
-        <!-- Brutalist Title -->
         <div class="container checkout-title-container">
             <h1 class="checkout-main-title">CHECKOUT
                 SEGURO</h1>
@@ -63,31 +60,19 @@
 
 
         <div class="container">
-            <!-- Progress Bar -->
-            <div class="checkout-progress" id="checkoutProgress">
-                <div class="step active" data-step="1" aria-current="step">
-                    <div class="step-number">1</div>
-                    <div class="step-label">ENVÍO</div>
-                </div>
-                <div class="step" data-step="2">
-                    <div class="step-number">2</div>
-                    <div class="step-label">PAGO</div>
-                </div>
-                <div class="step" data-step="3">
-                    <div class="step-number">3</div>
-                    <div class="step-label">REVISAR</div>
-                </div>
-                <div class="step" data-step="4">
-                    <div class="step-number">4</div>
-                    <div class="step-label">CONFIRMAR</div>
-                </div>
+            <!-- Progress Bar: lista accesible, aria-current en JS -->
+            <div class="checkout-progress" id="checkoutProgress" role="list" aria-label="Pasos del checkout">
+                <div class="step active" data-step="1" aria-current="step" role="listitem"><div class="step-number">1</div><div class="step-label">ENVÍO</div></div>
+                <div class="step" data-step="2" role="listitem"><div class="step-number">2</div><div class="step-label">PAGO</div></div>
+                <div class="step" data-step="3" role="listitem"><div class="step-number">3</div><div class="step-label">REVISAR</div></div>
+                <div class="step" data-step="4" role="listitem"><div class="step-number">4</div><div class="step-label">CONFIRMAR</div></div>
             </div>
 
             <!-- Main Grid -->
             <div class="checkout-container">
-                <!-- Left Column: Forms -->
-                <div class="checkout-content" id="checkoutContent">
-                    <div style="text-align: center; padding: 100px;" role="status" aria-live="polite">
+                <!-- Left Column: Forms (role=status para anunciar cambios) -->
+                <div class="checkout-content" id="checkoutContent" role="status" aria-live="polite">
+                    <div style="text-align: center; padding: 100px;">
                         <div class="loading-brutalist">CARGANDO SERVIDOR SEGURO...</div>
                     </div>
                 </div>
@@ -98,8 +83,6 @@
                 </div>
             </div>
 
-            <!-- Navigation Actions (Moved outside grid for mobile flow or kept inside? JS appends them. Let's keep a container just in case) -->
-            <!-- Navigation Actions (Moved outside grid for mobile flow or kept inside? JS appends them. Let's keep a container just in case) -->
             <div class="checkout-navigation checkout-nav-container" id="checkoutNavigation">
                 <button class="btn btn-outline btn-nav" id="btnPrevious">BACK</button>
                 <button class="btn btn-black btn-nav" id="btnNext">CONTINUE</button>

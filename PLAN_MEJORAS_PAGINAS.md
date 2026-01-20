@@ -55,7 +55,7 @@
 ### Páginas Principales
 - [x] index.html - ✅ OK
 - [x] products.html - ✅ products-streetwear 600px (grid 1 col, hero, toolbar, pagination)
-- [x] product-detail.html - ✅ OK
+- [x] product-detail.html - ✅ pdp-brutalist 600px (título, precio, sticky-atc)
 - [x] cart.html - ✅ OK
 - [x] checkout.html - ✅ OK
 - [x] profile.html - ✅ OK
@@ -94,5 +94,6 @@
 5. ~~Optimizar performance (preload críticos, defer no críticos, lazy images)~~ ✅ preload typography+imagen hero en index; getProductCard ya usa loading=lazy
 
 ## 🆕 PRÓXIMOS (opcionales)
-- Accesibilidad: completar [~] en final-polish (slider home/products, funnel cart/checkout/orders)
+- ~~Accesibilidad: funnel cart/checkout~~ ✅ checkout: pasos role=list+listitem, aria-current en JS, #checkoutContent role=status aria-live; cart: summary-shipping-note role=status+aria-label
+- Accesibilidad: slider home/products (teclado, focus-visible, productsCount aria-live)
 - Recuperación: FRONTEND_URL en backend para enlaces según deploy
