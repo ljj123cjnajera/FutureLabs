@@ -139,10 +139,14 @@ class CheckoutManager {
                     (Array.isArray(response) ? response : []);
             }
 
-            // Si falla API o está vacio, intentar localStorage
             if (!this.cart || this.cart.length === 0) {
-                const stored = localStorage.getItem('brutalist_cart');
-                if (stored) this.cart = JSON.parse(stored);
+                var stored = localStorage.getItem('brutalist_cart');
+                if (stored) {
+                    try { this.cart = JSON.parse(stored); } catch (_) { this.cart = []; }
+                    if (this.cart && this.cart.length && !this.isGuest() && window.api && typeof window.api.addToCart === 'function') {
+                        await this.syncCartToApi();
+                    }
+                }
             }
 
             if (!this.cart || this.cart.length === 0) {
@@ -165,10 +169,13 @@ class CheckoutManager {
                 if (window.Logger) window.Logger.error('Error loading cart:', error);
             }
 
-            // Fallback final a localStorage
-            const stored = localStorage.getItem('brutalist_cart');
-            if (stored) this.cart = JSON.parse(stored);
-
+            var stored = localStorage.getItem('brutalist_cart');
+            if (stored) {
+                try { this.cart = JSON.parse(stored); } catch (_) { this.cart = []; }
+                if (this.cart && this.cart.length && !this.isGuest() && window.api && typeof window.api.addToCart === 'function') {
+                    await this.syncCartToApi();
+                }
+            }
             if (!this.cart || this.cart.length === 0) window.location.href = 'cart.html';
         } finally {
             if (window.LoadingStates) window.LoadingStates.hide(this.formContainer, false);
@@ -176,24 +183,48 @@ class CheckoutManager {
     }
 
     async loadAddresses() {
+        if (this.isGuest()) {
+            this.addresses = [];
+            return;
+        }
         try {
-            const response = await window.api.getAddresses();
-            if (response.success) {
+            if (!window.api || typeof window.api.getAddresses !== 'function') {
+                this.addresses = [];
+                return;
+            }
+            var response = await window.api.getAddresses();
+            if (response && response.success) {
                 this.addresses = response.data.addresses || response.data || [];
-                // Auto-select
                 if (this.addresses.length > 0) {
-                    const defaultAddr = this.addresses.find(a => a.is_default);
+                    var defaultAddr = this.addresses.find(function (a) { return a.is_default; });
                     this.selectedAddressId = defaultAddr ? defaultAddr.id : this.addresses[0].id;
                 }
             } else {
                 this.addresses = [];
             }
         } catch (e) {
-            if (window.ErrorHandler) {
-                window.ErrorHandler.api(e, 'loadAddresses', 'No se pudieron cargar las direcciones');
-            }
+            if (window.ErrorHandler) window.ErrorHandler.api(e, 'loadAddresses', 'No se pudieron cargar las direcciones');
             this.addresses = [];
         }
+    }
+
+    /** Sincroniza this.cart (desde localStorage) al carrito de la API para usuarios autenticados. Luego actualiza this.cart con la respuesta. */
+    async syncCartToApi() {
+        if (!this.cart || !this.cart.length || !window.api) return;
+        for (var i = 0; i < this.cart.length; i++) {
+            var it = this.cart[i];
+            var pid = it.product_id || it.id;
+            if (!pid) continue;
+            try {
+                await window.api.addToCart(pid, it.quantity || 1, { size: it.size || null });
+            } catch (e) {
+                if (window.Logger) window.Logger.warn('syncCart: no se pudo añadir', pid, e);
+            }
+        }
+        try {
+            var r = await window.api.getCart();
+            if (r && r.success && r.data && r.data.items && r.data.items.length) this.cart = r.data.items;
+        } catch (_) {}
     }
 
     renderStep(step) {
@@ -497,24 +528,29 @@ class CheckoutManager {
             return;
         }
 
-        let addr = this.addresses.find(a => a.id == this.selectedAddressId);
-        if (this.selectedAddressId === 'GUEST_ADDR' && this.guestAddress) {
-            addr = this.guestAddress;
-        }
+        var addr = this.selectedAddressId === 'GUEST_ADDR' && this.guestAddress
+            ? this.guestAddress
+            : this.addresses.find(function (a) { return a.id == this.selectedAddressId; }.bind(this));
+        if (!addr) { this.renderStep(1); return; }
 
-        const t = this.getTotals();
+        var fullName = addr.full_name || ([addr.first_name, addr.last_name].filter(Boolean).join(' ')) || '—';
+        var line1 = addr.address || addr.street_address || addr.street || '—';
+        var line2 = (addr.city || '') + (addr.state || addr.region ? ', ' + (addr.state || addr.region) : '') + (addr.postal_code ? ', ' + addr.postal_code : '');
+        var phone = addr.phone || addr.phone_number || '';
 
-        const html = `
+        var t = this.getTotals();
+
+        var html = `
             <div class="checkout-form-section fade-in">
                 <h2>REVISAR PEDIDO</h2>
                 <div class="review-block">
                     <h4>ENVIAR A:</h4>
-                    <p><strong>${addr.first_name} ${addr.last_name}</strong></p>
-                    <p>${addr.email ? `<span>${addr.email}</span><br>` : ''}</p>
-                    <p>${addr.street_address || addr.street}</p>
-                    <p>${addr.city}${addr.region ? ', ' + addr.region : ''}, ${addr.postal_code}</p>
+                    <p><strong>${fullName}</strong></p>
+                    ${(addr.email || this.guestEmail) ? '<p><span>' + (addr.email || this.guestEmail) + '</span></p>' : ''}
+                    <p>${line1}</p>
+                    <p>${line2 || '—'}</p>
                     <p>${addr.country || 'Perú'}</p>
-                    ${addr.phone_number ? `<p><i class="fas fa-phone"></i> ${addr.phone_number}</p>` : ''}
+                    ${phone ? '<p><i class="fas fa-phone"></i> ' + phone + '</p>' : ''}
                 </div>
                 <div class="review-block">
                     <h4>MÉTODO DE PAGO:</h4>
@@ -582,6 +618,44 @@ class CheckoutManager {
         `;
     }
 
+    /** Construye el objeto plano de envío que exige /api/orders: shipping_address, shipping_city, shipping_full_name, shipping_email, shipping_phone, etc. */
+    getShippingFlat() {
+        var addr = null;
+        var email = null;
+
+        if (this.selectedAddressId === 'GUEST_ADDR' && this.guestAddress) {
+            addr = this.guestAddress;
+            email = this.guestEmail || addr.email || null;
+            return {
+                shipping_full_name: [addr.first_name, addr.last_name].filter(Boolean).join(' ').trim() || '—',
+                shipping_address: (addr.street_address || addr.address || '').trim() || '—',
+                shipping_city: (addr.city || '').trim() || '—',
+                shipping_country: (addr.country || 'Perú').trim(),
+                shipping_phone: (addr.phone_number || addr.phone || '').trim() || '—',
+                shipping_email: email || '',
+                shipping_state: (addr.state || addr.region || null) || null,
+                shipping_postal_code: (addr.postal_code || null) || null
+            };
+        }
+
+        var a = this.addresses.find(function (x) { return x.id == this.selectedAddressId; }.bind(this));
+        if (!a) return null;
+
+        var u = (window.authManager && (window.authManager.currentUser || (typeof window.authManager.getUser === 'function' ? window.authManager.getUser() : null))) || null;
+        email = (a.email && /@/.test(a.email)) ? a.email : (u && u.email) || '';
+
+        return {
+            shipping_full_name: (a.full_name || (a.first_name || '') + ' ' + (a.last_name || '') || '—').trim(),
+            shipping_address: (a.address || a.street_address || '').trim() || '—',
+            shipping_city: (a.city || '').trim() || '—',
+            shipping_country: (a.country || 'Perú').trim(),
+            shipping_phone: (a.phone || a.phone_number || '').trim() || '—',
+            shipping_email: email,
+            shipping_state: (a.state || a.region || null) || null,
+            shipping_postal_code: (a.postal_code || null) || null
+        };
+    }
+
     async placeOrder() {
         var btn = document.querySelector('.btn-confirm-order') || document.querySelector('.btn-black.btn-block');
         var navNext = document.getElementById('btnNext');
@@ -610,33 +684,35 @@ class CheckoutManager {
 
         const t = this.getTotals();
 
+        var flat = this.getShippingFlat();
+        if (!flat || !flat.shipping_email || !/@/.test(flat.shipping_email)) {
+            if (window.notifications) window.notifications.warning('Email requerido', 'Se necesita un email válido para el envío. Añade uno en la dirección o inicia sesión.');
+            if (btn) { btn.innerHTML = originalBtnText; btn.disabled = false; }
+            if (navNext) navNext.disabled = false;
+            return;
+        }
+
         try {
-            const orderData = {
-                items: this.cart.map(item => ({
-                    product_id: item.product_id || item.id,
-                    quantity: item.quantity,
-                    price: item.discount_price || item.price,
-                    size: item.size || null
-                })),
+            var orderData = {
                 payment_method: this.paymentMethod === 'card' ? 'stripe' : this.paymentMethod,
-                payment_details: {
-                    provider: 'stripe',
-                    transaction_id: 'tx_' + Date.now()
-                },
                 coupon_code: (window.couponsManager && window.couponsManager.getAppliedCoupon && window.couponsManager.getAppliedCoupon()) ? window.couponsManager.getAppliedCoupon().code : undefined,
                 loyalty_points_used: t.loyaltyPointsEffective > 0 ? t.loyaltyPointsEffective : undefined,
-                expected_total: t.total
+                expected_total: t.total,
+                shipping_cost: t.shipping,
+                shipping_address: flat.shipping_address,
+                shipping_city: flat.shipping_city,
+                shipping_country: flat.shipping_country,
+                shipping_full_name: flat.shipping_full_name,
+                shipping_email: flat.shipping_email,
+                shipping_phone: flat.shipping_phone
             };
+            if (flat.shipping_state) orderData.shipping_state = flat.shipping_state;
+            if (flat.shipping_postal_code) orderData.shipping_postal_code = flat.shipping_postal_code;
 
-            if (this.selectedAddressId === 'GUEST_ADDR' && this.guestAddress) {
-                orderData.shipping_address = this.guestAddress;
-                if (this.guestEmail) orderData.email = this.guestEmail;
-            } else {
-                orderData.shipping_address_id = this.selectedAddressId;
-            }
+            if (this.isGuest()) orderData.email = flat.shipping_email;
 
             if (window.Logger) window.Logger.log('📤 Placing Order:', orderData);
-            const response = await window.api.createOrder(orderData);
+            var response = await window.api.createOrder(orderData);
 
             if (response.success) {
                 if (window.Logger) window.Logger.log('✅ Order Created');
@@ -667,15 +743,16 @@ class CheckoutManager {
             }
 
         } catch (e) {
-            // Usar error handler si está disponible
-            if (window.ErrorHandler) {
-                window.ErrorHandler.api(e, 'placeOrder', 'No se pudo procesar el pedido. Por favor, intenta de nuevo.');
-            } else {
+            var is401 = (e && (e.status === 401 || (e.response && e.response.status === 401))) || (e && e.message && /401|unauthorized|token/i.test(String(e.message)));
+            if (is401) {
+                if (window.notifications) window.notifications.error('Inicia sesión', 'Para completar la compra inicia sesión o crea una cuenta. Redirigiendo...');
+                setTimeout(function () { window.location.href = 'login.html?returnUrl=' + encodeURIComponent('checkout.html'); }, 1800);
+                return;
+            }
+            if (window.ErrorHandler) window.ErrorHandler.api(e, 'placeOrder', 'No se pudo procesar el pedido. Por favor, intenta de nuevo.');
+            else {
                 if (window.Logger) window.Logger.error('Order Error:', e);
-                if (window.notifications) {
-                    const errorMsg = e.message || e.response?.data?.message || 'No se pudo procesar el pedido. Por favor, intenta de nuevo.';
-                    window.notifications.error('Error al Procesar', errorMsg);
-                }
+                if (window.notifications) window.notifications.error('Error al procesar', (e && e.message) || (e && e.data && e.data.message) || 'No se pudo procesar el pedido. Por favor, intenta de nuevo.');
             }
         } finally {
             if (btn) {

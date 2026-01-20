@@ -250,6 +250,20 @@
     color: var(--accent);
 }
 
+/* Nav: BACK / CONTINUE */
+.checkout-navigation.checkout-nav-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--black);
+}
+
+.checkout-navigation .btn-nav {
+    min-width: 140px;
+}
+
 /* RESPONSIVE */
 @media (max-width: 1024px) {
     .checkout-container {
@@ -259,13 +273,44 @@
 
     .order-summary-box {
         position: static;
-        order: -1;
-        /* Show summary first on mobile usually, or keep bottom? Keeping bottom for now or standard flow */
         order: 2;
     }
 
     .form-row {
         grid-template-columns: 1fr;
         gap: 0;
+    }
+}
+
+@media (max-width: 600px) {
+    .checkout-page {
+        padding-top: 100px;
+    }
+
+    .checkout-trust-row {
+        flex-direction: column;
+        gap: 0.75rem;
+        font-size: 0.8rem;
+    }
+
+    .checkout-progress {
+        gap: 0.25rem;
+    }
+
+    .step-label {
+        font-size: 0.7rem;
+    }
+
+    .checkout-navigation.checkout-nav-container {
+        flex-direction: column;
+    }
+
+    .checkout-navigation .btn-nav {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .order-summary-box {
+        padding: 1.25rem;
     }
 }
