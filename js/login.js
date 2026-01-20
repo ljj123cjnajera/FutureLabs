@@ -15,13 +15,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // 1. Auto-redirect if already logged in
-    if (window.authManager) {
-        // Wait for auth init if needed (though usually sync with token)
-        if (window.authManager.isAuthenticated()) {
-            window.location.href = 'profile.html';
-            return;
-        }
+    if (window.authManager && typeof window.authManager.isAuthenticated === 'function' && window.authManager.isAuthenticated()) {
+        window.location.href = (new URLSearchParams(window.location.search)).get('returnUrl') || 'profile.html';
+        return;
     }
 
     const form = document.getElementById('loginForm');
@@ -34,62 +30,52 @@ document.addEventListener('DOMContentLoaded', async () => {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            // Validar formulario antes de enviar
+            var emailInput = form.querySelector('#loginEmail') || form.elements.email;
+            var passwordInput = form.querySelector('#loginPassword') || form.elements.password;
+            var email = (emailInput && emailInput.value) ? String(emailInput.value).trim() : '';
+            var password = (passwordInput && passwordInput.value) ? String(passwordInput.value) : '';
+            var returnUrl = (new URLSearchParams(window.location.search)).get('returnUrl') || 'profile.html';
+            var btn = form.querySelector('button[type="submit"]');
+            var originalText = btn ? btn.innerHTML : '';
+
             if (window.FormValidator) {
-                const validation = window.FormValidator.validateForm(form, {
-                    showErrors: true,
-                    focusFirstError: true
-                });
+                var validation = window.FormValidator.validateForm(form, { showErrors: true, focusFirstError: true });
                 if (!validation.valid) {
-                    if (window.notifications) {
-                        window.notifications.warning('Formulario Inválido', 'Por favor, corrige los errores en el formulario');
-                    }
+                    if (window.notifications) window.notifications.warning('Formulario inválido', 'Corrige los campos marcados.');
                     return;
                 }
             }
 
             try {
-                // MODERN CORE: Use LoadingStates
                 if (window.LoadingStates) {
                     window.LoadingStates.show(form, { type: 'spinner', message: 'Iniciando sesión...', overlay: true });
-                } else {
+                } else if (btn) {
                     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> INICIANDO SESIÓN...';
                     btn.disabled = true;
                 }
 
-                if (window.authManager) {
-                    if (window.Logger) window.Logger.log('🔐 Attempting login for:', email);
-                    const success = await window.authManager.login(email, password);
+                if (!window.authManager) {
+                    throw new Error('AuthManager no está disponible. Recarga la página.');
+                }
 
-                    if (success) {
-                        if (window.Logger) window.Logger.log('✅ Login successful, redirecting to:', returnUrl);
-                        setTimeout(() => {
-                            window.location.href = returnUrl;
-                        }, 500);
-                    } else {
-                        if (window.Logger) window.Logger.warn('❌ Login failed');
-                        if (window.LoadingStates) window.LoadingStates.hide(form);
-                        else {
-                            btn.innerHTML = originalText;
-                            btn.disabled = false;
-                        }
-                    }
+                if (window.Logger) window.Logger.log('🔐 Login attempt:', email ? email.replace(/(.{2}).*(@.*)/, '$1***$2') : '(sin email)');
+                var success = await window.authManager.login(email, password);
+
+                if (success) {
+                    if (window.Logger) window.Logger.log('✅ Login OK, redirigiendo a:', returnUrl);
+                    setTimeout(function () { window.location.href = returnUrl; }, 400);
                 } else {
-                    throw new Error('AuthManager no está disponible');
+                    if (window.LoadingStates) window.LoadingStates.hide(form, false);
+                    else if (btn) { btn.innerHTML = originalText; btn.disabled = false; }
+                    if (window.notifications) window.notifications.error('Error al iniciar sesión', 'Correo o contraseña incorrectos. Verifica e intenta de nuevo.');
                 }
             } catch (error) {
-                if (window.LoadingStates) window.LoadingStates.hide(form);
+                if (window.LoadingStates) window.LoadingStates.hide(form, false);
+                else if (btn) { btn.innerHTML = originalText; btn.disabled = false; }
 
-                if (window.ErrorHandler) {
-                    window.ErrorHandler.api(error, 'login', 'No se pudo iniciar sesión.');
-                } else {
-                    if (window.notifications) window.notifications.error('Error', 'No se pudo iniciar sesión.');
-                }
-
-                if (!window.LoadingStates) {
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                }
+                var msg = (error && error.message) ? error.message : 'No se pudo iniciar sesión. Verifica tu conexión.';
+                if (window.ErrorHandler) window.ErrorHandler.api(error, 'login', msg);
+                else if (window.notifications) window.notifications.error('Error', msg);
             }
         });
     }
