@@ -66,8 +66,8 @@
 ### Páginas de Autenticación
 - [x] login.html - ✅ Corregido (footer agregado)
 - [x] register.html - ✅ Corregido (footer agregado)
-- [x] forgot-password.html - ✅ OK
-- [x] reset-password.html - ✅ OK
+- [x] forgot-password.html - ✅ success-message oculto+.show, recovery layout auth-brutalist, LoadingStates, aria status
+- [x] reset-password.html - ✅ ocultar token si ?token=, layout reset en auth-brutalist
 
 ### Páginas Legales/Info
 - [x] faq.html - ✅ OK
@@ -92,3 +92,7 @@
 3. ~~Agregar error-handler y loading-states a todas~~ ✅ (todas las .html los incluyen)
 4. ~~Mejorar responsive: faq, terms, profile, 404~~ ✅ faq/legal layouts en pages-brutalist; profile en account-brutalist; 404 footer, .btn-home, breakpoint 600px
 5. ~~Optimizar performance (preload críticos, defer no críticos, lazy images)~~ ✅ preload typography+imagen hero en index; getProductCard ya usa loading=lazy
+
+## 🆕 PRÓXIMOS (opcionales)
+- Accesibilidad: completar [~] en final-polish (slider home/products, funnel cart/checkout/orders)
+- Recuperación: FRONTEND_URL en backend para enlaces según deploy

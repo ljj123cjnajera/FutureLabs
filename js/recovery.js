@@ -36,8 +36,12 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="loading-inline"><span class="loading-spinner small"></span> Enviando...</span>';
+        if (window.LoadingStates) {
+            window.LoadingStates.show(form, { type: 'spinner', message: 'Enviando...', overlay: true });
+        } else {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="loading-inline"><span class="loading-spinner small"></span> Enviando...</span>';
+        }
 
         try {
             const response = await window.api.requestPasswordRecovery(email);
@@ -46,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Ocultar formulario y mostrar mensaje de éxito
                 form.style.display = 'none';
                 successMessage.classList.add('show');
+                successMessage.setAttribute('aria-hidden', 'false');
                 window.notifications?.success?.('Instrucciones enviadas');
 
                 // Mostrar token solo en desarrollo para facilitar pruebas
@@ -61,11 +66,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.Logger) window.Logger.error('Error al enviar instrucciones:', error);
             window.notifications?.error?.('Error al conectar con el servidor');
         } finally {
-            if (submitBtn) {
+            if (window.LoadingStates) window.LoadingStates.hide(form);
+            if (submitBtn && !successMessage.classList.contains('show')) {
                 submitBtn.disabled = false;
-                if (!successMessage.classList.contains('show')) {
-                    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Instrucciones';
-                }
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Instrucciones';
             }
         }
     });
