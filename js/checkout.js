@@ -234,12 +234,12 @@ class CheckoutManager {
                             <div class="address-card ${this.selectedAddressId === addr.id ? 'selected' : ''}" 
                                  onclick="checkoutManager.selectAddress('${addr.id}')">
                                 <div class="addr-header">
-                                    <strong>${addr.first_name || ''} ${addr.last_name || ''}</strong>
+                                    <strong>${addr.full_name || (addr.first_name || '') + ' ' + (addr.last_name || '') || '—'}</strong>
                                     ${addr.is_default ? '<span class="badge">PREDETERMINADA</span>' : ''}
                                 </div>
-                                <p>${addr.street_address}</p>
-                                <p>${addr.city}, ${addr.postal_code}</p>
-                                <p>${addr.country}</p>
+                                <p>${addr.address || addr.street_address || '—'}</p>
+                                <p>${addr.city || ''}${addr.postal_code ? ', ' + addr.postal_code : ''}</p>
+                                <p>${addr.country || '—'}</p>
                             </div>
                         `).join('')}
                     </div>
@@ -365,8 +365,18 @@ class CheckoutManager {
             return;
         }
 
-        addressData.is_default = this.addresses.length === 0;
-        addressData.type = 'shipping';
+        // Mapear formulario (first_name, street_address, phone_number) al formato de /api/addresses (full_name, address, phone)
+        var apiPayload = {
+            full_name: [addressData.first_name, addressData.last_name].filter(Boolean).join(' ').trim() || 'N/A',
+            address: addressData.street_address || addressData.address || '',
+            city: addressData.city || '',
+            state: addressData.state || null,
+            country: addressData.country || 'Perú',
+            postal_code: addressData.postal_code || null,
+            phone: addressData.phone_number || addressData.phone || '',
+            email: addressData.email || undefined,
+            is_default: this.addresses.length === 0
+        };
 
         var btn = this.formContainer.querySelector('button.btn-black') || document.querySelector('#checkoutContent button.btn-black');
         var originalBtnText = btn ? btn.innerHTML : '';
@@ -377,7 +387,7 @@ class CheckoutManager {
             if (!window.api || typeof window.api.createAddress !== 'function') {
                 throw new Error('El servicio no está disponible. Verifica tu conexión.');
             }
-            var res = await window.api.createAddress(addressData);
+            var res = await window.api.createAddress(apiPayload);
             if (res && res.success) {
                 await this.loadAddresses();
                 var newAddr = (res.data && res.data.address) ? res.data.address : (res.data || res.address || res);
