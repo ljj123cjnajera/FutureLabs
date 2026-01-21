@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. Handle Contact Form
     const form = document.getElementById('contactForm');
     if (form) {
-        form.addEventListener('submit', (e) => {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const btn = form.querySelector('button[type="submit"]');
