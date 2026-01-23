@@ -1123,6 +1123,85 @@ class SneakersAPI {
     return this.request('/admin/payments/notifications');
   }
 
+  // ==========================================
+  // 🛡️ ADMIN CORE MANAGEMENT (DASHBOARD & CRUD)
+  // ==========================================
+
+  // Dashboard Stats
+  async getAdminStats() {
+    return this.request('/admin/dashboard/stats');
+  }
+
+  // Admin Orders (Full Access)
+  async getAdminOrders(filters = {}) {
+    const params = new URLSearchParams({});
+    // Remove empty filters
+    Object.keys(filters).forEach(key => {
+      if (filters[key]) params.append(key, filters[key]);
+    });
+    return this.request(`/admin/orders?${params.toString()}`);
+  }
+
+  async getAdminOrderById(id) {
+    return this.request(`/admin/orders/${id}`);
+  }
+
+  async updateOrderStatus(orderId, status) {
+    return this.request(`/admin/orders/${orderId}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status })
+    });
+  }
+
+  // Admin Users
+  async getAdminUsers(limit = 50) {
+    return this.request(`/admin/users?limit=${limit}`);
+  }
+
+  async updateUserRole(userId, role) {
+    return this.request(`/admin/users/${userId}/role`, {
+      method: 'PUT',
+      body: JSON.stringify({ role })
+    });
+  }
+
+  // Admin Products (CRUD Extended)
+  async createProduct(productData) {
+    return this.request('/admin/products', {
+      method: 'POST',
+      body: JSON.stringify(productData)
+    });
+  }
+
+  async updateProduct(productId, productData) {
+    return this.request(`/admin/products/${productId}`, {
+      method: 'PUT',
+      body: JSON.stringify(productData)
+    });
+  }
+
+  async deleteProduct(productId) {
+    return this.request(`/admin/products/${productId}`, {
+      method: 'DELETE'
+    });
+  }
+
+  async uploadProductImage(file) {
+    const formData = new FormData();
+    formData.append('image', file);
+    const token = this.token || localStorage.getItem('auth_token');
+
+    // Use raw fetch to let browser handle Content-Type boundary
+    const response = await fetch(`${this.baseURL}/admin/upload`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      body: formData
+    });
+    return this.parseResponse(response);
+  }
+
   // ========== CHAT ==========
 
   async sendChatMessage(data) {
